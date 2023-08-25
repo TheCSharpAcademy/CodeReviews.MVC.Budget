@@ -1,0 +1,62 @@
+﻿@model HomeViewModel
+
+<div class="modal-content show">
+    <form asp-action="AddTransaction" id="AddTransactionForm" method="post" role="form">
+        <div class="modal-header">
+            <h5 class="modal-title">@(Model.AddTransaction.Id == 0 ? "New" : "Edit") Transaction</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" asp-for="AddTransaction.Id" class="form-control" />
+
+            <div class="form-floating mb-3">
+                <input asp-for="AddTransaction.Name" class="form-control" />
+                <label asp-for="AddTransaction.Name" class="control-label"></label>
+                <span asp-validation-for="AddTransaction.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="AddTransaction.Amount" class="form-control" />
+                <label asp-for="AddTransaction.Amount" class="control-label"></label>
+                <span asp-validation-for="AddTransaction.Amount" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3" >
+                <select asp-for="AddTransaction.TransactionTypeId" class="form-control AddTransactionForm-type-input" >
+                    <option value="">-- Select Type --</option>
+                    @foreach (var type in Model.TransactionTypes)
+                    {
+                        <option value="@type.Id">@type.Name</option>
+                    }
+                </select>
+                <label asp-for="AddTransaction.TransactionTypeId" class="form-label"></label>
+                <span asp-validation-for="AddTransaction.TransactionTypeId" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3" >
+                <select asp-for="AddTransaction.CategoryId" class="form-control AddTransactionForm-category-input" >
+                    <option value="">-- Select Category --</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Id" >@category.Name</option>
+                    }
+                </select>
+                <label asp-for="AddTransaction.CategoryId" class="form-label"></label>
+                <span asp-validation-for="AddTransaction.CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="AddTransaction.Date" class="form-control" type="date"/>
+                <label asp-for="AddTransaction.Date" class="control-label"></label>
+                <span asp-validation-for="AddTransaction.Date" class="text-danger"></span>
+            </div>
+
+            
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" id="AddTransactionBtn">Save</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+    </form>
+
+</div>
