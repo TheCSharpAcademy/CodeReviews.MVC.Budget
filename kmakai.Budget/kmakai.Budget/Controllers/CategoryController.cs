@@ -26,13 +26,6 @@ public class CategoryController : Controller
         return Ok();
     }
 
-    //[HttpDelete]
-    //public ActionResult DeleteCategory(int id)
-    //{
-    //    _repository.DeleteCategory(id);
-    //    return Ok();
-    //}
-
     [HttpPut]
     public ActionResult UpdateCategory(Category category)
     {

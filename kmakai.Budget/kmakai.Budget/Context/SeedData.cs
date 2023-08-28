@@ -60,7 +60,7 @@ public class SeedData
                 Name = "Groceries",
                 Amount = 100,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/01/2023"),
+                Date = DateTime.ParseExact("08/01/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 1
             },
             new Transaction
@@ -68,7 +68,7 @@ public class SeedData
                 Name = "Rent",
                 Amount = 1000,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/08/2023"),
+                Date = DateTime.ParseExact("08/08/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 2
             },
             new Transaction
@@ -76,7 +76,7 @@ public class SeedData
                 Name = "Electricity",
                 Amount = 100,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/05/2023"),
+                Date = DateTime.ParseExact("08/05/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 3
             },
             new Transaction
@@ -84,7 +84,7 @@ public class SeedData
                 Name = "Internet",
                 Amount = 100,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/12/2023"),
+                Date = DateTime.ParseExact("08/12/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 3
             },
             new Transaction
@@ -92,7 +92,7 @@ public class SeedData
                 Name = "Netflix",
                 Amount = 10,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/23/2023"),
+                Date = DateTime.ParseExact("08/23/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture,
                 CategoryId = 4
             },
             new Transaction
@@ -100,7 +100,7 @@ public class SeedData
                 Name = "Spotify",
                 Amount = 10,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/16/2023"),
+                Date = DateTime.ParseExact("08/16/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 4
             },
             new Transaction
@@ -108,7 +108,7 @@ public class SeedData
                 Name = "Gas",
                 Amount = 50,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/20/2023"),
+                Date = DateTime.ParseExact("08/20/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 5
             },
             new Transaction
@@ -116,7 +116,7 @@ public class SeedData
                 Name = "Car Insurance",
                 Amount = 100,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/22/2023"),
+                Date = DateTime.ParseExact("08/22/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 5
             },
             new Transaction
@@ -124,7 +124,7 @@ public class SeedData
                 Name = "Car Payment",
                 Amount = 200,
                 TransactionTypeId = 2,
-                Date = DateTime.Parse("08/21/2023"),
+                Date = DateTime.ParseExact("08/21/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 5
             }
             );
@@ -140,7 +140,7 @@ public class SeedData
                 Name = "Paycheck",
                 Amount = 1000,
                 TransactionTypeId = 1,
-                Date = DateTime.Parse("08/03/2023"),
+                Date = DateTime.ParseExact("08/03/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 7
             },
             new Transaction
@@ -148,7 +148,7 @@ public class SeedData
                 Name = "Paycheck",
                 Amount = 1000,
                 TransactionTypeId = 1,
-                Date = DateTime.Parse("08/10/2023"),
+                Date = DateTime.ParseExact("08/10/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 7
             },
             new Transaction
@@ -156,7 +156,7 @@ public class SeedData
                 Name = "Paycheck",
                 Amount = 1000,
                 TransactionTypeId = 1,
-                Date = DateTime.Parse("08/17/2023"),
+                Date = DateTime.ParseExact("08/17/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 7
             },
             new Transaction
@@ -164,7 +164,7 @@ public class SeedData
                 Name = "Paycheck",
                 Amount = 1000,
                 TransactionTypeId = 1,
-                Date = DateTime.Parse("08/24/2023"),
+                Date = DateTime.ParseExact("08/24/2023",, "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 7
             }
             );
