@@ -17,11 +17,12 @@ public class HomeController : Controller
 
     public IActionResult Index(HomeViewModel? model)
     {
+        var transactions = Filter(model);
 
         var viewModel = new HomeViewModel
         {
             Categories = _categoryController.GetCategories(),
-            Transactions = Filter(model).OrderByDescending(t => t.Date),
+            Transactions = transactions.OrderByDescending(t => t.Date),
             TransactionTypes = _transactionController.GetTransactionTypes(),
             Balance = new BalanceViewModel
             {
@@ -98,10 +99,9 @@ public class HomeController : Controller
     private List<Transaction> Filter(HomeViewModel? model)
     {
         var transactions = _transactionController.GetTransactions();
-
-        if (model.FilterParams == null)
+        if (model.FilterParams.CategoryId == null && model.FilterParams?.StartDate == null && model.FilterParams?.EndDate == null)
         {
-            return transactions.ToList();
+            return transactions;
         }
 
         if (model.FilterParams.CategoryId != 0 && model.FilterParams.StartDate == null)

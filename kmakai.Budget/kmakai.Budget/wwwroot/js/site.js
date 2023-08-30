@@ -115,7 +115,6 @@ categoriesTabBtn.addEventListener('click', () => {
 window.addEventListener('load', () => {
     setTimeout(() => {
         const activeTab = localStorage.getItem('activeTab');
-        console.log(activeTab);
 
         if (activeTab == null) {
             transactionsTabBtn.classList.add('active');
@@ -164,3 +163,21 @@ categoryInput.addEventListener('input', (e) => {
         document.querySelector('#category-exist-error').remove();
     }
 })
+
+const tableRows = document.querySelectorAll('.table-row');
+const searchInput = document.querySelector('#SearchInput');
+
+searchInput.addEventListener('keyup', (e) => {
+    tableRows.forEach(row => {
+        const name = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+        console.log(name);
+
+        if (name.includes(e.target.value.toLowerCase())) {
+            row.classList.remove('hidden');
+        } else {
+            row.classList.add('hidden');
+        }
+    });
+
+});
+

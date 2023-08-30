@@ -1,5 +1,6 @@
 ﻿using kmakai.Budget.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace kmakai.Budget.Context;
 
@@ -92,7 +93,7 @@ public class SeedData
                 Name = "Netflix",
                 Amount = 10,
                 TransactionTypeId = 2,
-                Date = DateTime.ParseExact("08/23/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture,
+                Date = DateTime.ParseExact("08/23/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 4
             },
             new Transaction
@@ -164,7 +165,7 @@ public class SeedData
                 Name = "Paycheck",
                 Amount = 1000,
                 TransactionTypeId = 1,
-                Date = DateTime.ParseExact("08/24/2023",, "MM/dd/yyyy", CultureInfo.InvariantCulture),
+                Date = DateTime.ParseExact("08/24/2023", "MM/dd/yyyy", CultureInfo.InvariantCulture),
                 CategoryId = 7
             }
             );

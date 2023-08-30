@@ -27,6 +27,12 @@
             <button type="button" class="btn btn-outline-success open-addTransaction px-4 fw-bold ms-2" data-bs-toggle="modal" data-bs-target="#AddTransactionModal"><i class="bi bi-plus-lg"></i> New</button>
             <div class="row my-2">
                 <partial name="_FilterForm" />
+                <div class=" ms-2 mt-3 col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="input-group">
+                        <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Search transaction" aria-label="Search" aria-describedby="basic-addon1" id="SearchInput" />
+                    </div>
+                </div>
             </div>
             <table class="table">
                 <thead>
@@ -44,7 +50,7 @@
                 <tbody>
                     @foreach (var transaction in Model.Transactions)
                     {
-                        <tr>
+                        <tr class="table-row">
                             <td>@transaction.Date.ToShortDateString()</td>
                             <td>@transaction.Name - @transaction.Category.Name</td>
                             <td class="@transaction.TransactionType.Name">@(@transaction.TransactionType.Id == 2 ? "-" : "+") $@transaction.Amount</td>
