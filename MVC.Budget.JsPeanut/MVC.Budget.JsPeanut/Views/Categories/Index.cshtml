@@ -6,18 +6,46 @@
 }
 
 <div class="buttons">
-    <a button type="button" class="btn btn-success" asp-page="/CreateHabit">
+    <a button type="button" class="btn btn-success" data-toggle="modal" data-target="addTransactionModal" onclick="showTransactionModal()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
         </svg>
         Add a new transaction
     </a>
-    <a button type="button" class="btn btn-success" asp-page="/LogHabit">
+    <a button type="button" class="btn btn-success">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
         </svg>
         Show transaction history
     </a>
+
+    <div class="modal fade" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTransactionModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input type="text" placeholder="Name">
+                    </form>
+                    <form>
+                        <input type="text" placeholder="Name">
+                    </form>
+                    <form>
+                        <input type="text" placeholder="Name">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
     @*<button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         
     </button>*@
@@ -44,7 +72,37 @@
                 </tr>
             </tbody>
         </table>
-        <button class="btn btn-primary" style="margin-left: 100px; margin-top: 5px;">Add @category.Name transaction</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="addCategoryTransactionModal" style="margin-top: 6px; padding: 5px 11px;" onclick="showCategoryTransactionModal()">Add @category.Name transaction</button>
+        <button class="btn btn-primary" style="margin-top: 6px; padding: 5px 11px;">Manage @category.Name transactions</button>
+
+        <div class="modal fade" id="addCategoryTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryTransactionModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCategoryTransactionModalLabel">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                       <form>
+                           <input type="text" placeholder="Name">
+                       </form>
+                        <form>
+                            <input type="text" placeholder="Name">
+                        </form>
+                        <form>
+                            <input type="text" placeholder="Name">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 }
 
@@ -106,10 +164,12 @@
 
 @section Scripts{
     <script>
-        function ShowTransactions() {
-            var transactionsDiv = document.querySelector("#transactions");
-            transactionsDiv.style.display = "block";
+        function showTransactionModal() {
+            $('#addTransactionModal').modal('show');
+        }
+
+        function showCategoryTransactionModal(){
+            $('#addCategoryTransactionModal').modal('show');
         }
     </script>
-    
 }
