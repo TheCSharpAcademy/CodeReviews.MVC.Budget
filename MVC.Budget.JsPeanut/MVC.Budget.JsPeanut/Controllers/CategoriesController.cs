@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MVC.Budget.JsPeanut.Data;
 using MVC.Budget.JsPeanut.Models;
 using MVC.Budget.JsPeanut.Models.ViewModel;
@@ -23,9 +24,19 @@ namespace MVC.Budget.JsPeanut.Controllers
         {
             var categories = _context.Categories.ToList();
             var transactions = _context.Transactions.ToList();
+            var categoryselectlist_ = new List<SelectListItem>();
+            foreach (var category in categories)
+            {
+                categoryselectlist_.Add(new SelectListItem
+                {
+                    Text = category.Name,
+                    Value = category.Id.ToString()
+                });
+            }
             var categoriesviewmodel = new CategoryViewModel
             {
                 Categories = categories,
+                CategorySelectList = categoryselectlist_,
                 Transactions = transactions
             };
             return View(categoriesviewmodel);

@@ -40,7 +40,8 @@
                         <input type="number" placeholder="Value" asp-for="Transaction.Value">
                         <br />
                         <label>Category</label>
-                        <input type="number" placeholder="CategoryId" asp-for="Transaction.CategoryId">
+                        @*<input type="number" placeholder="CategoryId" asp-for="Transaction.CategoryId">*@
+                        <select class="form-select-sm" asp-for="Transaction.CategoryId" asp-items="Model.CategorySelectList"></select>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save changes</button>
@@ -100,7 +101,8 @@
                             <input type="number" placeholder="Value" asp-for="Transaction.Value">
                             <br />
                             <label>Category</label>
-                            <input type="number" placeholder="CategoryId" asp-for="Transaction.CategoryId" value="@category.Id">
+                            @*@<input type="number" placeholder="CategoryId" asp-for="Transaction.CategoryId" value="@category.Id">*@
+                            <select asp-for="Transaction.CategoryId" asp-items="Model.CategorySelectList"></select>
                         </form>
                     </div>
                     <div class="modal-footer">
