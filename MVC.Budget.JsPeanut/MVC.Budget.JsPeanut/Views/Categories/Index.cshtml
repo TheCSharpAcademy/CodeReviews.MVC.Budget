@@ -29,19 +29,23 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
-                        <input type="text" placeholder="Name">
+                    <form asp-action="AddTransaction" method="post">
+                        <label>Date</label>
+                        <input type="datetime-local" placeholder="Date" asp-for="Transaction.Date">
+                        <br />
+                        <label>Name</label>
+                        <input type="text" placeholder="Name" asp-for="Transaction.Name">
+                        <br />
+                        <label>Value</label>
+                        <input type="number" placeholder="Value" asp-for="Transaction.Value">
+                        <br />
+                        <label>Category</label>
+                        <input type="number" placeholder="CategoryId" asp-for="Transaction.CategoryId">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
                     </form>
-                    <form>
-                        <input type="text" placeholder="Name">
-                    </form>
-                    <form>
-                        <input type="text" placeholder="Name">
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
@@ -65,15 +69,15 @@
             <tbody>
                 <tr>
                     <td>
-                        <img src="@category.ImageUrl" width="35px" height="35px">
+                        <img src="@category.ImageUrl" width="50px" height="50px">
                     </td>
                     <td>@category.Name</td>
                     <td>@category.TotalValue</td>
                 </tr>
             </tbody>
         </table>
-        <button class="btn btn-primary" data-toggle="modal" data-target="addCategoryTransactionModal" style="margin-top: 6px; padding: 5px 11px;" onclick="showCategoryTransactionModal()">Add @category.Name transaction</button>
-        <button class="btn btn-primary" style="margin-top: 6px; padding: 5px 11px;">Manage @category.Name transactions</button>
+        <button class="btn btn-outline-primary" data-toggle="modal" data-target="addCategoryTransactionModal" style="margin-top: 6px; padding: 5px 11px;" onclick="showCategoryTransactionModal()">Add @category.Name transaction</button>
+        <button class="btn btn-outline-primary" style="margin-top: 6px; padding: 5px 11px;" onclick="location.href='@Url.Action("Index", "Transactions", new { id = category.Id, name = category.Name, imageurl = category.ImageUrl })'">Manage @category.Name transactions</button>
 
         <div class="modal fade" id="addCategoryTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryTransactionModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -85,24 +89,27 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                       <form>
-                           <input type="text" placeholder="Name">
-                       </form>
-                        <form>
-                            <input type="text" placeholder="Name">
-                        </form>
-                        <form>
-                            <input type="text" placeholder="Name">
+                        <form id="addTransactionForm" asp-action="AddTransaction">
+                            <label>Date</label>
+                            <input type="datetime-local" placeholder="Date" asp-for="Transaction.Date">
+                            <br />
+                            <label>Name</label>
+                            <input type="text" placeholder="Name" asp-for="Transaction.Name">
+                            <br />
+                            <label>Value</label>
+                            <input type="number" placeholder="Value" asp-for="Transaction.Value">
+                            <br />
+                            <label>Category</label>
+                            <input type="number" placeholder="CategoryId" asp-for="Transaction.CategoryId" value="@category.Id">
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-primary" onclick="submitForm()">Save changes</button>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 }
 
@@ -170,6 +177,10 @@
 
         function showCategoryTransactionModal(){
             $('#addCategoryTransactionModal').modal('show');
+        }
+
+        function submitForm() {
+            document.getElementById("addTransactionForm").submit();
         }
     </script>
 }

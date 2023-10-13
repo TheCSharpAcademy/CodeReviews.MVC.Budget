@@ -23,6 +23,7 @@ body {
     border-radius: 20px;
     border: 1.5px solid green;
    padding: 15px;
+
 }
 
 .buttoncontainer table {
@@ -37,6 +38,8 @@ body {
         padding-left: 30px;
         padding-right: 30px;
         margin: 100px;
+        inline-size: 150px;
+        overflow-wrap: break-word;
     }
 
 .buttoncontainer table th {
@@ -51,6 +54,10 @@ body {
     border-bottom: none;
 }
 
+    .buttoncontainer .btn.btn-outline-primary {
+        inline-size: 150px;
+        overflow-wrap: break-word;
+    }
 /*.buttoncontainer table td.downarrow {
     position: relative;
     left: 0px;

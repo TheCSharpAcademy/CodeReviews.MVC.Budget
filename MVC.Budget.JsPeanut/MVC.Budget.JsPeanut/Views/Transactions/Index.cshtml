@@ -1,0 +1,50 @@
+﻿@model MVC.Budget.JsPeanut.Models.ViewModel.TransactionViewModel;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="buttons">
+    <a button type="button" class="btn btn-success" data-toggle="modal" data-target="addTransactionModal" onclick="showTransactionModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+        </svg>
+        Go back to categories
+    </a>
+    <a button type="button" class="btn btn-success">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+        </svg>
+        Sort
+    </a>
+</div>
+<br />
+<img src="@ViewBag.ImageUrl" width="70px" height="70px">
+<h3>@ViewBag.Message transactions:</h3>
+<br />
+<table id="records" class="table">
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Value</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @{
+        foreach (var transaction in Model.Transactions)
+        {   
+            <tr class="list-row">
+                <td>@ViewBag.Message</td>
+                <td>@transaction.Date</td>
+                <td>@transaction.Name</td>
+                <td>@transaction.Value</td>
+            </tr>  
+        }
+    }
+    </tbody>
+</table>

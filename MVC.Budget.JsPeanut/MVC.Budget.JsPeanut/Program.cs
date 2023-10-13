@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.JsPeanut.Data;
+using MVC.Budget.JsPeanut.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +8,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddTransient<CategoryService, CategoryService>();
+builder.Services.AddTransient<TransactionService, TransactionService>();
 var app = builder.Build();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    SeedData.Initialize(services);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
