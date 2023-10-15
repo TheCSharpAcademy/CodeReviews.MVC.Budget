@@ -4,6 +4,7 @@ using MVC.Budget.JsPeanut.Data;
 using MVC.Budget.JsPeanut.Models;
 using MVC.Budget.JsPeanut.Models.ViewModel;
 using MVC.Budget.JsPeanut.Services;
+using System.Text.Json;
 
 namespace MVC.Budget.JsPeanut.Controllers
 {
@@ -12,19 +13,25 @@ namespace MVC.Budget.JsPeanut.Controllers
         private readonly DataContext _context;
         private readonly CategoryService _categoryService;
         private readonly TransactionService _transactionService;
-        public Transaction TransactionArgument { get; set; }
-        public CategoriesController(DataContext context, CategoryService categoryService, TransactionService transactionService)
+        private readonly JsonFileCurrencyService _jsonFileCurrencyService;
+        private readonly CurrencyConverterService _currencyConverterService;
+        public CategoriesController(DataContext context, CategoryService categoryService, TransactionService transactionService, JsonFileCurrencyService jsonFileCurrencyService, CurrencyConverterService currencyConverterService)
         {
             _context = context;
             _categoryService = categoryService;
             _transactionService = transactionService;
+            _jsonFileCurrencyService = jsonFileCurrencyService;
+            _currencyConverterService = currencyConverterService;
         }
-        
+
         public IActionResult Index()
         {
+            
             var categories = _context.Categories.ToList();
             var transactions = _context.Transactions.ToList();
+            var currencies = _jsonFileCurrencyService.GetCurrencyList();
             var categoryselectlist_ = new List<SelectListItem>();
+            var currencyselectlist_ = new List<SelectListItem>();
             foreach (var category in categories)
             {
                 categoryselectlist_.Add(new SelectListItem
@@ -33,34 +40,102 @@ namespace MVC.Budget.JsPeanut.Controllers
                     Value = category.Id.ToString()
                 });
             }
+            foreach (var currency in currencies)
+            {
+                currencyselectlist_.Add(new SelectListItem
+                {
+                    Text = $"{currency.Name} ({currency.CurrencyCode})",
+                    Value = /*currency.NativeSymbol */JsonSerializer.Serialize(currency)
+                });
+            }
             var categoriesviewmodel = new CategoryViewModel
             {
                 Categories = categories,
                 CategorySelectList = categoryselectlist_,
+                CurrencySelectList = currencyselectlist_,
                 Transactions = transactions
             };
             return View(categoriesviewmodel);
         }
 
-        public IActionResult AddTransaction(Models.Transaction transaction)
+        [HttpPost]
+        public IActionResult UpdateCurrency(CategoryViewModel cvm)
         {
-            _transactionService.AddTransaction(transaction);
+            var categories = _categoryService.GetAllCategories();
+            var transactions = _transactionService.GetAllTransactions();
+            var selectedCurrencyOption = JsonSerializer.Deserialize<Currency>(cvm.CurrencyObjectJson);
+            foreach (var category in categories)
+            {
+                var updatedCategory = category;
+                updatedCategory.CurrencyCode = selectedCurrencyOption.CurrencyCode;
+                updatedCategory.CurrencyNativeSymbol = selectedCurrencyOption.NativeSymbol;
 
-            var category = _categoryService.GetAllCategories().Where(c => c.Id == transaction.CategoryId).First();
+                decimal totalValue = 0;
 
-            category.TotalValue += transaction.Value;
+                var transactionsWhereCategoryIsEqualToLoopsCategory = transactions.Where(x => x.CategoryId == category.Id);
+                foreach (var transaction in transactionsWhereCategoryIsEqualToLoopsCategory)
+                {
+                    if (transaction.CurrencyCode == categories.First().CurrencyCode)
+                    {
+                        totalValue += transaction.Value;
+                    }
+                    else
+                    {
+                        decimal conversionResult = _currencyConverterService.ConvertValueToUsd(transaction.CurrencyCode, transaction.Value, categories.First().CurrencyCode);
 
-            _context.SaveChanges();
+                        totalValue += conversionResult;
+                    }
+                }
+                //else
+                //{
+                //    foreach (var transaction in transactions)
+                //    {
+                //        decimal conversionResult = _currencyConverterService.ConvertValueToUsd(transaction.CurrencyCode, transaction.Value, categories.First().CurrencyCode);
+
+                //        totalValue = totalValue * _currencyConverterService.UsdCategoryCurrencyRate;
+                //    }
+                //}
+                
+
+                updatedCategory.TotalValue = totalValue;
+
+                _categoryService.UpdateCategory(updatedCategory);
+            }
 
             return Redirect("https://localhost:7229");
         }
 
-        public IActionResult ManageTransactions()
+        public IActionResult AddTransaction(Models.Transaction transaction, CategoryViewModel cvm)
         {
-            return View("~/Views/Transactions/Index.cshtml");
+            var categories = _categoryService.GetAllCategories();
+            var transactions = _transactionService.GetAllTransactions();
+
+            var transactionCategory = categories.Where(c => c.Id == transaction.CategoryId).First();
+
+            transactionCategory.TotalValue += transaction.Value;
+
+            var selectedCurrencyOption = JsonSerializer.Deserialize<Currency>(cvm.CurrencyObjectJson);
+
+            transaction.CurrencyCode = selectedCurrencyOption.CurrencyCode;
+            transaction.CurrencyNativeSymbol = selectedCurrencyOption.NativeSymbol;
+
+            _transactionService.AddTransaction(transaction);
+            _context.SaveChanges();
+
+            Currency currencyObject = new Currency
+            {
+                CurrencyCode = _context.Categories.First().CurrencyCode,
+                NativeSymbol = _context.Categories.First().CurrencyNativeSymbol,
+                Name = _context.Categories.First().Name
+            };
+            string currencyJson = JsonSerializer.Serialize<Currency>(currencyObject);
+            CategoryViewModel cmv = new CategoryViewModel
+            {
+                CurrencyObjectJson = currencyJson
+            };
+            UpdateCurrency(cmv);
+
+            return Redirect("https://localhost:7229");
         }
-        //public void GetAllCategories()
-        //{
-        //}
     }
 }

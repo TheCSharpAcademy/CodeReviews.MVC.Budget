@@ -18,25 +18,29 @@ namespace MVC.Budget.JsPeanut.Controllers
             _transactionService = transactionService;
         }
 
-        public Category chosenCategory { get; set; }
-
-        //public IActionResult GetAllTransactions()
-        //{
-        //    _service.GetAllTransactions();
-
-        //    return Redirect("https://localhost:7229/");
-        //}
-        public IActionResult Index(int id, string name, string imageurl)
+        public IActionResult Index(int id = -1, string name = "", string imageurl = "")
         {
-            var transactions = _transactionService.GetAllTransactions().Where(x => x.CategoryId == id).ToList();
+            List<Transaction> transactions = _transactionService.GetAllTransactions();
+            List<Transaction> transactionsToShow = new();
+            ViewBag.ImageUrl = imageurl;
+            ViewBag.Category = name;
+
+            if (id == -1)
+            {
+                transactionsToShow = transactions;
+                ViewBag.ImageUrl = null;
+                ViewBag.Category = null;
+            }
+            else
+            {
+                transactionsToShow = _transactionService.GetAllTransactions().Where(x => x.CategoryId == id).ToList();
+            }
+
             var transactionViewModel = new TransactionViewModel
             {
-                Transactions = transactions
+                Transactions = transactionsToShow,
+                Categories = _categoryService.GetAllCategories()
             };
-
-            ViewBag.ImageUrl = imageurl;
-            ViewBag.Message = name;
-
             return View(transactionViewModel);
         }
 

@@ -7,7 +7,7 @@
 }
 
 <div class="buttons">
-    <a button type="button" class="btn btn-success" data-toggle="modal" data-target="addTransactionModal" onclick="showTransactionModal()">
+    <a button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Index", "Categories")'">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
         </svg>
@@ -21,8 +21,17 @@
     </a>
 </div>
 <br />
-<img src="@ViewBag.ImageUrl" width="70px" height="70px">
-<h3>@ViewBag.Message transactions:</h3>
+@{
+    if (ViewBag.Category == null)
+    {
+        <h3>Transaction history:</h3>
+    }
+    else
+    {
+        <img src="@ViewBag.ImageUrl" width="70px" height="70px">
+        <h3>@ViewBag.Category transactions:</h3>
+    }
+}
 <br />
 <table id="records" class="table">
     <thead>
@@ -39,7 +48,7 @@
         foreach (var transaction in Model.Transactions)
         {   
             <tr class="list-row">
-                <td>@ViewBag.Message</td>
+                <td>@Model.Categories.Where(x => x.Id == transaction.CategoryId).First().Name</td>
                 <td>@transaction.Date</td>
                 <td>@transaction.Name</td>
                 <td>@transaction.Value</td>

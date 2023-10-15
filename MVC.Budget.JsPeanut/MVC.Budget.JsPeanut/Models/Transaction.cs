@@ -5,9 +5,10 @@
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public string Name { get; set; }
+        public string CurrencyCode { get; set; }
+        public string CurrencyNativeSymbol { get; set; }
         public decimal Value { get; set; }
         public int CategoryId { get; set; }
-
         public Category Category { get; set; }
     }
 }

@@ -1,7 +1,4 @@
 ﻿@model MVC.Budget.JsPeanut.Models.ViewModel.CategoryViewModel
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 @{
 }
 
@@ -10,14 +7,22 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
         </svg>
-        Add a new transaction
+        New transaction
     </a>
-    <a button type="button" class="btn btn-success">
+    <a button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Index", "Transactions")'">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
         </svg>
-        Show transaction history
+        Transaction history
     </a>
+    <form asp-action="UpdateCurrency" method="post">
+        <select asp-for="CurrencyObjectJson" asp-items="Model.CurrencySelectList" class="form-control" style="margin-top: 13px;">
+            <option value="" selected disabled>Select your default currency</option>
+        </select>
+        <input type="submit" value="Submit"/>
+    </form>
+    <small id="emailHelp" class="form-text text-muted">The value of each category will be displayed in that currency. Regardless of that, you can still use another currencies for your transactions</small>
+    
 
     <div class="modal fade" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -36,12 +41,14 @@
                         <label>Name</label>
                         <input type="text" placeholder="Name" asp-for="Transaction.Name">
                         <br />
+                        <label>Category</label>
+                        <select asp-for="Transaction.CategoryId" asp-items="Model.CategorySelectList"></select>
+                        <br />
                         <label>Value</label>
                         <input type="number" placeholder="Value" asp-for="Transaction.Value">
                         <br />
-                        <label>Category</label>
-                        @*<input type="number" placeholder="CategoryId" asp-for="Transaction.CategoryId">*@
-                        <select class="form-select-sm" asp-for="Transaction.CategoryId" asp-items="Model.CategorySelectList"></select>
+                        <label>Currency</label>
+                        <select asp-for="Transaction.CurrencyNativeSymbol" asp-items="Model.CurrencySelectList"></select>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save changes</button>
@@ -51,9 +58,6 @@
             </div>
         </div>
     </div>
-    @*<button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        
-    </button>*@
 </div>
 
     @foreach (var category in Model.Categories)
@@ -73,103 +77,94 @@
                         <img src="@category.ImageUrl" width="50px" height="50px">
                     </td>
                     <td>@category.Name</td>
-                    <td>@category.TotalValue</td>
+                    @{
+                        if (category.Transactions != null && category.Transactions.FirstOrDefault()?.CurrencyNativeSymbol == string.Empty)
+                        {
+                            <td>@category.CurrencyNativeSymbol @category.TotalValue</td>
+                        }
+                        else if (category.Transactions != null)
+                        {
+                            <td>@category.CurrencyNativeSymbol @category.TotalValue</td>
+                        }
+                        else
+                        {
+                            <td>@category.CurrencyNativeSymbol @category.TotalValue</td>
+                        }
+                    }
                 </tr>
             </tbody>
         </table>
-        <button class="btn btn-outline-primary" data-toggle="modal" data-target="addCategoryTransactionModal" style="margin-top: 6px; padding: 5px 11px;" onclick="showCategoryTransactionModal()">Add @category.Name transaction</button>
-        <button class="btn btn-outline-primary" style="margin-top: 6px; padding: 5px 11px;" onclick="location.href='@Url.Action("Index", "Transactions", new { id = category.Id, name = category.Name, imageurl = category.ImageUrl })'">Manage @category.Name transactions</button>
-
-        <div class="modal fade" id="addCategoryTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryTransactionModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addCategoryTransactionModalLabel">Modal title</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="addTransactionForm" asp-action="AddTransaction">
-                            <label>Date</label>
-                            <input type="datetime-local" placeholder="Date" asp-for="Transaction.Date">
-                            <br />
-                            <label>Name</label>
-                            <input type="text" placeholder="Name" asp-for="Transaction.Name">
-                            <br />
-                            <label>Value</label>
-                            <input type="number" placeholder="Value" asp-for="Transaction.Value">
-                            <br />
-                            <label>Category</label>
-                            @*@<input type="number" placeholder="CategoryId" asp-for="Transaction.CategoryId" value="@category.Id">*@
-                            <select asp-for="Transaction.CategoryId" asp-items="Model.CategorySelectList"></select>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="submitForm()">Save changes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <button class="btn btn-outline-primary" data-toggle="modal" data-target="addCategoryTransactionModal" style="margin-top: 6px; padding: 5px 11px; height: 60px;" onclick="showCategoryTransactionModal()">Add @category.Name transaction</button>
+        <button class="btn btn-outline-primary" style="margin-top: 6px; padding: 5px 11px; height: 60px;" onclick="location.href='@Url.Action("Index", "Transactions", new { id = category.Id, name = category.Name, imageurl = category.ImageUrl })'">Manage @category.Name transactions</button>
     </div>
 }
 
-@*//    foreach (var category in Model.Categories)
-//    {
-//        <div class="buttoncontainer" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-//            <table>
-//                <thead>
-//                    <tr>
-//                        <th>Category</th>
-//                        <th>Name</th>
-//                        <th>Total value</th>
-//                    </tr>
-//                </thead>
-//                <tbody>
-//                    <tr>
-//                        <td>
-//                            <img src="@category.ImageUrl" width="35px" height="35px">
-//                        </td>
-//                        <td>@category.Name</td>
-//                        <td>@category.TotalValue</td>
-//                        //<td class="downarrow">
-//                        //    <a onclick="ShowTransactions()">
-//                        //        <img src="@(Url.Content("~/img/down-arrow-svgrepo-com.svg"))" width="10px" height="10px" img>
-//                        //    </a>
-//                        //</td>
-//                    </tr>
-//                </tbody>
-//            </table>
-//            <button class="btn btn-primary">Add transaction</button>
-//        </div>
-//        //@foreach (var transaction in Model.Transactions)
-//        //{
-//        //    int collapseNumber = 0;
-//        //    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-//        //        <div class="transactionbuttoncontainer" style="margin-top: -6px;">
-//        //            <table>
-//        //                <thead>
-//        //                    <tr>
-//        //                        <th>Date</th>
-//        //                        <th>Name</th>
-//        //                        <th>Value</th>
-//        //                    </tr>
-//        //                </thead>
-//        //                <tbody>
-//        //                    <tr>
-//        //                        <td>@transaction.Date</td>
-//        //                        <td>@transaction.Name</td>
-//        //                        <td>@transaction.Value</td>
-//        //                    </tr>
-//        //                </tbody>
-//        //            </table>
-//        //        </div>
-//        //    </div>
-//        //    collapseNumber++;
-//        //}
-//    }
-//}*@
+@*<div class="modal fade" id="addCategoryTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryTransactionModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addTransactionForm" asp-action="AddTransaction">
+                    <label>Date</label>
+                    <input type="datetime-local" placeholder="Date" asp-for="Transaction.Date">
+                    <br />
+                    <label>Name</label>
+                    <input type="text" placeholder="Name" asp-for="Transaction.Name">
+                    <br />
+                    <label>Value</label>
+                    <input type="number" placeholder="Value" asp-for="Transaction.Value">
+                    <br />
+                    <label>Category</label>
+                    <select asp-for="Transaction.CategoryId" asp-items="Model.CategorySelectList"></select>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>*@
+<div class="modal fade" id="addCategoryTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTransactionModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="AddTransaction" method="post">
+                    <label>Date</label>
+                    <input type="datetime-local" placeholder="Date" asp-for="Transaction.Date">
+                    <br />
+                    <label>Name</label>
+                    <input type="text" placeholder="Name" asp-for="Transaction.Name">
+                    <br />
+                    <label>Category</label>
+                    <select asp-for="Transaction.CategoryId" asp-items="Model.CategorySelectList"></select>
+                    <br />
+                    <label>Value</label>
+                    <input type="number" placeholder="Value" asp-for="Transaction.Value">
+                    <br />
+                    <label>Currency</label>
+                    <select asp-for="CurrencyObjectJson" asp-items="Model.CurrencySelectList"></select>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts{
     <script>

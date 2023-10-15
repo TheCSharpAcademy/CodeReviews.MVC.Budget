@@ -10,7 +10,6 @@ namespace MVC.Budget.JsPeanut.Data
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<Transaction> Transactions { get; set; }
-
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{
         //    modelBuilder.Entity<Category>().HasData(
