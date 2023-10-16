@@ -1,5 +1,6 @@
 ﻿@model MVC.Budget.JsPeanut.Models.ViewModel.CategoryViewModel
 @{
+    ViewBag.Title = "Index";
 }
 
 <div class="buttons">
@@ -22,7 +23,12 @@
         <input type="submit" value="Submit"/>
     </form>
     <small id="emailHelp" class="form-text text-muted">The value of each category will be displayed in that currency. Regardless of that, you can still use another currencies for your transactions</small>
-    
+    @{
+        if (ViewBag.Currency != "")
+        {
+            <h6>Your default currency is @ViewBag.Currency</h6>
+        }
+    }
 
     <div class="modal fade" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">

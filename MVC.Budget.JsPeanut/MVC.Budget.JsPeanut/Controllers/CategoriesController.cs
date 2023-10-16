@@ -26,7 +26,6 @@ namespace MVC.Budget.JsPeanut.Controllers
 
         public IActionResult Index()
         {
-            
             var categories = _context.Categories.ToList();
             var transactions = _context.Transactions.ToList();
             var currencies = _jsonFileCurrencyService.GetCurrencyList();
@@ -55,6 +54,20 @@ namespace MVC.Budget.JsPeanut.Controllers
                 CurrencySelectList = currencyselectlist_,
                 Transactions = transactions
             };
+            Currency currencyObject = new Currency
+            {
+                CurrencyCode = categories.First().CurrencyCode,
+                NativeSymbol = categories.First().CurrencyNativeSymbol,
+                Name = ""
+            };
+            ViewBag.Currency = currencyObject.CurrencyCode;
+            var currencyObjectJson = JsonSerializer.Serialize<Currency>(currencyObject);
+            CategoryViewModel updatecurrencycvm = new CategoryViewModel
+            {
+                CurrencyObjectJson = currencyObjectJson
+            };
+            UpdateCurrency(updatecurrencycvm);
+
             return View(categoriesviewmodel);
         }
 
@@ -81,21 +94,13 @@ namespace MVC.Budget.JsPeanut.Controllers
                     }
                     else
                     {
-                        decimal conversionResult = _currencyConverterService.ConvertValueToUsd(transaction.CurrencyCode, transaction.Value, categories.First().CurrencyCode);
+                        decimal conversionResult = _currencyConverterService.ConvertValueToCategoryCurrency(transaction.CurrencyCode, transaction.Value, categories.First().CurrencyCode);
 
                         totalValue += conversionResult;
                     }
                 }
-                //else
-                //{
-                //    foreach (var transaction in transactions)
-                //    {
-                //        decimal conversionResult = _currencyConverterService.ConvertValueToUsd(transaction.CurrencyCode, transaction.Value, categories.First().CurrencyCode);
 
-                //        totalValue = totalValue * _currencyConverterService.UsdCategoryCurrencyRate;
-                //    }
-                //}
-                
+                totalValue = Decimal.Round(totalValue, 2);
 
                 updatedCategory.TotalValue = totalValue;
 
@@ -124,11 +129,11 @@ namespace MVC.Budget.JsPeanut.Controllers
 
             Currency currencyObject = new Currency
             {
-                CurrencyCode = _context.Categories.First().CurrencyCode,
-                NativeSymbol = _context.Categories.First().CurrencyNativeSymbol,
-                Name = _context.Categories.First().Name
+                CurrencyCode = categories[0].CurrencyCode,
+                NativeSymbol = categories[0].CurrencyNativeSymbol,
+                Name = ""
             };
-            string currencyJson = JsonSerializer.Serialize<Currency>(currencyObject);
+            string currencyJson = JsonSerializer.Serialize(currencyObject);
             CategoryViewModel cmv = new CategoryViewModel
             {
                 CurrencyObjectJson = currencyJson
