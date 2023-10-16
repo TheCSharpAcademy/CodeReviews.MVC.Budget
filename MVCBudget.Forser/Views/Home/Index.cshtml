@@ -1,0 +1,31 @@
+﻿@model List<MVCBudget.Forser.Models.UserWallet>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-8">
+            @foreach (var transaction in Model)
+            {
+                <p>Wallet Name : @transaction.Name</p>
+                <hr />
+                @for (int i = 0; i < transaction.Transactions.Count(); i++)
+                {
+                    <div>
+                        Transaction Name : @transaction.Transactions[i].Name<br />
+                        Transcation Description : @transaction.Transactions[i].Description<br />
+                        Transferred Amount : @transaction.Transactions[i].TransferredAmount<br />
+                        Category : @transaction.Transactions[i].Category.Name<br />
+                    </div>
+                    <hr />
+                }
+            }
+        </div>
+        <div class="col-2">
+            Name : @Model[0].Name
+            Amount : @Model[0].Amount
+        </div>
+    </div>
+</div>

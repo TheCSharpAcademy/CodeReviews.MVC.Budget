@@ -1,0 +1,80 @@
+// TODO: Get all Transactions for Specific wallet (based on their unique ID which are stored in a Cookie) !!! Figure out a solution.
+// TODO: Create a Search for Transactions by name
+// TODO: Filter Function for Transactions per Category or/and Date
+// TODO: Modals for Insert, Delete, Update Transactions/Categories
+// TODO: Show a modal on first time visit to create a Wallet for Visitor (Create unique ID with Guid on Save and assign a Session/Cookie to visitor)
+// TODO: Allow Export of Transactions to Excel Document with EPPlus
+// TODO: SeriLog with SEQ Support is enabled + An Exception Handling Middleware (Enabled).
+
+using MVCBudget.Forser.Middleware;
+
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
+    .Build();
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration)
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341", Serilog.Events.LogEventLevel.Warning)
+    .CreateLogger();
+
+try
+{
+    Log.Information("Starting web application");
+
+    var builder = WebApplication.CreateBuilder(args);
+    builder.Host.UseSerilog();
+    builder.Services.AddDbContext<AppDbContext>(options =>
+    {
+        options.UseSqlServer(configuration.GetConnectionString("MSSQLConnection"));
+    })
+    .AddScoped<AppDbContext>()
+    .AddScoped<IUserWalletRepository, UserWalletRepository>();
+
+    builder.Services.AddSession(options =>
+    {
+        options.Cookie.Name = ".UserGuidWallet";
+        options.IdleTimeout = TimeSpan.FromDays(7);
+        options.Cookie.IsEssential = true;
+    });
+
+    // Add services to the container.
+    builder.Services.AddControllersWithViews();
+    
+    var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
+    app.UseMiddleware(typeof(ExceptionHandlingMiddleware));
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+    app.UseSession();
+
+    app.UseRouting();
+
+    app.UseAuthorization();
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
