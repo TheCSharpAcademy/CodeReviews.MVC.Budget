@@ -24,9 +24,32 @@ namespace MVC.Budget.JsPeanut.Controllers
             _currencyConverterService = currencyConverterService;
         }
 
-        public IActionResult Index(int id = -1, string name = "", string imageurl = "")
+        public IActionResult Index(int id = -1, string name = "", string imageurl = "", string timeline = "", string searchString = "")
         {
             List<Transaction> transactions = _transactionService.GetAllTransactions();
+            if (!string.IsNullOrEmpty(timeline))
+            {
+                switch (timeline)
+                {
+                    case "Today":
+                        transactions = transactions.Where(x => x.Date.Day == DateTime.Now.Day).ToList();
+                        break;
+                    case "Yesterday":
+                        transactions = transactions.Where(x => x.Date.Day == (DateTime.Now.AddDays(-1).Day)).ToList();
+                        break;
+                    case "default":
+                        transactions = _transactionService.GetAllTransactions();
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                DateTime searchDate;
+                if (DateTime.TryParse(searchString, out searchDate))
+                {
+                    transactions = transactions.Where(x => x.Date.Date == searchDate.Date).ToList();
+                }
+            }
             List<Transaction> transactionsToShow = new();
             var categories = _context.Categories.ToList();
             var currencies = _jsonFileCurrencyService.GetCurrencyList();
@@ -48,7 +71,7 @@ namespace MVC.Budget.JsPeanut.Controllers
                 currencyselectlist_.Add(new SelectListItem
                 {
                     Text = $"{currency.Name} ({currency.CurrencyCode})",
-                    Value = /*currency.NativeSymbol */JsonSerializer.Serialize(currency)
+                    Value = JsonSerializer.Serialize(currency)
                 });
             }
             if (id == -1)
@@ -102,8 +125,6 @@ namespace MVC.Budget.JsPeanut.Controllers
             var transaction = _transactionService.GetAllTransactions().Find(x => x.Id == id);
 
             _transactionService.DeleteTransaction(transaction);
-
-            //return Redirect("https://localhost:7229");
 
             return RedirectToAction("Index", "Categories");
         }

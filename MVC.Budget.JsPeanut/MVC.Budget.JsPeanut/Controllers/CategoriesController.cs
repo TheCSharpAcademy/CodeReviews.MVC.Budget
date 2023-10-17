@@ -24,10 +24,52 @@ namespace MVC.Budget.JsPeanut.Controllers
             _currencyConverterService = currencyConverterService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string timeline = "", string searchStringOne = "", string searchStringTwo = "")
         {
-            var categories = _context.Categories.ToList();
-            var transactions = _context.Transactions.ToList();
+            var categories = _categoryService.GetAllCategories();
+            var transactions = _transactionService.GetAllTransactions();
+
+            if (!string.IsNullOrEmpty(timeline))
+            {
+                DateTime firstDayOfTheMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                DateTime lastDayOfTheMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month));
+
+                DateTime firstDayOfThreeMonthsAgoMonth = new DateTime(DateTime.Now.AddMonths(-3).Year, DateTime.Now.AddMonths(-3).Month, 1);
+                DateTime lastDayOfThreeMonthsAgoMonth = new DateTime(DateTime.Now.AddMonths(-3).Year, DateTime.Now.AddMonths(-3).Month, DateTime.DaysInMonth(DateTime.Now.AddMonths(-3).Year, DateTime.Now.AddMonths(-3).Month));
+
+                DateTime firstDayOfSixMonthsAgoMonth = new DateTime(DateTime.Now.AddMonths(-6).Year, DateTime.Now.AddMonths(-6).Month, 1);
+                DateTime lastDayOfSixMonthsAgoMonth = new DateTime(DateTime.Now.AddMonths(-6).Year, DateTime.Now.AddMonths(-6).Month, DateTime.DaysInMonth(DateTime.Now.AddMonths(-6).Year, DateTime.Now.AddMonths(-6).Month));
+
+                DateTime firstDayOfTLastYearMonth = new DateTime(DateTime.Now.AddYears(-1).Year, DateTime.Now.AddYears(-1).Month, 1);
+                DateTime lastDayOfLastYearMonth = new DateTime(DateTime.Now.AddYears(-1).Year, DateTime.Now.AddYears(-1).Month, DateTime.DaysInMonth(DateTime.Now.AddYears(-1).Year, DateTime.Now.AddYears(-1).Month));
+                switch (timeline)
+                {
+                    case "LastMonth":
+                        transactions = transactions = transactions.Where(x => x.Date.Date >= firstDayOfTheMonth && x.Date.Date <= lastDayOfTheMonth).ToList();
+                        break;
+                    case "LastThreeMonths":
+                        transactions = transactions = transactions.Where(x => x.Date.Date >= firstDayOfThreeMonthsAgoMonth && x.Date.Date <= lastDayOfTheMonth).ToList();
+                        break;
+                    case "LastSixMonths":
+                        transactions = transactions = transactions.Where(x => x.Date.Date >= firstDayOfSixMonthsAgoMonth && x.Date.Date <= lastDayOfTheMonth).ToList();
+                        break;
+                    case "LastYear":
+                        transactions = transactions = transactions.Where(x => x.Date.Date >= firstDayOfTLastYearMonth && x.Date.Date <= lastDayOfTheMonth).ToList();
+                        break;
+                    case "default":
+                        transactions = _transactionService.GetAllTransactions();
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(searchStringOne) && !string.IsNullOrEmpty(searchStringTwo))
+            {
+                DateTime searchDateOne;
+                DateTime searchDateTwo;
+                if (DateTime.TryParse(searchStringOne, out searchDateOne) && DateTime.TryParse(searchStringTwo, out searchDateTwo))
+                {
+                    transactions = transactions.Where(x => x.Date.Date >= searchDateOne.Date && x.Date.Date <= searchDateTwo.Date).ToList();
+                }
+            }
             var currencies = _jsonFileCurrencyService.GetCurrencyList();
             var categoryselectlist_ = new List<SelectListItem>();
             var currencyselectlist_ = new List<SelectListItem>();
@@ -44,7 +86,7 @@ namespace MVC.Budget.JsPeanut.Controllers
                 currencyselectlist_.Add(new SelectListItem
                 {
                     Text = $"{currency.Name} ({currency.CurrencyCode})",
-                    Value = /*currency.NativeSymbol */JsonSerializer.Serialize(currency)
+                    Value = JsonSerializer.Serialize<Currency>(currency)
                 });
             }
             var categoriesviewmodel = new CategoryViewModel
@@ -58,25 +100,29 @@ namespace MVC.Budget.JsPeanut.Controllers
             {
                 CurrencyCode = categories.First().CurrencyCode,
                 NativeSymbol = categories.First().CurrencyNativeSymbol,
-                Name = ""
+                Name = string.Empty
             };
             ViewBag.Currency = currencyObject.CurrencyCode;
             var currencyObjectJson = JsonSerializer.Serialize<Currency>(currencyObject);
-            CategoryViewModel updatecurrencycvm = new CategoryViewModel
-            {
-                CurrencyObjectJson = currencyObjectJson
-            };
-            UpdateCurrency(updatecurrencycvm);
+            UpdateCurrency(currencyObjectJson, transactions);
 
             return View(categoriesviewmodel);
         }
 
         [HttpPost]
-        public IActionResult UpdateCurrency(CategoryViewModel cvm)
+        public IActionResult UpdateCurrency(string selectedCurrency, List<Transaction> sortedTransactions = null)
         {
             var categories = _categoryService.GetAllCategories();
-            var transactions = _transactionService.GetAllTransactions();
-            var selectedCurrencyOption = JsonSerializer.Deserialize<Currency>(cvm.CurrencyObjectJson);
+            List<Transaction> transactions = new();
+            if (sortedTransactions != null)
+            {
+                transactions = sortedTransactions;
+            }
+            else
+            {
+                transactions = _transactionService.GetAllTransactions();
+            }
+            var selectedCurrencyOption = JsonSerializer.Deserialize<Currency>(selectedCurrency);
             foreach (var category in categories)
             {
                 var updatedCategory = category;
@@ -129,16 +175,12 @@ namespace MVC.Budget.JsPeanut.Controllers
 
             Currency currencyObject = new Currency
             {
-                CurrencyCode = categories[0].CurrencyCode,
-                NativeSymbol = categories[0].CurrencyNativeSymbol,
-                Name = ""
+                CurrencyCode = categories.First().CurrencyCode,
+                NativeSymbol = categories.First().CurrencyNativeSymbol,
+                Name = string.Empty
             };
             string currencyJson = JsonSerializer.Serialize(currencyObject);
-            CategoryViewModel cmv = new CategoryViewModel
-            {
-                CurrencyObjectJson = currencyJson
-            };
-            UpdateCurrency(cmv);
+            UpdateCurrency(currencyJson);
 
             return Redirect("https://localhost:7229");
         }

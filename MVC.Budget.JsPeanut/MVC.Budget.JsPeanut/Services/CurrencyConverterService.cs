@@ -8,7 +8,6 @@ namespace MVC.Budget.JsPeanut.Services
 {
     public class CurrencyConverterService
     {
-        public decimal UsdCategoryCurrencyRate { get; set; }
         public decimal ConvertValueToCategoryCurrency(string transactionCurrencyCode, decimal transactionValue, string categoryCurrencyCode)
         {
             var client = new RestClient("http://api.exchangeratesapi.io/");

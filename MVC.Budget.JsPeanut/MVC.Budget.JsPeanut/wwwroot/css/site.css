@@ -17,6 +17,9 @@ body {
   margin-bottom: 60px;
 }
 
+.buttons{
+    margin-bottom: -28px;
+}
 .buttons select{
     width: 300px
 }
@@ -63,8 +66,55 @@ body {
     border-bottom: none;
 }
 
-.buttoncontainer .btn.btn-outline-primary {
+.buttoncontainer .btn.btn-outline-success {
     inline-size: 200px;
     overflow-wrap: break-word;
     display: inline-block;
+}
+
+.buttoncontainer .btn.btn-success {
+    inline-size: 200px;
+    overflow-wrap: break-word;
+    display: inline-block;
+}
+
+
+
+.modal-body form label{
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.buttons .btn.btn-success {
+    height: 38px;
+    margin-right: 12px;
+    flex-grow: 1;
+}
+
+#search{
+    margin-top: -12px;
+}
+
+.category-image {
+    width: 75px;
+    height: 75px;
+}
+
+.select-container{
+    position: relative;
+    bottom: 37px;
+    margin-left: 700px;
+}
+
+.selectcurrencyform {
+    display: flex;
+    margin-top: -13px;
+    margin-right: 100px;
+}
+
+.selectcurrencyform select{
+    width: 400px;
+    height: 40px;
+    margin-top: 11px;
+    margin-right: 10px;
 }

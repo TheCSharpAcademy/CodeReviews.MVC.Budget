@@ -6,19 +6,29 @@
     ViewBag.Title = "Index";
 }
 
-<div class="buttons">
-    <a button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Index", "Categories")'">
+<div class="buttons d-flex" id="transactions">
+    @*onclick=" location.href='@Url.Action("Index", "Categories")' *@
+    <a button type="button" class="btn btn-success" href="javascript:history.back()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
         </svg>
         Go back to categories
     </a>
-    <a button type="button" class="btn btn-success">
+    <button type="button" class="btn btn-success dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
             <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
         </svg>
         Sort
-    </a>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="Default">Default</a>
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="Today">Today</a>
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="Yesterday">Yesterday</a>
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="AddedOrder">Added order</a>
+    </div>
+    <form class="search" class="ml-auto">
+        <p style="margin: 1em 0 1em 0;"> Title: <input type="text" id="searchInput" asp-for="SearchString" /> <input type="submit" value="Filter" /> </p>
+    </form>
 </div>
 <br />
 @{
@@ -134,6 +144,7 @@
 
 @section Scripts{
     <script>
+
         function showDeleteModal() {
             $('#deleteModal').modal('show');
         }
