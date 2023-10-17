@@ -5,6 +5,6 @@
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }
 
-        public ICollection<TransactionModel> Transactions { get; set; }
+        public ICollection<TransactionModel> Transactions { get; } = new List<TransactionModel>();
     }
 }

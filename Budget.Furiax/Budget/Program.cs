@@ -1,7 +1,14 @@
+using Budget.DataAccess;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<BudgetContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BudgetDB"));
+});
 
 var app = builder.Build();
 

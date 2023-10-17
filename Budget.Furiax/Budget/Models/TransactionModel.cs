@@ -6,7 +6,6 @@
         public DateTime TransactionDate { get; set; }
         public string? TransactionSource { get; set; }
         public decimal TransactionAmount { get; set; }
-
-        public CategoryModel Category { get; set; }
+        public CategoryModel Category { get; set; } = null!;
     }
 }
