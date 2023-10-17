@@ -1,4 +1,4 @@
-// TODO: Get all Transactions for Specific wallet (based on their unique ID which are stored in a Cookie) !!! Figure out a solution.
+// TODO: Create a Modal that opens up if a User visits for the first time.
 // TODO: Create a Search for Transactions by name
 // TODO: Filter Function for Transactions per Category or/and Date
 // TODO: Modals for Insert, Delete, Update Transactions/Categories
@@ -16,13 +16,11 @@ var configuration = new ConfigurationBuilder()
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
-    .WriteTo.Console()
-    .WriteTo.Seq("http://localhost:5341", Serilog.Events.LogEventLevel.Warning)
     .CreateLogger();
 
 try
 {
-    Log.Information("Starting web application");
+    Log.Information($"Starting web application in {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseSerilog();
@@ -31,14 +29,8 @@ try
         options.UseSqlServer(configuration.GetConnectionString("MSSQLConnection"));
     })
     .AddScoped<AppDbContext>()
-    .AddScoped<IUserWalletRepository, UserWalletRepository>();
-
-    builder.Services.AddSession(options =>
-    {
-        options.Cookie.Name = ".UserGuidWallet";
-        options.IdleTimeout = TimeSpan.FromDays(7);
-        options.Cookie.IsEssential = true;
-    });
+    .AddScoped<IUserWalletRepository, UserWalletRepository>()
+    .AddScoped<ICategoryRepository, CategoryRepository>();
 
     // Add services to the container.
     builder.Services.AddControllersWithViews();
@@ -58,7 +50,6 @@ try
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
-    app.UseSession();
 
     app.UseRouting();
 

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using MVCBudget.Forser.Models.ViewModels;
 using System.Diagnostics;
 
 namespace MVCBudget.Forser.Controllers
@@ -8,59 +8,62 @@ namespace MVCBudget.Forser.Controllers
         private readonly IDiagnosticContext _diagnosticContext;
         private readonly ILogger<HomeController> _logger;
         private IUserWalletRepository UserWalletRepository { get; }
-        private const string SessionGuid = "_Guid";
+        private ICategoryRepository CategoryRepository { get; }
 
-        public HomeController(IDiagnosticContext diagnosticContext, ILogger<HomeController> logger, IUserWalletRepository userWalletRepository)
+        public HomeController(IDiagnosticContext diagnosticContext, ILogger<HomeController> logger, 
+            IUserWalletRepository userWalletRepository, ICategoryRepository categoryRepository)
         {
             _diagnosticContext = diagnosticContext ??
                 throw new ArgumentNullException(nameof(diagnosticContext));
             _logger = logger;
             _logger.LogInformation("HomeController called");
             UserWalletRepository = userWalletRepository;
+            CategoryRepository = categoryRepository;
         }
         public async Task<IActionResult> Index()
         {
             _diagnosticContext.Set("CatalogLoadTime", 1423);
             _logger.LogInformation($"{nameof(Index)} Starting.");
-            _logger.LogInformation("Calling Verify User Guid to verify a Guid if existing");
 
-            if (HttpContext.Session.GetString(SessionGuid) != null)
+            _logger.LogInformation($"{nameof(UserWalletRepository)} is loaded");
+            var wallets = await UserWalletRepository.GetUserWalletsAsync();
+            _logger.LogInformation($"{nameof(CategoryRepository)}");
+            var categories = await CategoryRepository.GetAllCategoriesAsync();
+
+            var viewModel = new MainViewModel
             {
-                Guid userGuid = new Guid(HttpContext.Session.GetString(SessionGuid));
+                UserWallets = wallets,
+                Categories = categories
+            };
 
-                var validUser = await UserWalletRepository.VerifyUserGuidAsync(userGuid);
-                if (validUser)
-                {
-                    _logger.LogInformation($"{nameof(UserWalletRepository)} is loaded");
-                    var wallets = await UserWalletRepository.GetUserWalletsAsync();
-
-                    _logger.LogInformation($"{wallets.Select(s => s.Name).FirstOrDefault()} wallet is loaded");
-                    return View(wallets);
-                }
-            }
-
-            return RedirectToAction("Register");
-        }
-        public async Task<IActionResult> Register()
-        {
-            var registerWallet = new RegisterUserWallet();
-
-            return View(registerWallet);
+            _logger.LogInformation($"{wallets.Select(s => s.Name).FirstOrDefault()} wallet is loaded");
+            return View(viewModel);
         }
         [HttpPost]
-        [ActionName("Register")]
+        [ActionName("SaveCategory")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterUserWallet registerWallet)
+        public async Task<IActionResult> SaveCategory(MainViewModel mainViewModel)
         {
             if (ModelState.IsValid)
             {
-                registerWallet.UserGuid = Guid.NewGuid();
+                try
+                {
+                    Category newCategory = new Category();
+                    newCategory.Name = mainViewModel.Categories[0].Name;
 
-                HttpContext.Session.SetString(SessionGuid, registerWallet.UserGuid.ToString());
+                    _logger.LogInformation($"Saving a new category {newCategory.Name}");
+                    await CategoryRepository.CreateAsync(newCategory);
+                    await CategoryRepository.SaveChangesAsync();
 
-                return View(registerWallet);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Couldn't Save Model: {mainViewModel} with error {ex.Message}");
+                }
             }
-            return View(registerWallet);
+
+            return View("Index");
         }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

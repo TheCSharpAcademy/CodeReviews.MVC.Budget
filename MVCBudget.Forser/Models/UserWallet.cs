@@ -3,7 +3,6 @@
     public class UserWallet
     {
         public int Id { get; set; }
-        public Guid UserId { get; set; } = Guid.NewGuid();
         [DataType(DataType.Text)]
         [Required(ErrorMessage = "Please enter your name")]
         [RegularExpression(@"^[a-zA-Z\s.\-']{2,}$", ErrorMessage = "Name contains invalid characters.")]

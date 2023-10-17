@@ -1,15 +1,15 @@
-﻿@model List<MVCBudget.Forser.Models.UserWallet>
+﻿@model MainViewModel
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="container-fluid">
+<div class="container">
     <div class="row">
         <div class="col-8">
-            @foreach (var transaction in Model)
+            @foreach (var transaction in Model.UserWallets)
             {
-                <p>Wallet Name : @transaction.Name</p>
+                <p><i class="bi bi-wallet2"></i>: @transaction.Name</p>
                 <hr />
                 @for (int i = 0; i < transaction.Transactions.Count(); i++)
                 {
@@ -24,8 +24,11 @@
             }
         </div>
         <div class="col-2">
-            Name : @Model[0].Name
-            Amount : @Model[0].Amount
+            Name : @Model.UserWallets[0].Name
+            Amount : @Model.UserWallets[0].Amount
         </div>
     </div>
 </div>
+
+<partial name="_AddCategoryPartial.cshtml" />
+<partial name="_ListCategoriesPartial.cshtml" />

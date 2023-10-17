@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace MVCBudget.Forser.Data
+﻿namespace MVCBudget.Forser.Data
 {
     public class AppDbContext : DbContext
     {
