@@ -1,9 +1,7 @@
 ﻿namespace MVCBudget.Forser.Models
 {
-    public class Transaction
+    public class CreateTransactionDTO
     {
-        [Key]
-        public int Id { get; set; }
         [DataType(DataType.Text)]
         [Required(ErrorMessage = "Please enter a transaction name")]
         [RegularExpression(@"^[a-zA-Z0-9\s.\-']{2,}$", ErrorMessage = "Name contains invalid characters.")]
@@ -17,8 +15,6 @@
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
         public DateTime TransactionDate { get; set; }
-
-        public int CategoryId { get; set; }
-        public Category Category { get; set; } = null!;
+        public List<Category> Categories { get; set; }
     }
 }

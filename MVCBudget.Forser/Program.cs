@@ -30,7 +30,8 @@ try
     })
     .AddScoped<AppDbContext>()
     .AddScoped<IUserWalletRepository, UserWalletRepository>()
-    .AddScoped<ICategoryRepository, CategoryRepository>();
+    .AddScoped<ICategoryRepository, CategoryRepository>()
+    .AddScoped<ITransactionRepository, TransactionRepository>();
 
     // Add services to the container.
     builder.Services.AddControllersWithViews();

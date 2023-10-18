@@ -1,4 +1,4 @@
-﻿@model MainViewModel
+﻿@model Category
 
 <div id="AddCategoryModal" aria-labelledby="AddCategoryModal" aria-hidden="true" class="modal fade" tabindex="-1">
     <div class="modal-dialog">
@@ -12,9 +12,9 @@
                 </div>
                 <div class="modal-body">
                     <div>
-                        <input asp-for="Categories[0].Name" class="form-control" />
-                        <label asp-for="Categories[0].Name" class="control-label"></label>
-                        <span asp-validation-for="Categories[0].Name" class="text-danger"></span>
+                        <input asp-for="Name" class="form-control" />
+                        <label asp-for="Name" class="control-label"></label>
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="modal-footer">

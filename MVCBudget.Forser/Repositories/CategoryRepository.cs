@@ -24,5 +24,18 @@
                 throw new Exception($"{ex.Message}", ex);
             }
         }
+
+        public async Task<Category> GetCategoryByIdAsync(int id)
+        {
+            try
+            {
+                var category = await _appDbContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
+                return category;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex.Message}", ex);
+            }
+        }
     }
 }
