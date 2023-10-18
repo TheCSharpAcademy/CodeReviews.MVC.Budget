@@ -51,9 +51,9 @@ namespace MVCBudget.Forser.Controllers
         [HttpPost]
         [ActionName("CreateTransaction")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateTransaction(Transaction transaction)
+        public async Task<IActionResult> CreateTransaction(Transaction transaction, int CategoryName)
         {
-            if (transaction == null)
+            if (transaction == null || CategoryName < 1)
             {
                 return View("Error");
             }
@@ -62,9 +62,15 @@ namespace MVCBudget.Forser.Controllers
             {
                 try
                 {
-                    TransactionRepository.CreateAsync(transaction);
-                    await TransactionRepository.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    if (transaction != null)
+                    {
+                        transaction.CategoryId = CategoryName;
+                        transaction.UserWalletId = 1; // Currently, only one user can use this service hence hardcoded.
+
+                        await TransactionRepository.CreateAsync(transaction);
+                        await TransactionRepository.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
                 catch (Exception ex)
                 {

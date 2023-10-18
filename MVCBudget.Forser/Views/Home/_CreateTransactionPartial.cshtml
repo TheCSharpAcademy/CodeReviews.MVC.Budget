@@ -31,6 +31,9 @@
                         <label asp-for="TransactionDate" class="control-label"></label>
                         <span asp-validation-for="TransactionDate" class="text-danger"></span>
                     </div>
+                    <div>
+                        @await Component.InvokeAsync("CategoriesList")
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary" id="SaveBtn">Save</button>

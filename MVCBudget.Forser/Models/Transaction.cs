@@ -18,7 +18,9 @@
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
         public DateTime TransactionDate { get; set; }
 
-        public int CategoryId { get; set; }
-        public Category Category { get; set; } = null!;
+        public int? CategoryId { get; set; }
+        public Category? Category { get; set; } = null!;
+
+        public int? UserWalletId { get; set; } = 0;
     }
 }
