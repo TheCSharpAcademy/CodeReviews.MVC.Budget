@@ -31,5 +31,14 @@
 </div>
 
 <partial name="_AddCategoryPartial.cshtml" model="new Category()" />
-<partial name="_ListCategoriesPartial.cshtml" />
+<div id="view-categories">
+    <partial name="_ListCategoriesPartial.cshtml" model="Model" />
+</div>
 <partial name="_CreateTransactionPartial.cshtml" model="new Transaction()" />
+<div id="edit-category">
+    <partial name="_EditCategoryPartial.cshtml" model="new Category()" />
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

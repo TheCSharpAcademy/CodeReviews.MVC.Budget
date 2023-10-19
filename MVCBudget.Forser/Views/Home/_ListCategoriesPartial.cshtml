@@ -25,8 +25,10 @@
                                     @Html.DisplayFor(model => model.Categories[i].Name)
                                 </td>
                                 <td>
-                                    <a asp-action="" asp-route-id="@Model.Categories[i].Id"><i class="bi bi-pen"></i></a> |
-                                    <a asp-action="" asp-route-id="@Model.Categories[i].Id"><i class="bi bi-trash"></i></a>
+                                    <a onclick="showPopupCategory('@Url.Action("EditCategory", "Home", new { id = Model.Categories[i].Id }, Context.Request.Scheme)', 'Edit Category')" class="btn btn-info text-white"><i class="bi bi-pen"></i></a>  |
+                                    <form asp-action="DeleteCategory" asp-route-id="@Model.Categories[i].Id" onsubmit="return jQueryDeleteCategory(this)" class="d-inline">
+                                        <button type="submit" value="Delete" class="rounded"><i class="bi bi-trash"></i></button>
+                                    </form>
                                 </td>
                             </tr>
                         }

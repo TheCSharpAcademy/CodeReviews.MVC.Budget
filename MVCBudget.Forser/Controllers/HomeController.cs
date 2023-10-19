@@ -1,4 +1,5 @@
-﻿using MVCBudget.Forser.Models.ViewModels;
+﻿using MVCBudget.Forser.Helpers;
+using MVCBudget.Forser.Models.ViewModels;
 using System.Diagnostics;
 
 namespace MVCBudget.Forser.Controllers
@@ -82,6 +83,7 @@ namespace MVCBudget.Forser.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [NoDirectAccess]
         public async Task<IActionResult> EditTransaction(int? id)
         {
             var transaction = await TransactionRepository.GetTransactionById(id);
@@ -143,8 +145,8 @@ namespace MVCBudget.Forser.Controllers
             return View(transaction);
         }
 
-        [HttpPost]
-        [ActionName("DeleteTransaction")]
+        [NoDirectAccess]
+        [HttpPost, ActionName("DeleteTransaction")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteTransaction(Transaction transaction)
         {
@@ -198,51 +200,78 @@ namespace MVCBudget.Forser.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        [ActionName("DeleteCategory")]
+        [HttpPost, ActionName("DeleteCategory")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteCategory(MainViewModel mainViewModel)
+        public async Task<IActionResult> DeleteCategory(int id)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var category = await CategoryRepository.GetCategoryByIdAsync(mainViewModel.Categories[0].Id);
+                    var category = await CategoryRepository.GetCategoryByIdAsync(id);
 
                     if (category == null)
                     {
-                        _logger.LogError($"Category with ID: {mainViewModel.Categories[0].Id} couldn't be found.");
+                        _logger.LogError($"Category with ID: {id} couldn't be found.");
                         return Problem("Couldn't find Category");
                     }
                     
                     if (category != null)
                     {
-                        _logger.LogInformation($"Deleting category: {mainViewModel.Categories[0].Name}");
+                        _logger.LogInformation($"Deleting category: {category.Name}");
                         await CategoryRepository.DeleteAsync(category.Id);
                         await CategoryRepository.SaveChangesAsync();
                     }
 
-                    return RedirectToAction(nameof(Index));
+                    var wallets = await UserWalletRepository.GetUserWalletsAsync();
+                    var categories = await CategoryRepository.GetAllCategoriesAsync();
+
+                    var viewModel = new MainViewModel
+                    {
+                        UserWallets = wallets,
+                        Categories = categories
+                    };
+
+                    return Json(new { html = Helper.RenderViewToString(this, "_ListCategoriesPartial", viewModel) });
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Couldn't delete Category: {mainViewModel.Categories[0].Name} due to error : {ex.Message} ");
+                    _logger.LogError($"Couldn't delete Category with ID: {id} due to error : {ex.Message} ");
                 }
             }
 
-            return View(nameof(Index));
+            return Json(new { html = Helper.RenderViewToString(this, "_ListCategoriesPartial", null) });
+        }
+
+        [NoDirectAccess]
+        public async Task<IActionResult> EditCategory(int id)
+        {
+            if (id == 0)
+            {
+                return View(new Category());
+            }
+            else
+            {
+                var category = await CategoryRepository.GetCategoryByIdAsync(id);
+                if (category == null)
+                {
+                    _logger.LogInformation($"Category with ID : {id} was not found.", id);
+                    return NotFound();
+                }
+                return Json(new { html = Helper.RenderViewToString(this, "_EditCategoryPartial", category) });
+            }
         }
 
         [HttpPost]
         [ActionName("UpdateCategory")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateCategory(MainViewModel mainViewModel)
+        public async Task<IActionResult> UpdateCategory(int id, [Bind("Id", "Name")] Category category)
         {
-            var existingCategory = await CategoryRepository.GetCategoryByIdAsync(mainViewModel.Categories[0].Id);
+            var existingCategory = await CategoryRepository.GetCategoryByIdAsync(id);
 
             if (existingCategory == null)
             {
-                _logger.LogError($"Failed to find Category with ID: {mainViewModel.Categories[0].Id}");
+                _logger.LogError($"Failed to find Category with ID: {category.Id}");
                 return NotFound();
             }
 
@@ -250,7 +279,7 @@ namespace MVCBudget.Forser.Controllers
             {
                 try
                 {
-                    existingCategory.Name = mainViewModel.Categories[0].Name;
+                    existingCategory.Name = category.Name;
 
                     await CategoryRepository.SaveChangesAsync();
                 }
@@ -259,9 +288,10 @@ namespace MVCBudget.Forser.Controllers
                     _logger.LogError($"Couldn't update Category, Error : {ex.Message}");
                     throw;
                 }
-            }
 
-            return RedirectToAction(nameof(Index));
+                return Json(new { isValid = true, html = Helper.RenderViewToString(this, "_ListCategoriesPartial", CategoryRepository.GetAllCategoriesAsync()) });
+            }
+            return Json(new { isValid = false, html = Helper.RenderViewToString(this, "_EditCategoryPartial", category) });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
