@@ -4,34 +4,42 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="container">
+<div id="filterForm">
+    @await Html.PartialAsync("~/Views/Home/_FilterFormPartial.cshtml", new FilterModel())
+</div>
+
+<div class="container flex">
+    <div class="col-2">
+        <p><i class="bi bi-wallet2"></i>: @Model.UserWallets.Select(s => s.Name).FirstOrDefault()</p>
+        Amount : @Model.UserWallets.Select(s => s.Amount).FirstOrDefault()
+    </div>
     <div class="row" id="Transactions">
-        <div class="col-8">
-            @foreach (var transaction in Model.UserWallets)
-            {
-                <hr />
-                @for (int i = 0; i < transaction.Transactions.Count(); i++)
-                {
-                    <div>
-                        Transaction Name : @transaction.Transactions[i].Name<br />
-                        Transcation Description : @transaction.Transactions[i].Description<br />
-                        Transferred Amount : <span class="input-group-addon">$</span> @transaction.Transactions[i].TransferredAmount<br />
-                        Transferred Date : @transaction.Transactions[i].TransactionDate.ToShortDateString() <br />
-                        Category : @transaction.Transactions[i].Category.Name<br />
-                    </div>
-                    <div>
-                        <a onclick="showPopupTransaction('@Url.Action("EditTransaction", "Home", new { id = transaction.Transactions[i].Id }, Context.Request.Scheme)', 'Edit Transaction')" class="btn btn-info text-white"><i class="bi bi-pen"></i></a> |
-                        <form asp-action="DeleteTransaction" asp-route-id="@transaction.Transactions[i].Id" onsubmit="return jQueryDeleteTransaction(this)" class="d-inline">
-                            <button type="submit" value="Delete" class="rounded"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </div>
-                    <hr />
-                }
-            }
-        </div>
-        <div class="col-2">
-            <p><i class="bi bi-wallet2"></i>: @Model.UserWallets[0].Name</p>
-            Amount : @Model.UserWallets[0].Amount
+        <div class="col-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Transaction Name
+                        </th>
+                        <th>
+                            Transaction Description
+                        </th>
+                        <th>
+                            Transferred Amount
+                        </th>
+                        <th>
+                            Transaction Date
+                        </th>
+                        <th>
+                            Category
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <partial name="_TransactionListPartial.cshtml" model="Model" />
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

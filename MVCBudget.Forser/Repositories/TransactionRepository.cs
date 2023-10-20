@@ -39,6 +39,21 @@
             }
         }
 
+        public List<Transaction> GetAllTransactions()
+        {
+            try
+            {
+                _logger.LogInformation($"{nameof(Transaction)} - Calling GetAllTransactions()");
+                var transactions = _context.Transactions.ToList();
+
+                return transactions;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<Transaction> GetTransactionById(int? id)
         {
             try

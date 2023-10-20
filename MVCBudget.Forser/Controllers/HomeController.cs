@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using MVCBudget.Forser.Helpers;
-using MVCBudget.Forser.Models;
-using MVCBudget.Forser.Models.ViewModels;
 using System.Diagnostics;
 
 namespace MVCBudget.Forser.Controllers
@@ -26,7 +24,7 @@ namespace MVCBudget.Forser.Controllers
             TransactionRepository = transactionRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(FilterModel? filterModel, int? categoryName)
         {
             _diagnosticContext.Set("CatalogLoadTime", 1423);
             _logger.LogInformation($"{nameof(Index)} Starting.");
@@ -35,15 +33,58 @@ namespace MVCBudget.Forser.Controllers
             var wallets = await UserWalletRepository.GetUserWalletsAsync();
             _logger.LogInformation($"{nameof(CategoryRepository)}");
             var categories = await CategoryRepository.GetAllCategoriesAsync();
+            _logger.LogInformation($"{nameof(TransactionRepository)}");
+            var transactions = await TransactionRepository.GetAllTransactionsAsync();
+
+            if (filterModel != null)
+            {
+                transactions = Filter(filterModel, categoryName);
+            }
 
             var viewModel = new MainViewModel
             {
                 UserWallets = wallets,
-                Categories = categories
+                Categories = categories,
+                Transactions = transactions
             };
 
             _logger.LogInformation($"{wallets.Select(s => s.Name).FirstOrDefault()} wallet is loaded");
             return View(viewModel);
+        }
+
+        private List<Transaction> Filter(FilterModel? filterModel, int? categoryName)
+        {
+            var transactions = TransactionRepository.GetAllTransactions();
+
+            if (categoryName == null && filterModel.StartDate == null && filterModel.EndDate == null)
+            {
+                return transactions;
+            }
+
+            if (categoryName != null && filterModel.StartDate == null)
+            {
+                transactions = transactions.Where(w => w.CategoryId == categoryName).ToList();
+            }
+
+            if (categoryName == null && filterModel.StartDate != null && filterModel.EndDate == null)
+            {
+                transactions = transactions.Where(w => w.TransactionDate >= filterModel.StartDate).ToList();
+            }
+
+            if (categoryName == null && filterModel.StartDate == null && filterModel.EndDate != null)
+            {
+                transactions = transactions.Where(w => w.TransactionDate >= filterModel.StartDate
+                    && w.TransactionDate <= filterModel.EndDate).ToList();
+            }
+
+            if (categoryName != null && filterModel.StartDate != null)
+            {
+                transactions = transactions.Where(w => w.CategoryId == categoryName
+                    && w.TransactionDate >= filterModel.StartDate
+                    && w.TransactionDate <= filterModel.EndDate).ToList();
+            }
+
+            return transactions;
         }
 
         public async Task<IActionResult> CreateTransaction()

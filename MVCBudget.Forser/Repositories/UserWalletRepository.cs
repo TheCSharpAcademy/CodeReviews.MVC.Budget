@@ -16,8 +16,6 @@
             {
                 _logger.LogInformation($"{nameof(UserWalletRepository)} - Calling GetUserWalletsAsync()");
                 var userWallets = await _context.Wallets
-                    .Include(uw => uw.Transactions)
-                    .ThenInclude(t => t.Category)
                     .ToListAsync();
 
                 return userWallets;
