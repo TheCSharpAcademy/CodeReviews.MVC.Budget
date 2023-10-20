@@ -9,7 +9,9 @@ namespace MVC.Budget.JsPeanut.Models.ViewModel
         public List<SelectListItem> CategorySelectList { get; set; }
         public List<SelectListItem> CurrencySelectList { get; set; }
         public string CurrencyObjectJson { get; set; }
-        public string? SearchString { get; set; }
+        public string? SearchStringForName { get; set; }
+        public string? FilterByCategoryString { get; set; }
+        public string? FilterByDateString { get; set; }
         public Transaction Transaction { get; set; }
     }
 }

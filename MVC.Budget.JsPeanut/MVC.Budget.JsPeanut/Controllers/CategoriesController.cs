@@ -4,6 +4,7 @@ using MVC.Budget.JsPeanut.Data;
 using MVC.Budget.JsPeanut.Models;
 using MVC.Budget.JsPeanut.Models.ViewModel;
 using MVC.Budget.JsPeanut.Services;
+using System.Globalization;
 using System.Text.Json;
 
 namespace MVC.Budget.JsPeanut.Controllers
@@ -26,6 +27,7 @@ namespace MVC.Budget.JsPeanut.Controllers
 
         public IActionResult Index(string timeline = "", string searchStringOne = "", string searchStringTwo = "")
         {
+
             var categories = _categoryService.GetAllCategories();
             var transactions = _transactionService.GetAllTransactions();
 
@@ -158,6 +160,10 @@ namespace MVC.Budget.JsPeanut.Controllers
 
         public IActionResult AddTransaction(Models.Transaction transaction, CategoryViewModel cvm)
         {
+            decimal transactionValue = transaction.Value;
+
+            transactionValue = decimal.Parse(transactionValue.ToString());
+
             var categories = _categoryService.GetAllCategories();
             var transactions = _transactionService.GetAllTransactions();
 

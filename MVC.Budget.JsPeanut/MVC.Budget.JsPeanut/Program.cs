@@ -1,8 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.JsPeanut.Data;
 using MVC.Budget.JsPeanut.Services;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+CultureInfo culture = new CultureInfo("en-US");
+culture.NumberFormat.NumberDecimalSeparator = ".";
+culture.NumberFormat.NumberGroupSeparator = ",";
+CultureInfo.DefaultThreadCurrentCulture = culture;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

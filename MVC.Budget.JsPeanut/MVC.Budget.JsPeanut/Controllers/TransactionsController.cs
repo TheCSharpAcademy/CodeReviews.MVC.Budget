@@ -24,7 +24,7 @@ namespace MVC.Budget.JsPeanut.Controllers
             _currencyConverterService = currencyConverterService;
         }
 
-        public IActionResult Index(int id = -1, string name = "", string imageurl = "", string timeline = "", string searchString = "")
+        public IActionResult Index(int id = -1, string name = "", string imageurl = "", string timeline = "", string searchStringForName = "", string filterByCategoryString = "", string filterByDateString = "")
         {
             List<Transaction> transactions = _transactionService.GetAllTransactions();
             if (!string.IsNullOrEmpty(timeline))
@@ -42,10 +42,24 @@ namespace MVC.Budget.JsPeanut.Controllers
                         break;
                 }
             }
-            if (!string.IsNullOrEmpty(searchString))
+            
+            if (!string.IsNullOrEmpty(searchStringForName))
+            {
+                transactions = transactions.Where(x => x.Name.Contains(searchStringForName)).ToList();
+            }
+            if (!string.IsNullOrEmpty(filterByCategoryString))
+            {
+                var categories_ = _categoryService.GetAllCategories();
+                Category? category = categories_.Where(x => x.Name == filterByCategoryString).FirstOrDefault();
+                if (category != null)
+                {
+                    transactions = transactions.Where(x => x.CategoryId == category.Id).ToList();
+                }
+            }
+            if (!string.IsNullOrEmpty(filterByDateString))
             {
                 DateTime searchDate;
-                if (DateTime.TryParse(searchString, out searchDate))
+                if (DateTime.TryParse(filterByDateString, out searchDate))
                 {
                     transactions = transactions.Where(x => x.Date.Date == searchDate.Date).ToList();
                 }
@@ -104,6 +118,9 @@ namespace MVC.Budget.JsPeanut.Controllers
                 existingTransaction.Name = transaction.Name;
                 existingTransaction.CategoryId = transaction.CategoryId;
                 existingTransaction.Value = transaction.Value;
+                existingTransaction.Category = transaction.Category;
+
+                _transactionService.UpdateTransaction(existingTransaction);
 
                 var categories = _categoryService.GetAllCategories();
                 var transactionCategory = categories.Where(c => c.Id == transaction.CategoryId).First();
@@ -112,8 +129,6 @@ namespace MVC.Budget.JsPeanut.Controllers
                 var selectedCurrencyOption = JsonSerializer.Deserialize<Currency>(cvm.CurrencyObjectJson);
                 existingTransaction.CurrencyCode = selectedCurrencyOption.CurrencyCode;
                 existingTransaction.CurrencyNativeSymbol = selectedCurrencyOption.NativeSymbol;
-
-                _context.SaveChanges();
             }
 
             return Redirect("https://localhost:7229");

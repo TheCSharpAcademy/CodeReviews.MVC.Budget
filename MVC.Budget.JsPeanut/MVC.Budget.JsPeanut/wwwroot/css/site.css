@@ -18,10 +18,17 @@ body {
 }
 
 .buttons{
-    margin-bottom: -28px;
+    margin-bottom: 75px;
 }
+
+    .buttons .btn.btn-success {
+        height: 38px;
+        margin-right: 12px;
+        margin-bottom: -21px;
+    }
 .buttons select{
-    width: 300px
+    width: 300px;
+    
 }
 
 .buttoncontainer {
@@ -29,7 +36,7 @@ body {
     position: relative;
     left: 25%;
     transform: translateX(-50%);
-    margin-top: 30px;
+    margin-top: 60px;
     margin-right: 150px;
     border-radius: 20px;
     border: 1.5px solid green;
@@ -78,17 +85,19 @@ body {
     display: inline-block;
 }
 
+.form-group small{
+    position: relative;
+    bottom: 10px;
+}
 
-
-.modal-body form label{
+.modal-body form .form-group label {
     margin-top: 10px;
     margin-bottom: 20px;
 }
 
-.buttons .btn.btn-success {
-    height: 38px;
-    margin-right: 12px;
-    flex-grow: 1;
+#spendingsByDateForm{
+    margin-top: -100px;
+    margin-bottom: 30px;
 }
 
 #search{
@@ -101,8 +110,7 @@ body {
 }
 
 .select-container{
-    position: relative;
-    bottom: 37px;
+    margin-top: -31px;
     margin-left: 700px;
 }
 
@@ -117,4 +125,52 @@ body {
     height: 40px;
     margin-top: 11px;
     margin-right: 10px;
+}
+
+#transactionsearch{
+    margin-top: -10px;
+    margin-left: 79px;
+}
+
+.break-word {
+    inline-size: 450px;
+    word-break: break-word;
+}
+
+
+
+.buttons.d-flex input {
+    position: relative;
+    left: 155px;
+}
+
+.buttons.d-flex small{
+    position: relative;
+    left: 155px;
+    bottom: 18px;
+
+}
+
+#submit {
+    margin-right: 30px;
+}
+
+.text-danger span{
+    position: relative;
+}
+
+#transactions{
+    margin-bottom: -30px;
+}
+
+.errorNotification{
+    color: red;
+}
+
+#categoryErrorNotification{
+    margin-top: -55px;
+}
+
+#transactionErrorNotification{
+    margin-top: 22px;
 }
