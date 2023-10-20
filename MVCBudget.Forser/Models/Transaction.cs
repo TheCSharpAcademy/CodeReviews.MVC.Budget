@@ -1,4 +1,6 @@
-﻿namespace MVCBudget.Forser.Models
+﻿using System.ComponentModel;
+
+namespace MVCBudget.Forser.Models
 {
     public class Transaction
     {
@@ -11,12 +13,12 @@
         public string Description { get; set; } = string.Empty;
 
         [Required, Precision(10, 2)]
-        [DataType(DataType.Currency), DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true), DisplayName("Transferred Amount")]
         public decimal TransferredAmount { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}", ApplyFormatInEditMode = true)]
-        public DateTime TransactionDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true), DisplayName("Transaction Date")]
+        public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
 
         public int? CategoryId { get; set; }
         public Category? Category { get; set; } = null!;

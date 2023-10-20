@@ -1,4 +1,6 @@
-﻿using MVCBudget.Forser.Helpers;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using MVCBudget.Forser.Helpers;
+using MVCBudget.Forser.Models;
 using MVCBudget.Forser.Models.ViewModels;
 using System.Diagnostics;
 
@@ -87,6 +89,28 @@ namespace MVCBudget.Forser.Controllers
         public async Task<IActionResult> EditTransaction(int? id)
         {
             var transaction = await TransactionRepository.GetTransactionById(id);
+            var categories = await CategoryRepository.GetAllCategoriesAsync();
+            var selectList = categories.Select(s => new SelectListItem { Text = s.Name, Value = s.Id.ToString() }).ToList();
+
+            foreach (var item in selectList)
+            {
+                if (item.Value == transaction.CategoryId.ToString())
+                {
+                    item.Selected = true;
+                    break;
+                }
+            }
+
+            var editTransaction = new EditTransactionDTO
+            {
+                Id = transaction.Id,
+                Name = transaction.Name,
+                Description = transaction.Description,
+                TransferredAmount = transaction.TransferredAmount,
+                TransactionDate = transaction.TransactionDate,
+                CategoryId = transaction.CategoryId,
+                Categories = selectList
+            };
 
             if (id == null || transaction == null)
             {
@@ -94,13 +118,13 @@ namespace MVCBudget.Forser.Controllers
                 return NotFound();
             }
 
-            return View(transaction);
+            return Json(new { html = Helper.RenderViewToString(this, "_EditTransactionPartial", editTransaction) });
         }
 
         [HttpPost]
         [ActionName("EditTransaction")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditTransaction(Transaction transaction)
+        public async Task<IActionResult> EditTransaction(EditTransactionDTO transaction, int categoryName)
         {
             var exisitingTransaction = await TransactionRepository.GetTransactionById(transaction.Id);
 
@@ -115,8 +139,9 @@ namespace MVCBudget.Forser.Controllers
                 try
                 {
                     _logger.LogInformation($"Updated the Transaction with ID: {transaction.Id}");
-                    exisitingTransaction.CategoryId = transaction.CategoryId;
+                    exisitingTransaction.CategoryId = categoryName;
                     exisitingTransaction.TransferredAmount = transaction.TransferredAmount;
+                    exisitingTransaction.TransactionDate = transaction.TransactionDate;
                     exisitingTransaction.Name = transaction.Name;
                     exisitingTransaction.Description = transaction.Description;
 
@@ -127,50 +152,53 @@ namespace MVCBudget.Forser.Controllers
                     _logger.LogError($"Databsae issue : {ex.Message} while trying to update Transaction {transaction.Id}");
                     throw;
                 }
+                return Json(new { isValid = true, html = Helper.RenderViewToString(this, "_EditTransactionPartial", TransactionRepository.GetAllTransactionsAsync()) });
             }
 
-            return RedirectToAction(nameof(Index));
+            return Json(new { isValid = false, html = Helper.RenderViewToString(this, "_EditTransactionPartial", transaction) });
         }
 
-        public async Task<IActionResult> DeleteTransaction(int? id)
-        {
-            var transaction = await TransactionRepository.GetTransactionById(id);
-
-            if (id == null || transaction == null)
-            {
-                _logger.LogError($"Couldn't find Transaction ID : {id} while trying to delete it.");
-                return NotFound();
-            }
-
-            return View(transaction);
-        }
-
-        [NoDirectAccess]
         [HttpPost, ActionName("DeleteTransaction")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteTransaction(Transaction transaction)
+        public async Task<IActionResult> DeleteTransaction(int id)
         {
-            if (transaction == null)
+            if (ModelState.IsValid)
             {
-                _logger.LogError($"No transaction was submitted");
-                return View("Error");
-            }
-
-            try
-            {
-                var removed = TransactionRepository.DeleteTransaction(transaction);
-                if (removed)
+                try
                 {
-                    await TransactionRepository.SaveChangesAsync();
+                    var transaction = await TransactionRepository.GetTransactionById(id);
+
+                    if (transaction == null)
+                    {
+                        _logger.LogError($"Transaction with ID: {id} couldn't be found.", id);
+                        return Problem("Couldn't find the Transaction");
+                    }
+
+                    if (transaction != null)
+                    {
+                        _logger.LogInformation($"Deleting Transaction: {transaction.Name}", transaction.Name);
+                        await TransactionRepository.DeleteAsync(transaction.Id);
+                        await TransactionRepository.SaveChangesAsync();
+                    }
+
+                    var wallets = await UserWalletRepository.GetUserWalletsAsync();
+                    var categories = await CategoryRepository.GetAllCategoriesAsync();
+
+                    var viewModel = new MainViewModel
+                    {
+                        UserWallets = wallets,
+                        Categories = categories
+                    };
+
+                    return Json(new { html = Helper.RenderViewToString(this, "Index", viewModel) });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Couldn't delete transcation with ID {id} due to error {ex.Message}", id, ex.Message);
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Failed to remove Transaction with ID: {transaction.Id}");
-                throw;
-            }
 
-            return RedirectToAction(nameof(Index));
+            return Json(new { html = Helper.RenderViewToString(this, "Index", null) });
         }
 
         [HttpPost]

@@ -5,26 +5,32 @@
 }
 
 <div class="container">
-    <div class="row">
+    <div class="row" id="Transactions">
         <div class="col-8">
             @foreach (var transaction in Model.UserWallets)
             {
-                <p><i class="bi bi-wallet2"></i>: @transaction.Name</p>
                 <hr />
                 @for (int i = 0; i < transaction.Transactions.Count(); i++)
                 {
                     <div>
                         Transaction Name : @transaction.Transactions[i].Name<br />
                         Transcation Description : @transaction.Transactions[i].Description<br />
-                        Transferred Amount : @transaction.Transactions[i].TransferredAmount<br />
+                        Transferred Amount : <span class="input-group-addon">$</span> @transaction.Transactions[i].TransferredAmount<br />
+                        Transferred Date : @transaction.Transactions[i].TransactionDate.ToShortDateString() <br />
                         Category : @transaction.Transactions[i].Category.Name<br />
+                    </div>
+                    <div>
+                        <a onclick="showPopupTransaction('@Url.Action("EditTransaction", "Home", new { id = transaction.Transactions[i].Id }, Context.Request.Scheme)', 'Edit Transaction')" class="btn btn-info text-white"><i class="bi bi-pen"></i></a> |
+                        <form asp-action="DeleteTransaction" asp-route-id="@transaction.Transactions[i].Id" onsubmit="return jQueryDeleteTransaction(this)" class="d-inline">
+                            <button type="submit" value="Delete" class="rounded"><i class="bi bi-trash"></i></button>
+                        </form>
                     </div>
                     <hr />
                 }
             }
         </div>
         <div class="col-2">
-            Name : @Model.UserWallets[0].Name
+            <p><i class="bi bi-wallet2"></i>: @Model.UserWallets[0].Name</p>
             Amount : @Model.UserWallets[0].Amount
         </div>
     </div>
@@ -37,6 +43,9 @@
 <partial name="_CreateTransactionPartial.cshtml" model="new Transaction()" />
 <div id="edit-category">
     <partial name="_EditCategoryPartial.cshtml" model="new Category()" />
+</div>
+<div id="edit-transaction">
+    <partial name="_EditTransactionPartial.cshtml" model="new EditTransactionDTO()" />
 </div>
 
 @section Scripts {

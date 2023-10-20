@@ -7,7 +7,9 @@
 //
 // TODO: Allow Export of Transactions to Excel Document with EPPlus
 
+using Microsoft.AspNetCore.Localization;
 using MVCBudget.Forser.Middleware;
+using System.Globalization;
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
@@ -18,6 +20,11 @@ var configuration = new ConfigurationBuilder()
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
     .CreateLogger();
+
+var supportedCultures = new[]
+{
+    new CultureInfo("en-US")
+};
 
 try
 {
@@ -38,6 +45,13 @@ try
     builder.Services.AddControllersWithViews();
     
     var app = builder.Build();
+
+    app.UseRequestLocalization(new RequestLocalizationOptions
+    {
+        DefaultRequestCulture = new RequestCulture("en-US"),
+        SupportedCultures = supportedCultures,
+        SupportedUICultures = supportedCultures
+    });
 
     app.UseSerilogRequestLogging();
     app.UseMiddleware(typeof(ExceptionHandlingMiddleware));
