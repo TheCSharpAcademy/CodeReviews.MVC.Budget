@@ -44,8 +44,13 @@ namespace MVCBudget.Forser.Controllers
             {
                 UserWallets = wallets,
                 Categories = categories,
-                Transactions = transactions
+                Transactions = transactions,
             };
+
+            if (categoryName != null)
+            {
+                viewModel.ViewFilter.CategoryId = categoryName;
+            }
 
             _logger.LogInformation($"{wallets.Select(s => s.Name).FirstOrDefault()} wallet is loaded");
             return View(viewModel);

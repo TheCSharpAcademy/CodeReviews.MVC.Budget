@@ -5,6 +5,9 @@
 }
 
 <div id="filterForm">
+    @{
+        ViewData["CategoryId"] = Model.ViewFilter.CategoryId;
+    }
     @await Html.PartialAsync("~/Views/Home/_FilterFormPartial.cshtml", new FilterModel())
 </div>
 
