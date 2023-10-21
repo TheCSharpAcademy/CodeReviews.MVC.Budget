@@ -8,13 +8,17 @@
     @await Html.PartialAsync("~/Views/Home/_FilterFormPartial.cshtml", new FilterModel())
 </div>
 
-<div class="container flex">
-    <div class="col-2">
-        <p><i class="bi bi-wallet2"></i>: @Model.UserWallets.Select(s => s.Name).FirstOrDefault()</p>
-        Amount : @Model.UserWallets.Select(s => s.Amount).FirstOrDefault()
+<div class="container-fluid">
+    <div class="row row-cols-2 justify-content-between">
+        <div class="col-8"></div>
+        <div class="col-4 pt-2 pb-2">
+           <h5><i class="bi bi-wallet2"></i>: @Model.UserWallets.Select(s => s.Name).FirstOrDefault() |
+                Amount : <span class="input-group-addon">$</span> @Model.Transactions.Select(s => s.TransferredAmount).Sum()
+            </h5>
+        </div>
     </div>
     <div class="row" id="Transactions">
-        <div class="col-12">
+        <div class="col">
             <table class="table">
                 <thead>
                     <tr>
