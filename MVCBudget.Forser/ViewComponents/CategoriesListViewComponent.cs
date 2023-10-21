@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-
-namespace MVCBudget.Forser.ViewComponents
+﻿namespace MVCBudget.Forser.ViewComponents
 {
     public class CategoriesListViewComponent : ViewComponent
     {

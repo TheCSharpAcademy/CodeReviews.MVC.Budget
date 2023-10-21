@@ -152,3 +152,18 @@ jQueryDeleteTransaction = form => {
     }
     return false;
 }
+
+const transactionRows = document.querySelectorAll('.table-row');
+const searchField = document.querySelector("#SearchField");
+
+searchField.addEventListener('keyup', (e) => {
+    transactionRows.forEach(row => {
+        const name = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+
+        if (name.includes(e.target.value.toLowerCase())) {
+            row.classList.remove('hidden');
+        } else {
+            row.classList.add('hidden');
+        }
+    });
+});

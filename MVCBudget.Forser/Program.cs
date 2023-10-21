@@ -9,7 +9,6 @@
 
 using Microsoft.AspNetCore.Localization;
 using MVCBudget.Forser.Middleware;
-using System.Globalization;
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())

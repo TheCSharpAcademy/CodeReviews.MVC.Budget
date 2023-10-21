@@ -10,7 +10,6 @@
         [Required, Precision(10, 2)]
         [DataType(DataType.Currency), DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
         public decimal Amount { get; set; }
-
         public int? TransactionsId { get; set; }
         public IList<Transaction>? Transactions { get; set; } = null!;
     }

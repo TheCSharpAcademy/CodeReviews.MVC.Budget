@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using MVCBudget.Forser.Helpers;
+﻿using MVCBudget.Forser.Helpers;
 using System.Diagnostics;
 
 namespace MVCBudget.Forser.Controllers
@@ -71,7 +70,7 @@ namespace MVCBudget.Forser.Controllers
                 transactions = transactions.Where(w => w.TransactionDate >= filterModel.StartDate).ToList();
             }
 
-            if (categoryName == null && filterModel.StartDate == null && filterModel.EndDate != null)
+            if (categoryName == null && filterModel.StartDate != null && filterModel.EndDate != null)
             {
                 transactions = transactions.Where(w => w.TransactionDate >= filterModel.StartDate
                     && w.TransactionDate <= filterModel.EndDate).ToList();

@@ -29,7 +29,7 @@
             try
             {
                 _logger.LogInformation($"{nameof(Transaction)} - Calling GetAllTransactionAsync()");
-                var transactions = await _context.Transactions.ToListAsync();
+                var transactions = await _context.Transactions.OrderByDescending(o => o.TransactionDate).ToListAsync();
 
                 return transactions;
             }
@@ -44,7 +44,7 @@
             try
             {
                 _logger.LogInformation($"{nameof(Transaction)} - Calling GetAllTransactions()");
-                var transactions = _context.Transactions.ToList();
+                var transactions = _context.Transactions.OrderByDescending(o => o.TransactionDate).ToList();
 
                 return transactions;
             }

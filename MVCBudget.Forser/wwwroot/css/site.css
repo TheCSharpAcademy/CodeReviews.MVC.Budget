@@ -26,3 +26,7 @@ button {
     background: none;
     color: red;
 }
+
+.hidden {
+    display: none;
+}
