@@ -1,0 +1,246 @@
+﻿@model MVC.Budget.JsPeanut.Models.ViewModel.CategoryViewModel
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="buttons" id="categorybuttons">
+    <a button type="button" class="btn btn-success" data-toggle="modal" data-target="addTransactionModal" onclick="showTransactionModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+        </svg>
+        New transaction
+    </a>
+    <a button type="button" class="btn btn-success" onclick="location.href='@Url.Action("Index", "Transactions")'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+        </svg>
+        Transaction history
+    </a>
+    @*<button button type="button" class="btn btn-success" asp-action="SortBy" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Sort by
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" asp-page="./Index" asp-route-sorttype="Today">Larger value</a>
+        <a class="dropdown-item" asp-page="./Index" asp-route-sorttype="Yesterday">Smaller value</a>
+    </div>*@
+
+    <button button type="button" class="btn btn-success" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Show spendings by date
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="Default">Default</a>
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="LastMonth">Last month</a>
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="LastThreeMonths">Last 3 months</a>
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="LastSixMonths">Last 6 months</a>
+        <a class="dropdown-item" asp-action="Index" asp-route-timeline="LastYear">Last year</a>
+        <a class="dropdown-item search-link" asp-action="Index">Search for date</a>
+    </div>
+
+    <div class="modal fade" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTransactionModalLabel">Add a new transaction</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="AddTransaction" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="datetime-local" placeholder="Date" asp-for="Transaction.Date">
+                            <span asp-validation-for="Transaction.Date" class="text-danger"></span>
+                            <br />
+                            <label>Name</label>
+                            <input type="text" placeholder="Name" asp-for="Transaction.Name">
+                            <span asp-validation-for="Transaction.Name" class="text-danger"></span>
+                            <br />
+                            <label>Category</label>
+                            <select asp-for="Transaction.CategoryId" asp-items="Model.CategorySelectList"></select>
+                            <br />
+                            <label>Value</label>
+                            <input type="number" placeholder="Value" asp-for="Transaction.Value">
+                            <span asp-validation-for="Transaction.Value" class="text-danger"></span>
+                            <br />
+                            <small id="valueHelp" class="form-text text-muted">If you are going to insert a decimal, use a dot as separator</small>
+                            <br>
+                            <label>Description</label>
+                            <input type="text" placeholder="Description" asp-for="Transaction.Description"/>
+                            <span asp-validation-for="Transaction.Description" class="text-danger"></span>
+                            <br />
+                            <label>Currency</label>
+                            <select asp-for="CurrencyObjectJson" asp-items="Model.CurrencySelectList"></select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="select-container">
+    <form asp-action="UpdateCurrency" method="post" class="selectcurrencyform">
+        <select name="selectedCurrency" asp-items="Model.CurrencySelectList" class="form-control" style="margin-top: 13px;">
+            @{
+                if (ViewBag.Currency != null)
+                {
+                        <option value="" selected disabled>Selected currency: @ViewBag.Currency</option>
+                }
+                else
+                {
+                    <option value="" selected disabled>Select your default currency</option>
+                }
+            }
+        </select>
+        <input type="submit" class="btn btn-outline-success" value="Submit" style="margin-top: 13px;" />
+    </form>
+    <small id="selectcurrencyHelp" class="form-text text-muted">The value of each category will be displayed in that currency. Regardless of that, you can still use another currencies for your transactions</small>
+    </div>
+</div>
+
+<div id="spendingsByDateForm">
+    <form class="search" style="display: none;" asp-action="Index" asp-route-searchstringone="@Model.SearchStringOne" asp-route-searchstringtwo="@Model.SearchStringTwo" style="display: none; margin-top: -10px;">
+        <p style="margin: 1em 0 1em 0;"> Starting date: <input type="date" id="searchInput" asp-for="SearchStringOne" /> </p>
+        <p style="margin: 1em 0 1em 0;"> End date: <input type="date" id="searchInput" asp-for="SearchStringTwo" /> <input type="submit" value="Filter" /> </p>
+    </form>
+</div>
+
+    @foreach (var category in Model.Categories)
+    {
+    <div class="buttoncontainer">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Total value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="@category.ImageUrl" class="category-image">
+                    </td>
+                    <td>@category.Name</td>
+                    @{
+                        if (category.Transactions != null && category.Transactions.FirstOrDefault()?.CurrencyNativeSymbol == string.Empty)
+                        {
+                            <td>@category.CurrencyNativeSymbol @category.TotalValue</td>
+                        }
+                        else if (category.Transactions != null)
+                        {
+                            <td>@category.CurrencyNativeSymbol @category.TotalValue</td>
+                        }
+                        else
+                        {
+                            <td>@category.CurrencyNativeSymbol @category.TotalValue</td>
+                        }
+                    }
+                </tr>
+            </tbody>
+        </table>
+        @*<button class="btn btn-success" data-toggle="modal" data-target="addCategoryTransactionModal" style="margin-top: 6px; padding: 5px 11px; height: 38px;" onclick="showCategoryTransactionModal()">Add transaction</button>
+*@
+        <a button type="button" class="btn btn-success" data-toggle="modal" data-target="addCategoryTransactionModal_@category.Id" style="margin-top: 6px; padding: 5px 11px;" onclick="showCategoryTransactionModal(@category.Id)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+            </svg>
+            New transaction
+        </a>
+        <button class="btn btn-outline-success" style="margin-top: 6px; padding: 5px 11px; height: 38px;" onclick="location.href='@Url.Action("Index", "Transactions", new { id = category.Id, name = category.Name, imageurl = category.ImageUrl })'">Manage transactions</button>
+    </div>
+
+    <div class="modal fade" id="addCategoryTransactionModal_@category.Id" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTransactionModalLabel">Add a new transaction</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="AddTransaction" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="datetime-local" placeholder="Date" asp-for="Transaction.Date">
+                            <span asp-validation-for="Transaction.Date" class="text-danger"></span>
+                            <br />
+                            <label>Name</label>
+                            <input type="text" placeholder="Name" asp-for="Transaction.Name">
+                            <span asp-validation-for="Transaction.Name" class="text-danger"></span>
+                            <br />
+                            <label>Category</label>
+                            @{
+                                <select id="selectCategory" asp-for="Transaction.CategoryId">
+                                    <option value="@category.Id" selected>@category.Name</option>
+                                    @foreach (var item in Model.CategorySelectList.Where(x => x.Text != category.Name))
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            }
+                            <br />
+                            <label>Value</label>
+                            <input type="decimal" placeholder="Value" asp-for="Transaction.Value">
+                            <span asp-validation-for="Transaction.Value" class="text-danger"></span>
+                            <br />
+                            <small id="valueHelp" class="form-text text-muted">If you are going to insert a decimal, use a dot as separator</small>
+                            <br>
+                            <label>Description</label>
+                            <input type="text" placeholder="Description" asp-for="Transaction.Description" />
+                            <span asp-validation-for="Transaction.Description" class="text-danger"></span>
+                            <br />
+                            <label>Currency</label>
+                            <select asp-for="CurrencyObjectJson" asp-items="Model.CurrencySelectList"></select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var searchLink = document.querySelector('.search-link');
+            var searchForm = document.querySelector('.search');
+
+            searchLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                searchForm.style.display = 'block';
+            });
+        });
+
+        function showTransactionModal() {
+            $('#addTransactionModal').modal('show');
+        }
+
+        function showCategoryTransactionModal(transactionid){
+            $(`#addCategoryTransactionModal_${transactionid}`).modal('show');
+        }
+
+        function submitForm() {
+            document.getElementById("addTransactionForm").submit();
+        }
+
+        var selectCategory = document.getElementById("selectcategory");
+        var selectCategoryArray = selectCategory.options;
+    </script>
+}
