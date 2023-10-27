@@ -11,12 +11,10 @@ namespace MvcBudgetCarDioLogic.Models
         {
             _context = context;
         }
-
-        public IEnumerable<Transaction> Transactions { get; set; } //= new List<Transaction>();
-        public IEnumerable<Category> Categories { get; set; } //= new List<Category>();
+        public IEnumerable<Transaction> Transactions { get; set; }
+        public IEnumerable<Category> Categories { get; set; }
         public Transaction Transaction { get; set; }
         public FilterProperties FilterProperties { get; set; }
-        public int Id { get; set; }
 
         [DataType(DataType.Currency)]
         public decimal Balance

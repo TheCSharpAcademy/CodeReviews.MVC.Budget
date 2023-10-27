@@ -19,15 +19,15 @@
     <form asp-action="Index">
         <div class="d-flex align-items-center justify-content-start flex-wrap">
             <div class="form-floating ms-2">
-                <select asp-for="FilterProperties.FilterId" class="form-select" placeholder="Category">
+                <select asp-for="FilterProperties.FilterCategoryId" class="form-select" placeholder="Category">
                     <option value="0">-- Select Category --</option>
                     @foreach (var category in Model.Categories)
                     {
                         <option value="@category.Id">@category.CategoryName</option>
                     }
                 </select>
-                <label asp-for="FilterProperties.FilterId" class="control-label"></label>
-                <span asp-validation-for="FilterProperties.FilterId" class="text-danger"></span>
+                <label asp-for="FilterProperties.FilterCategoryId" class="control-label">Category</label>
+                <span asp-validation-for="FilterProperties.FilterCategoryId" class="text-danger"></span>
             </div>
             <div class="form-floating ms-2">
                 <input asp-for="FilterProperties.StartDate" class="form-control" value="0" />
@@ -42,15 +42,14 @@
             <button type="submit" class="btn btn-dark ms-3" id="FilterBtn">Filter</button>
         </div>
     </form>
+
     <div class="form-floating ms-2" style="margin-top:10px;">
         <input type="text" id="searchTransaction" class="form-control" placeholder="Search by transaction name">
         <label for="searchTransaction">Search Transaction</label>
     </div>
 
 </div>
-
-
-
+ 
 <table class="table table-hover" style="margin-top:10px;">
     <thead>
         <tr class="table-primary">
@@ -87,7 +86,7 @@
     </tbody>
 </table>
 
-<!-- create category -->
+<!-- create -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -100,7 +99,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group mb-3">
-                        <label asp-for="Transaction.TransactionName" class="control-label"></label>
+                        <label asp-for="Transaction.TransactionName" class="control-label">Transaction Name</label>
                         <input asp-for="Transaction.TransactionName" class="form-control" />
                         <span asp-validation-for="Transaction.TransactionName" class="text-danger"></span>
                     </div>
@@ -110,7 +109,7 @@
                         <span asp-validation-for="Transaction.Ammount" class="text-danger"></span>
                     </div>
                     <div class="form-group mb-3">
-                        <label asp-for="Transaction.Date" class="control-label"></label>
+                        <label asp-for="Transaction.Date" class="control-label">Transaction Date</label>
                         <input asp-for="Transaction.Date" class="form-control" />
                         <span asp-validation-for="Transaction.Date" class="text-danger"></span>
                     </div>
@@ -147,7 +146,7 @@
     </div>
 </div>
 
-<!-- Delete category -->
+<!-- Delete -->
 <div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -159,7 +158,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" asp-for="Id" id="TransactionToDeleteId" class="form-control" />
+                    <input type="hidden" asp-for="Transaction.Id" id="TransactionToDeleteId" class="form-control" />
                     <h4>Are you sure you want to delete this Transaction?</h4>
                 </div>
                 <div class="modal-footer">
@@ -171,7 +170,7 @@
     </div>
 </div>
 
-<!-- Update category -->
+<!-- Update -->
 <div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -194,7 +193,7 @@
                         <span asp-validation-for="Transaction.Ammount" class="text-danger"></span>
                     </div>
                     <div class="form-group mb-3">
-                        <label asp-for="Transaction.Date" class="control-label"></label>
+                        <label asp-for="Transaction.Date" class="control-label">Transaction Date</label>
                         <input id="transactionToUpdateDate" asp-for="Transaction.Date" class="form-control" />
                         <span asp-validation-for="Transaction.Date" class="text-danger"></span>
                     </div>
@@ -247,7 +246,6 @@
         var Confirm = function (id) {
             document.getElementById('TransactionToDeleteId').value = id;
         }
-
 
         var EditForm = function (id, name, Ammount) {
             document.getElementById('transactionToUpdateId').value = id;

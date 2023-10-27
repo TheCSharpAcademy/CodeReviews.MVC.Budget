@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using MvcBudgetCarDioLogic.Data;
 using MvcBudgetCarDioLogic.Models;
-using System.Diagnostics.Metrics;
 
 namespace MvcBudgetCarDioLogic.Controllers
 {
@@ -21,53 +18,58 @@ namespace MvcBudgetCarDioLogic.Controllers
         {
             List<Transaction> transactions = _context.Transactions.ToList();
 
-            if (filterProperties != null && filterProperties.FilterId != 0)
+            if (filterProperties.StartDate != null || filterProperties.EndDate != null || filterProperties.FilterCategoryId != 0)
             {
-                if (filterProperties.StartDate != null)
+                if (filterProperties.StartDate != null && filterProperties.EndDate == null)
                 {
-                    if (filterProperties.EndDate != null)
+                    if (filterProperties.FilterCategoryId != 0)
                     {
                         transactions = transactions
-                            .Where(t => t.CategoryId == filterProperties.FilterId &&
-                                        t.Date >= filterProperties.StartDate &&
-                                        t.Date <= filterProperties.EndDate)
-                            .ToList();
+                        .Where(t => t.CategoryId == filterProperties.FilterCategoryId &&
+                                    t.Date >= filterProperties.StartDate).ToList();
                     }
                     else
                     {
                         transactions = transactions
-                            .Where(t => t.CategoryId == filterProperties.FilterId &&
-                                        t.Date >= filterProperties.StartDate)
-                            .ToList();
+                        .Where(t => t.Date >= filterProperties.StartDate).ToList();
+                    }
+                }
+                if (filterProperties.StartDate == null && filterProperties.EndDate != null)
+                {
+                    if (filterProperties.FilterCategoryId != 0)
+                    {
+                        transactions = transactions
+                        .Where(t => t.CategoryId == filterProperties.FilterCategoryId &&
+                                    t.Date <= filterProperties.EndDate).ToList();
+                    }
+                    else
+                    {
+                        transactions = transactions
+                        .Where(t => t.Date <= filterProperties.EndDate).ToList();
+                    }
+                }
+                if (filterProperties.StartDate != null && filterProperties.EndDate != null)
+                {
+                    if (filterProperties.FilterCategoryId != 0)
+                    {
+                        transactions = transactions
+                        .Where(t => t.CategoryId == filterProperties.FilterCategoryId &&
+                                t.Date >= filterProperties.StartDate &&
+                                t.Date <= filterProperties.EndDate).ToList();
+                    }
+                    else
+                    {
+                        transactions = transactions
+                        .Where(t => t.Date >= filterProperties.StartDate &&
+                            t.Date <= filterProperties.EndDate).ToList();
                     }
                 }
                 else
                 {
                     transactions = transactions
-                        .Where(t => t.CategoryId == filterProperties.FilterId)
-                        .ToList();
+                    .Where(t => t.CategoryId == filterProperties.FilterCategoryId).ToList();
                 }
             }
-            else if (filterProperties != null && filterProperties.StartDate != null)
-            {
-                if (filterProperties.EndDate != null)
-                {
-                    transactions = transactions
-                        .Where(t => t.Date >= filterProperties.StartDate &&
-                                    t.Date <= filterProperties.EndDate)
-                        .ToList();
-                }
-                else
-                {
-                    transactions = transactions
-                        .Where(t => t.Date >= filterProperties.StartDate)
-                        .ToList();
-                }
-                return View(transactions);
-            }
-
-
-        
 
         TransactionViewModel transactionViewModel = new TransactionViewModel(_context)
             {
@@ -127,10 +129,10 @@ namespace MvcBudgetCarDioLogic.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteTransiction(int Id)
+        public IActionResult DeleteTransiction(Transaction transaction)
         {
-            var transactionToDel = _context.Transactions.Find(Id);
-            if (Id != null)
+            var transactionToDel = _context.Transactions.Find(transaction.Id);
+            if (transaction.Id != null)
             {
                 _context.Transactions.Remove(transactionToDel);
             }

@@ -11,7 +11,8 @@ document.getElementById('searchTransaction').addEventListener('keyup', function 
 
         if (name.includes(searchTerm)) {
             row.style.display = ''; // Show row
-        } else {
+        }
+        else {
             row.style.display = 'none'; // Hide row
         }
     });

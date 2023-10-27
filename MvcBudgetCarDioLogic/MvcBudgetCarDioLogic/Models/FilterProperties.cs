@@ -4,7 +4,7 @@ namespace MvcBudgetCarDioLogic.Models
 {
     public class FilterProperties
     {
-        public int FilterId { get; set; }
+        public int FilterCategoryId { get; set; }
         [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
         public DateTime? StartDate { get; set; }

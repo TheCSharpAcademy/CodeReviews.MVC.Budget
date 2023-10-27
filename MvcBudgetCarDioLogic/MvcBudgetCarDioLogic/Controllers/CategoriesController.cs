@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using MvcBudgetCarDioLogic.Data;
 using MvcBudgetCarDioLogic.Models;
 
@@ -23,7 +17,7 @@ namespace MvcBudgetCarDioLogic.Controllers
         {
             CategoryViewModel categoryViewModel = new CategoryViewModel()
             { 
-                Categories = _context.Categories.ToList()
+                Categories = _context.Categories.ToList() 
             }; 
 
             return View(categoryViewModel);
