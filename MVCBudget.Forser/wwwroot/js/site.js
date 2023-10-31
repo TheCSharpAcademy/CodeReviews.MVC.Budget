@@ -1,4 +1,8 @@
-﻿showPopupCategory = (url, title) => {
+﻿$(function openCreateWalletModal() {
+        $('#NewWalletModal').modal('show');
+});
+
+showPopupCategory = (url, title) => {
     if ($('#ListCategoriesModal').hasClass('show')) {
         $('#ListCategoriesModal').modal('hide');
     }

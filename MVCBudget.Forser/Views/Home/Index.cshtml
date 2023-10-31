@@ -55,13 +55,18 @@
 <div id="view-categories">
     <partial name="_ListCategoriesPartial.cshtml" model="Model" />
 </div>
-<partial name="_CreateTransactionPartial.cshtml" model="new Transaction()" />
+<partial name="_CreateTransactionPartial.cshtml" model="new EditTransactionDTO()" />
 <div id="edit-category">
     <partial name="_EditCategoryPartial.cshtml" model="new Category()" />
 </div>
 <div id="edit-transaction">
     <partial name="_EditTransactionPartial.cshtml" model="new EditTransactionDTO()" />
 </div>
+@if(@Model.UserWallets.Count() < 1) {
+    <div id="create-wallet">
+        <partial name="_CreateNewWallet.cshtml" model="new UserWallet()" onload="return openCreateWalletModal()" />
+    </div>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

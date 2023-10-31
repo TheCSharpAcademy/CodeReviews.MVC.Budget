@@ -1,12 +1,3 @@
-// TODO: Create a Search for Transactions by name
-// TODO: Filter Function for Transactions per Category or/and Date
-// TODO: Modals for Insert, Delete, Update Transactions/Categories
-//
-// TODO: Create a Modal that opens up if a User visits for the first time.
-// TODO: Show a modal on first time visit to create a Wallet for Visitor (Create unique ID with Guid on Save and assign a Session/Cookie to visitor)
-//
-// TODO: Allow Export of Transactions to Excel Document with EPPlus
-
 using Microsoft.AspNetCore.Localization;
 using MVCBudget.Forser.Middleware;
 
@@ -50,7 +41,7 @@ try
     {
         var services = scope.ServiceProvider;
 
-        SeedData.Initalize(services);
+        await SeedData.Initalize(services);
     }
 
     app.UseRequestLocalization(new RequestLocalizationOptions

@@ -99,7 +99,7 @@ namespace MVCBudget.Forser.Controllers
         [HttpPost]
         [ActionName("CreateTransaction")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateTransaction(Transaction transaction, int CategoryName)
+        public async Task<IActionResult> CreateTransaction(EditTransactionDTO transaction, int CategoryName)
         {
             if (transaction == null || CategoryName < 1)
             {
@@ -112,10 +112,17 @@ namespace MVCBudget.Forser.Controllers
                 {
                     if (transaction != null)
                     {
-                        transaction.CategoryId = CategoryName;
-                        transaction.UserWalletId = 1; // Currently, only one user can use this service hence hardcoded.
+                        Transaction newTransaction = new Transaction
+                        {
+                            Name = transaction.Name,
+                            Description = transaction.Description,
+                            TransferredAmount = transaction.TransferredAmount,
+                            TransactionDate = transaction.TransactionDate,
+                            UserWalletId = transaction.UserWalletId,
+                            CategoryId = CategoryName
+                        };
 
-                        await TransactionRepository.CreateAsync(transaction);
+                        await TransactionRepository.CreateAsync(newTransaction);
                         await TransactionRepository.SaveChangesAsync();
                         return RedirectToAction(nameof(Index));
                     }
@@ -124,6 +131,37 @@ namespace MVCBudget.Forser.Controllers
                 {
                     _logger.LogError($"Couldn't create the new Transaction: {transaction} with error {ex.Message}");
                     return View(transaction);
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ActionName("SaveWallet")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveWallet(UserWallet userWallet)
+        {
+            if (userWallet == null)
+            {
+                return View("Error");
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (userWallet != null)
+                    {
+                        await UserWalletRepository.CreateAsync(userWallet);
+                        await UserWalletRepository.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Couldn't create the wallet: {userWallet} with error {ex.Message}");
+                    return View(userWallet);
                 }
             }
 

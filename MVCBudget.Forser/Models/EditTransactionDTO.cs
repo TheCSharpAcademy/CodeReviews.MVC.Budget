@@ -9,11 +9,12 @@
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         [Required, Precision(10, 2)]
-        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true), DisplayName("Transferred Amount")]
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true), DisplayName("Transferred Amount")]
         public decimal TransferredAmount { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true), DisplayName("Transaction Date")]
         public DateTime TransactionDate { get; set; }
+        public int? UserWalletId { get; set; }
         public int? CategoryId { get; set; }
         public List<SelectListItem>? Categories { get; set; }
     }

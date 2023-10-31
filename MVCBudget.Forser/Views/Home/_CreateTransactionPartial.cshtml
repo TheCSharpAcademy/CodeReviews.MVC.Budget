@@ -1,4 +1,4 @@
-﻿@model Transaction
+﻿@model EditTransactionDTO
 
 <div id="CreateTransactionModal" aria-labelledby="CreateTransactionModal" aria-hidden="true" class="modal fade" tabindex="-1">
     <div class="modal-dialog">
@@ -11,6 +11,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    @Html.HiddenFor(h => h.UserWalletId)
                     <div>
                         <label asp-for="Name" class="control-label"></label>
                         <input asp-for="Name" class="form-control" />
@@ -23,7 +24,7 @@
                     </div>
                     <div>
                         <label asp-for="TransferredAmount" class="control-label"></label>
-                        <input asp-format="{0:C}" asp-for="TransferredAmount" class="form-control" />
+                        <input asp-format="{0:N2}" asp-for="TransferredAmount" class="form-control" />
                         <span asp-validation-for="TransferredAmount" class="text-danger"></span>
                     </div>
                     <div>

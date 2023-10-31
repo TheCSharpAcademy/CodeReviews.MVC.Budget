@@ -16,8 +16,7 @@ namespace MVCBudget.Forser.Data
                 var userwallet = new UserWallet()
                 {
                     Id = 1,
-                    Name = "User Wallet",
-                    Amount = decimal.Parse("10000")
+                    Name = "User Wallet"
                 };
 
                 var categories = new Category[]
