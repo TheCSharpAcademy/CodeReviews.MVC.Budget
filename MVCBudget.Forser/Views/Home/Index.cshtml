@@ -1,0 +1,73 @@
+﻿@model MainViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="filterForm">
+    @{
+        ViewData["CategoryId"] = Model.ViewFilter.CategoryId;
+    }
+    @await Html.PartialAsync("~/Views/Home/_FilterFormPartial.cshtml", new FilterModel())
+</div>
+
+<div class="container-fluid">
+    <div class="row row-cols-2 justify-content-between">
+        <div class="col-8"></div>
+        <div class="col-4 pt-2 pb-2">
+           <h5><i class="bi bi-wallet2"></i>: @Model.UserWallets.Select(s => s.Name).FirstOrDefault() |
+                Amount : <span class="input-group-addon">$</span> @Model.Transactions.Select(s => s.TransferredAmount).Sum()
+            </h5>
+        </div>
+    </div>
+    <div class="row" id="Transactions">
+        <div class="col">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Transaction Name
+                        </th>
+                        <th>
+                            Transaction Description
+                        </th>
+                        <th>
+                            Transferred Amount
+                        </th>
+                        <th>
+                            Transaction Date
+                        </th>
+                        <th>
+                            Category
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <partial name="_TransactionListPartial.cshtml" model="Model" />
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<partial name="_AddCategoryPartial.cshtml" model="new Category()" />
+<div id="view-categories">
+    <partial name="_ListCategoriesPartial.cshtml" model="Model" />
+</div>
+<partial name="_CreateTransactionPartial.cshtml" model="new EditTransactionDTO()" />
+<div id="edit-category">
+    <partial name="_EditCategoryPartial.cshtml" model="new Category()" />
+</div>
+<div id="edit-transaction">
+    <partial name="_EditTransactionPartial.cshtml" model="new EditTransactionDTO()" />
+</div>
+@if(@Model.UserWallets.Count() < 1) {
+    <div id="create-wallet">
+        <partial name="_CreateNewWallet.cshtml" model="new UserWallet()" onload="return openCreateWalletModal()" />
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

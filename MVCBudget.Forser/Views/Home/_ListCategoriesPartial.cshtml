@@ -1,0 +1,43 @@
+﻿@model MainViewModel
+
+<div id="ListCategoriesModal" aria-labelledby="ListCategoriesModal" aria-hidden="true" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">List of Categories</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Categories[0].Name)
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Categories.Count(); i++)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(model => model.Categories[i].Name)
+                                </td>
+                                <td>
+                                    <a onclick="showPopupCategory('@Url.Action("EditCategory", "Home", new { id = Model.Categories[i].Id }, Context.Request.Scheme)', 'Edit Category')" class="btn btn-info text-white"><i class="bi bi-pen"></i></a>  |
+                                    <form asp-action="DeleteCategory" asp-route-id="@Model.Categories[i].Id" onsubmit="return jQueryDeleteCategory(this)" class="d-inline">
+                                        <button type="submit" value="Delete" class="rounded"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

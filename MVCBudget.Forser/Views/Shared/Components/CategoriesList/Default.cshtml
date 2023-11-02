@@ -1,0 +1,11 @@
+﻿@model List<SelectListItem>
+
+<div class="form-group">
+    @if (Model != null)
+    {
+        <label class="control-label">Categories</label>
+        <select name="CategoryName" class="form-control" asp-items="@Model">
+            <option value="">-- Select an Category --</option>
+        </select>
+    }
+</div>

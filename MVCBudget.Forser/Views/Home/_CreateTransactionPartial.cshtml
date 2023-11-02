@@ -1,0 +1,46 @@
+﻿@model EditTransactionDTO
+
+<div id="CreateTransactionModal" aria-labelledby="CreateTransactionModal" aria-hidden="true" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="CreateTransaction">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="modal-header">
+                    <h3 class="modal-title">Transaction</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.HiddenFor(h => h.UserWalletId)
+                    <div>
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Description" class="control-label"></label>
+                        <input asp-for="Description" class="form-control" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="TransferredAmount" class="control-label"></label>
+                        <input asp-format="{0:N2}" asp-for="TransferredAmount" class="form-control" />
+                        <span asp-validation-for="TransferredAmount" class="text-danger"></span>
+                    </div>
+                    <div>
+                        <label asp-for="TransactionDate" class="control-label"></label>
+                        <input type="date" asp-for="TransactionDate" class="form-control" />
+                        <span asp-validation-for="TransactionDate" class="text-danger"></span>
+                    </div>
+                    <div>
+                        @await Component.InvokeAsync("CategoriesList")
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="SaveBtn">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+﻿@model MainViewModel
+
+@{
+    Layout = null;
+}
+
+@if (Model.Transactions != null)
+{
+    @foreach (var transaction in Model.Transactions)
+    {
+        <tr class="table-row">
+            <td>
+                @transaction.Name
+            </td>
+            <td>
+                @transaction.Description
+            </td>
+            <td>
+                <span class="input-group-addon">$</span> @transaction.TransferredAmount
+            </td>
+            <td>
+                @transaction.TransactionDate.ToShortDateString()
+            </td>
+            <td>
+                @transaction.Category.Name
+            </td>
+            <td>
+                <a onclick="showPopupTransaction('@Url.Action("EditTransaction", "Home", new { id = transaction.Id }, Context.Request.Scheme)', 'Edit Transaction')" class="btn btn-info text-white"><i class="bi bi-pen"></i></a> |
+                <form asp-action="DeleteTransaction" asp-route-id="@transaction.Id" onsubmit="return jQueryDeleteTransaction(this)" class="d-inline">
+                    <button type="submit" value="Delete" class="rounded"><i class="bi bi-trash"></i></button>
+                </form>
+            </td>
+        </tr>
+    }
+}
