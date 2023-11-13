@@ -16,7 +16,11 @@ namespace Budget.DataAccess
         {
             modelBuilder.Entity<CategoryModel>()
                 .HasMany(c => c.Transactions)
-                .WithOne(c => c.Category);
+                .WithOne(c => c.Category)
+                .HasForeignKey(c => c.CategoryId);
+            modelBuilder.Entity<TransactionModel>()
+                .HasOne(t => t.Category);
+
         }
     }
 }
