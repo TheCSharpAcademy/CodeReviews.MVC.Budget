@@ -7,16 +7,16 @@ namespace Budget.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TransactionController : ControllerBase
+    public class TransactionModelsController : ControllerBase
     {
         private readonly BudgetContext _context;
 
-        public TransactionController(BudgetContext context)
+        public TransactionModelsController(BudgetContext context)
         {
             _context = context;
         }
 
-        // GET: api/Transaction
+        // GET: api/TransactionModels
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions()
         {
@@ -27,7 +27,7 @@ namespace Budget.Controllers
             return await _context.Transactions.ToListAsync();
         }
 
-        // GET: api/Transaction/5
+        // GET: api/TransactionModels/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionModel>> GetTransactionModel(int id)
         {
@@ -45,7 +45,7 @@ namespace Budget.Controllers
             return transactionModel;
         }
 
-        // PUT: api/Transaction/5
+        // PUT: api/TransactionModels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTransactionModel(int id, TransactionModel transactionModel)
@@ -76,7 +76,7 @@ namespace Budget.Controllers
             return NoContent();
         }
 
-        // POST: api/Transaction
+        // POST: api/TransactionModels
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<TransactionModel>> PostTransactionModel(TransactionModel transactionModel)
@@ -91,7 +91,7 @@ namespace Budget.Controllers
             return CreatedAtAction("GetTransactionModel", new { id = transactionModel.TransactionId }, transactionModel);
         }
 
-        // DELETE: api/Transaction/5
+        // DELETE: api/TransactionModels/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransactionModel(int id)
         {
