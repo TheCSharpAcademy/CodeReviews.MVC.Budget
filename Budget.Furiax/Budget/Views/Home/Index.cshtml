@@ -1,8 +1,43 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Budget App";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Budget App</h1>
 </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 text-center mt-3">
+            <button>Manage Transactions</button>
+        </div>
+        <div class="col-md-6 text-center mt-3">
+            <button>Manage Categories</button>
+        </div>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>From/To</th>
+            <th>Amount</th>
+            <th>Options</th>
+        </tr>
+    </thead>
+@*     <tbody>
+        @if (Model != null)
+        {
+            foreach(var transaction in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(model => TransactionModel.TransactionId)</td>
+                    <td>@Html.DisplayFor(model => TransactionModel.TransactionDate)</td>
+                    <td>@Html.DisplayFor(model => TransactionModel.TransactionSource)</td>
+                    <td>@Html.DisplayFor(model => TransactionModel.TransactionAmount)</td>
+                    <td><a class="update" data-toggle="modal" href="#updateModal"></a></td>
+                </tr>
+            }
+        }
+    </tbody> *@
+</table>
