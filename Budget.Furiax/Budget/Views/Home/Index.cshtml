@@ -18,6 +18,19 @@
             </div>
         </div>
     </div>
+    <form action="javascript:void(0);" method="POST" onsubmit="addTransaction()">
+        Add Transaction:<br>
+        <input type ="date" id="add-date"><br />
+        <input type ="text" id="add-source" placeholder="To/From">
+        <input type ="text" id="add-amount" placeholder="amount"><br />
+        <input type ="number" id="add-categoryId">
+        <input type ="submit" value="Add">
+    </form>
+    <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
+        Add Category:<br>
+        <input type="text" id="add-category" placeholder="Name">
+        <input type="submit" value="Add">
+    </form>
     <div id="transactionList"></div>
 
     <script src="js/site.js" asp-append-version="true"></script>

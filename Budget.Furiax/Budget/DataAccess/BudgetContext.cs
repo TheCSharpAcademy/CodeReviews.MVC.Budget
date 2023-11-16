@@ -16,8 +16,9 @@ namespace Budget.DataAccess
         {
             modelBuilder.Entity<CategoryModel>()
                 .HasMany(c => c.Transactions)
-                .WithOne(c => c.Category)
-                .HasForeignKey(c => c.CategoryId);
+                .WithOne(t => t.Category)
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<TransactionModel>()
                 .HasOne(t => t.Category);
 

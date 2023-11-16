@@ -1,4 +1,5 @@
 ﻿const uriTransaction = 'api/TransactionModels';
+const uriCategory = 'api/Category';
 let transactions = [];
 
 function getTransactions() {
@@ -7,7 +8,53 @@ function getTransactions() {
         .then(data => displayTransactions(data))
         .catch(error => console.error('Unable to get items.', error));
 }
+function addTransaction() {
+    const addDate = document.getElementById('add-date');
+    const addSource = document.getElementById('add-source');
+    const addAmount = document.getElementById('add-amount');
+    const addCategoryId = document.getElementById('add-categoryId');
+    const item = {
+        TransactionDate: addDate.value,
+        TransactionSource: addSource.value.trim(),
+        TransactionAmount: parseFloat(addAmount.value),
+        CategoryId: parseInt(addCategoryId.value),
+    };
 
+    fetch(uriTransaction, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(item)
+    })
+        .then(response => response.json())
+        .then(() => {
+            getTransactions();
+            addDate.value = '';
+            addSource.value = '';
+            addAmount.value = '';
+            addCategoryId.value = '';
+        })
+        .catch(error => console.error('Unable to add item.'));
+}
+function addCategory() {
+    const addCategory = document.getElementById('add-category');
+    const item = { CategoryName: addCategory.value.trim() }
+    fetch(uriCategory, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(item)
+    })
+        .then(response => response.json())
+        .then(() => {
+            addCategory.value = '';
+        })
+        .catch(error => console.error('Unabale to add category.'));
+}
 function displayTransactions(data) {
     const tList = document.getElementById('transactionList');
     tList.innerHTML = '';
@@ -34,11 +81,11 @@ function displayTransactions(data) {
         let decimalAmount = item.TransactionAmount;
         let formattedAmount = formatAmount(decimalAmount);
         let textNodeAmount = document.createTextNode(formattedAmount);
-        td4.appendChild(textNodeAmount):
+        td4.appendChild(textNodeAmount);
 
     });
 
-    transactionList = data;
+    transactions = data;
 }
 function formatDate(date) {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };

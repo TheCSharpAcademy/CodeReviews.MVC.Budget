@@ -15,7 +15,7 @@ namespace Budget.Models
         public decimal TransactionAmount { get; set; }
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
-        [Required]
+        
         public CategoryModel Category { get; set; } = null!;
     }
 }
