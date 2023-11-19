@@ -15,13 +15,9 @@ namespace Budget.DataAccess
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<CategoryModel>()
-                .HasMany(c => c.Transactions)
-                .WithOne(t => t.Category)
-                .HasForeignKey(t => t.CategoryId)
+                .HasMany(t => t.Transactions)
+                .WithOne(c => c.Category)
                 .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<TransactionModel>()
-                .HasOne(t => t.Category);
-
         }
     }
 }

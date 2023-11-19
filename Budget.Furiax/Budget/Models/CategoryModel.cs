@@ -8,8 +8,7 @@ namespace Budget.Models
         [Key]
         public int CategoryId { get; set; }
         [Required]
-        public string? CategoryName { get; set; }
-        [ForeignKey("CategoryId")]
+        public string CategoryName { get; set; }
         public ICollection<TransactionModel> Transactions { get; } = new List<TransactionModel>();
     }
 }

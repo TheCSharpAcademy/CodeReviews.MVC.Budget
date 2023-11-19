@@ -51,7 +51,7 @@ namespace Budget.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TransactionAmount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");

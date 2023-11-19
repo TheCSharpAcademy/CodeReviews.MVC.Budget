@@ -1,6 +1,7 @@
-﻿const uriTransaction = 'api/TransactionModels';
+﻿const uriTransaction = 'api/Transaction';
 const uriCategory = 'api/Category';
 let transactions = [];
+
 
 function getTransactions() {
     fetch(uriTransaction)
@@ -8,16 +9,45 @@ function getTransactions() {
         .then(data => displayTransactions(data))
         .catch(error => console.error('Unable to get items.', error));
 }
+function populateCategoriesDropMenu() {
+    const addCategorySelect = document.getElementById('add-selectedcategory');
+    fetch(uriCategory)
+        .then(response => response.json())
+        .then(categories => {
+            addCategorySelect.innerHTML = '';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.categoryId;
+                option.text = category.categoryName;
+                addCategorySelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Unable to fetch categories.', error));
+}
+
 function addTransaction() {
     const addDate = document.getElementById('add-date');
     const addSource = document.getElementById('add-source');
     const addAmount = document.getElementById('add-amount');
-    const addCategoryId = document.getElementById('add-categoryId');
+    const addCategorySelect = document.getElementById('add-selectedcategory');
+    
+
+    if (!addDate.value || !addSource.value || !addAmount.value || !addCategorySelect.value) {
+        console.error('Please fill in all the fields.');
+        return;
+    }
+
+    const selectedCategoryOption = addCategorySelect.options[addCategorySelect.selectedIndex];
+    const selectedCategory = {
+        CategoryId: parseInt(selectedCategoryOption.value),
+        CategoryName: selectedCategoryOption.text,
+    };
+
     const item = {
         TransactionDate: addDate.value,
         TransactionSource: addSource.value.trim(),
         TransactionAmount: parseFloat(addAmount.value),
-        CategoryId: parseInt(addCategoryId.value),
+        Category: selectedCategory, 
     };
 
     fetch(uriTransaction, {
@@ -34,12 +64,13 @@ function addTransaction() {
             addDate.value = '';
             addSource.value = '';
             addAmount.value = '';
-            addCategoryId.value = '';
+            addCategorySelect.value = '';
+           
         })
         .catch(error => console.error('Unable to add item.'));
 }
 function addCategory() {
-    const addCategory = document.getElementById('add-category');
+    const addCategory = document.getElementById('add-categoryname');
     const item = { CategoryName: addCategory.value.trim() }
     fetch(uriCategory, {
         method: 'POST',
@@ -52,9 +83,11 @@ function addCategory() {
         .then(response => response.json())
         .then(() => {
             addCategory.value = '';
+            populateCategoriesDropMenu();
         })
         .catch(error => console.error('Unabale to add category.'));
 }
+
 function displayTransactions(data) {
     const tList = document.getElementById('transactionList');
     tList.innerHTML = '';
