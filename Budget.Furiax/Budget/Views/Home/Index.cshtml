@@ -31,7 +31,18 @@
         <input type="text" id="add-categoryname" placeholder="Name">
         <input type="submit" value="Add">
     </form>
-    <div id="transactionList"></div>
+    <table id="transactionList">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Source</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
 
     <script src="js/site.js" asp-append-version="true"></script>
     <script type="text/javascript">

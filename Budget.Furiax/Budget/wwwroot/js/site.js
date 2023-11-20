@@ -48,6 +48,7 @@ function addTransaction() {
         TransactionSource: addSource.value.trim(),
         TransactionAmount: parseFloat(addAmount.value),
         Category: selectedCategory, 
+        CategoryId: selectedCategory.CategoryId
     };
 
     fetch(uriTransaction, {

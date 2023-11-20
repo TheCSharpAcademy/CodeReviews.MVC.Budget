@@ -85,10 +85,24 @@ namespace Budget.Controllers
             {
                 return Problem("Entity set 'BudgetContext.Transactions'  is null.");
             }
-            _context.Transactions.Add(transactionModel);
+
+            if (!_context.Categories.Any(c => c.CategoryId == transactionModel.CategoryId))
+            {
+                return NotFound("Category not found.");
+            }
+
+            var newTransaction = new TransactionModel
+            {
+                TransactionDate = transactionModel.TransactionDate,
+                TransactionSource = transactionModel.TransactionSource,
+                TransactionAmount = transactionModel.TransactionAmount,
+                CategoryId = transactionModel.CategoryId
+            };
+
+            _context.Transactions.Add(newTransaction);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTransactionModel", new { id = transactionModel.TransactionId }, transactionModel);
+            return CreatedAtAction("GetTransactionModel", new { id = newTransaction.TransactionId }, newTransaction);
         }
 
         // DELETE: api/Transaction/5
