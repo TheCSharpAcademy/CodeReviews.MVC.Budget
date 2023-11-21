@@ -91,28 +91,30 @@ function addCategory() {
 
 function displayTransactions(data) {
     const tList = document.getElementById('transactionList');
-    tList.innerHTML = '';
+    const tBody = tList.querySelector('tBody');
+    tBody.innerHTML = '';
 
+    console.log(data);
     data.forEach(item => {
-
+        console.log(item);
         let tr = tList.insertRow();
 
         let td1 = tr.insertCell(0);
-        let textNodeId = document.createTextNode(item.TransactionId);
+        let textNodeId = document.createTextNode(item.transactionId);
         td1.appendChild(textNodeId);
 
         let td2 = tr.insertCell(1);
-        let date = new Date(item.TransactionDate);
+        let date = new Date(item.transactionDate);
         let dateString = formatDate(date);
         let textNodeDate = document.createTextNode(dateString);
         td2.appendChild(textNodeDate);
-
+        
         let td3 = tr.insertCell(2);
-        let textNodeSource = document.createTextNode(item.TransactionSource);
+        let textNodeSource = document.createTextNode(item.transactionSource);
         td3.appendChild(textNodeSource);
-
+        
         let td4 = tr.insertCell(3);
-        let decimalAmount = item.TransactionAmount;
+        let decimalAmount = item.transactionAmount;
         let formattedAmount = formatAmount(decimalAmount);
         let textNodeAmount = document.createTextNode(formattedAmount);
         td4.appendChild(textNodeAmount);

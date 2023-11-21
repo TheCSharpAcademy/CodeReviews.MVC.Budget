@@ -1,6 +1,3 @@
-html {
-  font-size: 14px;
-}
 
 @media (min-width: 768px) {
   html {
@@ -13,10 +10,27 @@ html {
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
   margin-bottom: 60px;
 }
+
+#transactionList {
+    border-collapse: collapse; 
+    width: 100%; 
+    padding: 2px; 
+}
+
+    #transactionList th, #transactionList td {
+        padding: 5px; 
+        text-align: left; 
+        border: 1px solid #dddddd;
+    }
+
+    #transactionList th {
+        background-color: #f2f2f2; /* Optional: Add a background color to header cells */
+    }
