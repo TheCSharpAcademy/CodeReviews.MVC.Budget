@@ -94,9 +94,7 @@ function displayTransactions(data) {
     const tBody = tList.querySelector('tBody');
     tBody.innerHTML = '';
 
-    console.log(data);
     data.forEach(item => {
-        console.log(item);
         let tr = tList.insertRow();
 
         let td1 = tr.insertCell(0);
@@ -121,7 +119,7 @@ function displayTransactions(data) {
 
     });
 
-    transactions = data;
+   transactions = data;
 }
 function formatDate(date) {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
