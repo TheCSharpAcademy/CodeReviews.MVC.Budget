@@ -18,21 +18,13 @@
             </div>
         </div>
     </div>
-    <form action="javascript:void(0);" method="POST" onsubmit="addTransaction()">
-        Add Transaction:<br>
-        <input type ="date" id="add-date"><br />
-        <input type ="text" id="add-source" placeholder="To/From">
-        <input type ="text" id="add-amount" placeholder="amount"><br />
-        <select id="add-selectedcategory" required> </select>
-        <input type ="submit" value="Add">
-    </form>
    
     <table id="transactionList" class="mt-3" >
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Date</th>
-                <th>Source</th>
+                <th>Name</th>
                 <th>Amount</th>
             </tr>
         </thead>
@@ -41,8 +33,16 @@
 
     <div id="transactionModal" class="modal">
         <div class="modal-content">
-            <p> content of the transaction modal comes here</p>
             <span class="btn-close" id="closeModalTransaction"></span>
+            <form action="javascript:void(0);" method="POST" onsubmit="addTransaction()">
+                Add Transaction:<br>
+                Date: <input type="date" id="add-date"><br />
+                Name: <input type="text" id="add-source" placeholder="To/From"><br />
+                Amount: <input type="text" id="add-amount" placeholder="amount"><br />
+                Category: <select id="add-selectedcategory" required> </select>
+                <input type="submit" value="Add">
+                <div id="error-message" style="color:red; display: none;"></div>
+            </form>
         </div>
     </div>
     <div id="categoryModal" class="modal">

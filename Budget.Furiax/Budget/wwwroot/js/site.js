@@ -2,7 +2,6 @@
 const uriCategory = 'api/Category';
 let transactions = [];
 
-
 function getTransactions() {
     fetch(uriTransaction)
         .then(response => response.json())
@@ -33,9 +32,19 @@ function addTransaction() {
     
 
     if (!addDate.value || !addSource.value || !addAmount.value || !addCategorySelect.value) {
-        console.error('Please fill in all the fields.');
+        document.getElementById('error-message').innerText = 'Please fill in all the required fields';
+        document.getElementById('error-message').style.display = 'block';
         return;
     }
+    const amountValue = parseFloat(addAmount.value);
+    if (isNaN(amountValue)) {
+        document.getElementById('error-message').innerText = 'Please fill in valid number for amount';
+        document.getElementById('error-message').style.display = 'block';
+        return;
+    }
+    document.getElementById('error-message').innerText = '';
+    document.getElementById('error-message').style.display = 'none';
+
 
     const selectedCategoryOption = addCategorySelect.options[addCategorySelect.selectedIndex];
     const selectedCategory = {
@@ -66,10 +75,10 @@ function addTransaction() {
             addSource.value = '';
             addAmount.value = '';
             addCategorySelect.value = '';
-           
         })
         .catch(error => console.error('Unable to add item.'));
 }
+
 function addCategory() {
     const addCategory = document.getElementById('add-categoryname');
     const item = { CategoryName: addCategory.value.trim() }
@@ -95,7 +104,7 @@ function displayTransactions(data) {
     tBody.innerHTML = '';
 
     data.forEach(item => {
-        let tr = tList.insertRow();
+        let tr = tBody.insertRow();
 
         let td1 = tr.insertCell(0);
         let textNodeId = document.createTextNode(item.transactionId);
@@ -121,6 +130,7 @@ function displayTransactions(data) {
 
    transactions = data;
 }
+
 function formatDate(date) {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
     return date.toLocaleDateString('nl-BE', options);
