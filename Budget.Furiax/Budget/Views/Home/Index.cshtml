@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>To-do CRUD</title>
+    <title>Budget App</title>
     <link rel="stylesheet" href="css/site.css" />
 </head>
 <body>
@@ -14,7 +14,7 @@
                 <button id="openTransactionModal" class="btn-outline-success">Add Transaction</button>
             </div>
             <div class="col-md-6 text-center mt-3">
-                <button id="openCategoryModal" class="btn-outline-success">Add Category</button>
+                <button id="openCategoryModal" class="btn-outline-success">Manage Categories</button>
             </div>
         </div>
     </div>
@@ -47,12 +47,21 @@
     </div>
     <div id="categoryModal" class="modal">
         <div class="modal-content">
-            <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
-                Add Category: <br>
-                <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
-                <input type="submit" value="Add">
-            </form>
-            
+            <div>
+                What action would you like to do: <select id="categoryAction">
+                    <option value="add-category">ADD</option>
+                    <option value="edit-category">EDIT</option>
+                    <option value="delete-category">DELETE</option>
+                </select>
+            </div>
+    
+            <div id="categoryModal-display">
+                <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
+                    Add Category: <br>
+                    <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
+                    <input type="submit" value="Add Category">
+                </form>
+            </div>
         </div>
     </div>
 

@@ -36,15 +36,13 @@ function addTransaction() {
         document.getElementById('error-message').style.display = 'block';
         return;
     }
-    const amountValue = parseFloat(addAmount.value);
-    if (isNaN(amountValue)) {
+    if (isNaN(parseFloat(addAmount.value))) {
         document.getElementById('error-message').innerText = 'Please fill in valid number for amount';
         document.getElementById('error-message').style.display = 'block';
         return;
     }
     document.getElementById('error-message').innerText = '';
     document.getElementById('error-message').style.display = 'none';
-
 
     const selectedCategoryOption = addCategorySelect.options[addCategorySelect.selectedIndex];
     const selectedCategory = {
@@ -169,3 +167,30 @@ window.addEventListener('click', (event) => {
         categoryModal.style.display = 'none';
     }
 });
+
+
+const categoryActionSelect = document.getElementById('categoryAction');
+const categoryDisplay = document.getElementById('categoryModal-display');
+// add change event listener on the select
+categoryActionSelect.addEventListener('change', updateCategoryContent);
+
+function updateCategoryContent() {
+    const selectedCategoryAction = categoryActionSelect.value;
+    if (selectedCategoryAction === 'add-category') {
+        categoryDisplay.innerHTML = ` 
+                <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
+                    Add Category: <br>
+                    <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
+                    <input type="submit" value="Add Category">
+                </form>`;
+    }
+    else if (selectedCategoryAction === 'edit-category') {
+        categoryDisplay.innerHTML = `
+        <p> here comes the edit text</p> `;
+    }
+    else if (selectedCategoryAction === 'delete-category') {
+        categoryDisplay.innerHTML = `
+        <p> here comes the delete text</p> `;
+    }
+
+}
