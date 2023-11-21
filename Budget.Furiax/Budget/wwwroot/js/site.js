@@ -128,3 +128,34 @@ function formatDate(date) {
 function formatAmount(decimalAmount) {
     return decimalAmount.toFixed(2);
 }
+
+const transactionModal = document.getElementById('transactionModal');
+const openTransactionModal = document.getElementById('openTransactionModal');
+const closeModalTransaction = document.getElementById('closeModalTransaction');
+const categoryModal = document.getElementById('categoryModal');
+const openCategoryModal = document.getElementById('openCategoryModal');
+const closeModalCategory = document.getElementById('closeModalCategory');
+
+openTransactionModal.addEventListener('click', () => {
+    transactionModal.style.display = 'block';
+});
+
+closeModalTransaction.addEventListener('click', () => {
+    transactionModal.style.display = 'none';
+})
+window.addEventListener('click', (event) => {
+    if (event.target === transactionModal) {
+        transactionModal.style.display = 'none';
+    }
+});
+openCategoryModal.addEventListener('click', () => {
+    categoryModal.style.display = 'block';
+});
+closeModalCategory.addEventListener('click', () => {
+    categoryModal.style.display = 'none';
+});
+window.addEventListener('click', (event) => {
+    if (event.target === categoryModal) {
+        categoryModal.style.display = 'none';
+    }
+});

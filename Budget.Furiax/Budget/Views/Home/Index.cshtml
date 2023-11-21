@@ -11,10 +11,10 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 text-center mt-3">
-                <button class="btn-outline-success">Add Transaction</button>
+                <button id="openTransactionModal" class="btn-outline-success">Add Transaction</button>
             </div>
             <div class="col-md-6 text-center mt-3">
-                <button class="btn-outline-success">Add Category</button>
+                <button id="openCategoryModal" class="btn-outline-success">Add Category</button>
             </div>
         </div>
     </div>
@@ -26,11 +26,7 @@
         <select id="add-selectedcategory" required> </select>
         <input type ="submit" value="Add">
     </form>
-    <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
-        Add Category:<br>
-        <input type="text" id="add-categoryname" placeholder="Name">
-        <input type="submit" value="Add">
-    </form>
+   
     <table id="transactionList" class="mt-3" >
         <thead>
             <tr>
@@ -43,12 +39,28 @@
         <tbody></tbody>
     </table>
 
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <p> content of the transaction modal comes here</p>
+            <span class="btn-close" id="closeModalTransaction"></span>
+        </div>
+    </div>
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
+                Add Category: <br>
+                <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
+                <input type="submit" value="Add">
+            </form>
+            
+        </div>
+    </div>
 
     <script src="js/site.js" asp-append-version="true"></script>
     <script type="text/javascript">
         populateCategoriesDropMenu();
         getTransactions();
-        </script>
+    </script>
 </body>
 </html>
 
