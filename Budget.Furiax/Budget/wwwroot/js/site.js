@@ -223,12 +223,12 @@ categoryActionSelect.addEventListener('change', updateCategoryModal);
         else if (selectedCategoryAction === 'edit-category') {
         
             categoryDisplay.innerHTML = `
-          <div> select category that you would like to change: <select id="edit-selectedcategory" required>
-    </select>
-    <form action ="javascript:void(0)" method="POST" onsubmit="updateCategory()">
-            <input type="text" id="update-categoryname" placeholder="add new categoryname" />
+          <div id="edit-category-container">Select the category you wish to alter: <select id="edit-selectedcategory" required>
+    </select></div>
+    <form id="edit-category-form" action ="javascript:void(0)" method="POST" onsubmit="updateCategory()">
+        <input type="text" id="update-categoryname" placeholder="add new categoryname" />
         <input type="submit" value="Edit Category" />
-    </form></div>
+    </form>
     `;
             const editCategorySelect = document.getElementById('edit-selectedcategory');
             populateCategoriesDropMenu3(editCategorySelect, uriCategory);
@@ -237,8 +237,10 @@ categoryActionSelect.addEventListener('change', updateCategoryModal);
             listOfCategoriesSelect.addEventListener('change', function () {
                 console.log('listOfCategoriesSelect changed');
                 updatePlaceholder();
+                toggleEditFormVisibility();
             });
             updateCategoryNameInput = document.getElementById('update-categoryname');
+            hideEditForm();
         }
         else if (selectedCategoryAction === 'delete-category') {
             categoryDisplay.innerHTML = `
@@ -246,13 +248,32 @@ categoryActionSelect.addEventListener('change', updateCategoryModal);
         }
     }
 
-    function updatePlaceholder() {
-        const selectedOption = listOfCategoriesSelect.options[listOfCategoriesSelect.selectedIndex];
-        console.log(selectedOption);
-        updateCategoryNameInput.placeholder = `${selectedOption.text}`;
-        console.log(updateCategoryNameInput.placeholder);
+function updatePlaceholder() {
+    const selectedOption = listOfCategoriesSelect.options[listOfCategoriesSelect.selectedIndex];
+    console.log(selectedOption);
+    updateCategoryNameInput.placeholder = `${selectedOption.text}`;
+    console.log(updateCategoryNameInput.placeholder);
+}
+
+function hideEditForm() {
+    const formContainer = document.getElementById('edit-category-form');
+    formContainer.style.display = 'none';
+}
+function showEditForm() {
+    const formContainer = document.getElementById('edit-category-form');
+    formContainer.style.display = 'block';
+}
+function toggleEditFormVisibility() {
+    const selectedOption = listOfCategoriesSelect.options[listOfCategoriesSelect.selectedIndex];
+    if (selectedOption.value) {
+        showEditForm();
     }
+    else {
+        hideEditForm();
+    }
+}
+
 
 
 //TODO list: - display error when trying to add empty as category
-            // - make the updatePlaceholder work
+            //- when closing and re-opening the category modal the add/edit/delete button doesnt reset
