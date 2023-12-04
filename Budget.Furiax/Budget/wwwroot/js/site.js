@@ -133,7 +133,7 @@ function updateCategory() {
     const getCategoryId = document.getElementById('edit-selectedcategory');
     const categoryId = getCategoryId.value;
     const item = { CategoryId: categoryId, CategoryName: newCategoryName };
-    console.log(item);
+    const statusMessage = document.getElementById('edit-form-message');
     fetch(uriCategory + "/" + categoryId, {
         method: 'PUT',
         headers: {
@@ -145,6 +145,9 @@ function updateCategory() {
         .then(response => {
             if (response.ok || response.status === 204) {
                 console.log('Category updated succesfully');
+                statusMessage.innerText = 'Categoryname successfully updated';
+                statusMessage.style.color = 'green';
+                statusMessage.style.display = 'block';
                 return true;
             }
             else {
@@ -260,16 +263,19 @@ function updateCategoryModal() {
     </select></div>
     <form id="edit-category-form" action ="javascript:void(0)" method="POST" onsubmit="updateCategory()">
         <input type="text" id="update-categoryname" placeholder="add new categoryname" />
-        <input type="submit" value="Edit Category" />
+        <input type="submit" value="Update Name" />
     </form>
+    <div id="edit-form-message" style="display: none;"></div>
     `;
         const editCategorySelect = document.getElementById('edit-selectedcategory');
         populateCategoriesDropMenu3(editCategorySelect, uriCategory);
 
         listOfCategoriesSelect = editCategorySelect;
        listOfCategoriesSelect.addEventListener('change', function () {
-            updatePlaceholder();
-            toggleEditFormVisibility();
+           updatePlaceholder();
+           toggleEditFormVisibility();
+           const statusMessage = document.getElementById('edit-form-message');
+           statusMessage.style.display = 'none';
        });
        updateCategoryNameInput = document.getElementById('update-categoryname');
        hideEditForm();
