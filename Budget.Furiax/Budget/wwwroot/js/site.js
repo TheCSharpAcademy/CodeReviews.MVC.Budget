@@ -209,20 +209,20 @@ let listOfCategoriesSelect;
 
 categoryActionSelect.addEventListener('change', updateCategoryModal);
 
-    function updateCategoryModal() {
-        const selectedCategoryAction = categoryActionSelect.value;
+function updateCategoryModal() {
+   const selectedCategoryAction = categoryActionSelect.value;
 
-        if (selectedCategoryAction === 'add-category') {
-            categoryDisplay.innerHTML = `
-                <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
-                    Add Category: <br>
-                    <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
-                    <input type="submit" value="Add Category">
-                </form>`;
-        }
-        else if (selectedCategoryAction === 'edit-category') {
-        
-            categoryDisplay.innerHTML = `
+   if (selectedCategoryAction === 'add-category') {
+      categoryDisplay.innerHTML = `
+          <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
+              Add Category: <br>
+              <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
+              <input type="submit" value="Add Category">
+          </form>`;
+    }
+   else if (selectedCategoryAction === 'edit-category') {
+
+        categoryDisplay.innerHTML = `
           <div id="edit-category-container">Select the category you wish to alter: <select id="edit-selectedcategory" required>
     </select></div>
     <form id="edit-category-form" action ="javascript:void(0)" method="POST" onsubmit="updateCategory()">
@@ -230,29 +230,27 @@ categoryActionSelect.addEventListener('change', updateCategoryModal);
         <input type="submit" value="Edit Category" />
     </form>
     `;
-            const editCategorySelect = document.getElementById('edit-selectedcategory');
-            populateCategoriesDropMenu3(editCategorySelect, uriCategory);
+        const editCategorySelect = document.getElementById('edit-selectedcategory');
+        populateCategoriesDropMenu3(editCategorySelect, uriCategory);
 
-            listOfCategoriesSelect = editCategorySelect;
-            listOfCategoriesSelect.addEventListener('change', function () {
-                console.log('listOfCategoriesSelect changed');
-                updatePlaceholder();
-                toggleEditFormVisibility();
-            });
-            updateCategoryNameInput = document.getElementById('update-categoryname');
-            hideEditForm();
-        }
-        else if (selectedCategoryAction === 'delete-category') {
-            categoryDisplay.innerHTML = `
-        <p> here comes the delete text</p> `;
-        }
-    }
+        listOfCategoriesSelect = editCategorySelect;
+       listOfCategoriesSelect.addEventListener('change', function () {
+            updatePlaceholder();
+            toggleEditFormVisibility();
+       });
+       updateCategoryNameInput = document.getElementById('update-categoryname');
+       hideEditForm();
+   }
+   else if (selectedCategoryAction === 'delete-category') {
+       categoryDisplay.innerHTML = `
+       <p> here comes the delete text</p> `;
+   }
+}
 
 function updatePlaceholder() {
     const selectedOption = listOfCategoriesSelect.options[listOfCategoriesSelect.selectedIndex];
-    console.log(selectedOption);
     updateCategoryNameInput.placeholder = `${selectedOption.text}`;
-    console.log(updateCategoryNameInput.placeholder);
+    (updateCategoryNameInput.placeholder);
 }
 
 function hideEditForm() {
