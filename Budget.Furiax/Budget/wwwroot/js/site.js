@@ -24,6 +24,38 @@ function populateCategoriesDropMenu() {
         .catch(error => console.error('Unable to fetch categories.', error));
 }
 
+function populateCategoriesDropMenu3(targetSelect, url) {
+    targetSelect.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.text = "--select category--";
+    targetSelect.appendChild(defaultOption);
+
+    let fetchPromise;
+    if (typeof url === 'string') {
+        // If categoriesOrUrl is a string, assume it's a URL and fetch the data
+        fetchPromise = fetch(url)
+            .then(response => response.json());
+    } else {
+        // If it's not a string, assume it's the array of categories
+        fetchPromise = Promise.resolve(url);
+    }
+
+    fetchPromise
+        .then(categories => {
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.categoryId;
+                option.text = category.categoryName;
+                targetSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Unable to fetch or process categories.', error));
+}
+
+
+
 function addTransaction() {
     const addDate = document.getElementById('add-date');
     const addSource = document.getElementById('add-source');
@@ -168,29 +200,55 @@ window.addEventListener('click', (event) => {
     }
 });
 
+// start of category modal content code
 
-const categoryActionSelect = document.getElementById('categoryAction');
-const categoryDisplay = document.getElementById('categoryModal-display');
-// add change event listener on the select
-categoryActionSelect.addEventListener('change', updateCategoryContent);
+    const categoryActionSelect = document.getElementById('categoryAction');
+    const categoryDisplay = document.getElementById('categoryModal-display');
+    const listOfCategoriesSelect = document.getElementById('add-selectedcategory');
+    const updateCategoryNameInput = document.getElementById('update-categoryname');
 
-function updateCategoryContent() {
-    const selectedCategoryAction = categoryActionSelect.value;
-    if (selectedCategoryAction === 'add-category') {
-        categoryDisplay.innerHTML = ` 
+    categoryActionSelect.addEventListener('change', updateCategoryModal);
+
+    function updateCategoryModal() {
+        const selectedCategoryAction = categoryActionSelect.value;
+
+       
+
+        if (selectedCategoryAction === 'add-category') {
+            categoryDisplay.innerHTML = `
                 <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
                     Add Category: <br>
                     <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
                     <input type="submit" value="Add Category">
                 </form>`;
-    }
-    else if (selectedCategoryAction === 'edit-category') {
-        categoryDisplay.innerHTML = `
-        <p> here comes the edit text</p> `;
-    }
-    else if (selectedCategoryAction === 'delete-category') {
-        categoryDisplay.innerHTML = `
+        }
+        else if (selectedCategoryAction === 'edit-category') {
+            categoryDisplay.innerHTML = `
+          <div> select category that you would like to change: <select id="edit-selectedcategory" required>
+    </select>
+    <form action ="javascript:void(0)" method="POST" onsubmit="updateCategory()">
+            <input type="text" id="update-categoryname" placeholder="add new categoryname" />
+        <input type="submit" value="Edit Category" />
+    </form></div>
+    `;
+            const editCategorySelect = document.getElementById('edit-selectedcategory');
+            populateCategoriesDropMenu3(editCategorySelect, uriCategory);
+            listOfCategoriesSelect.addEventListener('change', updatePlaceholder);
+            
+        }
+        else if (selectedCategoryAction === 'delete-category') {
+            categoryDisplay.innerHTML = `
         <p> here comes the delete text</p> `;
+        }
     }
 
-}
+    function updatePlaceholder() {
+        const selectedOption = listOfCategoriesSelect.options[listOfCategoriesSelect.selectedIndex];
+        console.log(selectedOption);
+        updateCategoryNameInput.placeholder = `${selectedOption.text}`;
+        console.log(updateCategoryNameInput.placeholder);
+    }
+
+
+//TODO list: - display error when trying to add empty as category
+            // - make the updatePlaceholder work
