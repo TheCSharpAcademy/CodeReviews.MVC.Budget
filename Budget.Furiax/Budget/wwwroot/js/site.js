@@ -104,10 +104,10 @@ function addTransaction() {
         })
         .catch(error => console.error('Unable to add item.'));
 }
-
 function addCategory() {
     const addCategory = document.getElementById('add-categoryname');
-    const item = { CategoryName: addCategory.value.trim() }
+    const item = { CategoryName: addCategory.value.trim() };
+
     fetch(uriCategory, {
         method: 'POST',
         headers: {
@@ -159,6 +159,40 @@ function updateCategory() {
             }
         })
         .catch(error => console.error('Could not update the category name', error.message));
+}
+function deleteCategory() {
+    const deleteCategoryId = document.getElementById('delete-selectedcategory');
+    const statusDeleteMessage = document.getElementById('delete-form-message');
+    const warning = confirm("By deleting a Category, all transactions linked to it will also be deleted ! \nAre you sure you want to delete this category ?");
+    if (warning) {
+        fetch(uriCategory + "/" + deleteCategoryId.value, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    statusDeleteMessage.innerText = 'Category successfully deleted';
+                    statusDeleteMessage.style.color = 'green';
+                    statusDeleteMessage.style.display = 'block';
+                    return true;
+                } 
+            })
+            .then(success => {
+                if (success) {
+                    const deleteCategorySelect = document.getElementById('delete-selectedcategory');
+                    populateCategoriesDropMenu3(deleteCategorySelect, uriCategory);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting category:', error);
+            });
+    }
+    else {
+        console.log("user clicked cancel");
+    }
 }
 
 function displayTransactions(data) {
@@ -240,23 +274,25 @@ const categoryDisplay = document.getElementById('categoryModal-display');
 let updateCategoryNameInput;
 let listOfCategoriesSelect;
 
-categoryActionSelect.addEventListener('change', updateCategoryModal);
+categoryActionSelect.addEventListener('change', manageCategoryModal);
 
-function updateCategoryModal() {
+function manageCategoryModal() {
    const selectedCategoryAction = categoryActionSelect.value;
 
-   if (selectedCategoryAction === 'add-category') {
-      categoryDisplay.innerHTML = `
-          <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
+    if (selectedCategoryAction === 'add-category') {
+        categoryDisplay.innerHTML = `
+          <form id="add-category-form" action="javascript:void(0);" method="POST" onsubmit="addCategory()">
               Add Category: <br>
-              <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
-              <input type="submit" value="Add Category">
-          </form>`;
+              <input type="text" id="add-categoryname" placeholder="Name">
+              <input type="submit" value="Add Category">                     
+          </form>
+          <div id="add-form-message" style="display: none;"></div>
+          `;
     }
    else if (selectedCategoryAction === 'edit-category') {
 
         categoryDisplay.innerHTML = `
-          <div id="edit-category-container">Select the category you wish to alter: <select id="edit-selectedcategory" required>
+          <div id="edit-category-container">Select the category name you wish to edit: <select id="edit-selectedcategory" required>
     </select></div>
     <form id="edit-category-form" action ="javascript:void(0)" method="POST" onsubmit="updateCategory()">
         <input type="text" id="update-categoryname" placeholder="add new categoryname" />
@@ -272,15 +308,29 @@ function updateCategoryModal() {
        listOfCategoriesSelect.addEventListener('change', function () {
            updatePlaceholder();
            toggleEditFormVisibility();
-           const statusMessage = document.getElementById('edit-form-message');
-           statusMessage.style.display = 'none';
+           const statusEditMessage = document.getElementById('edit-form-message');
+           statusEditMessage.style.display = 'none';
        });
        updateCategoryNameInput = document.getElementById('update-categoryname');
        hideEditForm();
    }
    else if (selectedCategoryAction === 'delete-category') {
        categoryDisplay.innerHTML = `
-       <p> here comes the delete text</p> `;
+       <div id="delete-category-container">Select the category that you wish to delete:
+       <select id="delete-selectedcategory" required>
+       </select></div>
+       <form id="delete-category-form" action ="javascript:void(0)" method="POST" onsubmit="deleteCategory()">
+        <input type="submit" value="Delete Category" />
+        </form>
+        <div id ="delete-form-message" style="display: none;"></div>
+       `;
+        const deleteCategorySelect = document.getElementById('delete-selectedcategory');
+        populateCategoriesDropMenu3(deleteCategorySelect, uriCategory);
+        listOfCategoriesSelect = deleteCategorySelect;
+        listOfCategoriesSelect.addEventListener('change', function () {
+            const statusDeleteMessage = document.getElementById('delete-form-message');
+            statusDeleteMessage.style.display = 'none';
+        });
    }
 }
 
@@ -312,4 +362,5 @@ function toggleEditFormVisibility() {
 
 //TODO list: - display error when trying to add empty as category
 //- when closing and re-opening the category modal the add/edit/delete button doesnt reset
-    //reset placeholder after succesfull edit categoryname
+//manage category functions - not all close buttons work
+// replace original dropdownmenu with dropdownmenu 3
