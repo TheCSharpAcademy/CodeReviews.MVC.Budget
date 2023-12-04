@@ -145,9 +145,17 @@ function updateCategory() {
         .then(response => {
             if (response.ok || response.status === 204) {
                 console.log('Category updated succesfully');
+                return true;
             }
             else {
                 throw new Error(`Failed to update category. Status: ${response.status}`);
+            }
+        })
+        .then(success => {
+            if (success) {
+                const editCategorySelect = document.getElementById('edit-selectedcategory');
+                populateCategoriesDropMenu3(editCategorySelect, uriCategory);
+                hideEditForm();
             }
         })
         .catch(error => console.error('Could not update the category name', error.message));
@@ -299,4 +307,5 @@ function toggleEditFormVisibility() {
 
 
 //TODO list: - display error when trying to add empty as category
-            //- when closing and re-opening the category modal the add/edit/delete button doesnt reset
+//- when closing and re-opening the category modal the add/edit/delete button doesnt reset
+    //-
