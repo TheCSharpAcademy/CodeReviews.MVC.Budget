@@ -202,17 +202,15 @@ window.addEventListener('click', (event) => {
 
 // start of category modal content code
 
-    const categoryActionSelect = document.getElementById('categoryAction');
-    const categoryDisplay = document.getElementById('categoryModal-display');
-    const listOfCategoriesSelect = document.getElementById('add-selectedcategory');
-    const updateCategoryNameInput = document.getElementById('update-categoryname');
+const categoryActionSelect = document.getElementById('categoryAction');
+const categoryDisplay = document.getElementById('categoryModal-display');
+let updateCategoryNameInput;
+let listOfCategoriesSelect;
 
-    categoryActionSelect.addEventListener('change', updateCategoryModal);
+categoryActionSelect.addEventListener('change', updateCategoryModal);
 
     function updateCategoryModal() {
         const selectedCategoryAction = categoryActionSelect.value;
-
-       
 
         if (selectedCategoryAction === 'add-category') {
             categoryDisplay.innerHTML = `
@@ -223,6 +221,7 @@ window.addEventListener('click', (event) => {
                 </form>`;
         }
         else if (selectedCategoryAction === 'edit-category') {
+        
             categoryDisplay.innerHTML = `
           <div> select category that you would like to change: <select id="edit-selectedcategory" required>
     </select>
@@ -233,8 +232,13 @@ window.addEventListener('click', (event) => {
     `;
             const editCategorySelect = document.getElementById('edit-selectedcategory');
             populateCategoriesDropMenu3(editCategorySelect, uriCategory);
-            listOfCategoriesSelect.addEventListener('change', updatePlaceholder);
-            
+
+            listOfCategoriesSelect = editCategorySelect;
+            listOfCategoriesSelect.addEventListener('change', function () {
+                console.log('listOfCategoriesSelect changed');
+                updatePlaceholder();
+            });
+            updateCategoryNameInput = document.getElementById('update-categoryname');
         }
         else if (selectedCategoryAction === 'delete-category') {
             categoryDisplay.innerHTML = `
