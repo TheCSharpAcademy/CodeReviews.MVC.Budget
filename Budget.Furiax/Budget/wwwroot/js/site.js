@@ -127,6 +127,31 @@ function addCategory() {
         })
         .catch(error => console.error('Unabale to add category.'));
 }
+function updateCategory() {
+    const getUpdatedCategoryName = document.getElementById('update-categoryname');
+    const newCategoryName = getUpdatedCategoryName.value.trim();
+    const getCategoryId = document.getElementById('edit-selectedcategory');
+    const categoryId = getCategoryId.value;
+    const item = { CategoryId: categoryId, CategoryName: newCategoryName };
+    console.log(item);
+    fetch(uriCategory + "/" + categoryId, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(item)
+    })
+        .then(response => {
+            if (response.ok || response.status === 204) {
+                console.log('Category updated succesfully');
+            }
+            else {
+                throw new Error(`Failed to update category. Status: ${response.status}`);
+            }
+        })
+        .catch(error => console.error('Could not update the category name', error.message));
+}
 
 function displayTransactions(data) {
     const tList = document.getElementById('transactionList');
