@@ -23,7 +23,6 @@ function populateCategoriesDropMenu() {
         })
         .catch(error => console.error('Unable to fetch categories.', error));
 }
-
 function populateCategoriesDropMenu3(targetSelect, url) {
     targetSelect.innerHTML = '';
 
@@ -53,9 +52,6 @@ function populateCategoriesDropMenu3(targetSelect, url) {
         })
         .catch(error => console.error('Unable to fetch or process categories.', error));
 }
-
-
-
 function addTransaction() {
     const addDate = document.getElementById('add-date');
     const addSource = document.getElementById('add-source');
@@ -158,6 +154,7 @@ function updateCategory() {
             if (success) {
                 const editCategorySelect = document.getElementById('edit-selectedcategory');
                 populateCategoriesDropMenu3(editCategorySelect, uriCategory);
+                document.getElementById('update-categoryname').value = '';
                 hideEditForm();
             }
         })
@@ -267,10 +264,11 @@ function updateCategoryModal() {
     </form>
     <div id="edit-form-message" style="display: none;"></div>
     `;
-        const editCategorySelect = document.getElementById('edit-selectedcategory');
-        populateCategoriesDropMenu3(editCategorySelect, uriCategory);
+       
+       const editCategorySelect = document.getElementById('edit-selectedcategory');
+       populateCategoriesDropMenu3(editCategorySelect, uriCategory);
 
-        listOfCategoriesSelect = editCategorySelect;
+       listOfCategoriesSelect = editCategorySelect;
        listOfCategoriesSelect.addEventListener('change', function () {
            updatePlaceholder();
            toggleEditFormVisibility();
@@ -314,4 +312,4 @@ function toggleEditFormVisibility() {
 
 //TODO list: - display error when trying to add empty as category
 //- when closing and re-opening the category modal the add/edit/delete button doesnt reset
-    //-
+    //reset placeholder after succesfull edit categoryname
