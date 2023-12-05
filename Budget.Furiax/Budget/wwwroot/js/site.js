@@ -106,7 +106,12 @@ function addTransaction() {
 }
 function addCategory() {
     const addCategory = document.getElementById('add-categoryname');
-    const item = { CategoryName: addCategory.value.trim() };
+    const input = addCategory.value.trim();
+    if (input === '') {
+        alert('Category name can\'t be empty');
+        return;
+    }
+    const item = { CategoryName: input };
 
     fetch(uriCategory, {
         method: 'POST',
@@ -381,7 +386,7 @@ function toggleDeleteFormVisibility() {
 
 
 
-//TODO list: - display error when trying to add empty as category
+//TODO list: - instead of an alert window try to show error in the modal
 //- when closing and re-opening the category modal the add/edit/delete button doesnt reset
 //manage category functions - not all close buttons work
 // replace original dropdownmenu with dropdownmenu 3
