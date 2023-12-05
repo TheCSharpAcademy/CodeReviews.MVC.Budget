@@ -184,6 +184,7 @@ function deleteCategory() {
                 if (success) {
                     const deleteCategorySelect = document.getElementById('delete-selectedcategory');
                     populateCategoriesDropMenu3(deleteCategorySelect, uriCategory);
+                    hideDeleteForm();
                 }
             })
             .catch(error => {
@@ -328,9 +329,11 @@ function manageCategoryModal() {
         populateCategoriesDropMenu3(deleteCategorySelect, uriCategory);
         listOfCategoriesSelect = deleteCategorySelect;
         listOfCategoriesSelect.addEventListener('change', function () {
+            toggleDeleteFormVisibility();
             const statusDeleteMessage = document.getElementById('delete-form-message');
             statusDeleteMessage.style.display = 'none';
         });
+        hideDeleteForm();
    }
 }
 
@@ -355,6 +358,24 @@ function toggleEditFormVisibility() {
     }
     else {
         hideEditForm();
+    }
+}
+
+function hideDeleteForm() {
+    const formContainer = document.getElementById('delete-category-form');
+    formContainer.style.display = 'none';
+}
+function showDeleteForm() {
+    const formContainer = document.getElementById('delete-category-form');
+    formContainer.style.display = 'block';
+}
+function toggleDeleteFormVisibility() {
+    const selectedOption = listOfCategoriesSelect.options[listOfCategoriesSelect.selectedIndex];
+    if (selectedOption.value) {
+        showDeleteForm();
+    }
+    else {
+        hideDeleteForm();
     }
 }
 
