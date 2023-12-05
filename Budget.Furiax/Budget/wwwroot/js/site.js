@@ -229,6 +229,14 @@ function displayTransactions(data) {
         let textNodeAmount = document.createTextNode(formattedAmount);
         td4.appendChild(textNodeAmount);
 
+        let td5 = tr.insertCell(4);
+        fetch(uriCategory + "/" + item.categoryId)
+            .then(response => response.json())
+            .then(categoryData => {
+                let textNodeCategory = document.createTextNode(categoryData.categoryName);
+                td5.appendChild(textNodeCategory);
+            })
+            .catch(error => console.error('Unable to get the category name'));
     });
 
    transactions = data;
@@ -339,7 +347,7 @@ function manageCategoryModal() {
             statusDeleteMessage.style.display = 'none';
         });
         hideDeleteForm();
-   }
+    }
 }
 
 function updatePlaceholder() {
@@ -388,5 +396,4 @@ function toggleDeleteFormVisibility() {
 
 //TODO list: - instead of an alert window try to show error in the modal
 //- when closing and re-opening the category modal the add/edit/delete button doesnt reset
-//manage category functions - not all close buttons work
 // replace original dropdownmenu with dropdownmenu 3
