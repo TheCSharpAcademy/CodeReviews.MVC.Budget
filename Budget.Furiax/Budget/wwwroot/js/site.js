@@ -161,6 +161,7 @@ function updateCategory() {
                 populateCategoriesDropMenu3(editCategorySelect, uriCategory);
                 document.getElementById('update-categoryname').value = '';
                 hideEditForm();
+                location.reload();
             }
         })
         .catch(error => console.error('Could not update the category name', error.message));
@@ -190,6 +191,7 @@ function deleteCategory() {
                     const deleteCategorySelect = document.getElementById('delete-selectedcategory');
                     populateCategoriesDropMenu3(deleteCategorySelect, uriCategory);
                     hideDeleteForm();
+                    location.reload();
                 }
             })
             .catch(error => {
@@ -397,3 +399,5 @@ function toggleDeleteFormVisibility() {
 //TODO list: - instead of an alert window try to show error in the modal
 //- when closing and re-opening the category modal the add/edit/delete button doesnt reset
 // replace original dropdownmenu with dropdownmenu 3
+// when deleting category the transactionslist isnt updated until it get refreshed
+// when no categories created yet display warning when adding transaction
