@@ -34,6 +34,7 @@
         <tbody></tbody>
     </table>
 
+
     <div id="transactionModal" class="modal">
         <div class="modal-content">
             <span class="btn-close" id="closeModalTransaction"></span>
@@ -45,6 +46,18 @@
                 Category: <select id="add-selectedcategory" required> </select>
                 <input type="submit" value="Add">
                 <div id="error-message" style="color:red; display: none;"></div>
+            </form>
+        </div>
+    </div>
+    <div id="editTransactionModal" class="modal">
+        <div class="modal-content">
+            <form action="javascript:void(0);" method="post" onsubmit="editTransaction()">
+                Edit Transaction:<br>
+                Date: <input type="date" id="edit-date"><br />
+                Name: <input type="text" id="edit-source"><br />
+                Amount: <input type="text" id="edit-amount" ><br />
+                Category: <select id="edit-selectedcategory" required> </select>
+                <input type="submit" value="Save Changes">
             </form>
         </div>
     </div>

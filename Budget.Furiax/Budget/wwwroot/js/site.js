@@ -250,7 +250,7 @@ function displayTransactions(data) {
             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
         </svg>`;
         editTransactionButton.addEventListener('click', () => {
-            openEditTransactionModal();
+            openEditTransactionModal(item);
         });
         td6.appendChild(editTransactionButton);
 
@@ -270,11 +270,34 @@ function displayTransactions(data) {
 
    transactions = data;
 }
-function openEditTransactionModal() {
-    console.log('opens up edit transaction modal');
+function openEditTransactionModal(item) {
+    const editTransactionModal = document.getElementById('editTransactionModal');
+    const editDate = document.getElementById('edit-date');
+    const editSource = document.getElementById('edit-source');
+    const editAmount = document.getElementById('edit-amount');
+    const editCategory = document.getElementById('edit-selectedcategory');
+    populateCategoriesDropMenu3(editCategory, uriCategory);
+
+    editTransactionModal.style.display = 'block';
+    editDate.value = convertDate(item.transactionDate);
+    editSource.value = item.transactionSource;
+    editAmount.value = item.transactionAmount;
+    editCategory.value = item.categoryId;
+    setTimeout(function () {
+        editCategory.value = item.categoryId;
+        console.log(editCategory.value);
+    }, 10);
 }
 function openDeleteTransactionModal() {
     console.log('opens up delete transaction modal');
+}
+function convertDate(dateString) {
+    const date = new Date(dateString);
+    //converting takes a day off so adding a day first
+    const plusOneDay = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+    const convertedDate = plusOneDay.toISOString().split('T')[0];
+    console.log(convertedDate);
+    return convertedDate;
 }
 function formatDate(date) {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
