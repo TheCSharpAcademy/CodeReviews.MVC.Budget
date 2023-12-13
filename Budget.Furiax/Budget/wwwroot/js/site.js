@@ -1,6 +1,7 @@
 ﻿const uriTransaction = 'api/Transaction';
 const uriCategory = 'api/Category';
 let transactions = [];
+let balance = 0;
 
 function getTransactions() {
     fetch(uriTransaction)
@@ -96,11 +97,11 @@ function addTransaction() {
     })
         .then(response => response.json())
         .then(() => {
-            getTransactions();
             addDate.value = '';
             addSource.value = '';
             addAmount.value = '';
             addCategorySelect.value = '';
+            location.reload();
         })
         .catch(error => console.error('Unable to add item.'));
 }
@@ -206,7 +207,6 @@ function displayTransactions(data) {
     const tList = document.getElementById('transactionList');
     const tBody = tList.querySelector('tBody');
     tBody.innerHTML = '';
-
     data.forEach(item => {
         let tr = tBody.insertRow();
 
@@ -265,9 +265,12 @@ function displayTransactions(data) {
             deleteTransaction(item.transactionId);
         });
         td7.appendChild(deleteTransactionButton);
+
+        balance += decimalAmount;
     });
 
-   transactions = data;
+    transactions = data;
+    document.getElementById('balanceTotal').textContent = balance.toFixed(2);
 }
 
 const transactionEditModal = document.getElementById('editTransactionModal'); 
@@ -522,7 +525,6 @@ function toggleDeleteFormVisibility() {
         hideDeleteForm();
     }
 }
-
 
 
 //TODO list: - instead of an alert window try to show error in the modal
