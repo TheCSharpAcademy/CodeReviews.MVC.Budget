@@ -250,7 +250,7 @@ function displayTransactions(data) {
             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
         </svg>`;
         editTransactionButton.addEventListener('click', () => {
-            openEditTransactionModal(item);
+            editTransactionModal(item);
         });
         td6.appendChild(editTransactionButton);
 
@@ -270,7 +270,7 @@ function displayTransactions(data) {
 
    transactions = data;
 }
-function openEditTransactionModal(item) {
+function editTransactionModal(item) {
     const editTransactionModal = document.getElementById('editTransactionModal');
     const editDate = document.getElementById('edit-date');
     const editSource = document.getElementById('edit-source');
@@ -286,7 +286,7 @@ function openEditTransactionModal(item) {
     setTimeout(function () {
         editCategory.value = item.categoryId;
         console.log(editCategory.value);
-    }, 10);
+    }, 5); // had to add a delay else the categoryvalue wasn't updating
 }
 function openDeleteTransactionModal() {
     console.log('opens up delete transaction modal');
@@ -313,6 +313,7 @@ const closeModalTransaction = document.getElementById('closeModalTransaction');
 const categoryModal = document.getElementById('categoryModal');
 const openCategoryModal = document.getElementById('openCategoryModal');
 const closeModalCategory = document.getElementById('closeModalCategory');
+const transactionEditModal = document.getElementById('editTransactionModal'); 
 
 openTransactionModal.addEventListener('click', () => {
     transactionModal.style.display = 'block';
@@ -337,7 +338,11 @@ window.addEventListener('click', (event) => {
         categoryModal.style.display = 'none';
     }
 });
-
+window.addEventListener('click', (event) => {
+    if (event.target === transactionEditModal) {
+        transactionEditModal.style.display = 'none';
+    }
+});
 // start of category modal content code
 
 const categoryActionSelect = document.getElementById('categoryAction');
