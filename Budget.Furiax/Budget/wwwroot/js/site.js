@@ -292,8 +292,17 @@ function editTransactionModal(item) {
     }, 100); // had to add a small delay else the categoryvalue wasn't updating
 }
 function editTransaction() {
-    console.log("save changes button pressed");
-    console.log("transactionid:" + editTransactionId);
+
+    if (!editDate.value || !editSource.value || !editAmount.value || !editCategory.value) {
+        document.getElementById('error-message-edit').innerText = 'Please fill in all the required fields';
+        document.getElementById('error-message-edit').style.display = 'block';
+        return;
+    }
+    if (isNaN(parseFloat(editAmount.value))) {
+        document.getElementById('error-message-edit').innerText = 'Please fill in valid number for amount';
+        document.getElementById('error-message-edit').style.display = 'block';
+        return;
+    }
 
     const selectedEditCategoryOption = editCategory.options[editCategory.selectedIndex];
     const selectedEditCategory = {
