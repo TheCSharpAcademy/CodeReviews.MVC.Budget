@@ -270,23 +270,69 @@ function displayTransactions(data) {
 
    transactions = data;
 }
+
+const transactionEditModal = document.getElementById('editTransactionModal'); 
+const editDate = document.getElementById('edit-date');
+const editSource = document.getElementById('edit-source');
+const editAmount = document.getElementById('edit-amount');
+const editCategory = document.getElementById('edit-selectedcategory');
+let editTransactionId;
 function editTransactionModal(item) {
-    const editTransactionModal = document.getElementById('editTransactionModal');
-    const editDate = document.getElementById('edit-date');
-    const editSource = document.getElementById('edit-source');
-    const editAmount = document.getElementById('edit-amount');
-    const editCategory = document.getElementById('edit-selectedcategory');
+
     populateCategoriesDropMenu3(editCategory, uriCategory);
 
-    editTransactionModal.style.display = 'block';
+    transactionEditModal.style.display = 'block';
+    editTransactionId = item.transactionId;
     editDate.value = convertDate(item.transactionDate);
     editSource.value = item.transactionSource;
     editAmount.value = item.transactionAmount;
     editCategory.value = item.categoryId;
     setTimeout(function () {
         editCategory.value = item.categoryId;
-        console.log(editCategory.value);
-    }, 5); // had to add a delay else the categoryvalue wasn't updating
+    }, 100); // had to add a small delay else the categoryvalue wasn't updating
+}
+function editTransaction() {
+    console.log("save changes button pressed");
+    console.log("transactionid:" + editTransactionId);
+
+    const selectedEditCategoryOption = editCategory.options[editCategory.selectedIndex];
+    const selectedEditCategory = {
+        CategoryId: parseInt(selectedEditCategoryOption.value),
+        CategoryName: selectedEditCategoryOption.text,
+    };
+    const editedItem = {
+        TransactionId: editTransactionId,
+        TransactionDate: editDate.value,
+        TransactionSource: editSource.value.trim(),
+        TransactionAmount: parseFloat(editAmount.value),
+        Category: selectedEditCategory,
+        CategoryId: selectedEditCategory.CategoryId
+    }
+    console.log(editedItem);
+
+    fetch(uriTransaction + "/" + editTransactionId, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(editedItem)
+    })
+        .then(response => {
+            if (response.ok || response.status === 204) {
+                console.log('Transaction successfully updated');
+                return true;
+            }
+            else {
+                throw new Error(`Failed to update category. Status: ${response.status}`);
+            }
+        })
+        .then(success => {
+            if (success) {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Could not update the transaction', error.message));
 }
 function openDeleteTransactionModal() {
     console.log('opens up delete transaction modal');
@@ -296,7 +342,6 @@ function convertDate(dateString) {
     //converting takes a day off so adding a day first
     const plusOneDay = new Date(date.getTime() + 24 * 60 * 60 * 1000);
     const convertedDate = plusOneDay.toISOString().split('T')[0];
-    console.log(convertedDate);
     return convertedDate;
 }
 function formatDate(date) {
@@ -313,7 +358,6 @@ const closeModalTransaction = document.getElementById('closeModalTransaction');
 const categoryModal = document.getElementById('categoryModal');
 const openCategoryModal = document.getElementById('openCategoryModal');
 const closeModalCategory = document.getElementById('closeModalCategory');
-const transactionEditModal = document.getElementById('editTransactionModal'); 
 
 openTransactionModal.addEventListener('click', () => {
     transactionModal.style.display = 'block';
