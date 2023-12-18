@@ -9,22 +9,7 @@ function getTransactions() {
         .then(data => displayTransactions(data))
         .catch(error => console.error('Unable to get items.', error));
 }
-function populateCategoriesDropMenu() {
-    const addCategorySelect = document.getElementById('add-selectedcategory');
-    fetch(uriCategory)
-        .then(response => response.json())
-        .then(categories => {
-            addCategorySelect.innerHTML = '';
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.categoryId;
-                option.text = category.categoryName;
-                addCategorySelect.appendChild(option);
-            });
-        })
-        .catch(error => console.error('Unable to fetch categories.', error));
-}
-function populateCategoriesDropMenu3(targetSelect, url) {
+async function populateCategoriesDropMenu(targetSelect, url) {
     targetSelect.innerHTML = '';
 
     const defaultOption = document.createElement('option');
@@ -33,32 +18,39 @@ function populateCategoriesDropMenu3(targetSelect, url) {
     targetSelect.appendChild(defaultOption);
 
     let fetchPromise;
+
     if (typeof url === 'string') {
         // If categoriesOrUrl is a string, assume it's a URL and fetch the data
-        fetchPromise = fetch(url)
-            .then(response => response.json());
+        fetchPromise = fetch(url);
     } else {
         // If it's not a string, assume it's the array of categories
         fetchPromise = Promise.resolve(url);
     }
 
-    fetchPromise
-        .then(categories => {
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.categoryId;
-                option.text = category.categoryName;
-                targetSelect.appendChild(option);
-            });
-        })
-        .catch(error => console.error('Unable to fetch or process categories.', error));
+    try {
+        const response = await fetchPromise;
+        if (!response.ok) {
+            throw new Error(`Failed to fetch categories. Status: ${response.status}`);
+        }
+
+        const categories = await response.json();
+
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.categoryId;
+            option.text = category.categoryName;
+            targetSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Unable to fetch or process categories.', error);
+    }
 }
 function addTransaction() {
     const addDate = document.getElementById('add-date');
     const addSource = document.getElementById('add-source');
     const addAmount = document.getElementById('add-amount');
     const addCategorySelect = document.getElementById('add-selectedcategory');
-    
+
 
     if (!addDate.value || !addSource.value || !addAmount.value || !addCategorySelect.value) {
         document.getElementById('error-message').innerText = 'Please fill in all the required fields';
@@ -83,7 +75,7 @@ function addTransaction() {
         TransactionDate: addDate.value,
         TransactionSource: addSource.value.trim(),
         TransactionAmount: parseFloat(addAmount.value),
-        Category: selectedCategory, 
+        Category: selectedCategory,
         CategoryId: selectedCategory.CategoryId
     };
 
@@ -125,7 +117,7 @@ function addCategory() {
         .then(response => response.json())
         .then(() => {
             addCategory.value = '';
-            populateCategoriesDropMenu();
+            location.reload();
         })
         .catch(error => console.error('Unabale to add category.'));
 }
@@ -159,7 +151,7 @@ function updateCategory() {
         .then(success => {
             if (success) {
                 const editCategorySelect = document.getElementById('edit-selectedcategory');
-                populateCategoriesDropMenu3(editCategorySelect, uriCategory);
+                populateCategoriesDropMenu(editCategorySelect, uriCategory);
                 document.getElementById('update-categoryname').value = '';
                 hideEditForm();
                 location.reload();
@@ -185,12 +177,12 @@ function deleteCategory() {
                     statusDeleteMessage.style.color = 'green';
                     statusDeleteMessage.style.display = 'block';
                     return true;
-                } 
+                }
             })
             .then(success => {
                 if (success) {
                     const deleteCategorySelect = document.getElementById('delete-selectedcategory');
-                    populateCategoriesDropMenu3(deleteCategorySelect, uriCategory);
+                    populateCategoriesDropMenu(deleteCategorySelect, uriCategory);
                     hideDeleteForm();
                     location.reload();
                 }
@@ -219,11 +211,11 @@ function displayTransactions(data) {
         let dateString = formatDate(date);
         let textNodeDate = document.createTextNode(dateString);
         td2.appendChild(textNodeDate);
-        
+
         let td3 = tr.insertCell(2);
         let textNodeSource = document.createTextNode(item.transactionSource);
         td3.appendChild(textNodeSource);
-        
+
         let td4 = tr.insertCell(3);
         let decimalAmount = item.transactionAmount;
         let formattedAmount = formatAmount(decimalAmount);
@@ -241,7 +233,7 @@ function displayTransactions(data) {
 
         let td6 = tr.insertCell(5);
         let editTransactionButton = document.createElement('button');
-        editTransactionButton.type= 'button';
+        editTransactionButton.type = 'button';
         editTransactionButton.classList.add('btn');
         editTransactionButton.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -273,7 +265,7 @@ function displayTransactions(data) {
     document.getElementById('balanceTotal').textContent = balance.toFixed(2);
 }
 
-const transactionEditModal = document.getElementById('editTransactionModal'); 
+const transactionEditModal = document.getElementById('editTransactionModal');
 const editDate = document.getElementById('edit-date');
 const editSource = document.getElementById('edit-source');
 const editAmount = document.getElementById('edit-amount');
@@ -281,7 +273,7 @@ const editCategory = document.getElementById('edit-selectedcategory');
 let editTransactionId;
 function editTransactionModal(item) {
 
-    populateCategoriesDropMenu3(editCategory, uriCategory);
+    populateCategoriesDropMenu(editCategory, uriCategory);
 
     transactionEditModal.style.display = 'block';
     editTransactionId = item.transactionId;
@@ -354,15 +346,15 @@ function deleteTransaction(transactionId) {
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => {
-             if (!response.ok) {
-                 throw new Error(`HTTP error! Status: ${response.status}`);
-             }
-            location.reload();
-        })
-        .catch (error => {
-            console.error('An error occured while deleting transaction: ', error.message);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                location.reload();
+            })
+            .catch(error => {
+                console.error('An error occured while deleting transaction: ', error.message);
+            });
     }
 }
 function convertDate(dateString) {
@@ -425,7 +417,7 @@ let listOfCategoriesSelect;
 categoryActionSelect.addEventListener('change', manageCategoryModal);
 
 function manageCategoryModal() {
-   const selectedCategoryAction = categoryActionSelect.value;
+    const selectedCategoryAction = categoryActionSelect.value;
 
     if (selectedCategoryAction === 'add-category') {
         categoryDisplay.innerHTML = `
@@ -437,33 +429,34 @@ function manageCategoryModal() {
           <div id="add-form-message" style="display: none;"></div>
           `;
     }
-   else if (selectedCategoryAction === 'edit-category') {
+    else if (selectedCategoryAction === 'edit-category') {
 
         categoryDisplay.innerHTML = `
-          <div id="edit-category-container">Select the category name you wish to edit: <select id="edit-selectedcategory" required>
+          <div id="edit-category-container">Select the category name you wish to edit:
+          <select id="edit-selectedcategory" required>
     </select></div>
     <form id="edit-category-form" action ="javascript:void(0)" method="POST" onsubmit="updateCategory()">
-        <input type="text" id="update-categoryname" placeholder="add new categoryname" />
+        <input type="text" id="update-categoryname" placeholder="" />
         <input type="submit" value="Update Name" />
     </form>
     <div id="edit-form-message" style="display: none;"></div>
     `;
-       
-       const editCategorySelect = document.getElementById('edit-selectedcategory');
-       populateCategoriesDropMenu3(editCategorySelect, uriCategory);
 
-       listOfCategoriesSelect = editCategorySelect;
-       listOfCategoriesSelect.addEventListener('change', function () {
-           updatePlaceholder();
-           toggleEditFormVisibility();
-           const statusEditMessage = document.getElementById('edit-form-message');
-           statusEditMessage.style.display = 'none';
-       });
-       updateCategoryNameInput = document.getElementById('update-categoryname');
-       hideEditForm();
-   }
-   else if (selectedCategoryAction === 'delete-category') {
-       categoryDisplay.innerHTML = `
+        const editCategorySelect = document.getElementById('edit-selectedcategory');
+        populateCategoriesDropMenu(editCategorySelect, uriCategory);
+        listOfCategoriesSelect = editCategorySelect;
+        listOfCategoriesSelect.addEventListener('change', function () {
+            updatePlaceholder();
+            toggleEditFormVisibility();
+            const statusEditMessage = document.getElementById('edit-form-message');
+            statusEditMessage.style.display = 'none';
+        });
+
+        updateCategoryNameInput = document.getElementById('update-categoryname');
+        hideEditForm();
+    }
+    else if (selectedCategoryAction === 'delete-category') {
+        categoryDisplay.innerHTML = `
        <div id="delete-category-container">Select the category that you wish to delete:
        <select id="delete-selectedcategory" required>
        </select></div>
@@ -473,7 +466,7 @@ function manageCategoryModal() {
         <div id ="delete-form-message" style="display: none;"></div>
        `;
         const deleteCategorySelect = document.getElementById('delete-selectedcategory');
-        populateCategoriesDropMenu3(deleteCategorySelect, uriCategory);
+        populateCategoriesDropMenu(deleteCategorySelect, uriCategory);
         listOfCategoriesSelect = deleteCategorySelect;
         listOfCategoriesSelect.addEventListener('change', function () {
             toggleDeleteFormVisibility();
@@ -487,7 +480,6 @@ function manageCategoryModal() {
 function updatePlaceholder() {
     const selectedOption = listOfCategoriesSelect.options[listOfCategoriesSelect.selectedIndex];
     updateCategoryNameInput.placeholder = `${selectedOption.text}`;
-    (updateCategoryNameInput.placeholder);
 }
 
 function hideEditForm() {
@@ -525,10 +517,3 @@ function toggleDeleteFormVisibility() {
         hideDeleteForm();
     }
 }
-
-
-//TODO list: - instead of an alert window try to show error in the modal
-//- when closing and re-opening the category modal the add/edit/delete button doesnt reset
-// replace original dropdownmenu with dropdownmenu 3
-// when deleting category the transactionslist isnt updated until it get refreshed
-// when no categories created yet display warning when adding transaction

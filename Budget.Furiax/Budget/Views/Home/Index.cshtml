@@ -87,8 +87,9 @@
 
     <script src="js/site.js" asp-append-version="true"></script>
     <script type="text/javascript">
-        populateCategoriesDropMenu();
         getTransactions();
+        const addCategorySelect = document.getElementById('add-selectedcategory');
+        populateCategoriesDropMenu(addCategorySelect, uriCategory);
     </script>
 </body>
 </html>
