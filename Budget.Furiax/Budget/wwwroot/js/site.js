@@ -450,7 +450,7 @@ function renderEditCategoryForm() {
     // in add transaction, edit transaction, edit category and delete category. They work in all except for this edit category
     // all are implemented the same way, so I really dont get it why it doesnt work
     const editCategorySelect = document.getElementById('edit-selectedcategory');
-    console.log(editCategorySelect);// editCategorySelect seems already populated before calling populate function with the right values
+    console.log(editCategorySelect);// editCategorySelect seems to already containing the right data before calling populate function
     populateCategoriesDropMenu(editCategorySelect, uriCategory);
     console.log(editCategorySelect); // shows same values as before the populatefunction is called.
     console.log(editCategorySelect.value); // returns <empty string>
