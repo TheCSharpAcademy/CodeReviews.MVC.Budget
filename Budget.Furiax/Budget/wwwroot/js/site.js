@@ -42,7 +42,8 @@ async function populateCategoriesDropMenu(targetSelect, url) {
             targetSelect.appendChild(option);
         });
     } catch (error) {
-        console.error('Unable to fetch or process categories.', error);
+        console.error('Error during category fetch or processing:', error);
+        console.error('Error details:', error.message);
     }
 }
 function addTransaction() {
@@ -127,7 +128,6 @@ function updateCategory() {
     const getCategoryId = document.getElementById('edit-selectedcategory');
     const categoryId = getCategoryId.value;
     const item = { CategoryId: categoryId, CategoryName: newCategoryName };
-    const statusMessage = document.getElementById('edit-form-message');
     fetch(uriCategory + "/" + categoryId, {
         method: 'PUT',
         headers: {
@@ -139,9 +139,6 @@ function updateCategory() {
         .then(response => {
             if (response.ok || response.status === 204) {
                 console.log('Category updated succesfully');
-                statusMessage.innerText = 'Categoryname successfully updated';
-                statusMessage.style.color = 'green';
-                statusMessage.style.display = 'block';
                 return true;
             }
             else {
@@ -161,7 +158,6 @@ function updateCategory() {
 }
 function deleteCategory() {
     const deleteCategoryId = document.getElementById('delete-selectedcategory');
-    const statusDeleteMessage = document.getElementById('delete-form-message');
     const warning = confirm("By deleting a Category, all transactions linked to it will also be deleted ! \nAre you sure you want to delete this category ?");
     if (warning) {
         fetch(uriCategory + "/" + deleteCategoryId.value, {
@@ -172,20 +168,15 @@ function deleteCategory() {
             },
         })
             .then(response => {
-                if (response.ok) {
-                    statusDeleteMessage.innerText = 'Category successfully deleted';
-                    statusDeleteMessage.style.color = 'green';
-                    statusDeleteMessage.style.display = 'block';
-                    return true;
+                if (!response.ok) {
+                    throw new Error(`Failed to delete the category. Status: ${response.status}`);
                 }
             })
-            .then(success => {
-                if (success) {
-                    const deleteCategorySelect = document.getElementById('delete-selectedcategory');
-                    populateCategoriesDropMenu(deleteCategorySelect, uriCategory);
-                    hideDeleteForm();
-                    location.reload();
-                }
+            .then(() => {
+                const deleteCategorySelect = document.getElementById('delete-selectedcategory');
+                populateCategoriesDropMenu(deleteCategorySelect, uriCategory);
+                hideDeleteForm();
+                location.reload();
             })
             .catch(error => {
                 console.error('Error deleting category:', error);
@@ -382,7 +373,6 @@ const closeModalCategory = document.getElementById('closeModalCategory');
 openTransactionModal.addEventListener('click', () => {
     transactionModal.style.display = 'block';
 });
-
 closeModalTransaction.addEventListener('click', () => {
     transactionModal.style.display = 'none';
 })
@@ -407,7 +397,6 @@ window.addEventListener('click', (event) => {
         transactionEditModal.style.display = 'none';
     }
 });
-// start of category modal content code
 
 const categoryActionSelect = document.getElementById('categoryAction');
 const categoryDisplay = document.getElementById('categoryModal-display');
@@ -415,73 +404,90 @@ let updateCategoryNameInput;
 let listOfCategoriesSelect;
 
 categoryActionSelect.addEventListener('change', manageCategoryModal);
-
 function manageCategoryModal() {
     const selectedCategoryAction = categoryActionSelect.value;
 
     if (selectedCategoryAction === 'add-category') {
-        categoryDisplay.innerHTML = `
-          <form id="add-category-form" action="javascript:void(0);" method="POST" onsubmit="addCategory()">
-              Add Category: <br>
-              <input type="text" id="add-categoryname" placeholder="Name">
-              <input type="submit" value="Add Category">                     
-          </form>
-          <div id="add-form-message" style="display: none;"></div>
-          `;
-    }
-    else if (selectedCategoryAction === 'edit-category') {
-
-        categoryDisplay.innerHTML = `
-          <div id="edit-category-container">Select the category name you wish to edit:
-          <select id="edit-selectedcategory" required>
-    </select></div>
-    <form id="edit-category-form" action ="javascript:void(0)" method="POST" onsubmit="updateCategory()">
-        <input type="text" id="update-categoryname" placeholder="" />
-        <input type="submit" value="Update Name" />
-    </form>
-    <div id="edit-form-message" style="display: none;"></div>
-    `;
-
-        const editCategorySelect = document.getElementById('edit-selectedcategory');
-        populateCategoriesDropMenu(editCategorySelect, uriCategory);
-        listOfCategoriesSelect = editCategorySelect;
-        listOfCategoriesSelect.addEventListener('change', function () {
-            updatePlaceholder();
-            toggleEditFormVisibility();
-            const statusEditMessage = document.getElementById('edit-form-message');
-            statusEditMessage.style.display = 'none';
-        });
-
-        updateCategoryNameInput = document.getElementById('update-categoryname');
-        hideEditForm();
-    }
-    else if (selectedCategoryAction === 'delete-category') {
-        categoryDisplay.innerHTML = `
-       <div id="delete-category-container">Select the category that you wish to delete:
-       <select id="delete-selectedcategory" required>
-       </select></div>
-       <form id="delete-category-form" action ="javascript:void(0)" method="POST" onsubmit="deleteCategory()">
-        <input type="submit" value="Delete Category" />
-        </form>
-        <div id ="delete-form-message" style="display: none;"></div>
-       `;
-        const deleteCategorySelect = document.getElementById('delete-selectedcategory');
-        populateCategoriesDropMenu(deleteCategorySelect, uriCategory);
-        listOfCategoriesSelect = deleteCategorySelect;
-        listOfCategoriesSelect.addEventListener('change', function () {
-            toggleDeleteFormVisibility();
-            const statusDeleteMessage = document.getElementById('delete-form-message');
-            statusDeleteMessage.style.display = 'none';
-        });
-        hideDeleteForm();
+        renderAddCategoryForm();
+    } else if (selectedCategoryAction === 'edit-category') {
+        renderEditCategoryForm();
+    } else if (selectedCategoryAction === 'delete-category') {
+        renderDeleteCategoryForm();
     }
 }
+function renderAddCategoryForm() {
+    categoryDisplay.innerHTML = `
+        <form id="add-category-form">
+            Add Category: <br>
+            <input type="text" id="add-categoryname" placeholder="Name">
+            <input type="submit" value="Add Category">                     
+        </form>
+        <div id="add-form-message" style="display: none;"></div>
+    `;
+    const addCategoryForm = document.getElementById('add-category-form');
+    addCategoryForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        addCategory();
+    });
+}
+function renderEditCategoryForm() {
+    categoryDisplay.innerHTML = `
+        <div id="edit-category-container">Select the category name you wish to edit:
+            <select id="edit-selectedcategory" required></select>
+        </div>
+        <form id="edit-category-form">
+            <input type="text" id="update-categoryname" placeholder="" />
+            <input type="submit" value="Update Name" />
+        </form>
+    `;
+    const editCategoryForm = document.getElementById('edit-category-form');
+    editCategoryForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        updateCategory();
+    });
 
+    const editCategorySelect = document.getElementById('edit-selectedcategory');
+    console.log(editCategorySelect);// seems like editCategorySelect already is populated
+    populateCategoriesDropMenu(editCategorySelect, uriCategory);
+    console.log(editCategorySelect); // same values as previous log
+    listOfCategoriesSelect = editCategorySelect;
+    console.log(listOfCategoriesSelect); // same values as editCategorySelect
+    listOfCategoriesSelect.addEventListener('change', function () {
+        console.log("we are inside listofcategoriesselect");
+        updatePlaceholder();
+        toggleEditFormVisibility();
+    });
+    updateCategoryNameInput = document.getElementById('update-categoryname');
+    hideEditForm();
+}
+function renderDeleteCategoryForm() {
+    categoryDisplay.innerHTML = `
+        <div id="delete-category-container">Select the category that you wish to delete:
+            <select id="delete-selectedcategory" required></select>
+        </div>
+        <form id="delete-category-form">
+            <input type="submit" value="Delete Category" />
+        </form>
+    `;
+
+    const deleteCategoryForm = document.getElementById('delete-category-form');
+    deleteCategoryForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        deleteCategory();
+    });
+
+    const deleteCategorySelect = document.getElementById('delete-selectedcategory');
+    populateCategoriesDropMenu(deleteCategorySelect, uriCategory);
+    listOfCategoriesSelect = deleteCategorySelect;
+    listOfCategoriesSelect.addEventListener('change', function () {
+        toggleDeleteFormVisibility();
+    });
+    hideDeleteForm();
+}
 function updatePlaceholder() {
     const selectedOption = listOfCategoriesSelect.options[listOfCategoriesSelect.selectedIndex];
     updateCategoryNameInput.placeholder = `${selectedOption.text}`;
 }
-
 function hideEditForm() {
     const formContainer = document.getElementById('edit-category-form');
     formContainer.style.display = 'none';
@@ -499,7 +505,6 @@ function toggleEditFormVisibility() {
         hideEditForm();
     }
 }
-
 function hideDeleteForm() {
     const formContainer = document.getElementById('delete-category-form');
     formContainer.style.display = 'none';
