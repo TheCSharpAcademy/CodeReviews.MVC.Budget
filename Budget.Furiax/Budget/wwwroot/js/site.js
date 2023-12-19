@@ -125,7 +125,7 @@ function addCategory() {
 function updateCategory() {
     const getUpdatedCategoryName = document.getElementById('update-categoryname');
     const newCategoryName = getUpdatedCategoryName.value.trim();
-    const getCategoryId = document.getElementById('edit-selectedcategory');
+    const getCategoryId = document.getElementById('edit-selected-category');
     const categoryId = getCategoryId.value;
     const item = { CategoryId: categoryId, CategoryName: newCategoryName };
     fetch(uriCategory + "/" + categoryId, {
@@ -147,8 +147,8 @@ function updateCategory() {
         })
         .then(success => {
             if (success) {
-                const editCategorySelect = document.getElementById('edit-selectedcategory');
-                populateCategoriesDropMenu(editCategorySelect, uriCategory);
+                //const editCategorySelect = document.getElementById('edit-selected-category');
+                //populateCategoriesDropMenu(editCategorySelect, uriCategory);
                 document.getElementById('update-categoryname').value = '';
                 hideEditForm();
                 location.reload();
@@ -383,13 +383,18 @@ window.addEventListener('click', (event) => {
 });
 openCategoryModal.addEventListener('click', () => {
     categoryModal.style.display = 'block';
+    categoryActionSelect.value = 'add-category';
+
 });
 closeModalCategory.addEventListener('click', () => {
     categoryModal.style.display = 'none';
+    categoryActionSelect.value = 'add-category';
+    console.log("category action: ", categoryActionSelect.value);
 });
 window.addEventListener('click', (event) => {
     if (event.target === categoryModal) {
         categoryModal.style.display = 'none';
+        renderAddCategoryForm();
     }
 });
 window.addEventListener('click', (event) => {
@@ -433,7 +438,7 @@ function renderAddCategoryForm() {
 function renderEditCategoryForm() {
     categoryDisplay.innerHTML = `
         <div id="edit-category-container">Select the category name you wish to edit:
-            <select id="edit-selectedcategory" required></select>
+            <select id="edit-selected-category" required></select>
         </div>
         <form id="edit-category-form">
             <input type="text" id="update-categoryname" placeholder="" />
@@ -446,20 +451,10 @@ function renderEditCategoryForm() {
         updateCategory();
     });
 
-    // my edit-selectedcategory select menu stays empty. I am using the populateCategoriesDropMenu to populate select menus in 4 functions
-    // in add transaction, edit transaction, edit category and delete category. They work in all except for this edit category
-    // all are implemented the same way, so I really dont get it why it doesnt work
-    const editCategorySelect = document.getElementById('edit-selectedcategory');
-    console.log(editCategorySelect);// editCategorySelect seems to already containing the right data before calling populate function
+    const editCategorySelect = document.getElementById('edit-selected-category');
     populateCategoriesDropMenu(editCategorySelect, uriCategory);
-    console.log(editCategorySelect); // shows same values as before the populatefunction is called.
-    console.log(editCategorySelect.value); // returns <empty string>
-    console.log(editCategorySelect.nodeValue); //returns null
-    // checked with the other working select menu's and there it also returns null/ <empty string> so not sure that is the problem
     listOfCategoriesSelect = editCategorySelect;
-    console.log(listOfCategoriesSelect); // same values as editCategorySelect
     listOfCategoriesSelect.addEventListener('change', function () {
-        console.log("we are inside listofcategoriesselect"); // not being displayed (seems logic since its not populating and there is no change)
         updatePlaceholder();
         toggleEditFormVisibility();
     });
