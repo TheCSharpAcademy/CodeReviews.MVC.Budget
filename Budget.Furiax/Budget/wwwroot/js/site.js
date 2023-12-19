@@ -446,14 +446,19 @@ function renderEditCategoryForm() {
         updateCategory();
     });
 
+    // my edit-selectedcategory select menu stays empty. I am using the populateCategoriesDropMenu to populate select menus in 4 functions 
+    // in add transaction, edit transaction, edit category and delete category. They work in all except for this edit category
     const editCategorySelect = document.getElementById('edit-selectedcategory');
-    console.log(editCategorySelect);// seems like editCategorySelect already is populated
+    console.log(editCategorySelect);// editCategorySelect seems already populated before calling populate function with the right values
     populateCategoriesDropMenu(editCategorySelect, uriCategory);
-    console.log(editCategorySelect); // same values as previous log
+    console.log(editCategorySelect); // shows same values as before the populatefunction is called.
+    console.log(editCategorySelect.value); // returns <empty string>
+    console.log(editCategorySelect.nodeValue); //returns null
+    // checked with the other working select menu's and there it also returns null/ <empty string> so not sure that is the problem
     listOfCategoriesSelect = editCategorySelect;
     console.log(listOfCategoriesSelect); // same values as editCategorySelect
     listOfCategoriesSelect.addEventListener('change', function () {
-        console.log("we are inside listofcategoriesselect");
+        console.log("we are inside listofcategoriesselect"); // not being displayed (seems logic since its not populating and there is no change)
         updatePlaceholder();
         toggleEditFormVisibility();
     });
@@ -477,6 +482,7 @@ function renderDeleteCategoryForm() {
     });
 
     const deleteCategorySelect = document.getElementById('delete-selectedcategory');
+    
     populateCategoriesDropMenu(deleteCategorySelect, uriCategory);
     listOfCategoriesSelect = deleteCategorySelect;
     listOfCategoriesSelect.addEventListener('change', function () {
