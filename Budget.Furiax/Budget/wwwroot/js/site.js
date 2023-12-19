@@ -6,8 +6,21 @@ let balance = 0;
 function getTransactions() {
     fetch(uriTransaction)
         .then(response => response.json())
-        .then(data => displayTransactions(data))
+        .then(data => {
+            transactions = data;
+            displayTransactions(data);
+        })
         .catch(error => console.error('Unable to get items.', error));
+}
+function searchOnTransactionName() {
+    const searchString = document.getElementById('searchTransactionName').value.toLowerCase();
+    console.log(searchString);
+    console.log(transactions);
+    const searchTransactionResult = transactions.filter(transaction =>
+       transaction.transactionSource.toLowerCase().includes(searchString)
+    );
+    console.log(searchTransactionResult);
+    displayTransactions(searchTransactionResult);
 }
 async function populateCategoriesDropMenu(targetSelect, url) {
     targetSelect.innerHTML = '';
@@ -251,8 +264,6 @@ function displayTransactions(data) {
 
         balance += decimalAmount;
     });
-
-    transactions = data;
     document.getElementById('balanceTotal').textContent = balance.toFixed(2);
 }
 
