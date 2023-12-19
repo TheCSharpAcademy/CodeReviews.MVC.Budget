@@ -446,8 +446,9 @@ function renderEditCategoryForm() {
         updateCategory();
     });
 
-    // my edit-selectedcategory select menu stays empty. I am using the populateCategoriesDropMenu to populate select menus in 4 functions 
+    // my edit-selectedcategory select menu stays empty. I am using the populateCategoriesDropMenu to populate select menus in 4 functions
     // in add transaction, edit transaction, edit category and delete category. They work in all except for this edit category
+    // all are implemented the same way, so I really dont get it why it doesnt work
     const editCategorySelect = document.getElementById('edit-selectedcategory');
     console.log(editCategorySelect);// editCategorySelect seems already populated before calling populate function with the right values
     populateCategoriesDropMenu(editCategorySelect, uriCategory);
