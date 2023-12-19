@@ -3,25 +3,6 @@ const uriCategory = 'api/Category';
 let transactions = [];
 let balance = 0;
 
-function getTransactions() {
-    fetch(uriTransaction)
-        .then(response => response.json())
-        .then(data => {
-            transactions = data;
-            displayTransactions(data);
-        })
-        .catch(error => console.error('Unable to get items.', error));
-}
-function searchOnTransactionName() {
-    const searchString = document.getElementById('searchTransactionName').value.toLowerCase();
-    console.log(searchString);
-    console.log(transactions);
-    const searchTransactionResult = transactions.filter(transaction =>
-       transaction.transactionSource.toLowerCase().includes(searchString)
-    );
-    console.log(searchTransactionResult);
-    displayTransactions(searchTransactionResult);
-}
 async function populateCategoriesDropMenu(targetSelect, url) {
     targetSelect.innerHTML = '';
 
@@ -58,6 +39,92 @@ async function populateCategoriesDropMenu(targetSelect, url) {
         console.error('Error during category fetch or processing:', error);
         console.error('Error details:', error.message);
     }
+}
+function getTransactions() {
+    fetch(uriTransaction)
+        .then(response => response.json())
+        .then(data => {
+            transactions = data;
+            displayTransactions(data);
+        })
+        .catch(error => console.error('Unable to get items.', error));
+}
+function displayTransactions(data) {
+    const tList = document.getElementById('transactionList');
+    const tBody = tList.querySelector('tBody');
+    tBody.innerHTML = '';
+    data.forEach(item => {
+        let tr = tBody.insertRow();
+
+        let td1 = tr.insertCell(0);
+        let textNodeId = document.createTextNode(item.transactionId);
+        td1.appendChild(textNodeId);
+
+        let td2 = tr.insertCell(1);
+        let date = new Date(item.transactionDate);
+        let dateString = formatDate(date);
+        let textNodeDate = document.createTextNode(dateString);
+        td2.appendChild(textNodeDate);
+
+        let td3 = tr.insertCell(2);
+        let textNodeSource = document.createTextNode(item.transactionSource);
+        td3.appendChild(textNodeSource);
+
+        let td4 = tr.insertCell(3);
+        let decimalAmount = item.transactionAmount;
+        let formattedAmount = formatAmount(decimalAmount);
+        let textNodeAmount = document.createTextNode(formattedAmount);
+        td4.appendChild(textNodeAmount);
+
+        let td5 = tr.insertCell(4);
+        fetch(uriCategory + "/" + item.categoryId)
+            .then(response => response.json())
+            .then(categoryData => {
+                let textNodeCategory = document.createTextNode(categoryData.categoryName);
+                td5.appendChild(textNodeCategory);
+            })
+            .catch(error => console.error('Unable to get the category name'));
+
+        let td6 = tr.insertCell(5);
+        let editTransactionButton = document.createElement('button');
+        editTransactionButton.type = 'button';
+        editTransactionButton.classList.add('btn');
+        editTransactionButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+        </svg>`;
+        editTransactionButton.addEventListener('click', () => {
+            editTransactionModal(item);
+        });
+        td6.appendChild(editTransactionButton);
+
+        let td7 = tr.insertCell(6);
+        let deleteTransactionButton = document.createElement('button');
+        deleteTransactionButton.type = 'button';
+        deleteTransactionButton.classList = ('btn');
+        deleteTransactionButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+        </svg>`;
+        deleteTransactionButton.addEventListener('click', () => {
+            deleteTransaction(item.transactionId);
+        });
+        td7.appendChild(deleteTransactionButton);
+
+        balance += decimalAmount;
+    });
+    document.getElementById('balanceTotal').textContent = balance.toFixed(2);
+}
+function searchOnTransactionName() {
+    const searchString = document.getElementById('searchTransactionName').value.toLowerCase();
+    console.log(searchString);
+    console.log(transactions);
+    const searchTransactionResult = transactions.filter(transaction =>
+       transaction.transactionSource.toLowerCase().includes(searchString)
+    );
+    console.log(searchTransactionResult);
+    displayTransactions(searchTransactionResult);
 }
 function addTransaction() {
     const addDate = document.getElementById('add-date');
@@ -110,6 +177,78 @@ function addTransaction() {
             location.reload();
         })
         .catch(error => console.error('Unable to add item.'));
+}
+function editTransaction() {
+
+    if (!editDate.value || !editSource.value || !editAmount.value || !editCategory.value) {
+        document.getElementById('error-message-edit').innerText = 'Please fill in all the required fields';
+        document.getElementById('error-message-edit').style.display = 'block';
+        return;
+    }
+    if (isNaN(parseFloat(editAmount.value))) {
+        document.getElementById('error-message-edit').innerText = 'Please fill in valid number for amount';
+        document.getElementById('error-message-edit').style.display = 'block';
+        return;
+    }
+
+    const selectedEditCategoryOption = editCategory.options[editCategory.selectedIndex];
+    const selectedEditCategory = {
+        CategoryId: parseInt(selectedEditCategoryOption.value),
+        CategoryName: selectedEditCategoryOption.text,
+    };
+    const editedItem = {
+        TransactionId: editTransactionId,
+        TransactionDate: editDate.value,
+        TransactionSource: editSource.value.trim(),
+        TransactionAmount: parseFloat(editAmount.value),
+        Category: selectedEditCategory,
+        CategoryId: selectedEditCategory.CategoryId
+    }
+
+    fetch(uriTransaction + "/" + editTransactionId, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(editedItem)
+    })
+        .then(response => {
+            if (response.ok || response.status === 204) {
+                console.log('Transaction successfully updated');
+                return true;
+            }
+            else {
+                throw new Error(`Failed to update category. Status: ${response.status}`);
+            }
+        })
+        .then(success => {
+            if (success) {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Could not update the transaction', error.message));
+}
+function deleteTransaction(transactionId) {
+    const askForConfirmation = confirm("Delete transaction with id " + transactionId + " ?");
+    if (askForConfirmation) {
+        fetch(uriTransaction + "/" + transactionId, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                location.reload();
+            })
+            .catch(error => {
+                console.error('An error occured while deleting transaction: ', error.message);
+            });
+    }
 }
 function addCategory() {
     const addCategory = document.getElementById('add-categoryname');
@@ -199,74 +338,6 @@ function deleteCategory() {
         console.log("user clicked cancel");
     }
 }
-function displayTransactions(data) {
-    const tList = document.getElementById('transactionList');
-    const tBody = tList.querySelector('tBody');
-    tBody.innerHTML = '';
-    data.forEach(item => {
-        let tr = tBody.insertRow();
-
-        let td1 = tr.insertCell(0);
-        let textNodeId = document.createTextNode(item.transactionId);
-        td1.appendChild(textNodeId);
-
-        let td2 = tr.insertCell(1);
-        let date = new Date(item.transactionDate);
-        let dateString = formatDate(date);
-        let textNodeDate = document.createTextNode(dateString);
-        td2.appendChild(textNodeDate);
-
-        let td3 = tr.insertCell(2);
-        let textNodeSource = document.createTextNode(item.transactionSource);
-        td3.appendChild(textNodeSource);
-
-        let td4 = tr.insertCell(3);
-        let decimalAmount = item.transactionAmount;
-        let formattedAmount = formatAmount(decimalAmount);
-        let textNodeAmount = document.createTextNode(formattedAmount);
-        td4.appendChild(textNodeAmount);
-
-        let td5 = tr.insertCell(4);
-        fetch(uriCategory + "/" + item.categoryId)
-            .then(response => response.json())
-            .then(categoryData => {
-                let textNodeCategory = document.createTextNode(categoryData.categoryName);
-                td5.appendChild(textNodeCategory);
-            })
-            .catch(error => console.error('Unable to get the category name'));
-
-        let td6 = tr.insertCell(5);
-        let editTransactionButton = document.createElement('button');
-        editTransactionButton.type = 'button';
-        editTransactionButton.classList.add('btn');
-        editTransactionButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
-        </svg>`;
-        editTransactionButton.addEventListener('click', () => {
-            editTransactionModal(item);
-        });
-        td6.appendChild(editTransactionButton);
-
-        let td7 = tr.insertCell(6);
-        let deleteTransactionButton = document.createElement('button');
-        deleteTransactionButton.type = 'button';
-        deleteTransactionButton.classList = ('btn');
-        deleteTransactionButton.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
-            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
-        </svg>`;
-        deleteTransactionButton.addEventListener('click', () => {
-            deleteTransaction(item.transactionId);
-        });
-        td7.appendChild(deleteTransactionButton);
-
-        balance += decimalAmount;
-    });
-    document.getElementById('balanceTotal').textContent = balance.toFixed(2);
-}
-
 const transactionEditModal = document.getElementById('editTransactionModal');
 const editDate = document.getElementById('edit-date');
 const editSource = document.getElementById('edit-source');
@@ -286,78 +357,6 @@ function editTransactionModal(item) {
     setTimeout(function () {
         editCategory.value = item.categoryId;
     }, 100); // had to add a small delay else the categoryvalue wasn't updating
-}
-function editTransaction() {
-
-    if (!editDate.value || !editSource.value || !editAmount.value || !editCategory.value) {
-        document.getElementById('error-message-edit').innerText = 'Please fill in all the required fields';
-        document.getElementById('error-message-edit').style.display = 'block';
-        return;
-    }
-    if (isNaN(parseFloat(editAmount.value))) {
-        document.getElementById('error-message-edit').innerText = 'Please fill in valid number for amount';
-        document.getElementById('error-message-edit').style.display = 'block';
-        return;
-    }
-
-    const selectedEditCategoryOption = editCategory.options[editCategory.selectedIndex];
-    const selectedEditCategory = {
-        CategoryId: parseInt(selectedEditCategoryOption.value),
-        CategoryName: selectedEditCategoryOption.text,
-    };
-    const editedItem = {
-        TransactionId: editTransactionId,
-        TransactionDate: editDate.value,
-        TransactionSource: editSource.value.trim(),
-        TransactionAmount: parseFloat(editAmount.value),
-        Category: selectedEditCategory,
-        CategoryId: selectedEditCategory.CategoryId
-    }
-
-    fetch(uriTransaction + "/" + editTransactionId, {
-        method: 'PUT',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(editedItem)
-    })
-        .then(response => {
-            if (response.ok || response.status === 204) {
-                console.log('Transaction successfully updated');
-                return true;
-            }
-            else {
-                throw new Error(`Failed to update category. Status: ${response.status}`);
-            }
-        })
-        .then(success => {
-            if (success) {
-                location.reload();
-            }
-        })
-        .catch(error => console.error('Could not update the transaction', error.message));
-}
-function deleteTransaction(transactionId) {
-    const askForConfirmation = confirm("Delete transaction with id " + transactionId + " ?");
-    if (askForConfirmation) {
-        fetch(uriTransaction + "/" + transactionId, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                location.reload();
-            })
-            .catch(error => {
-                console.error('An error occured while deleting transaction: ', error.message);
-            });
-    }
 }
 function convertDate(dateString) {
     const date = new Date(dateString);
