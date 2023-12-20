@@ -1,7 +1,7 @@
 ﻿const uriTransaction = 'api/Transaction';
 const uriCategory = 'api/Category';
 let transactions = [];
-let balance = 0;
+let balance;
 
 async function populateCategoriesDropMenu(targetSelect, url) {
     targetSelect.innerHTML = '';
@@ -53,6 +53,7 @@ function displayTransactions(data) {
     const tList = document.getElementById('transactionList');
     const tBody = tList.querySelector('tBody');
     tBody.innerHTML = '';
+    balance = 0;
     data.forEach(item => {
         let tr = tBody.insertRow();
 
@@ -118,13 +119,38 @@ function displayTransactions(data) {
 }
 function searchOnTransactionName() {
     const searchString = document.getElementById('searchTransactionName').value.toLowerCase();
-    console.log(searchString);
-    console.log(transactions);
     const searchTransactionResult = transactions.filter(transaction =>
        transaction.transactionSource.toLowerCase().includes(searchString)
     );
-    console.log(searchTransactionResult);
     displayTransactions(searchTransactionResult);
+}
+function sortOnCategory() {
+    fetch(uriTransaction)
+        .then(response => response.json())
+        .then(data => {
+            const sortedTransactions = data.sort(function (a, b) {
+                if (a.categoryId < b.categoryId) {
+                    return -1;
+                }
+                if (a.categoryId > b.categoryId) {
+                    return 1;
+                }
+                return 0;
+            });
+            displayTransactions(sortedTransactions);
+        })
+}
+function sortOnDate() {
+    fetch(uriTransaction)
+        .then(response => response.json())
+        .then(data => {
+            const sortedOnDate = data.sort(function (a, b) {
+                var dateA = new Date(a.transactionDate);
+                var dateB = new Date(b.transactionDate);
+                return dateA - dateB;
+            });
+            displayTransactions(sortedOnDate);
+        });
 }
 function addTransaction() {
     const addDate = document.getElementById('add-date');
@@ -215,7 +241,6 @@ function editTransaction() {
     })
         .then(response => {
             if (response.ok || response.status === 204) {
-                console.log('Transaction successfully updated');
                 return true;
             }
             else {
@@ -290,7 +315,6 @@ function updateCategory() {
     })
         .then(response => {
             if (response.ok || response.status === 204) {
-                console.log('Category updated succesfully');
                 return true;
             }
             else {
@@ -333,9 +357,6 @@ function deleteCategory() {
             .catch(error => {
                 console.error('Error deleting category:', error);
             });
-    }
-    else {
-        console.log("user clicked cancel");
     }
 }
 const transactionEditModal = document.getElementById('editTransactionModal');
@@ -399,7 +420,6 @@ openCategoryModal.addEventListener('click', () => {
 closeModalCategory.addEventListener('click', () => {
     categoryModal.style.display = 'none';
     categoryActionSelect.value = 'add-category';
-    console.log("category action: ", categoryActionSelect.value);
 });
 window.addEventListener('click', (event) => {
     if (event.target === categoryModal) {
