@@ -54,7 +54,7 @@ function displayTransactions(data) {
     const tBody = tList.querySelector('tBody');
     tBody.innerHTML = '';
     balance = 0;
-    data.forEach(item => {
+    data.forEach(item => { 
         let tr = tBody.insertRow();
 
         let td1 = tr.insertCell(0);

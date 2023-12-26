@@ -6,52 +6,66 @@
     <link rel="stylesheet" href="css/site.css" />
 </head>
 <body>
-    <h1 class="display-4 text-center">Budget App</h1>
-
     <div class="container">
+        <div class="row"><h1 class="display-4 text-center">Budget App</h1></div>
         <div class="row">
-            <div class="col-md-6 text-center mt-3">
+            <div class="col-6 p-2 d-flex justify-content-center">
                 <button id="openTransactionModal" class="btn-outline-success">Add Transaction</button>
             </div>
-            <div class="col-md-6 text-center mt-3">
+            <div class="col-6 p-2 d-flex justify-content-center">
                 <button id="openCategoryModal" class="btn-outline-success">Manage Categories</button>
             </div>
         </div>
+        <div class="row">
+            <div class="col-4 p-2 d-flex justify-content-center">
+                <div class="row ">
+                    <input type="text" class="col-9" id="searchTransactionName" placeholder="Search name" />
+                <button class="btn btn-success btn-sm col-3" onclick="searchOnTransactionName()">Search</button>
+                </div>
+            </div>
+            <div class="col-4 p-2 d-flex justify-content-center">
+                <button class="btn btn-success btn-sm" onclick="sortOnCategory()">Sort on Category</button>
+            </div>
+            <div class="col-4 p-2 d-flex justify-content-center">
+                <button class="btn btn-success btn-sm" onclick="sortOnDate()">Sort on Date</button>
+            </div>
+        </div>
+        <div class="row" id="balance"><div>Account balance: <div id="balanceTotal"></div></div></div>
+
+        <table id="transactionList" class="table table-striped mt-2">
+            <thead class="table table-light" >
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        
     </div>
-    <div><input type="text" id="searchTransactionName" placeholder="Search transaction name" />
-        <button onclick="searchOnTransactionName()">Search</button>
-        <button onclick="sortOnCategory()">Sort on Category</button>
-        <button onclick="sortOnDate()">Sort on Date</button>
-    </div>
-    <div id="balance">Total balance: <span id="balanceTotal"></span></div>
-    <table id="transactionList" class="mt-3" >
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Category</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    
 
 
     <div id="transactionModal" class="modal">
-        <div class="modal-content">
-            <span class="btn-close" id="closeModalTransaction"></span>
-            <form action="javascript:void(0);" method="POST" onsubmit="addTransaction()">
-                Add Transaction:<br>
-                Date: <input type="date" id="add-date"><br />
-                Name: <input type="text" id="add-source" placeholder="To/From"><br />
-                Amount: <input type="text" id="add-amount" placeholder="amount"><br />
-                Category: <select id="add-selectedcategory" required> </select>
-                <input type="submit" value="Add">
-                <div id="error-message" style="color:red; display: none;"></div>
-            </form>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-content" id="modalTransaction">
+                    <form action="javascript:void(0);" method="POST" onsubmit="addTransaction()">
+                        Add Transaction:<br>
+                        Date: <input type="date" id="add-date"><br />
+                        Name: <input type="text" id="add-source" placeholder="To/From"><br />
+                        Amount: <input type="text" id="add-amount" placeholder="amount"><br />
+                        Category: <select id="add-selectedcategory" required> </select>
+                        <input type="submit" value="Add">
+                        <div id="error-message" style="color:red; display: none;"></div>
+                    </form>
+                </div>
+            </div>    
         </div>
     </div>
 
