@@ -1,0 +1,45 @@
+﻿body {
+  background-color: #1c1c1c;
+  color: white;
+}
+
+.sidebar {
+  background-color: #198754;
+  position: fixed;
+  right: 0px;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+}
+
+.sidebar-container {
+  margin: 1rem 0 0 0;
+  width: 200px;
+  opacity: 1;
+  transition: width ease 0.5s, opacity ease-in 0.5s;
+}
+
+.sidebar-caret {
+  margin-top: auto;
+  margin-bottom: auto;
+  transform: rotate(270deg);
+  transition: transform linear 0.5s;
+}
+
+.sidebar li {
+  list-style-type: none;
+  white-space: nowrap;
+}
+
+.collapsed > .sidebar-container {
+  width: 0;
+  opacity: 0;
+}
+
+.collapsed > .sidebar-caret {
+  transform: rotate(90deg);
+}
+
+.progress {
+  height: 0.5rem;
+}
