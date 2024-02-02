@@ -1,11 +1,26 @@
-﻿$primary: #1c1c1c;
+﻿//Variables
+$primary: #020403;
+$secondary: #1c1c1c;
 
-body {
-    background-color: $primary;
+$body-bg: $primary;
+$body-color: white;
+
+$accordion-bg: $secondary;
+$accordion-button-active-bg: $secondary;
+$accordion-button-active-color: white;
+$accordion-icon-active-color: white;
+
+//Import Bootstrap
+@import "../lib/node_modules/bootstrap/scss/bootstrap";
+
+//Custom Styles
+
+body {    
     color: white;
 }
 
 .sidebar {
+    z-index: 1;
     background-color: #198754;
     position: fixed;
     right: 0px;

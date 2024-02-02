@@ -13,12 +13,12 @@ public class CategoriesRepository : ICategoriesRepository
     {
         _context = context;
     }
-    public Task<List<Category>> GetCategories(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null )
+    public Task<List<Category>> GetCategoriesAsync(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null )
     {
         IQueryable<Category> query = _context.Categories;
 
-        if(filter != null)
-            query = query.Where(filter);
+        if (filter != null)
+            query = query.Where(filter).Include(c => c.Transactions);
 
         if(orderBy != null)
             return orderBy(query).ToListAsync();
@@ -62,7 +62,7 @@ public class CategoriesRepository : ICategoriesRepository
 
 public interface ICategoriesRepository
 {
-    Task<List<Category>> GetCategories(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null);
+    Task<List<Category>> GetCategoriesAsync(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null);
     Category? GetCategory(int id);
     ValueTask<Category?> GetCategoryAsync(int id);
     Task AddCategoryAsnyc(Category category);

@@ -17,13 +17,13 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Category>>> Get()
+    public async Task<ActionResult<List<Category>>> GetCategories()
     {
-        return Ok(await _repo.GetCategories());
+        return Ok(await _repo.GetCategoriesAsync());
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Category>> Get(int id)
+    public async Task<ActionResult<Category>> GetCategory(int id)
     {
         var category = await _repo.GetCategoryAsync(id);
 
@@ -32,20 +32,26 @@ public class CategoriesController : ControllerBase
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Post([FromBody][Bind("Name")] Category category)
+    public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, IncomeId")] PostCategory postCategory)
     {
         if (!ModelState.IsValid)
             return BadRequest();
 
+        var category = new Category()
+        {
+            Name = postCategory.Name,
+            Budget = postCategory.Budget,
+            IncomeId = postCategory.IncomeId,
+        };
+
         await _repo.AddCategoryAsnyc(category);
 
-        return CreatedAtAction(nameof(Get), new { id = category.Id }, category);
-
+        return CreatedAtAction(nameof(Category), new { id = category.Id }, category);
     }
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Put(int id, [Bind("Name,Id")] Category category)
+    public async Task<ActionResult> PutCategory(int id, [Bind("Name,Id")] Category category)
     {
         if(id != category.Id)
             return BadRequest();
@@ -70,7 +76,6 @@ public class CategoriesController : ControllerBase
         {
             return NotFound();
         }
-
     }
 
     private bool CategoryExists(int id) => _repo.GetCategory(id) is null;
@@ -78,7 +83,7 @@ public class CategoriesController : ControllerBase
 
     [HttpDelete("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> DeleteCategory(int id)
     {
         var category = await _repo.GetCategoryAsync(id);
 
@@ -95,6 +100,5 @@ public class CategoriesController : ControllerBase
         {
             return NotFound();
         }
-
     }
 }

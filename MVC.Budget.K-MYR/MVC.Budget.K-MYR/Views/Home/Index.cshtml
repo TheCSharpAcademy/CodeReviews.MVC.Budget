@@ -1,4 +1,6 @@
-﻿@{
+﻿@model MVC.Budget.K_MYR.Models.HomeViewModel;
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -7,7 +9,7 @@
         <svg id="sidebar-caret" class="sidebar-caret" width="30" height="35" fill="#ffffff" viewBox="0 0 15 15">
             <path d="M3.204 5h9.592L8 10.481zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659" />
         </svg>
-        <div id="sidebar-container" class="sidebar-container">            
+        <div id="sidebar-container" class="sidebar-container">
             <div class="sidebar-category">
                 <h5>Budget</h5>
                 <ul>
@@ -17,7 +19,7 @@
                 </ul>
                 <h5>Categories</h5>
                 <ul>
-                    <li>Add New Category</li>
+                    <li data-bs-toggle="modal" data-bs-target="#add-category-modal">Add New Category</li>
                     <li>Edit Category</li>
                     <li>Delete Category</li>
                 </ul>
@@ -32,43 +34,96 @@
     </div>
 </section>
 
-<div class="dashboard border">
-    <p>Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.</p>
-</div>
+<section>
+    <div class="dashboard border mt-3">
+        <p>Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.</p>
+    </div>
 
-<div class="categories-container mt-2 d-flex flex-column gap-1">
-    <div class="category border p-2">
-        <div class="d-flex">
-            <div>Overall</div>
-            <div class="ms-auto">Balance: 950 / 3.800</div>
-        </div>
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="accordion my-2" id="accordionIncome" data-id="1">
+        <div class="accordion-item">
+            <div class="d-flex">
+                <h2 class="accordion-header flex-grow-1" id="accordionIncomeHeader">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIncome" aria-expanded="false" aria-controls="collapseIncome">
+                        Income
+                        <img class="add-icon ms-2" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                    </button>
+                </h2>
+            </div>
+            <div id="collapseIncome" class="accordion-collapse collapse" aria-labelledby="accordionIncomeHeader">
+                <div class="accordion-body text-black">
+                </div>
+            </div>
         </div>
     </div>
-    <div class="category border p-2">
-        <div class="d-flex">
-            <div>Groceries</div>
-            <div class="ms-auto">Balance: 250 / 500</div>
-        </div>
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-    </div>
-    <div class="category border p-2">
-        <div class="d-flex">
-            <div>Rent</div>
-            <div class="ms-auto">Balance: 700 / 700</div>
-        </div>
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+
+    <div class="accordion my-2" id="accordionSavings">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionSavingsHeader">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSavings" aria-expanded="false" aria-controls="collapseSavings">
+                    Expenses
+                </button>
+            </h2>
+            <div id="collapseSavings" class="accordion-collapse collapse" aria-labelledby="accordionSavingsHeader">
+                <div class="accordion-body text-black">
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
+    <div class="accordion my-2" id="accordionExpenses">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accordionExpensesHeader">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExpenses" aria-expanded="false" aria-controls="collapseExpenses">
+                    Savings
+                </button>
+            </h2>
+            <div id="collapseExpenses" class="accordion-collapse collapse" aria-labelledby="accordionExpensesHeader">
+                <div class="accordion-body text-black">
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div id="categories-container" class="categories-container d-flex flex-column gap-1">
+        @foreach (var category in Model.Categories)
+        {
+            <div class="category border p-2">
+                <div class="d-flex">
+                    <div>@category.Name</div>
+                    <div class="ms-auto">Balance: @category.Transactions.Sum(t => t.Amount) / @category.Budget.ToString("G4")</div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        }
+        @*
+        <div class="category border p-2">
+        <div class="d-flex">
+        <div>Groceries</div>
+        <div class="ms-auto">Balance: 250 / 500</div>
+        </div>
+        <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        </div>
+        <div class="category border p-2">
+        <div class="d-flex">
+        <div>Rent</div>
+        <div class="ms-auto">Balance: 700 / 700</div>
+        </div>
+        <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        </div>
+        *@
+    </div>
+</section>
 
+@await Html.PartialAsync("_Modals", Model.Category)
 
-
-
-
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
