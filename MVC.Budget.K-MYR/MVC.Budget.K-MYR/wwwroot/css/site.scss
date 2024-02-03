@@ -57,6 +57,31 @@ body {
     transform: rotate(90deg);
 }
 
+.accordion {
+    cursor: pointer;
+}
+
+.accordion-header {
+    padding: 7px 5px 5px 10px;
+}
+
+.accordion-caret {
+    transform: none;
+    flex-shrink: 0;
+    width: var(--bs-accordion-btn-icon-width);
+    height: var(--bs-accordion-btn-icon-width);
+    margin: auto 7px auto 10px;
+    content: "";
+    background-image: var(--bs-accordion-btn-icon);
+    background-repeat: no-repeat;
+    background-size: var(--bs-accordion-btn-icon-width);
+    transition: var(--bs-accordion-btn-icon-transition);
+}
+
+.rotate {
+    transform: rotate(180deg);    
+}
+
 .progress {
     height: 0.5rem;    
 }

@@ -13,7 +13,7 @@ public class Category
     [DataType(DataType.Currency)]
     [Precision(19,4)]
     public decimal Budget { get; set; }
-    public int IncomeId { get; set; }
-    public Income Income { get; set; } = null!;
+    public int GroupId { get; set; }
+    public Group Group { get; set; } = null!;
     public ICollection<Transaction> Transactions { get; } = new List<Transaction>();
 }

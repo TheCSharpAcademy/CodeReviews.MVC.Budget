@@ -34,7 +34,7 @@ namespace MVC.Budget.K_MYR.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
-                    b.Property<int>("IncomeId")
+                    b.Property<int>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -44,12 +44,12 @@ namespace MVC.Budget.K_MYR.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IncomeId");
+                    b.HasIndex("GroupId");
 
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("MVC.Budget.K_MYR.Models.Income", b =>
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.Group", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,7 +59,7 @@ namespace MVC.Budget.K_MYR.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Incomes");
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Transaction", b =>
@@ -95,13 +95,13 @@ namespace MVC.Budget.K_MYR.Migrations
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Category", b =>
                 {
-                    b.HasOne("MVC.Budget.K_MYR.Models.Income", "Income")
+                    b.HasOne("MVC.Budget.K_MYR.Models.Group", "Group")
                         .WithMany("Categories")
-                        .HasForeignKey("IncomeId")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Income");
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Transaction", b =>
@@ -120,7 +120,7 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("MVC.Budget.K_MYR.Models.Income", b =>
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.Group", b =>
                 {
                     b.Navigation("Categories");
                 });

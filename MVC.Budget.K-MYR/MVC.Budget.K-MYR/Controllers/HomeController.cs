@@ -18,11 +18,15 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
+        
         HomeViewModel HomeViewModel = new()
         {
-            Categories = await _repo.GetCategoriesAsync(),
+           Income =  await _repo.GetCategoriesAsync(c => c.GroupId == 1, q => q.OrderBy(t => t.Name)),
+           Expenses = await _repo.GetCategoriesAsync(c => c.GroupId == 2, q => q.OrderBy(t => t.Name)),
+           Savings = await _repo.GetCategoriesAsync(c => c.GroupId == 3, q => q.OrderBy(t => t.Name)),
             Category = new()
         };
+
         return View(HomeViewModel);
     }
 

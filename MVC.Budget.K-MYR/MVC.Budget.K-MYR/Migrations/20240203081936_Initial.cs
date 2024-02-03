@@ -12,7 +12,7 @@ namespace MVC.Budget.K_MYR.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Incomes",
+                name: "Groups",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -20,7 +20,7 @@ namespace MVC.Budget.K_MYR.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Incomes", x => x.Id);
+                    table.PrimaryKey("PK_Groups", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -31,15 +31,15 @@ namespace MVC.Budget.K_MYR.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Budget = table.Column<decimal>(type: "decimal(19,4)", precision: 19, scale: 4, nullable: false),
-                    IncomeId = table.Column<int>(type: "int", nullable: false)
+                    GroupId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Categories_Incomes_IncomeId",
-                        column: x => x.IncomeId,
-                        principalTable: "Incomes",
+                        name: "FK_Categories_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -68,9 +68,9 @@ namespace MVC.Budget.K_MYR.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_IncomeId",
+                name: "IX_Categories_GroupId",
                 table: "Categories",
-                column: "IncomeId");
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_CategoryId",
@@ -88,7 +88,7 @@ namespace MVC.Budget.K_MYR.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "Incomes");
+                name: "Groups");
         }
     }
 }

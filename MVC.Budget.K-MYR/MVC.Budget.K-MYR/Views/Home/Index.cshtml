@@ -39,85 +39,117 @@
         <p>Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.</p>
     </div>
 
-    <div class="accordion my-2" id="accordionIncome" data-id="1">
+    <div class="accordion my-2" id="group_1" data-id="1">
         <div class="accordion-item">
-            <div class="d-flex">
-                <h2 class="accordion-header flex-grow-1" id="accordionIncomeHeader">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIncome" aria-expanded="false" aria-controls="collapseIncome">
-                        Income
-                        <img class="add-icon ms-2" src="~/img/svg/plus.svg" alt="" width="20px;" />
-                    </button>
-                </h2>
+            <div id="accordion-head-income" class="accordion-head d-flex">
+                <h5 class="accordion-header me-auto" id="accordionIncomeHeader">
+                    Income
+                </h5>
+                <h5 class="accordion-header">
+                    @Model.Income.Sum(c => c.Transactions.Sum(t => t.Amount)) / @Model.Income.Sum(c => c.Budget).ToString("G4")
+                </h5>
+                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                <div class="accordion-caret rotate"></div>
             </div>
-            <div id="collapseIncome" class="accordion-collapse collapse" aria-labelledby="accordionIncomeHeader">
-                <div class="accordion-body text-black">
+            <div id="collapseIncome" class="accordion-collapse collapse show" aria-labelledby="accordionIncomeHeader">
+                <div class="accordion-body">
+                    @foreach (var category in Model.Income)
+                    {
+                        <div id="category_@category.Id" class="category p-2" data-id="@category.Id">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex">
+                                        <div>@category.Name</div>
+                                        <div class="ms-auto">Balance: @category.Transactions.Sum(t => t.Amount) / @category.Budget.ToString("G4")</div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="delete-icon ms-2">
+                                    @Html.AntiForgeryToken()
+                                    <img src="~/img/svg/trash_white.svg" width="25px" alt="" />
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="accordion my-2" id="accordionSavings">
+    <div class="accordion my-2" id="group_2" data-id="2">
         <div class="accordion-item">
-            <h2 class="accordion-header" id="accordionSavingsHeader">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSavings" aria-expanded="false" aria-controls="collapseSavings">
+            <div id="accordion-head-expenses" class="accordion-head d-flex">
+                <h5 class="accordion-header me-auto" id="accordionExpensesHeader">
                     Expenses
-                </button>
-            </h2>
-            <div id="collapseSavings" class="accordion-collapse collapse" aria-labelledby="accordionSavingsHeader">
-                <div class="accordion-body text-black">
+                </h5>
+                <h5 class="accordion-header">
+                    @Model.Expenses.Sum(c => c.Transactions.Sum(t => t.Amount)) / @Model.Expenses.Sum(c => c.Budget).ToString("G4")
+                </h5>
+                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                <div class="accordion-caret rotate"></div>
+            </div>
+            <div id="collapseExpenses" class="accordion-collapse collapse show" aria-labelledby="accordionExpensesHeader">
+                <div class="accordion-body">
+                    @foreach (var category in Model.Expenses)
+                    {
+                        <div class="category p-2">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex">
+                                        <div>@category.Name</div>
+                                        <div class="ms-auto">Balance: @category.Transactions.Sum(t => t.Amount) / @category.Budget.ToString("G4")</div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <img class="ms-2" src="~/img/svg/trash_white.svg" width="25px" alt="" />
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="accordion my-2" id="accordionExpenses">
+    <div class="accordion my-2" id="group_3" data-id="3">
         <div class="accordion-item">
-            <h2 class="accordion-header" id="accordionExpensesHeader">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExpenses" aria-expanded="false" aria-controls="collapseExpenses">
+            <div id="accordion-head-savings" class="accordion-head d-flex">
+                <h5 class="accordion-header me-auto" id="accordionSavingsHeader">
                     Savings
-                </button>
-            </h2>
-            <div id="collapseExpenses" class="accordion-collapse collapse" aria-labelledby="accordionExpensesHeader">
-                <div class="accordion-body text-black">
+                </h5>
+                <h5 class="accordion-header">
+                    @Model.Savings.Sum(c => c.Transactions.Sum(t => t.Amount)) / @Model.Savings.Sum(c => c.Budget).ToString("G4")
+                </h5>
+                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                <div class="accordion-caret rotate"></div>
+            </div>
+            <div id="collapseSavings" class="accordion-collapse collapse show" aria-labelledby="accordionSavingsHeader">
+                <div class="accordion-body">
+                    @foreach (var category in Model.Savings)
+                    {
+                        <div class="category p-2">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex">
+                                        <div>@category.Name</div>
+                                        <div class="ms-auto">Balance: @category.Transactions.Sum(t => t.Amount) / @category.Budget.ToString("G4")</div>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <img class="ms-2" src="~/img/svg/trash_white.svg" width="25px" alt="" />
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="categories-container" class="categories-container d-flex flex-column gap-1">
-        @foreach (var category in Model.Categories)
-        {
-            <div class="category border p-2">
-                <div class="d-flex">
-                    <div>@category.Name</div>
-                    <div class="ms-auto">Balance: @category.Transactions.Sum(t => t.Amount) / @category.Budget.ToString("G4")</div>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-            </div>
-        }
-        @*
-        <div class="category border p-2">
-        <div class="d-flex">
-        <div>Groceries</div>
-        <div class="ms-auto">Balance: 250 / 500</div>
-        </div>
-        <div class="progress">
-        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        </div>
-        <div class="category border p-2">
-        <div class="d-flex">
-        <div>Rent</div>
-        <div class="ms-auto">Balance: 700 / 700</div>
-        </div>
-        <div class="progress">
-        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-        </div>
-        *@
-    </div>
 </section>
 
 @await Html.PartialAsync("_Modals", Model.Category)

@@ -13,5 +13,5 @@ public class PostCategory
     [Precision(19, 4)]
     public decimal Budget { get; set; }
     [Required]
-    public int IncomeId { get; set; }
+    public int GroupId { get; set; }
 }

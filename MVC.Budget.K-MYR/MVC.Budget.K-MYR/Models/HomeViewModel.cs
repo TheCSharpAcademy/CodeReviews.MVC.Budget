@@ -2,6 +2,8 @@
 
 public class HomeViewModel
 {
-    public List<Category> Categories { get; set; }
-    public Category Category { get; set; }
+    public List<Category> Income { get; set; }
+    public List<Category> Expenses { get; set; }
+    public List<Category> Savings { get; set; }
+    public PostCategory Category { get; set; }
 }

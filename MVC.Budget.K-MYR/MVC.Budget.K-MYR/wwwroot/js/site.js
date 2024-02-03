@@ -1,10 +1,8 @@
 ﻿const uri = "https://localhost:7246/api/Categories";
 
-categoriesContainer = document.getElementById("categories-container");
-
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("sidebar-caret").addEventListener("click", () => {
-        const sidebar = document.getElementById("sidebar");
+        var sidebar = document.getElementById("sidebar");
         if (sidebar.classList.contains("collapsed")) {
             sidebar.classList.remove("collapsed");
         }
@@ -13,10 +11,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    document.getElementById("accordionIncome").addEventListener("click", function(event) {
-        if (event.target.matches("img.add-icon.ms-2")) {
+    $(".accordion-head").on("click", function (event) {
+        if (event.target.matches("img.add-icon.ms-auto")) {
+            var id = $(this).closest('.accordion').data("id");
             $("#add-category-modal").modal('show');
-            $("#add-category-modal #IncomeId").val(this.dataset.id);                    
+            $("#add-category-modal #GroupId").val(id);
+        }
+        else {
+            $(this).next().collapse('toggle');
+            var caret = $('.accordion-caret', this)[0];
+            if (caret.classList.contains("rotate")) {
+                caret.classList.remove("rotate");
+            } else {
+                caret.classList.add("rotate");
+            }
         }
     });
 
@@ -24,14 +32,20 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
         if ($(this).valid()) {
             $("#add-category-modal").modal('hide');
-            addCategory(new FormData(this));            
+            await addCategory(new FormData(this));            
         }
     });
+
+    $('.delete-icon').on("click", async function (event) {
+        var id = $(this).closest('.category').data('id');
+        var token = this.querySelector('input').value
+        deleteCategory(id, token);
+    })
 })
 
 async function addCategory(data) {
-    try {
-        const response = await fetch(`${uri}`, {
+    try {   
+        var response = await fetch(`${uri}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -40,14 +54,13 @@ async function addCategory(data) {
             body: JSON.stringify({
                 Name: data.get("Name"),
                 Budget: data.get("Budget"),
-                IncomeId: data.get("IncomeId")
+                GroupId: data.get("GroupId")
             })
         });
         
         if (response.ok) {
-            createCategoryElement(await response.json());
-        }
-        else {
+            document.querySelector(`#group_${data.get("GroupId")} .accordion-body`).innerHTML += createCategoryElement(await response.json());
+        } else {
             console.error(`HTTP Post Error: ${response.status}`);
         }
 
@@ -56,8 +69,28 @@ async function addCategory(data) {
     };
 }
 
+async function deleteCategory(id, token) {
+    try {
+        var response = await fetch(`${uri}/${id}`, {
+            method: "DELETE",
+            headers: {                
+                "RequestVerificationToken": token
+            }
+        });
+
+        if (response.ok) {
+            document.getElementById(`category_${id}`).remove();
+        } else {
+            console.error(`HTTP Delete Error: ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error(error);
+    };    
+}
+
 function createCategoryElement(category) {        
-    categoriesContainer.innerHTML += `
+    return  `
     <div class="category border p-2">
         <div class="d-flex">
             <div>${category.name}</div>

@@ -1,5 +1,5 @@
 ﻿namespace MVC.Budget.K_MYR.Models;
 
-public class Income : Group
-{   
+public class Expense : Group
+{
 }

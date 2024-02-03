@@ -32,7 +32,7 @@ public class CategoriesController : ControllerBase
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, IncomeId")] PostCategory postCategory)
+    public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, GroupId")] PostCategory postCategory)
     {
         if (!ModelState.IsValid)
             return BadRequest();
@@ -41,7 +41,7 @@ public class CategoriesController : ControllerBase
         {
             Name = postCategory.Name,
             Budget = postCategory.Budget,
-            IncomeId = postCategory.IncomeId,
+            GroupId = postCategory.GroupId,
         };
 
         await _repo.AddCategoryAsnyc(category);
@@ -76,10 +76,7 @@ public class CategoriesController : ControllerBase
         {
             return NotFound();
         }
-    }
-
-    private bool CategoryExists(int id) => _repo.GetCategory(id) is null;
-    
+    }    
 
     [HttpDelete("{id}")]
     [ValidateAntiForgeryToken]
@@ -101,4 +98,6 @@ public class CategoriesController : ControllerBase
             return NotFound();
         }
     }
+
+    private bool CategoryExists(int id) => _repo.GetCategory(id) is null;
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Repositories;
+using MVC.Budget.K_MYR.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
