@@ -1,6 +1,54 @@
 ﻿const uri = "https://localhost:7246/api/Categories";
+Chart.defaults.color = '#ffffff';
+
 
 document.addEventListener("DOMContentLoaded", () => {
+    const chart1 = document.getElementById('chart');
+    const chart2 = document.getElementById('chart2');
+
+    new Chart(chart1, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                'Happy',
+                'Unhappy',
+                'No Data'
+            ],
+            datasets: [{
+                label: 'My First Dataset',
+                data: [300, 50, 100],
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)'
+                ],
+                hoverOffset: 4
+            }]
+        }
+    });
+
+    new Chart(chart2, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                'Necessary',
+                'Unecessary',
+                'No Data'
+            ],
+            datasets: [{
+                label: 'My First Dataset',
+                data: [300, 50, 100],
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)'
+                ],
+                hoverOffset: 4
+            }]
+        }
+    });
+    
+
     document.getElementById("sidebar-caret").addEventListener("click", () => {
         var sidebar = document.getElementById("sidebar");
         if (sidebar.classList.contains("collapsed")) {
@@ -36,10 +84,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    $('.delete-icon').on("click", async function (event) {
-        var id = $(this).closest('.category').data('id');
-        var token = this.querySelector('input').value
-        deleteCategory(id, token);
+    $('.category').on("click", function (event) {
+        var id = this.dataset.id;
+        if (event.target.matches('img')) {
+            var token = this.querySelector('input').value;
+            deleteCategory(id, token);
+        } else {
+            window.location.href = "Category/" + id;
+        }
     })
 })
 

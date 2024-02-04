@@ -11947,6 +11947,10 @@ body {
   transform: rotate(90deg);
 }
 
+.dashboard {
+  border-radius: var(--bs-border-radius);
+}
+
 .accordion {
   cursor: pointer;
 }

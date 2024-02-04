@@ -35,8 +35,11 @@
 </section>
 
 <section>
-    <div class="dashboard border mt-3">
-        <p>Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard. Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.Here will be the dashboard.</p>
+    <div class="dashboard border mt-3" style="background-color: #1c1c1c">
+        <div class="d-flex justify-content-evenly">
+            <div class="m-4" style="width: 300px;"><canvas id="chart"></canvas></div>
+            <div class="m-4"  style="width: 300px;"><canvas id="chart2"></canvas></div>
+        </div>       
     </div>
 
     <div class="accordion my-2" id="group_1" data-id="1">
@@ -55,15 +58,17 @@
                 <div class="accordion-body">
                     @foreach (var category in Model.Income)
                     {
+                        var spent = @category.Transactions.Sum(t => t.Amount);
+                        var progressbarWidth = spent / category.Budget;
                         <div id="category_@category.Id" class="category p-2" data-id="@category.Id">
                             <div class="d-flex">
                                 <div class="flex-grow-1">
                                     <div class="d-flex">
                                         <div>@category.Name</div>
-                                        <div class="ms-auto">Balance: @category.Transactions.Sum(t => t.Amount) / @category.Budget.ToString("G4")</div>
+                                        <div class="ms-auto">Balance: @spent / @category.Budget.ToString("G4")</div>
                                     </div>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: @progressbarWidth.ToString("G4")" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
                                 <div class="delete-icon ms-2">
@@ -94,18 +99,23 @@
                 <div class="accordion-body">
                     @foreach (var category in Model.Expenses)
                     {
-                        <div class="category p-2">
+                        var spent = @category.Transactions.Sum(t => t.Amount);
+                        var progressbarWidth = spent / category.Budget;
+                        <div id="category_@category.Id" class="category p-2" data-id="@category.Id">
                             <div class="d-flex">
                                 <div class="flex-grow-1">
                                     <div class="d-flex">
                                         <div>@category.Name</div>
-                                        <div class="ms-auto">Balance: @category.Transactions.Sum(t => t.Amount) / @category.Budget.ToString("G4")</div>
+                                        <div class="ms-auto">Balance: @spent / @category.Budget.ToString("G4")</div>
                                     </div>
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: @progressbarWidth.ToString("G4")" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
-                                <img class="ms-2" src="~/img/svg/trash_white.svg" width="25px" alt="" />
+                                <div class="delete-icon ms-2">
+                                    @Html.AntiForgeryToken()
+                                    <img src="~/img/svg/trash_white.svg" width="25px" alt="" />
+                                </div>
                             </div>
                         </div>
                     }
@@ -130,7 +140,7 @@
                 <div class="accordion-body">
                     @foreach (var category in Model.Savings)
                     {
-                        <div class="category p-2">
+                        <div id="category_@category.Id" class="category p-2" data-id="@category.Id">
                             <div class="d-flex">
                                 <div class="flex-grow-1">
                                     <div class="d-flex">
@@ -141,7 +151,10 @@
                                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
-                                <img class="ms-2" src="~/img/svg/trash_white.svg" width="25px" alt="" />
+                                <div class="delete-icon ms-2">
+                                    @Html.AntiForgeryToken()
+                                    <img src="~/img/svg/trash_white.svg" width="25px" alt="" />
+                                </div>
                             </div>
                         </div>
                     }
@@ -156,6 +169,7 @@
 
 @section Scripts {
     @{
+        <script src="~/lib/node_modules/chart.js/dist/chart.umd.js"></script>
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
