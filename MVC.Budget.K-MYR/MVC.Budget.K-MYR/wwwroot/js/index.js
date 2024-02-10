@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }]
         }
     });
-    
+
 
     document.getElementById("sidebar-caret").addEventListener("click", () => {
         var sidebar = document.getElementById("sidebar");
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
         if ($(this).valid()) {
             $("#add-category-modal").modal('hide');
-            await addCategory(new FormData(this));            
+            await addCategory(new FormData(this));
         }
     });
 
@@ -92,8 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             window.location.href = "Category/" + id;
         }
-    })
-})
+    });
+});
 
 async function addCategory(data) {
     try {   
@@ -118,7 +118,7 @@ async function addCategory(data) {
 
     } catch (error) {
         console.error(error);
-    };
+    }
 }
 
 async function deleteCategory(id, token) {
@@ -131,14 +131,14 @@ async function deleteCategory(id, token) {
         });
 
         if (response.ok) {
-            document.getElementById(`category_${id}`).remove();
+            //document.getElementById(`category_${id}`).remove();
         } else {
             console.error(`HTTP Delete Error: ${response.status}`);
         }
 
     } catch (error) {
         console.error(error);
-    };    
+    }  
 }
 
 function createCategoryElement(category) {        

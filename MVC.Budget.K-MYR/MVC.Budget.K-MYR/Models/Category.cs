@@ -14,6 +14,6 @@ public class Category
     [Precision(19,4)]
     public decimal Budget { get; set; }
     public int GroupId { get; set; }
-    public Group Group { get; set; } = null!;
+    public Group Group { get; set; }
     public ICollection<Transaction> Transactions { get; } = new List<Transaction>();
 }

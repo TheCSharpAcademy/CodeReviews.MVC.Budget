@@ -1,0 +1,34 @@
+﻿@model MVC.Budget.K_MYR.Models.TransactionPost;
+
+<section id="modals">
+    <div class="modal fade" id="add-transaction-modal" tabindex="-1" aria-labelledby="add-transaction-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-truncate text-center flex-grow-1" id="add-transaction-label">Add Transaction</h5>
+                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-transaction-form" asp-controller="Transaction" asp-action="PostTransaction" method="POST">
+                        <input type="hidden"asp-for="CategoryId" value="" />
+                        <div class="form-group">
+                            <label asp-for="Title" class="control-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Amount" class="control-label"></label>
+                            <input asp-for="Amount" class="form-control" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                        <div class="form-group mt-2 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Add" class="px-4" /> 
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+

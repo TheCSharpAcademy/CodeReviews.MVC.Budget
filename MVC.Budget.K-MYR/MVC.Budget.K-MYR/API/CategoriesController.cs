@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
-using MVC.Budget.K_MYR.Repositories;
 
 namespace MVC.Budget.K_MYR.API;
 
@@ -9,30 +9,32 @@ namespace MVC.Budget.K_MYR.API;
 [ApiController]
 public class CategoriesController : ControllerBase
 {
-    private readonly ICategoriesRepository _repo;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<CategoriesController> _logger;
 
-    public CategoriesController(ICategoriesRepository repo)
+    public CategoriesController(IUnitOfWork unitOfWork, ILogger<CategoriesController> logger)
     {
-        _repo = repo;
+        _unitOfWork = unitOfWork;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Category>>> GetCategories()
     {
-        return Ok(await _repo.GetCategoriesAsync());
+        return Ok(await _unitOfWork.CategoriesRepository.GetAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Category>> GetCategory(int id)
     {
-        var category = await _repo.GetCategoryAsync(id);
+        var category = await _unitOfWork.CategoriesRepository.GetByIDAsync(id);
 
         return category is null ? NotFound() : Ok(category);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, GroupId")] PostCategory postCategory)
+    public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, GroupId")] CategoryPost postCategory)
     {
         if (!ModelState.IsValid)
             return BadRequest();
@@ -44,7 +46,8 @@ public class CategoriesController : ControllerBase
             GroupId = postCategory.GroupId,
         };
 
-        await _repo.AddCategoryAsnyc(category);
+        _unitOfWork.CategoriesRepository.Insert(category);
+        await _unitOfWork.Save();
 
         return CreatedAtAction(nameof(Category), new { id = category.Id }, category);
     }
@@ -53,13 +56,13 @@ public class CategoriesController : ControllerBase
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> PutCategory(int id, [Bind("Name,Id")] Category category)
     {
-        if(id != category.Id)
+        if (id != category.Id)
             return BadRequest();
 
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var entity = await _repo.GetCategoryAsync(id);
+        var entity = await _unitOfWork.CategoriesRepository.GetByIDAsync(id);
 
         if (entity is null)
             return NotFound();
@@ -68,7 +71,8 @@ public class CategoriesController : ControllerBase
 
         try
         {
-            await _repo.UpdateCategoryAsnyc(entity);
+            _unitOfWork.CategoriesRepository.Update(entity);
+            await _unitOfWork.Save();
             return NoContent();
         }
 
@@ -76,20 +80,21 @@ public class CategoriesController : ControllerBase
         {
             return NotFound();
         }
-    }    
+    }
 
     [HttpDelete("{id}")]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> DeleteCategory(int id)
     {
-        var category = await _repo.GetCategoryAsync(id);
+        var category = await _unitOfWork.CategoriesRepository.GetByIDAsync(id);
 
         if (category is null)
             return NotFound();
 
         try
         {
-            await _repo.DeleteCategoryAsnyc(id);
+            await _unitOfWork.CategoriesRepository.DeleteAsync(id);
+            await _unitOfWork.Save();
             return NoContent();
         }
 
@@ -99,5 +104,5 @@ public class CategoriesController : ControllerBase
         }
     }
 
-    private bool CategoryExists(int id) => _repo.GetCategory(id) is null;
+    private bool CategoryExists(int id) => _unitOfWork.CategoriesRepository.GetByID(id) is null;
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MVC.Budget.K_MYR.Models;
 
-public class PostCategory
+public class CategoryPost
 {
     [Required]
     [StringLength(50, MinimumLength = 1)]

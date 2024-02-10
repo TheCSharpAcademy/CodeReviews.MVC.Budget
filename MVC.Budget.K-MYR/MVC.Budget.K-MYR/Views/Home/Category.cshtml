@@ -4,19 +4,51 @@
     ViewData["Title"] = "Category";
 }
 
-
 <div class="dashboard border mt-3" style="background-color: #1c1c1c">
     <div class="d-flex justify-content-evenly">
         <div class="m-4" style="width: 300px;"><canvas id="chart"></canvas></div>
         <div class="m-4"  style="width: 300px;"><canvas id="chart2"></canvas></div>
     </div>       
 </div>
+<div class="accordion my-2" id="transactions" data-id="@Model.Id">
+    <div class="accordion-item">
+        <div id="accordion-head-transaction" class="accordion-head d-flex">
+            <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
+                Transactions
+            </h5>            
+            <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+            <div class="accordion-caret rotate"></div>
+        </div>
+        <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
+            <div class="accordion-body">
+                @foreach (var transaction in Model.Transactions)
+                {                   
+                    <div id="transaction_@transaction.Id" class="transaction p-2" data-id="@transaction.Id">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <div class="d-flex">
+                                    <div>@transaction.Title</div>
+                                    <div class="ms-auto">@transaction.Amount.ToString("G4")</div>
+                                </div>                                
+                            </div>
+                            <div class="delete-icon ms-2">
+                                @Html.AntiForgeryToken()
+                                <img src="~/img/svg/trash_white.svg" width="25px" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
 
-   
+@await Html.PartialAsync("_CategoryModals", new TransactionPost())
 
 @section Scripts {
     @{
         <script src="~/lib/node_modules/chart.js/dist/chart.umd.js"></script>
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="~/js/category.js" asp-append-version="true"></script>
     }
 }

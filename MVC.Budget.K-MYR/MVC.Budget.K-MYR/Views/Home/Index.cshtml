@@ -165,11 +165,13 @@
 
 </section>
 
-@await Html.PartialAsync("_Modals", Model.Category)
+@await Html.PartialAsync("_IndexModals", Model.Category)
 
 @section Scripts {
     @{
         <script src="~/lib/node_modules/chart.js/dist/chart.umd.js"></script>
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="~/js/index.js" asp-append-version="true"></script>
+
     }
 }

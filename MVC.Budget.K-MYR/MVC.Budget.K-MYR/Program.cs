@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Repositories;
-using MVC.Budget.K_MYR.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
+builder.Services.AddTransient<ITransactionsRepository, TransactionsRepository>();
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")));
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder .Configuration.GetConnectionString("SQLServer")));
-
-builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 
 var app = builder.Build();
 
