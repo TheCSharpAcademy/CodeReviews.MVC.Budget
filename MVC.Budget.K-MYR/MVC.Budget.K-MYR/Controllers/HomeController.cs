@@ -20,9 +20,9 @@ public class HomeController : Controller
     {
         HomeViewModel HomeViewModel = new()
         {
-            Income = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 1, q => q.OrderBy(t => t.Name)),
-            Expenses = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 2, q => q.OrderBy(t => t.Name)),
-            Savings = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 3, q => q.OrderBy(t => t.Name)),
+            Income = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 1, q => q.OrderBy(t => t.Name), "Transactions"),
+            Expenses = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 2, q => q.OrderBy(t => t.Name), "Transactions"),
+            Savings = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 3, q => q.OrderBy(t => t.Name), "Transactions"),
             Category = new()
         };
 
