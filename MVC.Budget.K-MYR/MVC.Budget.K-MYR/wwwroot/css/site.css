@@ -11947,6 +11947,79 @@ body {
   transform: rotate(90deg);
 }
 
+#menu-container {
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-out 0.4s, visibility 0.2s ease-out 0.4s;
+}
+
+#menu-container.active {
+  transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+  visibility: visible;
+  opacity: 1;
+}
+
+.menu {
+  position: relative;
+  height: 200px;
+  width: 200px;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.toggle {
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+  font-size: 2em;
+  color: black;
+  background-color: rgb(255, 255, 255);
+}
+
+#menu-container .span-box {
+  position: absolute;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgb(255, 255, 255);
+  transform-origin: 100px;
+  transition: transform 0.4s ease;
+  transform: rotate(0deg) translateX(80px);
+}
+
+#menu-container.active .span-box {
+  transform: rotate(calc(90deg * var(--i)));
+  transition: transform 0.4s ease 0.2s;
+}
+
+.menu .span-box svg {
+  transform: rotate(calc(-90deg * var(--i)));
+  width: 30px;
+  height: 30px;
+  color: black;
+}
+
+.menu .plus {
+  width: 40px !important;
+  height: 40px !important;
+}
+
 .dashboard {
   border-radius: var(--bs-border-radius);
 }

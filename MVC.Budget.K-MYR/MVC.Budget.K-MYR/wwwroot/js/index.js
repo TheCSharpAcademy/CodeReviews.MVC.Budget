@@ -1,10 +1,11 @@
 ﻿const uri = "https://localhost:7246/api/Categories";
+const menu = document.getElementById('menu-container');
+const sidebar = document.getElementById("sidebar");
 Chart.defaults.color = '#ffffff';
 
-
 document.addEventListener("DOMContentLoaded", () => {
-    const chart1 = document.getElementById('chart');
-    const chart2 = document.getElementById('chart2');
+    var chart1 = document.getElementById('chart');
+    var chart2 = document.getElementById('chart2');
 
     new Chart(chart1, {
         type: 'doughnut',
@@ -50,13 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     document.getElementById("sidebar-caret").addEventListener("click", () => {
-        var sidebar = document.getElementById("sidebar");
-        if (sidebar.classList.contains("collapsed")) {
-            sidebar.classList.remove("collapsed");
-        }
-        else {
-            sidebar.classList.add("collapsed")
-        }
+        sidebar.classList.toggle('collapsed');
     });
 
     $(".accordion-head").on("click", function (event) {
@@ -84,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    /*
     $('.category').on("click", function (event) {
         var id = this.dataset.id;
         if (event.target.matches('img')) {
@@ -93,6 +89,41 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "Category/" + id;
         }
     });
+    */
+    $('.category').on("click", function (event) {
+        menu.style.left = `${this.style.left + event.pageX - 100}px`;
+        menu.style.top = `${event.pageY - 100}px`;   
+        menu.classList.add('active');     
+        menu.dataset.category = this.dataset.id;
+    });
+
+    document.getElementById('close-menu').onclick = function () {
+        menu.classList.remove('active');
+    };
+
+    document.getElementById('delete-menu').onclick = function () {
+        var token = menu.querySelector('input').value;
+        var id = menu.dataset.category;
+        if (deleteCategory(id, token)) {
+            menu.classList.remove('active');
+        }
+    };
+
+    document.getElementById('add-menu').onclick = function () {
+        var token = menu.querySelector('input').value;
+        var id = menu.dataset.category;        
+    };
+
+    document.getElementById('edit-menu').onclick = function () {
+        var token = menu.querySelector('input').value;
+        var id = menu.dataset.category;        
+    };
+
+    document.getElementById('details-menu').onclick = function () {
+        var token = menu.querySelector('input').value;
+        var id = menu.dataset.category;      
+    };
+
 });
 
 async function addCategory(data) {
@@ -112,12 +143,15 @@ async function addCategory(data) {
         
         if (response.ok) {
             document.querySelector(`#group_${data.get("GroupId")} .accordion-body`).innerHTML += createCategoryElement(await response.json());
+            return true;
         } else {
             console.error(`HTTP Post Error: ${response.status}`);
+            return false;
         }
 
     } catch (error) {
         console.error(error);
+        return false;
     }
 }
 
@@ -131,7 +165,7 @@ async function deleteCategory(id, token) {
         });
 
         if (response.ok) {
-            //document.getElementById(`category_${id}`).remove();
+            document.getElementById(`category_${id}`).remove();
         } else {
             console.error(`HTTP Delete Error: ${response.status}`);
         }

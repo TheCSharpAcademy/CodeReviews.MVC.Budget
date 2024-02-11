@@ -73,11 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    $('.transaction').on("click", function (event) {
-        var id = this.dataset.id;
+    $('.transaction').on("click", function (event) {        
         if (event.target.matches('img')) {
             var token = this.querySelector('input').value;
-            deleteCategory(id, token);
+            deleteTransaction(this.dataset.id, token);
         } 
     });
 });
@@ -108,7 +107,7 @@ async function addTransaction(data) {
     };
 }
 
-async function deleteCategory(id, token) {
+async function deleteTransaction(id, token) {
     try {
         var response = await fetch(`${uri}/${id}`, {
             method: "DELETE",
