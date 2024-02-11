@@ -10,6 +10,8 @@ builder.Services.AddDbContext<BudgetContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString") ?? throw new InvalidOperationException("Connection string not found")));
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<BudgetContext>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

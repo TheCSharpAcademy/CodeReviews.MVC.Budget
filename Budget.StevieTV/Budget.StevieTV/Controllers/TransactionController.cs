@@ -1,8 +1,10 @@
 using Budget.StevieTV.Database;
+using Budget.StevieTV.Enums;
 using Budget.StevieTV.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 
 namespace Budget.StevieTV.Controllers
 {
@@ -18,34 +20,28 @@ namespace Budget.StevieTV.Controllers
         // GET: Transaction
         public async Task<IActionResult> Index()
         {
-            var budgetContext = _context.Transactions.Include(t => t.Category);
-            return View(await budgetContext.ToListAsync());
-        }
+            
+            var transactions = await _context.Transactions.Include(t => t.Category).OrderBy(t => t.Date).ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
 
-        // GET: Transaction/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            var viewModel = new BudgetViewModel
             {
-                return NotFound();
-            }
-
-            var transaction = await _context.Transactions
-                .Include(t => t.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-
-            return View(transaction);
+                Transactions = transactions,
+                Categories = categories
+            };
+            
+            return View(viewModel);
         }
 
         // GET: Transaction/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
-            return View();
+
+   
+            var transaction = new TransactionViewModel( _context.Categories.ToList());
+
+            // ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            return View("_AddTransactionPartial", transaction); 
         }
 
         // POST: Transaction/Create
@@ -53,16 +49,27 @@ namespace Budget.StevieTV.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TransactionType,Date,Description,Amount,CategoryId")] Transaction transaction)
+        public async Task<IActionResult> Create(TransactionViewModel transaction)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(transaction);
+
+                var newTransaction = new Transaction
+                {
+                    TransactionType = transaction.TransactionType,
+                    Date = transaction.Date,
+                    Description = transaction.Description,
+                    Amount = transaction.Amount,
+                    CategoryId = transaction.CategoryId
+                };
+                
+                _context.Add(newTransaction);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.CategoryId);
-            return View(transaction);
+            //ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.CategoryId);
+            // return View("_AddTransactionPartial", transaction);
+            return View("Index");
         }
 
         // GET: Transaction/Edit/5
