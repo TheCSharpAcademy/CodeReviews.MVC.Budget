@@ -1,5 +1,5 @@
 @using Budget.StevieTV.Enums
-@model Budget.StevieTV.Models.TransactionViewModel
+@model Budget.StevieTV.Models.BudgetViewModel
 
 <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -13,28 +13,29 @@
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
-                        <label asp-for="TransactionType" class="control-label"></label>
-                        <select asp-for="TransactionType" class="form-control" asp-items="Html.GetEnumSelectList<TransactionType>()"></select>
-                        <span asp-validation-for="TransactionType" class="text-danger"></span>
+                        <label asp-for="TransactionViewModel.TransactionType" class="control-label"></label>
+                        <select asp-for="TransactionViewModel.TransactionType" class="form-control" asp-items="Html.GetEnumSelectList<TransactionType>()"></select>
+                        <span asp-validation-for="TransactionViewModel.TransactionType" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Date" class="control-label"></label>
-                        <input asp-for="Date" class="form-control"/>
-                        <span asp-validation-for="Date" class="text-danger"></span>
+                        <label asp-for="TransactionViewModel.Date" class="control-label"></label>
+                        <input asp-for="TransactionViewModel.Date" class="form-control"/>
+                        <span asp-validation-for="TransactionViewModel.Date" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Description" class="control-label"></label>
-                        <input asp-for="Description" class="form-control"/>
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <label asp-for="TransactionViewModel.Description" class="control-label"></label>
+                        <input asp-for="TransactionViewModel.Description" class="form-control"/>
+                        <span asp-validation-for="TransactionViewModel.Description" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Amount" class="control-label"></label>
-                        <input asp-for="Amount" class="form-control"/>
-                        <span asp-validation-for="Amount" class="text-danger"></span>
+                        <label asp-for="TransactionViewModel.Amount" class="control-label"></label>
+                        <input asp-for="TransactionViewModel.Amount" class="form-control"/>
+                        <span asp-validation-for="TransactionViewModel.Amount" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="CategoryId" class="control-label"></label>
-                        <select asp-for="CategoryId" class="form-control" asp-items="Model.Categories"></select>
+                        <label asp-for="TransactionViewModel.CategoryId" class="control-label"></label>
+                        <select asp-for="TransactionViewModel.CategoryId" class="form-control" asp-items="Model.TransactionViewModel.Categories">
+                        </select>
                     </div>
                     <div class="form-group">
                         <input type="submit" value="Create" class="btn btn-primary"/>

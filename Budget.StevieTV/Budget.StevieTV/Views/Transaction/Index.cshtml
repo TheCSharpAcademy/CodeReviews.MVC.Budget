@@ -52,10 +52,9 @@
                 @Html.DisplayFor(modelItem => item.Category.Name)
             </td>
             <td>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editTransactionModal" asp-route-id="@item.Id">
+                <button type="button" id="@item.Id" class="btn btn-primary editTransactionButton" onclick="editTransaction(this.id)">
                     Edit Transaction
                 </button>
-                <partial name="_EditTransactionPartial" model="new TransactionViewModel(Model.Categories)"/>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
@@ -64,7 +63,8 @@
     </tbody>
 </table>
 
-<partial name="_AddTransactionPartial" model="new TransactionViewModel(Model.Categories)"/>
+<partial name="_AddTransactionPartial" />
+<partial name="_EditTransactionPartial"/>
 
 
 @section Scripts {

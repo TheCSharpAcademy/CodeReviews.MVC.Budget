@@ -15,6 +15,7 @@ public class Transaction
     public TransactionType TransactionType { get; set; }
 
     [DataType(DataType.Date)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
     public DateTime Date { get; set; }
     
     public string Description { get; set; }
@@ -26,5 +27,6 @@ public class Transaction
     
     [ForeignKey("Category")]
     public int CategoryId { get; set; }
+    [DisplayName("Category")]
     public Category Category { get; set; }
 }

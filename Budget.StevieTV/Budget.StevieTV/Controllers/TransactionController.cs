@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging;
+using NuGet.Protocol;
 
 namespace Budget.StevieTV.Controllers
 {
@@ -27,49 +28,80 @@ namespace Budget.StevieTV.Controllers
             var viewModel = new BudgetViewModel
             {
                 Transactions = transactions,
-                Categories = categories
+                Categories = categories,
+                TransactionViewModel = new TransactionViewModel(categories)
             };
             
             return View(viewModel);
         }
-
-        // GET: Transaction/Create
-        public IActionResult Create()
+        
+        // GET: Transaction/Details/5
+        [HttpGet]
+        public async Task<IActionResult> Details(int? id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-   
-            var transaction = new TransactionViewModel( _context.Categories.ToList());
-
-            // ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
-            return View("_AddTransactionPartial", transaction); 
+            var transaction = await _context.Transactions
+                .Include(t => t.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+      
+            return Json(transaction);
         }
+        
+
+        // // GET: Transaction/Create
+        // public IActionResult Create()
+        // {
+        //
+        //
+        //     var transaction = new TransactionViewModel( _context.Categories.ToList());
+        //
+        //     // ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+        //     return View("_AddTransactionPartial", transaction); 
+        // }
 
         // POST: Transaction/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TransactionViewModel transaction)
+        public async Task<IActionResult> Create(BudgetViewModel budgetViewModel)
         {
             if (ModelState.IsValid)
             {
 
                 var newTransaction = new Transaction
                 {
-                    TransactionType = transaction.TransactionType,
-                    Date = transaction.Date,
-                    Description = transaction.Description,
-                    Amount = transaction.Amount,
-                    CategoryId = transaction.CategoryId
+                    Id = budgetViewModel.TransactionViewModel.Id,
+                    TransactionType = budgetViewModel.TransactionViewModel.TransactionType,
+                    Date = budgetViewModel.TransactionViewModel.Date,
+                    Description = budgetViewModel.TransactionViewModel.Description,
+                    Amount = budgetViewModel.TransactionViewModel.Amount,
+                    CategoryId = budgetViewModel.TransactionViewModel.CategoryId
                 };
+
+                if (newTransaction.Id > 0)
+                {
+                    _context.Update(newTransaction);
+                }
+                else
+                {
+                    _context.Add(newTransaction);
+                }
                 
-                _context.Add(newTransaction);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             //ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.CategoryId);
             // return View("_AddTransactionPartial", transaction);
-            return View("Index");
+            return RedirectToAction("Index");
         }
 
         // GET: Transaction/Edit/5
