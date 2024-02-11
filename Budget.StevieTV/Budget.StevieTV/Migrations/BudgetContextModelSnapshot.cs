@@ -36,7 +36,7 @@ namespace Budget.StevieTV.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Budget.StevieTV.Models.Transaction", b =>
@@ -68,7 +68,7 @@ namespace Budget.StevieTV.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("Budget.StevieTV.Models.Transaction", b =>

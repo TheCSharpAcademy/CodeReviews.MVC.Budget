@@ -11,6 +11,7 @@ public class Transaction
     public int Id { get; set; }
     
     [DisplayName("Type")]
+    [EnumDataType(typeof(TransactionType))]
     public TransactionType TransactionType { get; set; }
 
     [DataType(DataType.Date)]
@@ -23,6 +24,7 @@ public class Transaction
     [Precision(18,2)]
     public decimal Amount { get; set; }
     
+    [ForeignKey("Category")]
     public int CategoryId { get; set; }
     public Category Category { get; set; }
 }

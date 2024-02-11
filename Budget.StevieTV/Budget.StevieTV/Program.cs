@@ -1,4 +1,6 @@
+using System.Globalization;
 using Budget.StevieTV.Database;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,28 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+var cultureInfo = new CultureInfo("en-US")
+{
+    NumberFormat =
+    {
+        CurrencyDecimalSeparator = ".",
+        CurrencyGroupSeparator = ",",
+        CurrencySymbol = "€"
+    }
+};
+
+var supportedCultures = new CultureInfo[]
+{
+    cultureInfo
+};
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(cultureInfo, cultureInfo),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -27,6 +51,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Transaction}/{action=Index}/{id?}");
 
 app.Run();
