@@ -54,18 +54,6 @@ namespace Budget.StevieTV.Controllers
       
             return Json(transaction);
         }
-        
-
-        // // GET: Transaction/Create
-        // public IActionResult Create()
-        // {
-        //
-        //
-        //     var transaction = new TransactionViewModel( _context.Categories.ToList());
-        //
-        //     // ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
-        //     return View("_AddTransactionPartial", transaction); 
-        // }
 
         // POST: Transaction/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -99,8 +87,6 @@ namespace Budget.StevieTV.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            //ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.CategoryId);
-            // return View("_AddTransactionPartial", transaction);
             return RedirectToAction("Index");
         }
 
@@ -157,29 +143,9 @@ namespace Budget.StevieTV.Controllers
             return View(transaction);
         }
 
-        // GET: Transaction/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var transaction = await _context.Transactions
-                .Include(t => t.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-
-            return View(transaction);
-        }
-
         // POST: Transaction/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
         {
             var transaction = await _context.Transactions.FindAsync(id);
             if (transaction != null)

@@ -52,11 +52,11 @@
                 @Html.DisplayFor(modelItem => item.Category.Name)
             </td>
             <td>
-                <button type="button" id="@item.Id" class="btn btn-primary editTransactionButton" onclick="editTransaction(this.id)">
+                <button type="button" class="btn btn-primary editTransactionButton" onclick="editTransaction(@item.Id)">
                     Edit Transaction
                 </button>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @* <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | *@
+                <button type="button" class="btn btn-danger" onclick="deleteTransaction(@item.Id)">Delete</button>
             </td>
         </tr>
     }
