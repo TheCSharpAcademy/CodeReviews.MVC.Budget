@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Budget.StevieTV.Models;
+﻿namespace Budget.StevieTV.Models;
 
 public class Category
 {

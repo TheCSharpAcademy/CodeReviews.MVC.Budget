@@ -1,9 +1,7 @@
 using Budget.StevieTV.Database;
 using Budget.StevieTV.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 
 namespace Budget.StevieTV.Controllers
 {
