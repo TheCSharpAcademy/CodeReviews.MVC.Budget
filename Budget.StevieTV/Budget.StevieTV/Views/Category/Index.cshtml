@@ -12,30 +12,36 @@
 
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Categories[0].Name)
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Categories[0].Name)
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Categories) {
+    @foreach (var item in Model.Categories)
+    {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <button type="button" class="btn btn-primary editCategoryButton" onclick="editCategory(@item.Id)">
+                    Edit Category
+                </button>
+                @* <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | *@
+                @* <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
+                <button type="button" class="btn btn-danger" onclick="deleteCategory(@item.Id, '@item.Name')">Delete</button>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>
 
-<partial name="_AddCategoryPartial" />
+<partial name="_AddCategoryPartial"/>
+<partial name="_EditCategoryPartial"/>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

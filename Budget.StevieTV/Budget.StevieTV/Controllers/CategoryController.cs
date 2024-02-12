@@ -48,7 +48,7 @@ namespace Budget.StevieTV.Controllers
                 return NotFound();
             }
 
-            return View(category);
+            return Json(category);
         }
 
         // POST: Category/Create
@@ -58,17 +58,6 @@ namespace Budget.StevieTV.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BudgetViewModel budgetViewModel)
         {
-            // ADD CHECK FOR DUPE CATEGORY
-
-            ModelState.Remove("TransactionViewModel.Description");
-
-            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
-
-            if (_context.Categories.Any(c => c.Name.ToLower() == budgetViewModel.CategoryViewModel.Name))
-            {
-                ModelState.AddModelError("CategoryViewModel.Name", "Duplicate Categories are not allowed");
-                return RedirectToAction(nameof(Index));
-            }
 
             var newCategory = new Category
             {
@@ -146,29 +135,9 @@ namespace Budget.StevieTV.Controllers
             return View(category);
         }
 
-        // GET: Category/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return View(category);
-        }
-
         // POST: Category/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
         {
             var category = await _context.Categories.FindAsync(id);
 
@@ -184,6 +153,18 @@ namespace Budget.StevieTV.Controllers
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.Id == id);
+        }
+
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> DuplicateCategoryName([Bind(Prefix = "CategoryViewModel.Name")] string name)
+        {
+            var categories = await _context.Categories.ToListAsync();
+
+            if (categories.Any(c => c.Name.ToLower() == name.ToLower()))
+                return Json("Duplicate Category");
+
+            return Json(true);
+
         }
     }
 }
