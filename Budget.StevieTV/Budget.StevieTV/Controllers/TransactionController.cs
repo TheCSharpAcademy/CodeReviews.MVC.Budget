@@ -1,11 +1,9 @@
 using Budget.StevieTV.Database;
-using Budget.StevieTV.Enums;
 using Budget.StevieTV.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Packaging;
-using NuGet.Protocol;
+
 
 namespace Budget.StevieTV.Controllers
 {
@@ -29,7 +27,8 @@ namespace Budget.StevieTV.Controllers
             {
                 Transactions = transactions,
                 Categories = categories,
-                TransactionViewModel = new TransactionViewModel(categories)
+                TransactionViewModel = new TransactionViewModel(categories),
+                CategoryViewModel = new CategoryViewModel()
             };
             
             return View(viewModel);
@@ -62,33 +61,29 @@ namespace Budget.StevieTV.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BudgetViewModel budgetViewModel)
         {
-            if (ModelState.IsValid)
+            var newTransaction = new Transaction
             {
+                Id = budgetViewModel.TransactionViewModel.Id,
+                TransactionType = budgetViewModel.TransactionViewModel.TransactionType,
+                Date = budgetViewModel.TransactionViewModel.Date,
+                Description = budgetViewModel.TransactionViewModel.Description,
+                Amount = budgetViewModel.TransactionViewModel.Amount,
+                CategoryId = budgetViewModel.TransactionViewModel.CategoryId
+            };
 
-                var newTransaction = new Transaction
-                {
-                    Id = budgetViewModel.TransactionViewModel.Id,
-                    TransactionType = budgetViewModel.TransactionViewModel.TransactionType,
-                    Date = budgetViewModel.TransactionViewModel.Date,
-                    Description = budgetViewModel.TransactionViewModel.Description,
-                    Amount = budgetViewModel.TransactionViewModel.Amount,
-                    CategoryId = budgetViewModel.TransactionViewModel.CategoryId
-                };
-
-                if (newTransaction.Id > 0)
-                {
-                    _context.Update(newTransaction);
-                }
-                else
-                {
-                    _context.Add(newTransaction);
-                }
-                
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            if (newTransaction.Id > 0)
+            {
+                _context.Update(newTransaction);
             }
-            return RedirectToAction("Index");
+            else
+            {
+                _context.Add(newTransaction);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Transaction/Edit/5
         public async Task<IActionResult> Edit(int? id)

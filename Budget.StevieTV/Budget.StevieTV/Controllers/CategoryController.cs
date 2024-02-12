@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Budget.StevieTV.Database;
 using Budget.StevieTV.Models;
+using Humanizer;
 
 namespace Budget.StevieTV.Controllers
 {
@@ -22,7 +18,18 @@ namespace Budget.StevieTV.Controllers
         // GET: Category
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            var transactions = await _context.Transactions.Include(t => t.Category).OrderBy(t => t.Date).ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
+
+            var viewModel = new BudgetViewModel
+            {
+                Transactions = transactions,
+                Categories = categories,
+                TransactionViewModel = new TransactionViewModel(categories),
+                CategoryViewModel = new CategoryViewModel()
+            };
+
+            return View(viewModel);
         }
 
         // GET: Category/Details/5
@@ -35,6 +42,7 @@ namespace Budget.StevieTV.Controllers
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (category == null)
             {
                 return NotFound();
@@ -43,27 +51,45 @@ namespace Budget.StevieTV.Controllers
             return View(category);
         }
 
-        // GET: Category/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
         // POST: Category/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
+        public async Task<IActionResult> Create(BudgetViewModel budgetViewModel)
         {
-            if (ModelState.IsValid)
+            // ADD CHECK FOR DUPE CATEGORY
+
+            ModelState.Remove("TransactionViewModel.Description");
+
+            if (!ModelState.IsValid) return RedirectToAction(nameof(Index));
+
+            if (_context.Categories.Any(c => c.Name.ToLower() == budgetViewModel.CategoryViewModel.Name))
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                ModelState.AddModelError("CategoryViewModel.Name", "Duplicate Categories are not allowed");
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+
+            var newCategory = new Category
+            {
+                Id = budgetViewModel.CategoryViewModel.Id,
+                Name = budgetViewModel.CategoryViewModel.Name,
+            };
+
+            if (newCategory.Id > 0)
+            {
+                _context.Update(newCategory);
+            }
+            else
+            {
+                _context.Add(newCategory);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Category/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -74,10 +100,12 @@ namespace Budget.StevieTV.Controllers
             }
 
             var category = await _context.Categories.FindAsync(id);
+
             if (category == null)
             {
                 return NotFound();
             }
+
             return View(category);
         }
 
@@ -111,8 +139,10 @@ namespace Budget.StevieTV.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(category);
         }
 
@@ -126,6 +156,7 @@ namespace Budget.StevieTV.Controllers
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (category == null)
             {
                 return NotFound();
@@ -140,6 +171,7 @@ namespace Budget.StevieTV.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories.FindAsync(id);
+
             if (category != null)
             {
                 _context.Categories.Remove(category);
