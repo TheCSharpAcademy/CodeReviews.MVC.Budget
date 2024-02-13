@@ -1,4 +1,6 @@
-﻿using Budget.StevieTV.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using Budget.StevieTV.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Budget.StevieTV.Models;
 
@@ -10,6 +12,8 @@ public class BudgetViewModel
 
     public CategoryViewModel CategoryViewModel { get; set; } = new CategoryViewModel();
 
+    [DataType(DataType.Currency)]
+    [Precision(18,2)]
     public decimal RunningTotal
     {
         get

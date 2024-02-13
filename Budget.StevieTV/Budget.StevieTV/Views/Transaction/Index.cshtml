@@ -1,18 +1,33 @@
-@using System.Diagnostics
-@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @model Budget.StevieTV.Models.BudgetViewModel
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<div class="row">
+    <div class="col-md-auto px-2">
+        <p class="h2">List of Transactions</p>
+    </div>
+    <div class="col-md-auto px-2 align-self-center">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+            Add Transaction
+        </button>
+    </div>
+</div>
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
-    Add Transaction
-</button>
+<hr />
 
-<table class="table">
+<form asp-controller="Transaction" asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
+    <div class="form-floating col-9">
+        <input type="text" class="form-control" id="searchString" name="searchString" placeholder="Search Description"/>
+        <label for="searchString">Search Description</label>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<table class="table table-hover">
     <thead>
     <tr>
         <th>
@@ -34,7 +49,8 @@
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.Transactions) {
+    @foreach (var item in Model.Transactions)
+    {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.TransactionType)
@@ -53,7 +69,7 @@
             </td>
             <td>
                 <button type="button" class="btn btn-primary editTransactionButton" onclick="editTransaction(@item.Id)">
-                    Edit Transaction
+                    Edit
                 </button>
                 @* <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | *@
                 <button type="button" class="btn btn-danger" onclick="deleteTransaction(@item.Id)">Delete</button>
@@ -61,14 +77,20 @@
         </tr>
     }
     </tbody>
+    <tfoot>
+    <tr class="fw-bold">
+        <td colspan="3" class="text-end">Sub-Total:</td>
+        <td >@Html.DisplayFor(model => model.RunningTotal)</td>
+        <td></td>
+    </tr>
+    </tfoot>
 </table>
 
-@Html.DisplayFor(model => model.RunningTotal)
 
-<partial name="_AddTransactionPartial" />
+<partial name="_AddTransactionPartial"/>
 <partial name="_EditTransactionPartial"/>
 
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
