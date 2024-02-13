@@ -15,26 +15,32 @@ namespace Budget.StevieTV.Controllers
         }
 
         // GET: Transaction
-        public async Task<IActionResult> Index(string searchString, string categoryId, string date)
+        public async Task<IActionResult> Index(string searchString, string categoryId, string startDate, string endDate)
         {
             
             var transactions = await _context.Transactions.Include(t => t.Category).OrderBy(t => t.Date).ToListAsync();
             var categories = await _context.Categories.ToListAsync();
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
             {
                 transactions = transactions.Where(t => t.Description.Contains(searchString, StringComparison.CurrentCultureIgnoreCase)).ToList();
             }
 
-            if (!String.IsNullOrEmpty(categoryId))
+            if (!string.IsNullOrEmpty(categoryId))
             {
                 transactions = transactions.Where(t => t.CategoryId.ToString() == categoryId).ToList();
             }
 
-            if (!String.IsNullOrEmpty(date))
+            if (!string.IsNullOrEmpty(startDate))
             {
-                var inputDate = DateTime.Parse(date);
-                transactions = transactions.Where(t => t.Date == inputDate).ToList();
+                var inputDate = DateTime.Parse(startDate);
+                transactions = transactions.Where(t => t.Date >= inputDate).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(endDate))
+            {
+                var inputDate = DateTime.Parse(endDate);
+                transactions = transactions.Where(t => t.Date <= inputDate).ToList();
             }
 
             var viewModel = new BudgetViewModel
@@ -44,6 +50,8 @@ namespace Budget.StevieTV.Controllers
                 TransactionViewModel = new TransactionViewModel(categories),
                 CategoryViewModel = new CategoryViewModel()
             };
+            
+            
             
             return View(viewModel);
         }

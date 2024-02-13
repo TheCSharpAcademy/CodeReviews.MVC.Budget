@@ -19,12 +19,16 @@
 
 <form asp-controller="Transaction" asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
     <div class="input-group col-9">
-        <span class="input-group-text" id="searchString">Search:</span>
+        <span class="input-group-text">Search:</span>
         <input type="text" class="form-control" id="searchString" name="searchString" placeholder="Search Description"/>
+        <span class="input-group-text">Category:</span>
         <select class="form-select" name="categoryId" asp-items="@(new SelectList(Model.Categories, nameof(Category.Id), nameof(Category.Name)))">
             <option value="">All</option>
         </select>
-        <input class="form-control" id="date" name="date" type="date"/>
+        <span class="input-group-text">Start Date:</span>
+        <input class="form-control" id="startDate" name="startDate" type="date"/>
+        <span class="input-group-text">End Date:</span>
+        <input class="form-control" id="endDate" name="endDate" placeholder="End Date" type="date"/>
         <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
