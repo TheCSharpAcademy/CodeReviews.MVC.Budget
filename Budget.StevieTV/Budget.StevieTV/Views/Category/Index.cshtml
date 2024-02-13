@@ -3,13 +3,17 @@
 @{
     ViewData["Title"] = "Index";
 }
+<div class="row">
+    <div class="col-md-auto px-2">
 
-<h1>Index</h1>
-
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-    Add Category
-</button>
-
+        <p class="h2">Manage Categories</p>
+    </div>
+    <div class="col-md-auto px-2 align-self-center">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+            Add Category
+        </button>
+    </div>
+</div>
 <table class="table">
     <thead>
     <tr>
@@ -28,11 +32,11 @@
             </td>
             <td>
                 <button type="button" class="btn btn-primary editCategoryButton" onclick="editCategory(@item.Id)">
-                    Edit Category
+                    Edit
                 </button>
-                @* <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | *@
-                @* <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
-                <button type="button" class="btn btn-danger" onclick="deleteCategory(@item.Id, '@item.Name')">Delete</button>
+                <button type="button" class="btn btn-danger" onclick="deleteCategory(@item.Id, '@item.Name')">
+                    Delete
+                </button>
             </td>
         </tr>
     }

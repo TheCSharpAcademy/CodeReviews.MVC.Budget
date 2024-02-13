@@ -18,7 +18,7 @@ namespace Budget.StevieTV.Controllers
         public async Task<IActionResult> Index()
         {
             var transactions = await _context.Transactions.Include(t => t.Category).OrderBy(t => t.Date).ToListAsync();
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
 
             var viewModel = new BudgetViewModel
             {
@@ -91,11 +91,6 @@ namespace Budget.StevieTV.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.Id == id);
         }
 
         [AcceptVerbs("GET", "POST")]

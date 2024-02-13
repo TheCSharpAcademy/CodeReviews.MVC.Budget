@@ -8,7 +8,7 @@
                 <h1 class="modal-title fs-5" id="addTransactionModalLabel">Add a Transaction</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-content">
+            <div class="modal-content px-2">
                 <form asp-action="Create">
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -19,7 +19,7 @@
                     </div>
                     <div class="form-group">
                         <label asp-for="TransactionViewModel.Date" class="control-label"></label>
-                        <input asp-for="TransactionViewModel.Date" class="form-control"/>
+                        <input asp-for="TransactionViewModel.Date" class="form-control" value="2024-01-01"/>
                         <span asp-validation-for="TransactionViewModel.Date" class="text-danger"></span>
                     </div>
                     <div class="form-group">
@@ -37,7 +37,7 @@
                         <select asp-for="TransactionViewModel.CategoryId" class="form-control" asp-items="Model.TransactionViewModel.Categories">
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group py-1">
                         <input type="submit" value="Create" class="btn btn-primary"/>
                     </div>
                 </form>

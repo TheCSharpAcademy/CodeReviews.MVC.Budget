@@ -17,13 +17,4 @@
       <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Views\Transaction\Create.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\Transaction\Delete.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\Transaction\Details.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\Transaction\Edit.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\Transaction\Index.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\Transaction\_AddTransactionPartial.cshtml" />
-    </ItemGroup>
-
 </Project>
