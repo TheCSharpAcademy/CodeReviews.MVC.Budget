@@ -15,6 +15,12 @@ builder.Services.AddScoped<BudgetContext>();
 
 var app = builder.Build();
 
+
+using (var scope = app.Services.CreateScope())
+{
+    SeedDatabase.Seed(scope.ServiceProvider.GetService<BudgetContext>());
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
