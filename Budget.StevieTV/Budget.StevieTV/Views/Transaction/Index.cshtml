@@ -24,6 +24,7 @@
         <select class="form-select" name="categoryId" asp-items="@(new SelectList(Model.Categories, nameof(Category.Id), nameof(Category.Name)))">
             <option value="">All</option>
         </select>
+        <input class="form-control" id="date" name="date" type="date"/>
         <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
@@ -90,7 +91,6 @@
 
 <partial name="_AddTransactionPartial"/>
 <partial name="_EditTransactionPartial"/>
-
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
