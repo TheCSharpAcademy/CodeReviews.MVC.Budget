@@ -15,7 +15,7 @@ namespace Budget.StevieTV.Controllers
         }
 
         // GET: Transaction
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string searchString, string categoryId)
         {
             
             var transactions = await _context.Transactions.Include(t => t.Category).OrderBy(t => t.Date).ToListAsync();
@@ -24,6 +24,11 @@ namespace Budget.StevieTV.Controllers
             if (!String.IsNullOrEmpty(searchString))
             {
                 transactions = transactions.Where(t => t.Description.Contains(searchString, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            }
+
+            if (!String.IsNullOrEmpty(categoryId))
+            {
+                transactions = transactions.Where(t => t.CategoryId.ToString() == categoryId).ToList();
             }
 
             var viewModel = new BudgetViewModel
