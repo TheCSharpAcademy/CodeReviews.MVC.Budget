@@ -92,20 +92,17 @@
                         var progressbarWidth = spent / category.Budget * 100;
 
                         <div id="category_@category.Id" class="category p-2" data-id="@category.Id">
-                            <div class="d-flex">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex">
-                                        <div>@category.Name</div>
-                                        <div class="ms-auto">Balance: @spent.ToString("C2") / @Html.DisplayFor(m => category.Budget)</div>
+                            <div class="border-container">
+                                <div class="content">
+                                    <div class="d-flex category-body">
+                                        <div>@(category.Name)</div>
+                                        <div class="ms-auto">Balance: @(spent.ToString("C2")) / @(Html.DisplayFor(m => category.Budget))</div>
                                     </div>
                                     <div class="progress">
                                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
-                                <div class="delete-icon ms-2">
-                                    @Html.AntiForgeryToken()
-                                    <img src="~/img/svg/trash_white.svg" width="25px" alt="" />
-                                </div>
+                                <div class="border-animation"></div>
                             </div>
                         </div>
                     }

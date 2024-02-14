@@ -65,6 +65,7 @@ body {
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.2s ease-out 0.4s, visibility 0.2s ease-out 0.4s;
+    z-index: 1000;
 }
 
 #menu-container.active {
@@ -164,6 +165,62 @@ body {
     transform: rotate(180deg);    
 }
 
+// Category 
+
+.border-container {
+    position: relative;
+    z-index: 0;
+    padding: 2px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.content {
+    position: relative;
+    z-index: 10;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: $secondary;
+}
+
+.category-body {    
+    background-color: $secondary;
+}
+
+.border-animation {
+    position: absolute;
+    left: 0;
+    top: 15%;
+    content: "";
+    z-index: 0;
+    width: 100%;
+    height: 70%;
+    opacity: 0;
+    transition: opacity .5s ease-in;    
+}
+
+.border-rotate {
+    background: radial-gradient(circle, rgba(74,1,105,1) 0%, rgba(0,44,255,1) 50%, rgba(163,23,23,1) 100%);
+    animation: rotate 4s cubic-bezier(.8, 0, 0.2, 1) infinite;
+    opacity: 1;
+}
+
 .progress {
-    height: 0.5rem;    
+    position: relative;
+    z-index: 10;
+    height: 0.5rem;
+}
+
+.rotate {
+    transform: rotate(180deg);
+}
+
+@keyframes rotate {
+    
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform: rotate(180deg);
+    }
 }
