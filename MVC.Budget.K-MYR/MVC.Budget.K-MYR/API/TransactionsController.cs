@@ -19,13 +19,13 @@ public class TransactionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Category>>> GetTransactions()
+    public async Task<ActionResult<List<Transaction>>> GetTransactions()
     {
         return Ok(await _unitOfWork.TransactionsRepository.GetAsync());
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Category>> GetTransaction(int id)
+    public async Task<ActionResult<Transaction>> GetTransaction(int id)
     {
         var transaction = await _unitOfWork.TransactionsRepository.GetByIDAsync(id);
 
@@ -34,7 +34,7 @@ public class TransactionsController : ControllerBase
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostCategory([FromBody][Bind("Title, Amount, CategoryId")] TransactionPost postTransaction)
+    public async Task<ActionResult> PostTransaction([FromBody][Bind("Title, Amount, IsHappy, IsNecessary, CategoryId")] TransactionPost postTransaction)
     {
         if (!ModelState.IsValid)
             return BadRequest();
@@ -43,7 +43,9 @@ public class TransactionsController : ControllerBase
         {
             Title = postTransaction.Title,
             Amount = postTransaction.Amount,
-            CategoryId = postTransaction.CategoryId,
+            IsHappy = postTransaction.IsHappy,
+            IsNecessary = postTransaction.IsNecessary,
+            CategoryId = postTransaction.CategoryId,            
         };
 
         _unitOfWork.TransactionsRepository.Insert(transaction);
@@ -54,7 +56,7 @@ public class TransactionsController : ControllerBase
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutCategory(int id, [Bind("Title,Id")] Transaction transaction)
+    public async Task<ActionResult> PutTransaction(int id, [FromBody][Bind("Title, Amount, IsHappy, IsNecessary, Id")] Transaction transaction)
     {
         if (id != transaction.Id)
             return BadRequest();
@@ -68,6 +70,9 @@ public class TransactionsController : ControllerBase
             return NotFound();
 
         entity.Title = transaction.Title;
+        entity.Amount = transaction.Amount;
+        entity.IsHappy = transaction.IsHappy;
+        entity.IsNecessary = transaction.IsNecessary;
 
         try
         {

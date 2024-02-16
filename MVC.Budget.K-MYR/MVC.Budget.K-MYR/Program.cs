@@ -18,6 +18,8 @@ using (var scope = app.Services.CreateScope())
 
     if(builder.Configuration.GetValue<bool>("Auto-Migrate"))
         db.Database.Migrate();
+    if (builder.Configuration.GetValue<bool>("SeedData"))
+        SeedData.InitializeDatabase(db);
 }
 
 if (!app.Environment.IsDevelopment())

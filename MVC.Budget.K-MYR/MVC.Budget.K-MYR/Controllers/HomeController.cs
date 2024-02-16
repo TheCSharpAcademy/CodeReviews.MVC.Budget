@@ -23,7 +23,8 @@ public class HomeController : Controller
             Income = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 1, q => q.OrderBy(t => t.Name), "Transactions"),
             Expenses = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 2, q => q.OrderBy(t => t.Name), "Transactions"),
             Savings = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 3, q => q.OrderBy(t => t.Name), "Transactions"),
-            Category = new()
+            Category = new(),
+            Transaction = new()
         };
 
         return View(HomeViewModel);

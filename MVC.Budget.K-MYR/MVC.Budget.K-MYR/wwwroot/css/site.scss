@@ -138,7 +138,21 @@ body {
 
 .dashboard {
     border-radius: var(--bs-border-radius);
+    margin-top: 10px;
+    padding: 10px;
 }
+
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.chart-container {
+    position: relative;
+    min-width: 0;
+}
+
+//Accordion
 
 .accordion {
     cursor: pointer;

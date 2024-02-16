@@ -1,4 +1,5 @@
-﻿const uri = "https://localhost:7246/api/Categories";
+﻿const categoriesAPI = "https://localhost:7246/api/Categories";
+const transactionsAPI = "https://localhost:7246/api/Transactions";
 const menu = document.getElementById('menu-container');
 const sidebar = document.getElementById("sidebar");
 Chart.defaults.color = '#ffffff';
@@ -12,19 +13,21 @@ document.addEventListener("DOMContentLoaded", () => {
         data: {
             labels: [
                 'Happy',
-                'Unhappy',
-                'No Data'
+                'Unhappy'
             ],
             datasets: [{
                 label: 'My First Dataset',
-                data: [300, 50, 100],
+                data: [chart1.dataset.happy, chart1.dataset.unhappy],
                 backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)'
+                    'rgb(25,135,84)',
+                    'rgb(220,53,69)'
                 ],
                 hoverOffset: 4
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 
@@ -33,22 +36,23 @@ document.addEventListener("DOMContentLoaded", () => {
         data: {
             labels: [
                 'Necessary',
-                'Unecessary',
-                'No Data'
+                'Unnecessary'
             ],
             datasets: [{
                 label: 'My First Dataset',
-                data: [300, 50, 100],
+                data: [chart2.dataset.necessary, chart2.dataset.unnecessary],
                 backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)'
+                    'rgb(25,135,84)',
+                    'rgb(220,53,69)'
                 ],
                 hoverOffset: 4
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
-
 
     document.getElementById("sidebar-caret").addEventListener("click", () => {
         sidebar.classList.toggle('collapsed');
@@ -58,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.target.matches("img.add-icon.ms-auto")) {
             var id = $(this).closest('.accordion').data("id");
             $("#add-category-modal").modal('show');
-            $("#add-category-modal #GroupId").val(id);
+            $("#add-category-modal").find("#GroupId").val(id);
         }
         else {
             $(this).next().collapse('toggle');
@@ -79,21 +83,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    /*
-    $('.category').on("click", function (event) {
-        var id = this.dataset.id;
-        if (event.target.matches('img')) {
-            var token = this.querySelector('input').value;
-            deleteCategory(id, token);
-        } else {
-            window.location.href = "Category/" + id;
+    $('#add-transaction-form').on("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            $("#add-transaction-modal").modal('hide');
+            await addTransaction(new FormData(this));
         }
     });
-    */
 
-    $('.category').on("click", function (event) {  
-        
-        
+    $('.category').on("click", function (event) { 
         if (menu.dataset.category != 0) {
             var borderBox = document.getElementById(`category_${menu.dataset.category}`).querySelector('.border-animation');
             borderBox.classList.remove('border-rotate');
@@ -120,12 +118,14 @@ document.addEventListener("DOMContentLoaded", () => {
         var id = menu.dataset.category;
         if (deleteCategory(id, token)) {
             menu.classList.remove('active');
+            menu.dataset.category = 0;
         }
     };
 
     document.getElementById('add-menu').onclick = function () {
-        var token = menu.querySelector('input').value;
         var id = menu.dataset.category;        
+        $("#add-transaction-modal").modal('show');
+        $("#add-transaction-modal").find("#CategoryId").val(id);     
     };
 
     document.getElementById('edit-menu').onclick = function () {
@@ -134,15 +134,42 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     document.getElementById('details-menu').onclick = function () {
-        var token = menu.querySelector('input').value;
-        var id = menu.dataset.category;      
+        var id = menu.dataset.category;    
+        window.location.href = "Category/" + id;
     };
-
 });
+
+async function addTransaction(data) {
+    try { 
+        var response = await fetch(`${transactionsAPI}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": data.get('__RequestVerificationToken')
+            },
+            body: JSON.stringify({
+                Title: data.get("Title"),
+                Amount: parseFloat(data.get("Amount")),
+                IsHappy: data.get("IsHappy") === "true" ? true : false,
+                IsNecessary: data.get("IsNecessary") === "true" ? true : false,
+                CategoryId: parseInt(data.get("CategoryId"))
+            })
+        });
+
+        if (response.ok) {
+            //document.querySelector(`#transactions .accordion-body`).innerHTML += createCategoryElement(await response.json());
+        } else {
+            console.error(`HTTP Post Error: ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error(error);
+    };
+}
 
 async function addCategory(data) {
     try {   
-        var response = await fetch(`${uri}`, {
+        var response = await fetch(`${categoriesAPI}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -150,8 +177,8 @@ async function addCategory(data) {
             },
             body: JSON.stringify({
                 Name: data.get("Name"),
-                Budget: data.get("Budget"),
-                GroupId: data.get("GroupId")
+                Budget: parseFloat(data.get("Budget")),
+                GroupId: parseInt(data.get("GroupId"))
             })
         });
         
@@ -171,7 +198,7 @@ async function addCategory(data) {
 
 async function deleteCategory(id, token) {
     try {
-        var response = await fetch(`${uri}/${id}`, {
+        var response = await fetch(`${categoriesAPI}/${id}`, {
             method: "DELETE",
             headers: {                
                 "RequestVerificationToken": token

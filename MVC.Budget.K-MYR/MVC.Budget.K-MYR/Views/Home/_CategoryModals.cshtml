@@ -21,6 +21,16 @@
                             <input asp-for="Amount" class="form-control" />
                             <span asp-validation-for="Amount" class="text-danger"></span>
                         </div>
+                        <div class="form-group">
+                            <label for="IsHappy" class="control-label">This Transaction made me happy</label>
+                            <input asp-for="IsHappy" type="checkbox" value="true"/>
+                            <span asp-validation-for="IsHappy" class="text-danger"></span>
+                        </div>   
+                        <div class="form-group">
+                            <label for="IsNecessary" class="control-label">This Transaction was necessary</label>
+                            <input asp-for="IsNecessary" type="checkbox" value="true" />
+                            <span asp-validation-for="IsNecessary" class="text-danger"></span>
+                        </div>
                         <div class="form-group mt-2 d-flex align-items-center justify-content-center">
                             <input type="submit" value="Add" class="px-4" /> 
                         </div>

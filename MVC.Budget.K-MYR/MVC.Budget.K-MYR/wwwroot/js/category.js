@@ -1,4 +1,5 @@
-﻿const uri = "https://localhost:7246/api/Transactions";
+﻿const transactionsAPI = "https://localhost:7246/api/Transactions";
+
 Chart.defaults.color = '#ffffff';
 
 
@@ -52,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.target.matches("img.add-icon.ms-auto")) {
             var id = $(this).closest('.accordion').data("id");
             $("#add-transaction-modal").modal('show');
-            $("#add-transaction-modal #CategoryId").val(id);
+            $("#add-transaction-modal").find("#CategoryId").val(id);
         }
         else {
             $(this).next().collapse('toggle');
@@ -83,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function addTransaction(data) {
     try {
-        var response = await fetch(`${uri}`, {
+        var response = await fetch(`${transactionsAPI}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -91,8 +92,10 @@ async function addTransaction(data) {
             },
             body: JSON.stringify({
                 Title: data.get("Title"),
-                Amount: data.get("Amount"),
-                CategoryId: data.get("CategoryId")
+                Amount: parseFloat(data.get("Amount")),
+                IsHappy: data.get("IsHappy") === "true" ? true : false,
+                IsNecessary: data.get("IsNecessary") === "true" ? true : false,
+                CategoryId: parseInt(data.get("CategoryId"))
             })
         });
 
@@ -109,7 +112,7 @@ async function addTransaction(data) {
 
 async function deleteTransaction(id, token) {
     try {
-        var response = await fetch(`${uri}/${id}`, {
+        var response = await fetch(`${transactionsAPI}/${id}`, {
             method: "DELETE",
             headers: {
                 "RequestVerificationToken": token

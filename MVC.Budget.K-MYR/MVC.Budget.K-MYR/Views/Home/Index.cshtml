@@ -3,6 +3,10 @@
 
 @{
     ViewData["Title"] = "Home Page";
+    var expensesTotal = Model.Expenses.Sum(c => c.Transactions.Sum(t => t.Amount));
+    var happyExpenses = Model.Expenses.Sum(c => c.Transactions.Where(t => t.IsHappy).Sum(t => t.Amount));
+    var necessaryExpenses = Model.Expenses.Sum(c => c.Transactions.Where(t => t.IsNecessary).Sum(t => t.Amount));
+
 }
 
 <section>
@@ -39,36 +43,42 @@
     <div id="menu-container" data-category="0">
         <div id="menu" class="menu">
             @Html.AntiForgeryToken()
-            <span class="toggle">
-                <svg id="close-menu" class="close" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368" /></svg>
+            <span class="toggle" id="close-menu">
+                <svg class="close" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368" /></svg>
             </span>
-            <span class="span-box" style="--i:0">
-                <span>
-                    <svg id="details-menu" class="details" viewBox="0 0 512 512"><path d="M32 32v432a16 16 0 0016 16h432" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="96" y="224" width="80" height="192" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="240" y="176" width="80" height="240" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="383.64" y="112" width="80" height="304" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
-                </span>
+            <span id="details-menu" class="span-box" style="--i:0">
+                <svg class="details" viewBox="0 0 512 512"><path d="M32 32v432a16 16 0 0016 16h432" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="96" y="224" width="80" height="192" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="240" y="176" width="80" height="240" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="383.64" y="112" width="80" height="304" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
             </span>
-            <span class="span-box" style="--i:1">
-                <span>
-                    <svg id="add-menu" class="plus" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112" /></svg>
-                </span>
+            <span id="add-menu" class="span-box" style="--i:1">
+                <svg class="plus" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112" /></svg>
             </span>
-            <span class="span-box" style="--i:2">
-                <span>
-                    <svg id="edit-menu" class="pen" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M364.13 125.25L87 403l-23 45 44.99-23 277.76-277.13-22.62-22.62zM420.69 68.69l-22.62 22.62 22.62 22.63 22.62-22.63a16 16 0 000-22.62h0a16 16 0 00-22.62 0z" /></svg>
-                </span>
+            <span id="edit-menu" class="span-box" style="--i:2">
+                <svg class="pen" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M364.13 125.25L87 403l-23 45 44.99-23 277.76-277.13-22.62-22.62zM420.69 68.69l-22.62 22.62 22.62 22.63 22.62-22.63a16 16 0 000-22.62h0a16 16 0 00-22.62 0z" /></svg>
             </span>
-            <span class="span-box" style="--i:3">
-                <span>
-                    <svg id="delete-menu" class="trash" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" /><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
-                </span>
+            <span id="delete-menu" class="span-box" style="--i:3">
+                <svg class="trash" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" /><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
             </span>
         </div>
     </div>
+</section>
 
-    <div class="dashboard border mt-3" style="background-color: #1c1c1c">
-        <div class="d-flex justify-content-evenly">
-            <div class="m-4" style="width: 300px;"><canvas id="chart"></canvas></div>
-            <div class="m-4" style="width: 300px;"><canvas id="chart2"></canvas></div>
+<section>
+    <div class="dashboard border" style="background-color: #1c1c1c">
+        <div class="dashboard-container">
+            <div class="chart-container">
+                <canvas id="chart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                        data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                </canvas>
+            </div>
+            <div class="chart-container">
+                <h1 class="text-center">My Budget</h1>
+                <h4 class="text-center">February 2024</h4>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart2" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                        data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                </canvas>
+            </div>
         </div>
     </div>
 
@@ -91,7 +101,7 @@
                         var spent = @category.Transactions.Sum(t => t.Amount);
                         var progressbarWidth = spent / category.Budget * 100;
 
-                        <div id="category_@category.Id" class="category p-2" data-id="@category.Id">
+                        <div id="category_@category.Id" class="category" data-id="@category.Id">
                             <div class="border-container">
                                 <div class="content">
                                     <div class="d-flex category-body">
@@ -118,7 +128,7 @@
                     Expenses
                 </h5>
                 <h5 class="accordion-header">
-                    @Model.Expenses.Sum(c => c.Transactions.Sum(t => t.Amount)).ToString("C2") / @Model.Expenses.Sum(c => c.Budget).ToString("C2")
+                    @expensesTotal.ToString("C2") / @Model.Expenses.Sum(c => c.Budget).ToString("C2")
                 </h5>
                 <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
                 <div class="accordion-caret rotate"></div>
@@ -132,10 +142,10 @@
 
                         var color = progressbarWidth > 85 ? "bg-danger" : progressbarWidth > 50 ? "bg-warning" : "bg-success";
 
-                        <div id="category_@category.Id" class="category p-2" data-id="@category.Id">
-                            <div class="d-flex">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex">
+                        <div id="category_@category.Id" class="category" data-id="@category.Id">
+                            <div class="border-container">
+                                <div class="content">
+                                    <div class="d-flex category-body">
                                         <div>@category.Name</div>
                                         <div class="ms-auto">Balance: @spent.ToString("C2") / @Html.DisplayFor(m => category.Budget)</div>
                                     </div>
@@ -143,10 +153,7 @@
                                         <div class="progress-bar progress-bar-striped progress-bar-animated @color" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
-                                <div class="delete-icon ms-2">
-                                    @Html.AntiForgeryToken()
-                                    <img src="~/img/svg/trash_white.svg" width="25px" alt="" />
-                                </div>
+                                <div class="border-animation"></div>
                             </div>
                         </div>
                     }
@@ -171,10 +178,10 @@
                 <div class="accordion-body">
                     @foreach (var category in Model.Savings)
                     {
-                        <div id="category_@category.Id" class="category p-2" data-id="@category.Id">
-                            <div class="d-flex">
-                                <div class="flex-grow-1">
-                                    <div class="d-flex">
+                        <div id="category_@category.Id" class="category" data-id="@category.Id">
+                            <div class="border-container">
+                                <div class="content">
+                                    <div class="d-flex category-body">
                                         <div>@category.Name</div>
                                         <div class="ms-auto">Balance: @category.Transactions.Sum(t => t.Amount).ToString("C2")  / @Html.DisplayFor(m => category.Budget)</div>
                                     </div>
@@ -182,10 +189,7 @@
                                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
-                                <div class="delete-icon ms-2">
-                                    @Html.AntiForgeryToken()
-                                    <img src="~/img/svg/trash_white.svg" width="25px" alt="" />
-                                </div>
+                                <div class="border-animation"></div>
                             </div>
                         </div>
                     }
@@ -196,6 +200,7 @@
 </section>
 
 @await Html.PartialAsync("_IndexModals", Model.Category)
+@await Html.PartialAsync("_CategoryModals", Model.Transaction)
 
 @section Scripts {
     @{

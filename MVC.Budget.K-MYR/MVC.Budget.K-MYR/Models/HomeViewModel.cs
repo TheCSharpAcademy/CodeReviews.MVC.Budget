@@ -6,4 +6,5 @@ public class HomeViewModel
     public IEnumerable<Category> Expenses { get; set; }
     public IEnumerable<Category> Savings { get; set; }
     public CategoryPost Category { get; set; }
+    public TransactionPost Transaction { get; set; }
 }
