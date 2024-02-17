@@ -8,6 +8,8 @@ public class Transaction
     public int Id { get; set; }
     public string? Title { get; set; }
     public string? Description { get; set; }
+    [Display(Name="Date & Time")]
+    [DataType(DataType.DateTime)]
     public DateTime DateTime { get; set; }
     [DataType(DataType.Currency)]
     [Precision(19, 4)]

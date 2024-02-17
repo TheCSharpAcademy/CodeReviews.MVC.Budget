@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 'Unhappy'
             ],
             datasets: [{
-                label: 'My First Dataset',
+                label: 'Total Amount',
                 data: [chart1.dataset.happy, chart1.dataset.unhappy],
                 backgroundColor: [
                     'rgb(25,135,84)',
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 'Unnecessary'
             ],
             datasets: [{
-                label: 'My First Dataset',
+                label: 'Total Amount',
                 data: [chart2.dataset.necessary, chart2.dataset.unnecessary],
                 backgroundColor: [
                     'rgb(25,135,84)',

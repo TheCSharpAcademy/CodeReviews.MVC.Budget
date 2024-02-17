@@ -34,7 +34,7 @@ public class TransactionsController : ControllerBase
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostTransaction([FromBody][Bind("Title, Amount, IsHappy, IsNecessary, CategoryId")] TransactionPost postTransaction)
+    public async Task<ActionResult> PostTransaction([FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, CategoryId")] TransactionPost postTransaction)
     {
         if (!ModelState.IsValid)
             return BadRequest();
@@ -42,6 +42,7 @@ public class TransactionsController : ControllerBase
         var transaction = new Transaction()
         {
             Title = postTransaction.Title,
+            DateTime = postTransaction.DateTime,
             Amount = postTransaction.Amount,
             IsHappy = postTransaction.IsHappy,
             IsNecessary = postTransaction.IsNecessary,
@@ -56,7 +57,7 @@ public class TransactionsController : ControllerBase
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutTransaction(int id, [FromBody][Bind("Title, Amount, IsHappy, IsNecessary, Id")] Transaction transaction)
+    public async Task<ActionResult> PutTransaction(int id, [FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, Id")] Transaction transaction)
     {
         if (id != transaction.Id)
             return BadRequest();
@@ -73,6 +74,7 @@ public class TransactionsController : ControllerBase
         entity.Amount = transaction.Amount;
         entity.IsHappy = transaction.IsHappy;
         entity.IsNecessary = transaction.IsNecessary;
+        entity.DateTime = transaction.DateTime;
 
         try
         {

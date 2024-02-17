@@ -19,6 +19,11 @@ body {
     color: white;
 }
 
+.form-control {
+    background-color: white;
+    color: black;
+}
+
 //Sidebar
 
 .sidebar {
@@ -222,18 +227,56 @@ body {
 .progress {
     position: relative;
     z-index: 10;
-    height: 0.5rem;
+    height: 0.4rem;
 }
 
 .rotate {
     transform: rotate(180deg);
 }
 
+// Modals
+.iconRadioButton {
+   display:none;
+}
+
+.iconRadioButton:checked + label {
+    box-shadow: 0 0 2px 2px white;
+}
+
+.form-group {
+    margin-top: 10px;
+}
+
+.modalIcon {
+    width: 50px;
+    height: 50px;   
+}
+
+.modalIconNecessity {
+    width: 30px;
+    height: 30px;   
+}
+
+.modalIconLabel {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+
+.modalIconContainer  {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 @keyframes rotate {
-    
+
     from {
-        transform:rotate(0deg);
+        transform: rotate(0deg);
     }
+
     to {
         transform: rotate(180deg);
     }
