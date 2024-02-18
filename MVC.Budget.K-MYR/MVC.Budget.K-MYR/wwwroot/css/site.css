@@ -12030,6 +12030,7 @@ body {
   border-radius: var(--bs-border-radius);
   margin-top: 10px;
   padding: 10px;
+  background-color: #1c1c1c;
 }
 
 .dashboard-container {
@@ -12085,6 +12086,7 @@ body {
 
 .category-body {
   background-color: #1c1c1c;
+  display: flex;
 }
 
 .border-animation {
