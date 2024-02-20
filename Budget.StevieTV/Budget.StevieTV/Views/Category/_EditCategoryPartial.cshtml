@@ -1,0 +1,25 @@
+@model Budget.StevieTV.Models.BudgetViewModel
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content px-3">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editCategoryModalLabel">Edit Category</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" asp-route-id="@Model.CategoryViewModel.Id">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="CategoryViewModel.Id"/>
+                <div class="form-group">
+                    <label asp-for="CategoryViewModel.Name" class="control-label"></label>
+                    <input asp-for="CategoryViewModel.Name" class="form-control"/>
+                    <span asp-validation-for="CategoryViewModel.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group py-1">
+                    <input type="submit" value="Save" class="btn btn-primary"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

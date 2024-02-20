@@ -1,0 +1,102 @@
+@model Budget.StevieTV.Models.BudgetViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row">
+    <div class="col-md-auto px-2">
+        <p class="h2">List of Transactions</p>
+    </div>
+    <div class="col-md-auto px-2 align-self-center">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+            Add Transaction
+        </button>
+    </div>
+</div>
+
+<hr/>
+
+<form asp-controller="Transaction" asp-action="Index" class="row row-cols-lg-auto g-3 align-items-center">
+    <div class="input-group col-9">
+        <span class="input-group-text">Search:</span>
+        <input type="text" class="form-control" id="searchString" name="searchString" placeholder="Search Description"/>
+        <span class="input-group-text">Category:</span>
+        <select class="form-select" name="categoryId" asp-items="@(new SelectList(Model.Categories, nameof(Category.Id), nameof(Category.Name)))">
+            <option value="">All</option>
+        </select>
+        <span class="input-group-text">Start Date:</span>
+        <input class="form-control" id="startDate" name="startDate" type="date"/>
+        <span class="input-group-text">End Date:</span>
+        <input class="form-control" id="endDate" name="endDate" placeholder="End Date" type="date"/>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].TransactionType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].Date)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].Amount)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Transactions[0].Category)
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Transactions)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransactionType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+                <button type="button" class="btn btn-primary editTransactionButton" onclick="editTransaction(@item.Id)">
+                    Edit
+                </button>
+                <button type="button" class="btn btn-danger" onclick="deleteTransaction(@item.Id)">
+                    Delete
+                </button>
+            </td>
+        </tr>
+    }
+    </tbody>
+    <tfoot>
+    <tr class="fw-bold">
+        <td colspan="3" class="text-end">Sub-Total:</td>
+        <td >@Html.DisplayFor(model => model.RunningTotal)</td>
+        <td></td>
+    </tr>
+    </tfoot>
+</table>
+
+
+<partial name="_AddTransactionPartial"/>
+<partial name="_EditTransactionPartial"/>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

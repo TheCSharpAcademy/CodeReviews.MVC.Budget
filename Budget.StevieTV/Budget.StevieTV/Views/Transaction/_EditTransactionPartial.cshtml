@@ -1,0 +1,47 @@
+@using Budget.StevieTV.Enums
+@model Budget.StevieTV.Models.BudgetViewModel
+
+<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editTransactionModalLabel">Edit Transaction</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-content px-2">
+                <form asp-action="Create" asp-route-id="@Model.TransactionViewModel.Id">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="TransactionViewModel.Id"/>
+                    <div class="form-group">
+                        <label asp-for="TransactionViewModel.TransactionType" class="control-label"></label>
+                        <select asp-for="TransactionViewModel.TransactionType" class="form-control" asp-items="Html.GetEnumSelectList<TransactionType>()"></select>
+                        <span asp-validation-for="TransactionViewModel.TransactionType" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TransactionViewModel.Date" class="control-label"></label>
+                        <input asp-for="TransactionViewModel.Date" class="form-control"/>
+                        <span asp-validation-for="TransactionViewModel.Date" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TransactionViewModel.Description" class="control-label"></label>
+                        <input asp-for="TransactionViewModel.Description" class="form-control"/>
+                        <span asp-validation-for="TransactionViewModel.Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TransactionViewModel.Amount" class="control-label"></label>
+                        <input asp-for="TransactionViewModel.Amount" class="form-control"/>
+                        <span asp-validation-for="TransactionViewModel.Amount" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TransactionViewModel.CategoryId" class="control-label"></label>
+                        <select asp-for="TransactionViewModel.CategoryId" class="form-control" asp-items="Model.TransactionViewModel.Categories"></select>
+                    </div>
+                    <div class="form-group py-1">
+                        <input type="submit" value="Save" class="btn btn-primary"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
