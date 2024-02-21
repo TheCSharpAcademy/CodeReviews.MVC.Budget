@@ -150,6 +150,7 @@ async function addTransaction(data) {
             body: JSON.stringify({
                 Title: data.get("Title"),
                 Amount: parseFloat(data.get("Amount")),
+                DateTime: data.get("DateTime"),
                 IsHappy: data.get("IsHappy") === "true" ? true : false,
                 IsNecessary: data.get("IsNecessary") === "true" ? true : false,
                 CategoryId: parseInt(data.get("CategoryId"))

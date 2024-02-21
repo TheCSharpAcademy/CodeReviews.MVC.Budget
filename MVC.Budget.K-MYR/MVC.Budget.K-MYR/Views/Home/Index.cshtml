@@ -91,7 +91,9 @@
             </div>
         </div>
     </div>
+</section>
 
+<section>
     <div class="accordion my-2" id="group_1" data-id="1">
         <div class="accordion-item">
             <div id="accordion-head-income" class="accordion-head d-flex">
@@ -161,7 +163,7 @@
                                         {
                                             <div class="me-3">Overspending: @((sumTransactions - category.Budget).ToString("C2"))</div>
                                         }
-                                        <div>Balance: @sumTransactions.ToString("C2") / @Html.DisplayFor(m => category.Budget)</div>                                        
+                                        <div>Balance: @sumTransactions.ToString("C2") / @Html.DisplayFor(m => category.Budget)</div>
                                     </div>
                                     <div class="progress">
                                         <div class="progress-bar progress-bar-striped progress-bar-animated @color" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
@@ -199,7 +201,7 @@
                                     <div class="category-body">
                                         <div>@category.Name</div>
                                         <div class="ms-auto">Balance: @sumTransactions.ToString("C2")  / @Html.DisplayFor(m => category.Budget)</div>
-                                    </div>                                    
+                                    </div>
                                     <div class="progress">
                                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>

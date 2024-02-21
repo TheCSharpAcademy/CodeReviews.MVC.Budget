@@ -10,6 +10,10 @@ $accordion-button-active-bg: $secondary;
 $accordion-button-active-color: white;
 $accordion-icon-active-color: white;
 
+$navbar-light-color: white;
+$navbar-light-brand-color: white;
+
+
 //Import Bootstrap
 @import "../lib/node_modules/bootstrap/scss/bootstrap";
 
@@ -22,6 +26,16 @@ body {
 .form-control {
     background-color: white;
     color: black;
+}
+
+//Navbar
+
+.navbar {
+    background-color: $secondary;
+}
+
+.nav-link:hover, .navbar-brand:hover {
+    color: darken(white, 20%);
 }
 
 //Sidebar

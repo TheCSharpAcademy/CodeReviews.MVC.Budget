@@ -1,47 +1,107 @@
-﻿@model Category;
+﻿@using System.Globalization
+@model Category;
 
 @{
     ViewData["Title"] = "Category";
+    var happyExpenses = Model.Transactions.Where(t => t.IsHappy).Sum(t => t.Amount);
+    var necessaryExpenses = Model.Transactions.Where(t => t.IsNecessary).Sum(t => t.Amount);
+    var expensesTotal = Model.Transactions.Sum(t => t.Amount);
 }
 
-<div class="dashboard border mt-3">
-    <div class="d-flex justify-content-evenly">
-        <div class="m-4" style="width: 300px;"><canvas id="chart"></canvas></div>
-        <div class="m-4" style="width: 300px;"><canvas id="chart2"></canvas></div>
-    </div>
-</div>
-<div class="accordion my-2" id="transactions" data-id="@Model.Id">
-    <div class="accordion-item">
-        <div id="accordion-head-transaction" class="accordion-head d-flex">
-            <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
-                Transactions
-            </h5>
-            <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
-            <div class="accordion-caret rotate"></div>
+<section>
+    <div id="menu-container" data-transaction="0">
+        <div id="menu" class="menu">
+            @Html.AntiForgeryToken()
+            <span class="toggle" id="close-menu">
+                <svg class="close" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368" /></svg>
+            </span>
+            <span id="details-menu" class="span-box" style="--i:0">
+                <svg class="details" viewBox="0 0 512 512"><path d="M32 32v432a16 16 0 0016 16h432" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="96" y="224" width="80" height="192" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="240" y="176" width="80" height="240" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="383.64" y="112" width="80" height="304" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
+            </span>
+            <span id="add-menu" class="span-box" style="--i:1">
+                <svg class="plus" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112" /></svg>
+            </span>
+            <span id="edit-menu" class="span-box" style="--i:2">
+                <svg class="pen" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M364.13 125.25L87 403l-23 45 44.99-23 277.76-277.13-22.62-22.62zM420.69 68.69l-22.62 22.62 22.62 22.63 22.62-22.63a16 16 0 000-22.62h0a16 16 0 00-22.62 0z" /></svg>
+            </span>
+            <span id="delete-menu" class="span-box" style="--i:3">
+                <svg class="trash" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" /><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
+            </span>
         </div>
-        <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
-            <div class="accordion-body">
-                @foreach (var transaction in Model.Transactions)
-                {
-                    <div id="transaction_@transaction.Id" class="transaction p-2" data-id="@transaction.Id">
-                        <div class="d-flex">
-                            <div class="flex-grow-1">
-                                <div class="d-flex">
-                                    <div>@transaction.Title</div>
-                                    <div class="ms-auto">@transaction.Amount.ToString("G4")</div>
-                                </div>
-                            </div>
-                            <div class="delete-icon ms-2">
-                                @Html.AntiForgeryToken()
-                                <img src="~/img/svg/trash_white.svg" width="25px" alt="" />
-                            </div>
-                        </div>
-                    </div>
-                }
+    </div>
+</section>
+
+<section>
+    <div class="dashboard border">
+        <div class="dashboard-container">
+            <div class="chart-container">
+                <canvas id="chart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                        data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                </canvas>
+            </div>
+            <div class="chart-container">
+                <h1 class="text-center">@Model.Name</h1>
+                <h4 class="text-center">February 2024</h4>
+                <div class="statistics mt-4">
+                    <h5 class="text-center">Budget: @Model.Budget.ToString("C2") </h5>
+                    <h5 class="text-center">Spent: @expensesTotal.ToString("C2") </h5>
+                    @{
+                        var difference = Model.Budget - expensesTotal;
+
+                        if(difference < 0)
+                        {
+                            <h5 class="text-center">Overspending: @((-difference).ToString("C2")) </h5>
+                        }
+                        else
+                        {
+                            <h5 class="text-center">Available: @(difference.ToString("C2")) </h5>
+                        }
+                    }
+                    <h5 class="text-center">Sentiment Turnover Rate: </h5>
+                    <h5 class="text-center">Necessity Turnover Rate: </h5>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart2" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                        data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                </canvas>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<section>
+    <div class="accordion my-2" id="transactions" data-id="@Model.Id">
+        <div class="accordion-item">
+            <div id="accordion-head-transaction" class="accordion-head d-flex">
+                <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
+                    Transactions
+                </h5>
+                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                <div class="accordion-caret rotate"></div>
+            </div>
+            <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
+                <div class="accordion-body">
+                    @foreach (var transaction in Model.Transactions)
+                    {
+                        <div id="transaction_@transaction.Id" class="transaction" data-id="@transaction.Id">
+                            <div class="border-container">
+                                <div class="content">
+                                    <div class="category-body">
+                                        <div>@transaction.Title</div>
+                                        <div class="ms-auto me-3">@transaction.DateTime.ToShortDateString()</div>
+                                        <div>@transaction.Amount.ToString("C2")</div>
+                                    </div>
+                                </div>
+                                <div class="border-animation"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 @await Html.PartialAsync("_CategoryModals", new TransactionPost())
 

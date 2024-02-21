@@ -1,4 +1,5 @@
 ﻿const transactionsAPI = "https://localhost:7246/api/Transactions";
+const menu = document.getElementById('menu-container');
 
 Chart.defaults.color = '#ffffff';
 
@@ -12,19 +13,21 @@ document.addEventListener("DOMContentLoaded", () => {
         data: {
             labels: [
                 'Happy',
-                'Unhappy',
-                'No Data'
+                'Unhappy'
             ],
             datasets: [{
-                label: 'My First Dataset',
-                data: [300, 50, 100],
+                label: 'Total Amount',
+                data: [chart1.dataset.happy, chart1.dataset.unhappy],
                 backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)'
+                    'rgb(25,135,84)',
+                    'rgb(220,53,69)'
                 ],
                 hoverOffset: 4
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 
@@ -33,19 +36,21 @@ document.addEventListener("DOMContentLoaded", () => {
         data: {
             labels: [
                 'Necessary',
-                'Unecessary',
-                'No Data'
+                'Unnecessary'
             ],
             datasets: [{
-                label: 'My First Dataset',
-                data: [300, 50, 100],
+                label: 'Total Amount',
+                data: [chart2.dataset.necessary, chart2.dataset.unnecessary],
                 backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)'
+                    'rgb(25,135,84)',
+                    'rgb(220,53,69)'
                 ],
                 hoverOffset: 4
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 
@@ -72,14 +77,44 @@ document.addEventListener("DOMContentLoaded", () => {
             $("#add-transaction-modal").modal('hide');
             await addTransaction(new FormData(this));
         }
+    });    
+
+    $('.transaction').on("click", function (event) {
+        if (menu.dataset.transaction != 0) {
+            var borderBox = document.getElementById(`transaction_${menu.dataset.transaction}`).querySelector('.border-animation');
+            borderBox.classList.remove('border-rotate');
+        }
+
+        menu.dataset.transaction = this.dataset.id;
+        menu.style.left = `${this.style.left + event.pageX - 100}px`;
+        menu.style.top = `${event.pageY - 100}px`;
+        menu.classList.add('active');
+
+        this.querySelector('.border-animation').classList.add('border-rotate');
     });
 
-    $('.transaction').on("click", function (event) {        
-        if (event.target.matches('img')) {
-            var token = this.querySelector('input').value;
-            deleteTransaction(this.dataset.id, token);
-        } 
-    });
+    document.getElementById('close-menu').onclick = function () {
+        menu.classList.remove('active');
+        var id = menu.dataset.transaction;
+        var borderBox = document.getElementById(`transaction_${id}`).querySelector('.border-animation');
+        borderBox.classList.remove('border-rotate');
+        menu.dataset.transaction = 0;
+    };
+
+    document.getElementById('delete-menu').onclick = function () {
+        var token = menu.querySelector('input').value;
+        var id = menu.dataset.transaction;
+        if (deleteTransaction(id, token)) {
+            menu.classList.remove('active');
+            menu.dataset.transaction = 0;
+        }
+    };
+
+    document.getElementById('add-menu').onclick = function () {
+        var id = menu.dataset.category;
+        $("#add-transaction-modal").modal('show');
+        $("#add-transaction-modal").find("#CategoryId").val(id);
+    };
 });
 
 async function addTransaction(data) {
@@ -92,6 +127,7 @@ async function addTransaction(data) {
             },
             body: JSON.stringify({
                 Title: data.get("Title"),
+                DateTime: data.get("DateTime"),
                 Amount: parseFloat(data.get("Amount")),
                 IsHappy: data.get("IsHappy") === "true" ? true : false,
                 IsNecessary: data.get("IsNecessary") === "true" ? true : false,

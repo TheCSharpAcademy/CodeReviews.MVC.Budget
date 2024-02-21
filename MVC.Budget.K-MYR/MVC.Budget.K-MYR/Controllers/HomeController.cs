@@ -1,10 +1,9 @@
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection.PortableExecutable;
 
 namespace MVC.Budget.K_MYR.Controllers;
 
@@ -27,7 +26,8 @@ public class HomeController : Controller
             Expenses = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 2, q => q.OrderBy(t => t.Name), "Transactions"),
             Savings = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 3, q => q.OrderBy(t => t.Name), "Transactions"),
             Category = new(),
-            Transaction = new()
+            Transaction = new(),
+            Cultures = new SelectList(CultureInfo.GetCultures(CultureTypes.SpecificCultures))
         };
 
         return View(HomeViewModel);
