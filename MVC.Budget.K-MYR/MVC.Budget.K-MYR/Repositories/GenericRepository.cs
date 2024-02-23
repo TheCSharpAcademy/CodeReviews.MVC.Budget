@@ -20,7 +20,7 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
     {
         IQueryable<TEntity> query = _dbSet;
 
-        if (filter != null)
+        if (filter is not null)
             query = query.Where(filter);
 
         foreach (var includeProperty in includeProperties.Split
@@ -29,7 +29,7 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
             query = query.Include(includeProperty);
         }
 
-        if (orderBy != null)
+        if (orderBy is not null)
             return await orderBy(query).ToListAsync();
 
         return await query.ToListAsync();

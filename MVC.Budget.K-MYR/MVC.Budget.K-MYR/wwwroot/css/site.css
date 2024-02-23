@@ -11922,6 +11922,10 @@ body {
   color: #cccccc;
 }
 
+#country, .country-name {
+  color: black;
+}
+
 .sidebar {
   z-index: 1;
   background-color: #198754;

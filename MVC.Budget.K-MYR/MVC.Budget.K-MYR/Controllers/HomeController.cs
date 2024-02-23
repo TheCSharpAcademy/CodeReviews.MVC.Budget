@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
 using System.Diagnostics;
@@ -20,24 +19,36 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        HomeViewModel HomeViewModel = new()
+        HomeModel HomeModel = new()
         {
-            Income = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 1, q => q.OrderBy(t => t.Name), "Transactions"),
-            Expenses = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 2, q => q.OrderBy(t => t.Name), "Transactions"),
-            Savings = await _unitOfWork.CategoriesRepository.GetAsync(c => c.GroupId == 3, q => q.OrderBy(t => t.Name), "Transactions"),
+            Income = await _unitOfWork.CategoriesRepository.GetCategoryWithFilteredTransactionsAsync(
+                c => c.GroupId == 1, 
+                q => q.OrderBy(t => t.Name), 
+                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month).OrderByDescending(d => d.DateTime)),
+            Expenses = await _unitOfWork.CategoriesRepository.GetCategoryWithFilteredTransactionsAsync(
+                c => c.GroupId == 2,
+                q => q.OrderBy(t => t.Name),
+                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month).OrderByDescending(d => d.DateTime)),
+            Savings = await _unitOfWork.CategoriesRepository.GetCategoryWithFilteredTransactionsAsync(
+                c => c.GroupId == 3,
+                q => q.OrderBy(t => t.Name),
+                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month).OrderByDescending(d => d.DateTime)),
             Category = new(),
-            Transaction = new(),
-            Cultures = new SelectList(CultureInfo.GetCultures(CultureTypes.SpecificCultures))
+            Transaction = new()
         };
 
-        return View(HomeViewModel);
+        return View(new LayoutModel<HomeModel>(HomeModel, new CultureInfo("en-US")));
     }
 
     [HttpGet("Category/{id}")]
     public async Task<IActionResult> Category([FromRoute] int id)
     {
         var category = await _unitOfWork.CategoriesRepository.GetCategoryAsync(id);
-        return View(category);
+
+        if (category is null)
+            return NotFound();
+
+        return View(new LayoutModel<Category>(category, new CultureInfo("en-US")));
     }
 
     public IActionResult Privacy()

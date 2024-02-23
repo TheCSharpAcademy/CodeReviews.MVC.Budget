@@ -19,6 +19,8 @@ $navbar-light-brand-color: white;
 
 // --- Custom Styles ---
 
+
+
 body {    
     color: white;
 }
@@ -36,6 +38,10 @@ body {
 
 .nav-link:hover, .navbar-brand:hover {
     color: darken(white, 20%);
+}
+
+#country, .country-name {
+    color: black;
 }
 
 //Sidebar

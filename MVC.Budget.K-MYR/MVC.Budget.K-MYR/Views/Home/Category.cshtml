@@ -1,11 +1,11 @@
 ﻿@using System.Globalization
-@model Category;
+@model LayoutModel<Category>
 
 @{
     ViewData["Title"] = "Category";
-    var happyExpenses = Model.Transactions.Where(t => t.IsHappy).Sum(t => t.Amount);
-    var necessaryExpenses = Model.Transactions.Where(t => t.IsNecessary).Sum(t => t.Amount);
-    var expensesTotal = Model.Transactions.Sum(t => t.Amount);
+    var happyExpenses = Model.PageModel.Transactions.Where(t => t.IsHappy).Sum(t => t.Amount);
+    var necessaryExpenses = Model.PageModel.Transactions.Where(t => t.IsNecessary).Sum(t => t.Amount);
+    var expensesTotal = Model.PageModel.Transactions.Sum(t => t.Amount);
 }
 
 <section>
@@ -40,21 +40,21 @@
                 </canvas>
             </div>
             <div class="chart-container">
-                <h1 class="text-center">@Model.Name</h1>
+                <h1 class="text-center text-truncate">@Html.Encode(Model.PageModel.Name)</h1>
                 <h4 class="text-center">February 2024</h4>
                 <div class="statistics mt-4">
-                    <h5 class="text-center">Budget: @Model.Budget.ToString("C2") </h5>
-                    <h5 class="text-center">Spent: @expensesTotal.ToString("C2") </h5>
+                    <h5 class="text-center">Budget: @Model.PageModel.Budget.ToString("C2", Model.Culture) </h5>
+                    <h5 class="text-center">Spent: @expensesTotal.ToString("C2", Model.Culture) </h5>
                     @{
-                        var difference = Model.Budget - expensesTotal;
+                        var difference = Model.PageModel.Budget - expensesTotal;
 
                         if(difference < 0)
                         {
-                            <h5 class="text-center">Overspending: @((-difference).ToString("C2")) </h5>
+                            <h5 class="text-center">Overspending: @((-difference).ToString("C2", Model.Culture)) </h5>
                         }
                         else
                         {
-                            <h5 class="text-center">Available: @(difference.ToString("C2")) </h5>
+                            <h5 class="text-center">Available: @(difference.ToString("C2", Model.Culture)) </h5>
                         }
                     }
                     <h5 class="text-center">Sentiment Turnover Rate: </h5>
@@ -71,7 +71,7 @@
 </section>
 
 <section>
-    <div class="accordion my-2" id="transactions" data-id="@Model.Id">
+    <div class="accordion my-2" id="transactions" data-id="@Model.PageModel.Id">
         <div class="accordion-item">
             <div id="accordion-head-transaction" class="accordion-head d-flex">
                 <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
@@ -82,15 +82,15 @@
             </div>
             <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
                 <div class="accordion-body">
-                    @foreach (var transaction in Model.Transactions)
+                    @foreach (var transaction in Model.PageModel.Transactions)
                     {
                         <div id="transaction_@transaction.Id" class="transaction" data-id="@transaction.Id">
                             <div class="border-container">
                                 <div class="content">
                                     <div class="category-body">
-                                        <div>@transaction.Title</div>
+                                        <div>@Html.Encode(transaction.Title)</div>
                                         <div class="ms-auto me-3">@transaction.DateTime.ToShortDateString()</div>
-                                        <div>@transaction.Amount.ToString("C2")</div>
+                                        <div>@transaction.Amount.ToString("C2", Model.Culture)</div>
                                     </div>
                                 </div>
                                 <div class="border-animation"></div>

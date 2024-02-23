@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@model LayoutModel
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,6 +7,7 @@
     <title>@ViewData["Title"] - MVC.Budget.K_MYR</title>
     <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MVC.Budget.K_MYR.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/node_modules/country-select-js/build/css/countrySelect.css" asp-append-version="true">
 </head>
 <body>
     <header>
@@ -23,12 +25,13 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>                       
+                        </li>
                     </ul>
                 </div>
             </div>
-            <div class="ms-auto me-2">
-                <select asp-items="@Model.Currencies" style="width: 70px"></select>
+            <div class="ms-auto me-5">
+                <input type="text" id="country">
+                <input type="hidden" id="country_code" />
             </div>
         </nav>
     </header>
@@ -37,9 +40,9 @@
             @RenderBody()
         </main>
     </div>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/node_modules/country-select-js/build/js/countrySelect.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

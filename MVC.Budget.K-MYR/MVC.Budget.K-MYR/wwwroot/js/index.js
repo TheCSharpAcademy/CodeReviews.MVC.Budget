@@ -5,6 +5,10 @@ const sidebar = document.getElementById("sidebar");
 Chart.defaults.color = '#ffffff';
 
 document.addEventListener("DOMContentLoaded", () => {
+    $("#country").countrySelect({        
+        preferredCountries: []
+    });
+
     var chart1 = document.getElementById('chart');
     var chart2 = document.getElementById('chart2');
 
