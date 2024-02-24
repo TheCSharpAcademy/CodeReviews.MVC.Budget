@@ -3,9 +3,10 @@
 
 @{
     ViewData["Title"] = "Category";
-    var happyExpenses = Model.PageModel.Transactions.Where(t => t.IsHappy).Sum(t => t.Amount);
-    var necessaryExpenses = Model.PageModel.Transactions.Where(t => t.IsNecessary).Sum(t => t.Amount);
-    var expensesTotal = Model.PageModel.Transactions.Sum(t => t.Amount);
+    var monthlyTransactions = Model.PageModel.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month);
+    var happyExpenses = monthlyTransactions.Where(t => t.IsHappy).Sum(t => t.Amount);
+    var necessaryExpenses = monthlyTransactions.Where(t => t.IsNecessary).Sum(t => t.Amount);
+    var expensesTotal = monthlyTransactions.Sum(t => t.Amount);
 }
 
 <section>
@@ -82,7 +83,7 @@
             </div>
             <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
                 <div class="accordion-body">
-                    @foreach (var transaction in Model.PageModel.Transactions)
+                    @foreach (var transaction in monthlyTransactions)
                     {
                         <div id="transaction_@transaction.Id" class="transaction" data-id="@transaction.Id">
                             <div class="border-container">

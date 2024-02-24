@@ -16,6 +16,9 @@ public class Transaction
     public decimal Amount { get; set; }
     public bool IsHappy { get; set; }
     public bool IsNecessary { get; set; }
+    public bool Evaluated { get; set; }
+    public bool PreviousIsHappyValue { get; set; }
+    public bool PreviousIsNecessaryValue { get; set; }
     public int CategoryId { get; set; }
     public Category Category { get; set; }
 }

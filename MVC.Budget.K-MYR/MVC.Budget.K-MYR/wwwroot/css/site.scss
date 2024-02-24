@@ -218,12 +218,13 @@ body {
 .content {
     position: relative;
     z-index: 10;
-    padding: 10px;
+    padding: 5px;
     border-radius: 10px;
     background-color: $secondary;
 }
 
 .category-body {    
+    min-height: 35px;
     background-color: $secondary;
     display: flex;
 }

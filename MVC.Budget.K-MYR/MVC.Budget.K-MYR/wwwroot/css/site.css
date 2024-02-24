@@ -12091,12 +12091,13 @@ body {
 .content {
   position: relative;
   z-index: 10;
-  padding: 10px;
+  padding: 5px;
   border-radius: 10px;
   background-color: #1c1c1c;
 }
 
 .category-body {
+  min-height: 35px;
   background-color: #1c1c1c;
   display: flex;
 }
