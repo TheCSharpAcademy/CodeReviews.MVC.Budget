@@ -57,7 +57,7 @@ public class TransactionsController : ControllerBase
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutTransaction(int id, [FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, Id")] Transaction transaction)
+    public async Task<ActionResult> PutTransaction(int id, [FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, Evaluated, EvaluatedIsHappy, EvaluatedIsNecessary, Id")] TransactionPut transaction)
     {
         if (id != transaction.Id)
             return BadRequest();
@@ -75,6 +75,10 @@ public class TransactionsController : ControllerBase
         entity.IsHappy = transaction.IsHappy;
         entity.IsNecessary = transaction.IsNecessary;
         entity.DateTime = transaction.DateTime;
+        entity.CategoryId = transaction.CategoryId;
+        entity.Evaluated = transaction.Evaluated;
+        entity.EvaluatedIsNecessary = transaction.EvaluatedIsNecessary;
+        entity.EvaluatedIsHappy = transaction.EvaluatedIsHappy;
 
         try
         {

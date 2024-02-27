@@ -49,7 +49,7 @@
                     @{
                         var difference = Model.PageModel.Budget - expensesTotal;
 
-                        if(difference < 0)
+                        if (difference < 0)
                         {
                             <h5 class="text-center">Overspending: @((-difference).ToString("C2", Model.Culture)) </h5>
                         }
@@ -85,7 +85,18 @@
                 <div class="accordion-body">
                     @foreach (var transaction in monthlyTransactions)
                     {
-                        <div id="transaction_@transaction.Id" class="transaction" data-id="@transaction.Id">
+                        <div id="transaction_@transaction.Id" class="transaction"
+                             data-id="@transaction.Id"
+                             data-amount="@transaction.Amount.ToString("F2", CultureInfo.InvariantCulture)"
+                             data-date="@transaction.DateTime.ToString("yyyy-MM-ddTHH:mm")"
+                             data-title="@Html.Encode(transaction.Title)"
+                             data-categoryid="@transaction.CategoryId"
+                             data-ishappy="@transaction.IsHappy"
+                             data-isnecessary="@transaction.IsNecessary"
+                             data-evaluated="@transaction.Evaluated"
+                             data-evaluatedishappy="@transaction.EvaluatedIsHappy"
+                             data-evaluatedisnecessary="@transaction.EvaluatedIsNecessary">
+
                             <div class="border-container">
                                 <div class="content">
                                     <div class="category-body">
@@ -104,7 +115,7 @@
     </div>
 </section>
 
-@await Html.PartialAsync("_CategoryModals", new TransactionPost())
+@await Html.PartialAsync("_CategoryModals", new Transaction())
 
 @section Scripts {
     @{

@@ -54,7 +54,7 @@ public class CategoriesController : ControllerBase
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutCategory(int id, [Bind("Name,Id")] Category category)
+    public async Task<ActionResult> PutCategory(int id, [Bind("Name,Budget,Id")] CategoryPut category)
     {
         if (id != category.Id)
             return BadRequest();
@@ -68,6 +68,8 @@ public class CategoriesController : ControllerBase
             return NotFound();
 
         entity.Name = category.Name;
+        entity.Budget = category.Budget;
+        entity.GroupId = category.GroupId;
 
         try
         {

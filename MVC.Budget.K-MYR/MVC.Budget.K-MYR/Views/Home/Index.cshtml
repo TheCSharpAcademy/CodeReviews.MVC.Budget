@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Home Page";
+
     var expensesPerCategory = Model.PageModel.Expenses.Select(c => new
     {
         category = c,
@@ -25,11 +26,11 @@
     decimal sentimentTurnOverRate = 0;
     decimal necessityTurnOverRate = 0;
 
-    if(transactionsCount > 0)
+    if (transactionsCount > 0)
     {
-        sentimentTurnOverRate = evaluatedTransactions.Count(t => t.IsHappy != t.PreviousIsHappyValue) / (decimal) transactionsCount;
-        necessityTurnOverRate = evaluatedTransactions.Count(t => t.IsNecessary != t.PreviousIsNecessaryValue) / (decimal) transactionsCount;
-    }    
+        sentimentTurnOverRate = evaluatedTransactions.Count(t => t.IsHappy != t.EvaluatedIsHappy) / (decimal)transactionsCount;
+        necessityTurnOverRate = evaluatedTransactions.Count(t => t.IsNecessary != t.EvaluatedIsNecessary) / (decimal)transactionsCount;
+    }
 }
 
 <section>
@@ -130,9 +131,13 @@
                     @foreach (var category in Model.PageModel.Income)
                     {
                         var spent = @category.Transactions.Sum(t => t.Amount);
-                        var progressbarWidth = Math.Max(100, spent / category.Budget * 100);
+                        var progressbarWidth = Math.Min(100, spent / category.Budget * 100);
 
-                        <div id="category_@category.Id" class="category" data-id="@category.Id">
+                        <div id="category_@category.Id" class="category"
+                             data-id="@category.Id"
+                             data-name="@Html.Encode(category.Name)"
+                             data-budget="@category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
+                             data-groupid="@category.GroupId">
                             <div class="border-container">
                                 <div class="content">
                                     <div class="category-body">
@@ -168,13 +173,17 @@
                 <div class="accordion-body">
                     @foreach (var group in expensesPerCategory)
                     {
-                        var progressbarWidth = Math.Max(100,group.sumOfTransactions / group.category.Budget * 100);
+                        var progressbarWidth = Math.Min(100, group.sumOfTransactions / group.category.Budget * 100);
                         var cutOffDate = DateTime.UtcNow.AddDays(-14);
                         var reevaluatableTransactions = group.category.Transactions.Where(t => !t.Evaluated).Where(t => t.DateTime < cutOffDate).ToArray();
 
                         var color = progressbarWidth < 50 ? "bg-success" : progressbarWidth < 85 ? "bg-warning" : "bg-danger";
 
-                        <div id="category_@group.category.Id" class="category" data-id="@group.category.Id">
+                        <div id="category_@group.category.Id" class="category"
+                             data-id="@group.category.Id"
+                             data-name="@Html.Encode(group.category.Name)"
+                             data-budget="@group.category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
+                             data-groupid="@group.category.GroupId">
                             <div class="border-container">
                                 <div class="content">
                                     <div class="category-body">
@@ -307,7 +316,11 @@
                     @foreach (var category in Model.PageModel.Savings)
                     {
                         var sumTransactions = category.Transactions.Sum(t => t.Amount);
-                        <div id="category_@category.Id" class="category" data-id="@category.Id">
+                        <div class="category" id="category_@category.Id"
+                             data-id="@category.Id"
+                             data-name="@Html.Encode(category.Name)"
+                             data-budget="@category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
+                             data-groupid="@category.GroupId">
                             <div class="border-container">
                                 <div class="content">
                                     <div class="category-body">

@@ -1,5 +1,7 @@
 ﻿const transactionsAPI = "https://localhost:7246/api/Transactions";
 const menu = document.getElementById('menu-container');
+const addTransactionModal = $("#add-transaction-modal");
+const updateTransactionModal = $("#update-transaction-modal");
 
 Chart.defaults.color = '#ffffff';
 
@@ -59,8 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
     $(".accordion-head").on("click", function (event) {
         if (event.target.matches("img.add-icon.ms-auto")) {
             var id = $(this).closest('.accordion').data("id");
-            $("#add-transaction-modal").modal('show');
-            $("#add-transaction-modal").find("#CategoryId").val(id);
+            addTransactionModal.modal('show');
+            addTransactionModal.find("#CategoryId").val(id);
         }
         else {
             $(this).next().collapse('toggle');
@@ -76,10 +78,18 @@ document.addEventListener("DOMContentLoaded", () => {
     $('#add-transaction-form').on("submit", async function (event) {
         event.preventDefault();
         if ($(this).valid()) {
-            $("#add-transaction-modal").modal('hide');
+            addTransactionModal.modal('hide');
             await addTransaction(new FormData(this));
         }
-    });    
+    });  
+
+    $('#update-transaction-form').on("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            updateTransactionModal.modal('hide');
+            await updateTransaction(new FormData(this));
+        }
+    }); 
 
     $('.transaction').on("click", function (event) {
         if (menu.dataset.transaction != 0) {
@@ -112,10 +122,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    document.getElementById('add-menu').onclick = function () {
-        var id = menu.dataset.category;
-        $("#add-transaction-modal").modal('show');
-        $("#add-transaction-modal").find("#CategoryId").val(id);
+    document.getElementById('edit-menu').onclick = function () {
+        var transaction = document.getElementById(`transaction_${menu.dataset.transaction}`);
+        var id = transaction.dataset.id;
+        var categoryId = transaction.dataset.categoryid;
+        var title = transaction.dataset.title;
+        var amount = transaction.dataset.amount;
+        var datetime = transaction.dataset.date;
+        var isNecessary = transaction.dataset.isnecessary;
+        var isHappy = transaction.dataset.ishappy;
+        var evaluated = transaction.dataset.evaluated;
+        var evaluatedIsNecessary = transaction.dataset.evaluatedisnecessary;
+        var evaluatedIsHappy = transaction.dataset.evaluatedishappy;
+        updateTransactionModal.find("#update-transaction-label").text(`Edit ${title}`);
+        updateTransactionModal.find("#Id").val(id);
+        updateTransactionModal.find("#Title").val(title);
+        updateTransactionModal.find("#Amount").val(amount);
+        updateTransactionModal.find("#CategoryId").val(categoryId);
+        updateTransactionModal.find("#DateTime").val(datetime);
+        updateTransactionModal.find("#Evaluated").val(evaluated);
+        updateTransactionModal.find("#EvaluatedIsHappy").val(evaluatedIsHappy);
+        updateTransactionModal.find("#EvaluatedIsNecessary").val(evaluatedIsNecessary);
+        updateTransactionModal.find(`#IsHappy${isHappy}`).prop("checked", true)
+        updateTransactionModal.find(`#IsNecessary${isNecessary}`).prop("checked", true)
+        updateTransactionModal.modal('show');
     };
 });
 
@@ -146,6 +176,42 @@ async function addTransaction(data) {
     } catch (error) {
         console.error(error);
     };
+}
+
+async function updateTransaction(data) {
+    try {
+        var id = parseInt(data.get("Id"));
+        var response = await fetch(`${transactionsAPI}/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": data.get('__RequestVerificationToken')
+            },
+            body: JSON.stringify({
+                Id: id,
+                Title: data.get("Title"),
+                DateTime: data.get("DateTime"),
+                Amount: parseFloat(data.get("Amount")),
+                IsHappy: data.get("IsHappy") === "true" ? true : false,
+                IsNecessary: data.get("IsNecessary") === "true" ? true : false,
+                CategoryId: parseInt(data.get("CategoryId")),
+                Evaluated: data.get("Evaluated") === "true" ? true : false,
+                EvaluatedIsHappy: data.get("EvaluatedIsHappy") === "true" ? true : false,
+                evaluatedIsNecessary: data.get("EvaluatedIsNecessary") === "true" ? true : false,
+            })
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            console.error(`HTTP Post Error: ${response.status}`);
+            return false;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
 }
 
 async function deleteTransaction(id, token) {

@@ -2,6 +2,9 @@
 const transactionsAPI = "https://localhost:7246/api/Transactions";
 const menu = document.getElementById('menu-container');
 const sidebar = document.getElementById("sidebar");
+const updateCategoryModal = $("#update-category-modal");
+const addCategoryModal = $("#add-category-modal");
+const addTransactionModal = $("#add-transaction-modal");
 Chart.defaults.color = '#ffffff';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -65,8 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
     $(".accordion-head").on("click", function (event) {
         if (event.target.matches("img.add-icon.ms-auto")) {
             var id = $(this).closest('.accordion').data("id");
-            $("#add-category-modal").modal('show');
-            $("#add-category-modal").find("#GroupId").val(id);
+            addCategoryModal.modal('show');
+            addCategoryModal.find("#GroupId").val(id);
         }
         else {
             $(this).next().collapse('toggle');
@@ -82,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $('#add-category-form').on("submit", async function (event) {
         event.preventDefault();
         if ($(this).valid()) {
-            $("#add-category-modal").modal('hide');
+            addCategoryModal.modal('hide');
             await addCategory(new FormData(this));
         }
     });
@@ -90,8 +93,16 @@ document.addEventListener("DOMContentLoaded", () => {
     $('#add-transaction-form').on("submit", async function (event) {
         event.preventDefault();
         if ($(this).valid()) {
-            $("#add-transaction-modal").modal('hide');
+            addTransactionModal.modal('hide');
             await addTransaction(new FormData(this));
+        }
+    });
+
+    $('#update-category-form').on("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            updateCategoryModal.modal('hide');
+            await updateCategory(new FormData(this));
         }
     });
 
@@ -115,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
         borderBox.classList.remove('border-rotate');
         menu.dataset.category = 0;
+        menu.dataset.groupId = 0;
     };
 
     document.getElementById('delete-menu').onclick = function () {
@@ -123,18 +135,28 @@ document.addEventListener("DOMContentLoaded", () => {
         if (deleteCategory(id, token)) {
             menu.classList.remove('active');
             menu.dataset.category = 0;
+            menu.dataset.groupId = 0;
         }
     };
 
     document.getElementById('add-menu').onclick = function () {
         var id = menu.dataset.category;        
-        $("#add-transaction-modal").modal('show');
-        $("#add-transaction-modal").find("#CategoryId").val(id);     
+        addTransactionModal.find("#CategoryId").val(id);   
+        addTransactionModal.modal('show');
     };
 
-    document.getElementById('edit-menu').onclick = function () {
-        var token = menu.querySelector('input').value;
-        var id = menu.dataset.category;        
+    document.getElementById('edit-menu').onclick = function () {      
+        var category = document.getElementById(`category_${menu.dataset.category}`);
+        var id = category.dataset.id;   
+        var groupId = category.dataset.groupid;   
+        var name = category.dataset.name;   
+        var budget = category.dataset.budget;   
+        updateCategoryModal.find("#update-category-label").text(`Edit ${name}`);
+        updateCategoryModal.find("#Id").val(id);    
+        updateCategoryModal.find("#Name").val(name);    
+        updateCategoryModal.find("#Budget").val(budget);    
+        updateCategoryModal.find("#GroupId").val(groupId); 
+        updateCategoryModal.modal('show');
     };
 
     document.getElementById('details-menu').onclick = function () {
@@ -201,6 +223,36 @@ async function addCategory(data) {
     }
 }
 
+async function updateCategory(data) {
+    try {
+        var id = parseInt(data.get("Id"));
+        var response = await fetch(`${categoriesAPI}/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": data.get('__RequestVerificationToken')
+            },
+            body: JSON.stringify({
+                Name: data.get("Name"),
+                Budget: parseFloat(data.get("Budget")),
+                GroupId: parseInt(data.get("GroupId")),
+                Id: id
+            })
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            console.error(`HTTP Post Error: ${response.status}`);
+            return false;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+}
+
 async function deleteCategory(id, token) {
     try {
         var response = await fetch(`${categoriesAPI}/${id}`, {
@@ -212,12 +264,15 @@ async function deleteCategory(id, token) {
 
         if (response.ok) {
             document.getElementById(`category_${id}`).remove();
+            return true;
         } else {
             console.error(`HTTP Delete Error: ${response.status}`);
+            return false;
         }
 
     } catch (error) {
         console.error(error);
+        return false;
     }  
 }
 
