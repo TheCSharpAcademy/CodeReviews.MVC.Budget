@@ -13,13 +13,10 @@ $accordion-icon-active-color: white;
 $navbar-light-color: white;
 $navbar-light-brand-color: white;
 
-
 //Import Bootstrap
 @import "../lib/node_modules/bootstrap/scss/bootstrap";
 
 // --- Custom Styles ---
-
-
 
 body {    
     color: white;
@@ -30,10 +27,28 @@ body {
     color: black;
 }
 
+::-webkit-scrollbar {
+    width: 5px;
+    padding-left: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: white;
+    border-radius: 5px;
+}
+
 //Navbar
 
 .navbar {
     background-color: $secondary;
+    position: fixed;
+    width: 100%;
+    top: 0px;
+    z-index: 100;
 }
 
 .nav-link:hover, .navbar-brand:hover {
@@ -83,6 +98,30 @@ body {
 .collapsed > .sidebar-caret {
     transform: rotate(90deg);
 }
+
+// Action sidebar
+
+#action-sidebar {
+    position: fixed;         
+    left: 0px; 
+    top: 50%;
+    z-index: 500;
+}
+/*
+#reevaluation-button-container {
+    width: 50px;
+    transition: width ease-in-out 0.5s;
+}
+
+#reevaluation-button-container:hover {    
+    width: 300px;
+}
+
+#reevaluation-button {
+    margin: auto;
+    display: block;    
+}
+*/
 
 // Menu wheel
 #menu-container {
@@ -159,11 +198,72 @@ body {
     height: 40px !important;
 }
 
+// Main Container 
+
+.main-container {
+    padding-top: 57px;
+    padding-right: 0;
+    padding-left:25px;
+    height: 100vh;
+}
+
+// Flip Container
+
+.flip-container {
+    background-color: transparent;
+    perspective: 1000px;
+    margin-top: 10px;
+}
+
+.flip-container-inner {
+    position: relative;
+    transition: transform 1s;
+    transform-style: preserve-3d;
+}
+
+.flip-content {
+    position: relative;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    height: calc(100vh - 67px);
+}
+
+.flip-scroll-container {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.flip-content-container {
+    position: relative;
+    margin-right: 20px;
+}
+
+.flip-content-back {
+    position: absolute;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    top: 0;
+    left: 0;
+    height: calc(100vh - 67px);
+    width: 100%;
+    transform: rotateY(180deg);
+}
+
+.flip {
+    transform: rotateY(180deg);
+}
+
+.reevaluation {
+    height: calc(100% - 10px);
+    border-radius: var(--bs-border-radius);
+    background-color: $secondary;
+    margin-top: 10px;
+}
+
 // Dashboard
 
 .dashboard {
     border-radius: var(--bs-border-radius);
-    margin-top: 10px;
     padding: 10px;
     background-color: $secondary;
 }
@@ -253,8 +353,17 @@ body {
     height: 0.4rem;
 }
 
-.rotate {
-    transform: rotate(180deg);
+// Transaction (Details)
+
+.transaction-date {
+    margin-left: auto;
+    min-width: 80px;
+    text-align: end;
+}
+
+.transaction-value {
+    min-width:80px;
+    text-align: end;
 }
 
 // Modals

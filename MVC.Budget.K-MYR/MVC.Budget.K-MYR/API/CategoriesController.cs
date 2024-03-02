@@ -32,6 +32,18 @@ public class CategoriesController : ControllerBase
         return category is null ? NotFound() : Ok(category);
     }
 
+    [HttpGet("filteredByEvaluation")]
+    public async Task<ActionResult<List<Category>>> GetCategoriesWithUnevaluatedTransactions()
+    {
+        var cutoffDate = DateTime.UtcNow.AddDays(-14);
+
+        return Ok(await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
+                c => c.GroupId == 2,
+                q => q.OrderBy(t => t.Name),
+                c => c.Transactions.Where(t => t.Evaluated != false && t.DateTime < cutoffDate)
+                    .OrderByDescending(d => d.DateTime)));
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, GroupId")] CategoryPost postCategory)

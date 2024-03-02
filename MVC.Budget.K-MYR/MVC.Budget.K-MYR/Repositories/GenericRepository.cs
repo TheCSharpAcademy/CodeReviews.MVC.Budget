@@ -14,7 +14,7 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         _dbSet = _context.Set<TEntity>();
     }
 
-    public virtual async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>,
+    public virtual async Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>,
                                                  IOrderedQueryable<TEntity>>? orderBy = null,
                                                  string includeProperties = "")
     {

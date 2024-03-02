@@ -21,18 +21,21 @@ public class HomeController : Controller
     {
         HomeModel HomeModel = new()
         {
-            Income = await _unitOfWork.CategoriesRepository.GetCategoryWithFilteredTransactionsAsync(
+            Income = await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
                 c => c.GroupId == 1, 
                 q => q.OrderBy(t => t.Name), 
-                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month).OrderByDescending(d => d.DateTime)),
-            Expenses = await _unitOfWork.CategoriesRepository.GetCategoryWithFilteredTransactionsAsync(
+                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month)
+                    .OrderByDescending(d => d.DateTime)),
+            Expenses = await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
                 c => c.GroupId == 2,
                 q => q.OrderBy(t => t.Name),
-                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month).OrderByDescending(d => d.DateTime)),
-            Savings = await _unitOfWork.CategoriesRepository.GetCategoryWithFilteredTransactionsAsync(
+                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month)
+                    .OrderByDescending(d => d.DateTime)),
+            Savings = await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
                 c => c.GroupId == 3,
                 q => q.OrderBy(t => t.Name),
-                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month).OrderByDescending(d => d.DateTime)),
+                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month)
+                    .OrderByDescending(d => d.DateTime)),
             Category = new(),
             Transaction = new()
         };

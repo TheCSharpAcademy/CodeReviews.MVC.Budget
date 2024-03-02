@@ -32,314 +32,272 @@
         necessityTurnOverRate = evaluatedTransactions.Count(t => t.IsNecessary != t.EvaluatedIsNecessary) / (decimal)transactionsCount;
     }
 }
-
-<section>
-    <div id="sidebar" class="sidebar collapsed">
-        <svg id="sidebar-caret" class="sidebar-caret" width="30" height="35" fill="#ffffff" viewBox="0 0 15 15">
-            <path d="M3.204 5h9.592L8 10.481zm-.753.659 4.796 5.48a1 1 0 0 0 1.506 0l4.796-5.48c.566-.647.106-1.659-.753-1.659H3.204a1 1 0 0 0-.753 1.659" />
-        </svg>
-        <div id="sidebar-container" class="sidebar-container">
-            <div class="sidebar-category">
-                <h5>Budget</h5>
-                <ul>
-                    <li>Add New Budget</li>
-                    <li>Edit Budget</li>
-                    <li>Delete Budget</li>
-                </ul>
-                <h5>Categories</h5>
-                <ul>
-                    <li data-bs-toggle="modal" data-bs-target="#add-category-modal">Add New Category</li>
-                    <li>Edit Category</li>
-                    <li>Delete Category</li>
-                </ul>
-                <h5>Display</h5>
-                <ul>
-                    <li>Locale</li>
-                    <li>Locale</li>
-                    <li>Currency</li>
-                    <li>Other Settings</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section>
-    <div id="menu-container" data-category="0">
-        <div id="menu" class="menu">
-            @Html.AntiForgeryToken()
-            <span class="toggle" id="close-menu">
-                <svg class="close" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368" /></svg>
-            </span>
-            <span id="details-menu" class="span-box" style="--i:0">
-                <svg class="details" viewBox="0 0 512 512"><path d="M32 32v432a16 16 0 0016 16h432" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="96" y="224" width="80" height="192" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="240" y="176" width="80" height="240" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="383.64" y="112" width="80" height="304" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
-            </span>
-            <span id="add-menu" class="span-box" style="--i:1">
-                <svg class="plus" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112" /></svg>
-            </span>
-            <span id="edit-menu" class="span-box" style="--i:2">
-                <svg class="pen" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M364.13 125.25L87 403l-23 45 44.99-23 277.76-277.13-22.62-22.62zM420.69 68.69l-22.62 22.62 22.62 22.63 22.62-22.63a16 16 0 000-22.62h0a16 16 0 00-22.62 0z" /></svg>
-            </span>
-            <span id="delete-menu" class="span-box" style="--i:3">
-                <svg class="trash" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" /><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
-            </span>
-        </div>
-    </div>
-</section>
-
-<section>
-    <div class="dashboard border">
-        <div class="dashboard-container">
-            <div class="chart-container">
-                <canvas id="chart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
-                        data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
-                </canvas>
-            </div>
-            <div class="chart-container">
-                <h1 class="text-center">My Budget</h1>
-                <h4 class="text-center">February 2024</h4>
-                <div class="statistics mt-4">
-                    <h5 class="text-center">Total Overspending: @overspending.ToString("C2", Model.Culture) </h5>
-                    <h5 class="text-center">Sentiment Turnover Rate: @sentimentTurnOverRate.ToString("P2")</h5>
-                    <h5 class="text-center">Necessity Turnover Rate: @necessityTurnOverRate.ToString("P2")</h5>
-                </div>
-            </div>
-            <div class="chart-container">
-                <canvas id="chart2" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
-                        data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
-                </canvas>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section>
-    <div class="accordion my-2" id="group_1" data-id="1">
-        <div class="accordion-item">
-            <div id="accordion-head-income" class="accordion-head d-flex">
-                <h5 class="accordion-header me-auto" id="accordionIncomeHeader">
-                    Income
-                </h5>
-                <h5 class="accordion-header">
-                    @incomeTotal.ToString("C2", Model.Culture) / @incomeBudget.ToString("C2", Model.Culture)
-                </h5>
-                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
-                <div class="accordion-caret rotate"></div>
-            </div>
-            <div id="collapseIncome" class="accordion-collapse collapse show" aria-labelledby="accordionIncomeHeader">
-                <div class="accordion-body">
-                    @foreach (var category in Model.PageModel.Income)
-                    {
-                        var spent = @category.Transactions.Sum(t => t.Amount);
-                        var progressbarWidth = Math.Min(100, spent / category.Budget * 100);
-
-                        <div id="category_@category.Id" class="category"
-                             data-id="@category.Id"
-                             data-name="@Html.Encode(category.Name)"
-                             data-budget="@category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
-                             data-groupid="@category.GroupId">
-                            <div class="border-container">
-                                <div class="content">
-                                    <div class="category-body">
-                                        <div>@Html.Encode(category.Name)</div>
-                                        <div class="ms-auto">Balance: @(spent.ToString("C2", Model.Culture)) / @category.Budget.ToString("C2", Model.Culture)</div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
+<div class="flip-container">
+    <div id="flip-container-inner" class="flip-container-inner">
+        <div class="flip-content">
+            <div class="flip-scroll-container">
+                <div class="flip-content-container">
+                    <div class="dashboard border">
+                        <div class="dashboard-container">
+                            <div class="chart-container">
+                                <canvas id="chart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                                        data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                                </canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h1 class="text-center">My Budget</h1>
+                                <h4 class="text-center">February 2024</h4>
+                                <div class="statistics mt-4">
+                                    <h5 class="text-center">Total Overspending: @overspending.ToString("C2", Model.Culture) </h5>
+                                    <h5 class="text-center">Sentiment Turnover Rate: @sentimentTurnOverRate.ToString("P2")</h5>
+                                    <h5 class="text-center">Necessity Turnover Rate: @necessityTurnOverRate.ToString("P2")</h5>
                                 </div>
-                                <div class="border-animation"></div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart2" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                                        data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                                </canvas>
                             </div>
                         </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
+                    </div>
 
-    <div class="accordion my-2" id="group_2" data-id="2">
-        <div class="accordion-item">
-            <div id="accordion-head-expenses" class="accordion-head d-flex">
-                <h5 class="accordion-header me-auto" id="accordionExpensesHeader">
-                    Expenses
-                </h5>
-                <h5 class="accordion-header">
-                    @expensesTotal.ToString("C2", Model.Culture) / @expensesBudget.ToString("C2", Model.Culture)
-                </h5>
-                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
-                <div class="accordion-caret rotate"></div>
-            </div>
-            <div id="collapseExpenses" class="accordion-collapse collapse show" aria-labelledby="accordionExpensesHeader">
-                <div class="accordion-body">
-                    @foreach (var group in expensesPerCategory)
-                    {
-                        var progressbarWidth = Math.Min(100, group.sumOfTransactions / group.category.Budget * 100);
-                        var cutOffDate = DateTime.UtcNow.AddDays(-14);
-                        var reevaluatableTransactions = group.category.Transactions.Where(t => !t.Evaluated).Where(t => t.DateTime < cutOffDate).ToArray();
+                    <div class="accordion my-2" id="group_1" data-id="1">
+                        <div class="accordion-item">
+                            <div id="accordion-head-income" class="accordion-head d-flex">
+                                <h5 class="accordion-header me-auto" id="accordionIncomeHeader">
+                                    Income
+                                </h5>
+                                <h5 class="accordion-header">
+                                    @incomeTotal.ToString("C2", Model.Culture) / @incomeBudget.ToString("C2", Model.Culture)
+                                </h5>
+                                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                                <div class="accordion-caret rotate"></div>
+                            </div>
+                            <div id="collapseIncome" class="accordion-collapse collapse show" aria-labelledby="accordionIncomeHeader">
+                                <div class="accordion-body">
+                                    @foreach (var category in Model.PageModel.Income)
+                                    {
+                                        var spent = @category.Transactions.Sum(t => t.Amount);
+                                        var progressbarWidth = Math.Min(100, spent / category.Budget * 100);
 
-                        var color = progressbarWidth < 50 ? "bg-success" : progressbarWidth < 85 ? "bg-warning" : "bg-danger";
-
-                        <div id="category_@group.category.Id" class="category"
-                             data-id="@group.category.Id"
-                             data-name="@Html.Encode(group.category.Name)"
-                             data-budget="@group.category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
-                             data-groupid="@group.category.GroupId">
-                            <div class="border-container">
-                                <div class="content">
-                                    <div class="category-body">
-                                        @if (reevaluatableTransactions.Length > 0)
-                                        {
-                                            <div>@Html.Encode(group.category.Name)</div>
-                                            <svg class="ms-2 me-auto" width="30" height="30" viewBox="0 0 31.999992 32.000019">
-                                                <g id="layer1" transform="matrix(2.5250218,0,0,2.5250218,-260.90966,-387.06062)">
-                                                    <g data-name="Layer 3" id="Layer_3" transform="matrix(0.00645325,0,0,0.00645325,100.67545,155.38824)">
-                                                        <circle fill="#ffc500"
-                                                                cx="1025"
-                                                                cy="1025"
-                                                                r="613.70001"
-                                                                id="circle1" /><path fill="#ff9f1e"
-                                                                                     d="m 1068.5,1551.8 c -339,0 -613.7,-274.8 -613.7,-613.7 A 613.5,613.5 0 0 1 499.2,708.3 610.7,610.7 0 0 0 411.3,1025 c 0,338.9 274.8,613.7 613.7,613.7 257.7,0 478.3,-158.8 569.2,-383.9 -107.4,178 -302.7,297 -525.7,297 z"
-                                                                                     id="path1" /><ellipse fill="#00305f"
-                                                                                                           cx="773.90002"
-                                                                                                           cy="896.29999"
-                                                                                                           rx="94.900002"
-                                                                                                           ry="60.200001"
-                                                                                                           transform="rotate(-87.5,774.17572,896.35979)"
-                                                                                                           id="ellipse1" /><circle fill="#00305f"
-                                                                                                                                   id="circle2"
-                                                                                                                                   cx="0"
-                                                                                                                                   cy="0"
-                                                                                                                                   r="0" />
-                                                        <ellipse fill="#00305f"
-                                                                 cx="1276.1"
-                                                                 cy="896.29999"
-                                                                 rx="60.200001"
-                                                                 ry="94.900002"
-                                                                 transform="rotate(-2.5,1266.6633,891.93327)"
-                                                                 id="ellipse2" /><circle fill="#00305f"
-                                                                                         id="circle3"
-                                                                                         cx="0"
-                                                                                         cy="0"
-                                                                                         r="0" />
-                                                        <path fill="#ffe059"
-                                                              d="m 1025,411.3 a 610.4,610.4 0 0 0 -365.1,120.4 706.9,706.9 0 0 1 453.2,-18.9 27.8,27.8 0 0 0 -3.3,5.1 c -18.2,33.9 18.9,89.1 82.7,123.3 63.8,34.2 130.4,34.6 148.6,0.8 a 38.6,38.6 0 0 0 3.7,-10.5 c 165.2,128 271.9,328.1 272.9,553.1 a 613.3,613.3 0 0 0 21,-159.6 c 0,-338.9 -274.8,-613.7 -613.7,-613.7 z"
-                                                              id="path3" /><ellipse fill="#ffe059"
-                                                                                    cx="1339.4"
-                                                                                    cy="698.79999"
-                                                                                    rx="30.799999"
-                                                                                    ry="52.799999"
-                                                                                    transform="rotate(-79,1338.4579,699.0109)"
-                                                                                    id="ellipse3" /><ellipse fill="#ffe059"
-                                                                                                             cx="1235.1"
-                                                                                                             cy="718.70001"
-                                                                                                             rx="17.200001"
-                                                                                                             ry="25"
-                                                                                                             transform="rotate(-60,1235.1003,718.74352)"
-                                                                                                             id="ellipse4" /><path fill="#00305f"
-                                                                                                                                   d="m 1296.4,1314.5 a 29.7,29.7 0 0 1 -23,-10.7 c -32.3,-38.4 -70,-68.5 -112,-89.5 -42,-21 -88.8,-32.4 -136,-32.4 -91.6,0 -178.2,41.6 -243.9,117.1 a 30.018536,30.018536 0 0 1 -45.3,-39.4 c 37.5,-43 81,-76.8 129.5,-100.5 a 361.4,361.4 0 0 1 322.6,1.6 c 49.3,24.7 93.4,59.8 131,104.5 a 29.9,29.9 0 0 1 -22.9,49.3 z"
-                                                                                                                                   id="path4" />
-                                                    </g><g data-name="Layer 3"
-                                                           id="Layer_3-3"
-                                                           transform="matrix(0.00645325,0,0,0.00645325,105.42788,150.6358)">
-                                                        <circle fill="#ffc500"
-                                                                cx="1025"
-                                                                cy="1025"
-                                                                r="613.70001"
-                                                                id="circle1-6" /><path fill="#ff9f1e"
-                                                                                       d="m 1068.5,1551.8 c -339,0 -613.7,-274.8 -613.7,-613.7 A 613.5,613.5 0 0 1 499.2,708.3 610.7,610.7 0 0 0 411.3,1025 c 0,338.9 274.8,613.7 613.7,613.7 257.7,0 478.3,-158.8 569.2,-383.9 -107.4,178 -302.7,297 -525.7,297 z"
-                                                                                       id="path1-6" /><path fill="#ffe059"
-                                                                                                            d="m 1025,411.3 a 610.4,610.4 0 0 0 -365.1,120.4 706.9,706.9 0 0 1 453.2,-18.9 27.8,27.8 0 0 0 -3.3,5.1 c -18.2,33.9 18.9,89.1 82.7,123.3 63.8,34.2 130.4,34.6 148.6,0.8 a 38.6,38.6 0 0 0 3.7,-10.5 c 165.2,128 271.9,328.1 272.9,553.1 a 613.3,613.3 0 0 0 21,-159.6 c 0,-338.9 -274.8,-613.7 -613.7,-613.7 z"
-                                                                                                            id="path2" /><ellipse fill="#ffe059"
-                                                                                                                                  cx="1339.4"
-                                                                                                                                  cy="698.79999"
-                                                                                                                                  rx="30.799999"
-                                                                                                                                  ry="52.799999"
-                                                                                                                                  transform="rotate(-79,1338.4579,699.0109)"
-                                                                                                                                  id="ellipse2-2" /><ellipse fill="#ffe059"
-                                                                                                                                                             cx="1235.1"
-                                                                                                                                                             cy="718.70001"
-                                                                                                                                                             rx="17.200001"
-                                                                                                                                                             ry="25"
-                                                                                                                                                             transform="rotate(-60,1235.1003,718.74352)"
-                                                                                                                                                             id="ellipse3-1" /><path fill="#00305f"
-                                                                                                                                                                                     d="m 1146.1,883.2 a 30.6,30.6 0 0 1 -13.7,-3.2 30,30 0 0 1 -13,-40.4 c 26.2,-51.3 63.4,-79.5 104.7,-79.5 41.3,0 78.5,28.2 104.7,79.5 a 30,30 0 1 1 -53.4,27.3 c -15,-29.3 -34.2,-46.8 -51.3,-46.8 -17.1,0 -36.3,17.5 -51.3,46.8 a 29.9,29.9 0 0 1 -26.7,16.3 z"
-                                                                                                                                                                                     id="path3-6" /><path fill="#00305f"
-                                                                                                                                                                                                          d="m 903.9,883.2 a 29.9,29.9 0 0 1 -26.7,-16.3 c -15,-29.3 -34.2,-46.8 -51.3,-46.8 -17.1,0 -36.3,17.5 -51.3,46.8 a 30,30 0 1 1 -53.4,-27.3 c 26.2,-51.3 63.4,-79.5 104.7,-79.5 41.3,0 78.5,28.2 104.7,79.5 a 30,30 0 0 1 -13,40.4 30.6,30.6 0 0 1 -13.7,3.2 z"
-                                                                                                                                                                                                          id="path4-3" /><path fill="#00305f"
-                                                                                                                                                                                                                               d="m 863.1,1280.8 a 29.4,29.4 0 0 1 -15.8,-4.5 29.9,29.9 0 0 1 -9.6,-41.3 89.9,89.9 0 0 0 13.4,-47.4 88.9,88.9 0 0 0 -16.9,-52.5 30.004166,30.004166 0 0 1 48.6,-35.2 150.2,150.2 0 0 1 5.8,166.8 30.1,30.1 0 0 1 -25.5,14.1 z"
-                                                                                                                                                                                                                               id="path5" /><path fill="#00305f"
-                                                                                                                                                                                                                                                  d="m 1186.9,1280.8 a 30.1,30.1 0 0 1 -25.5,-14.1 150.2,150.2 0 0 1 5.8,-166.8 30.004166,30.004166 0 1 1 48.6,35.2 88.9,88.9 0 0 0 -16.9,52.5 89.9,89.9 0 0 0 13.4,47.4 29.9,29.9 0 0 1 -9.6,41.3 29.4,29.4 0 0 1 -15.8,4.5 z"
-                                                                                                                                                                                                                                                  id="path6" /><path fill="#00305f"
-                                                                                                                                                                                                                                                                     d="m 1025,1247.3 a 293.2,293.2 0 0 1 -135.5,-33.1 30,30 0 1 1 27.6,-53.2 234.3,234.3 0 0 0 215.8,0 c 46.2,-19.3 34.3,19.6 27.6,53.2 a 293.2,293.2 0 0 1 -135.5,33.1 z"
-                                                                                                                                                                                                                                                                     id="path7" />
-                                                    </g>
-                                                </g>
-                                            </svg>
-                                        }
-                                        else
-                                        {
-                                            <div class="me-auto">@Html.Encode(group.category.Name)</div>
-                                        }
-                                        @if (group.sumOfTransactions > group.category.Budget)
-                                        {
-                                            <div class="me-3">Overspending: @((group.sumOfTransactions - group.category.Budget).ToString("C2", Model.Culture))</div>
-                                        }
-                                        <div>Balance: @group.sumOfTransactions.ToString("C2", Model.Culture) / @group.category.Budget.ToString("C2", Model.Culture)</div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated @color" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
+                                        <div id="category_@category.Id" class="category"
+                                             data-id="@category.Id"
+                                             data-name="@Html.Encode(category.Name)"
+                                             data-budget="@category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
+                                             data-groupid="@category.GroupId">
+                                            <div class="border-container">
+                                                <div class="content">
+                                                    <div class="category-body">
+                                                        <div>@Html.Encode(category.Name)</div>
+                                                        <div class="ms-auto">Balance: @(spent.ToString("C2", Model.Culture)) / @category.Budget.ToString("C2", Model.Culture)</div>
+                                                    </div>
+                                                    <div class="progress">
+                                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="border-animation"></div>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
-                                <div class="border-animation"></div>
                             </div>
                         </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
+                    </div>
 
-    <div class="accordion my-2" id="group_3" data-id="3">
-        <div class="accordion-item">
-            <div id="accordion-head-savings" class="accordion-head d-flex">
-                <h5 class="accordion-header me-auto" id="accordionSavingsHeader">
-                    Savings
-                </h5>
-                <h5 class="accordion-header">
-                    @Model.PageModel.Savings.Sum(c => c.Transactions.Sum(t => t.Amount)).ToString("C2", Model.Culture) / @Model.PageModel.Savings.Sum(c => c.Budget).ToString("C2", Model.Culture)
-                </h5>
-                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
-                <div class="accordion-caret rotate"></div>
-            </div>
-            <div id="collapseSavings" class="accordion-collapse collapse show" aria-labelledby="accordionSavingsHeader">
-                <div class="accordion-body">
-                    @foreach (var category in Model.PageModel.Savings)
-                    {
-                        var sumTransactions = category.Transactions.Sum(t => t.Amount);
-                        <div class="category" id="category_@category.Id"
-                             data-id="@category.Id"
-                             data-name="@Html.Encode(category.Name)"
-                             data-budget="@category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
-                             data-groupid="@category.GroupId">
-                            <div class="border-container">
-                                <div class="content">
-                                    <div class="category-body">
-                                        <div>@Html.Encode(category.Name)</div>
-                                        <div class="ms-auto">Balance: @sumTransactions.ToString("C2", Model.Culture)  / @category.Budget.ToString("C2", Model.Culture)</div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
+                    <div class="accordion my-2" id="group_2" data-id="2">
+                        <div class="accordion-item">
+                            <div id="accordion-head-expenses" class="accordion-head d-flex">
+                                <h5 class="accordion-header me-auto" id="accordionExpensesHeader">
+                                    Expenses
+                                </h5>
+                                <h5 class="accordion-header">
+                                    @expensesTotal.ToString("C2", Model.Culture) / @expensesBudget.ToString("C2", Model.Culture)
+                                </h5>
+                                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                                <div class="accordion-caret rotate"></div>
+                            </div>
+                            <div id="collapseExpenses" class="accordion-collapse collapse show" aria-labelledby="accordionExpensesHeader">
+                                <div class="accordion-body">
+                                    @foreach (var group in expensesPerCategory)
+                                    {
+                                        var progressbarWidth = Math.Min(100, group.sumOfTransactions / group.category.Budget * 100);
+                                        var cutOffDate = DateTime.UtcNow.AddDays(-14);
+                                        var reevaluatableTransactions = group.category.Transactions.Where(t => !t.Evaluated).Where(t => t.DateTime < cutOffDate).ToArray();
+
+                                        var color = progressbarWidth < 50 ? "bg-success" : progressbarWidth < 85 ? "bg-warning" : "bg-danger";
+
+                                        <div id="category_@group.category.Id" class="category"
+                                             data-id="@group.category.Id"
+                                             data-name="@Html.Encode(group.category.Name)"
+                                             data-budget="@group.category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
+                                             data-groupid="@group.category.GroupId">
+                                            <div class="border-container">
+                                                <div class="content">
+                                                    <div class="category-body">
+                                                        @if (reevaluatableTransactions.Length > 0)
+                                                        {
+                                                            <div>@Html.Encode(group.category.Name)</div>
+                                                            <svg class="ms-2 me-auto" width="30" height="30" viewBox="0 0 31.999992 32.000019">
+                                                                <g id="layer1" transform="matrix(2.5250218,0,0,2.5250218,-260.90966,-387.06062)">
+                                                                    <g data-name="Layer 3" id="Layer_3" transform="matrix(0.00645325,0,0,0.00645325,100.67545,155.38824)">
+                                                                        <circle fill="#ffc500"
+                                                                                cx="1025"
+                                                                                cy="1025"
+                                                                                r="613.70001"
+                                                                                id="circle1" /><path fill="#ff9f1e"
+                                                                                                     d="m 1068.5,1551.8 c -339,0 -613.7,-274.8 -613.7,-613.7 A 613.5,613.5 0 0 1 499.2,708.3 610.7,610.7 0 0 0 411.3,1025 c 0,338.9 274.8,613.7 613.7,613.7 257.7,0 478.3,-158.8 569.2,-383.9 -107.4,178 -302.7,297 -525.7,297 z"
+                                                                                                     id="path1" /><ellipse fill="#00305f"
+                                                                                                                           cx="773.90002"
+                                                                                                                           cy="896.29999"
+                                                                                                                           rx="94.900002"
+                                                                                                                           ry="60.200001"
+                                                                                                                           transform="rotate(-87.5,774.17572,896.35979)"
+                                                                                                                           id="ellipse1" /><circle fill="#00305f"
+                                                                                                                                                   id="circle2"
+                                                                                                                                                   cx="0"
+                                                                                                                                                   cy="0"
+                                                                                                                                                   r="0" />
+                                                                        <ellipse fill="#00305f"
+                                                                                 cx="1276.1"
+                                                                                 cy="896.29999"
+                                                                                 rx="60.200001"
+                                                                                 ry="94.900002"
+                                                                                 transform="rotate(-2.5,1266.6633,891.93327)"
+                                                                                 id="ellipse2" /><circle fill="#00305f"
+                                                                                                         id="circle3"
+                                                                                                         cx="0"
+                                                                                                         cy="0"
+                                                                                                         r="0" />
+                                                                        <path fill="#ffe059"
+                                                                              d="m 1025,411.3 a 610.4,610.4 0 0 0 -365.1,120.4 706.9,706.9 0 0 1 453.2,-18.9 27.8,27.8 0 0 0 -3.3,5.1 c -18.2,33.9 18.9,89.1 82.7,123.3 63.8,34.2 130.4,34.6 148.6,0.8 a 38.6,38.6 0 0 0 3.7,-10.5 c 165.2,128 271.9,328.1 272.9,553.1 a 613.3,613.3 0 0 0 21,-159.6 c 0,-338.9 -274.8,-613.7 -613.7,-613.7 z"
+                                                                              id="path3" /><ellipse fill="#ffe059"
+                                                                                                    cx="1339.4"
+                                                                                                    cy="698.79999"
+                                                                                                    rx="30.799999"
+                                                                                                    ry="52.799999"
+                                                                                                    transform="rotate(-79,1338.4579,699.0109)"
+                                                                                                    id="ellipse3" /><ellipse fill="#ffe059"
+                                                                                                                             cx="1235.1"
+                                                                                                                             cy="718.70001"
+                                                                                                                             rx="17.200001"
+                                                                                                                             ry="25"
+                                                                                                                             transform="rotate(-60,1235.1003,718.74352)"
+                                                                                                                             id="ellipse4" /><path fill="#00305f"
+                                                                                                                                                   d="m 1296.4,1314.5 a 29.7,29.7 0 0 1 -23,-10.7 c -32.3,-38.4 -70,-68.5 -112,-89.5 -42,-21 -88.8,-32.4 -136,-32.4 -91.6,0 -178.2,41.6 -243.9,117.1 a 30.018536,30.018536 0 0 1 -45.3,-39.4 c 37.5,-43 81,-76.8 129.5,-100.5 a 361.4,361.4 0 0 1 322.6,1.6 c 49.3,24.7 93.4,59.8 131,104.5 a 29.9,29.9 0 0 1 -22.9,49.3 z"
+                                                                                                                                                   id="path4" />
+                                                                    </g><g data-name="Layer 3"
+                                                                           id="Layer_3-3"
+                                                                           transform="matrix(0.00645325,0,0,0.00645325,105.42788,150.6358)">
+                                                                        <circle fill="#ffc500"
+                                                                                cx="1025"
+                                                                                cy="1025"
+                                                                                r="613.70001"
+                                                                                id="circle1-6" /><path fill="#ff9f1e"
+                                                                                                       d="m 1068.5,1551.8 c -339,0 -613.7,-274.8 -613.7,-613.7 A 613.5,613.5 0 0 1 499.2,708.3 610.7,610.7 0 0 0 411.3,1025 c 0,338.9 274.8,613.7 613.7,613.7 257.7,0 478.3,-158.8 569.2,-383.9 -107.4,178 -302.7,297 -525.7,297 z"
+                                                                                                       id="path1-6" /><path fill="#ffe059"
+                                                                                                                            d="m 1025,411.3 a 610.4,610.4 0 0 0 -365.1,120.4 706.9,706.9 0 0 1 453.2,-18.9 27.8,27.8 0 0 0 -3.3,5.1 c -18.2,33.9 18.9,89.1 82.7,123.3 63.8,34.2 130.4,34.6 148.6,0.8 a 38.6,38.6 0 0 0 3.7,-10.5 c 165.2,128 271.9,328.1 272.9,553.1 a 613.3,613.3 0 0 0 21,-159.6 c 0,-338.9 -274.8,-613.7 -613.7,-613.7 z"
+                                                                                                                            id="path2" /><ellipse fill="#ffe059"
+                                                                                                                                                  cx="1339.4"
+                                                                                                                                                  cy="698.79999"
+                                                                                                                                                  rx="30.799999"
+                                                                                                                                                  ry="52.799999"
+                                                                                                                                                  transform="rotate(-79,1338.4579,699.0109)"
+                                                                                                                                                  id="ellipse2-2" /><ellipse fill="#ffe059"
+                                                                                                                                                                             cx="1235.1"
+                                                                                                                                                                             cy="718.70001"
+                                                                                                                                                                             rx="17.200001"
+                                                                                                                                                                             ry="25"
+                                                                                                                                                                             transform="rotate(-60,1235.1003,718.74352)"
+                                                                                                                                                                             id="ellipse3-1" /><path fill="#00305f"
+                                                                                                                                                                                                     d="m 1146.1,883.2 a 30.6,30.6 0 0 1 -13.7,-3.2 30,30 0 0 1 -13,-40.4 c 26.2,-51.3 63.4,-79.5 104.7,-79.5 41.3,0 78.5,28.2 104.7,79.5 a 30,30 0 1 1 -53.4,27.3 c -15,-29.3 -34.2,-46.8 -51.3,-46.8 -17.1,0 -36.3,17.5 -51.3,46.8 a 29.9,29.9 0 0 1 -26.7,16.3 z"
+                                                                                                                                                                                                     id="path3-6" /><path fill="#00305f"
+                                                                                                                                                                                                                          d="m 903.9,883.2 a 29.9,29.9 0 0 1 -26.7,-16.3 c -15,-29.3 -34.2,-46.8 -51.3,-46.8 -17.1,0 -36.3,17.5 -51.3,46.8 a 30,30 0 1 1 -53.4,-27.3 c 26.2,-51.3 63.4,-79.5 104.7,-79.5 41.3,0 78.5,28.2 104.7,79.5 a 30,30 0 0 1 -13,40.4 30.6,30.6 0 0 1 -13.7,3.2 z"
+                                                                                                                                                                                                                          id="path4-3" /><path fill="#00305f"
+                                                                                                                                                                                                                                               d="m 863.1,1280.8 a 29.4,29.4 0 0 1 -15.8,-4.5 29.9,29.9 0 0 1 -9.6,-41.3 89.9,89.9 0 0 0 13.4,-47.4 88.9,88.9 0 0 0 -16.9,-52.5 30.004166,30.004166 0 0 1 48.6,-35.2 150.2,150.2 0 0 1 5.8,166.8 30.1,30.1 0 0 1 -25.5,14.1 z"
+                                                                                                                                                                                                                                               id="path5" /><path fill="#00305f"
+                                                                                                                                                                                                                                                                  d="m 1186.9,1280.8 a 30.1,30.1 0 0 1 -25.5,-14.1 150.2,150.2 0 0 1 5.8,-166.8 30.004166,30.004166 0 1 1 48.6,35.2 88.9,88.9 0 0 0 -16.9,52.5 89.9,89.9 0 0 0 13.4,47.4 29.9,29.9 0 0 1 -9.6,41.3 29.4,29.4 0 0 1 -15.8,4.5 z"
+                                                                                                                                                                                                                                                                  id="path6" /><path fill="#00305f"
+                                                                                                                                                                                                                                                                                     d="m 1025,1247.3 a 293.2,293.2 0 0 1 -135.5,-33.1 30,30 0 1 1 27.6,-53.2 234.3,234.3 0 0 0 215.8,0 c 46.2,-19.3 34.3,19.6 27.6,53.2 a 293.2,293.2 0 0 1 -135.5,33.1 z"
+                                                                                                                                                                                                                                                                                     id="path7" />
+                                                                    </g>
+                                                                </g>
+                                                            </svg>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="me-auto">@Html.Encode(group.category.Name)</div>
+                                                        }
+                                                        @if (group.sumOfTransactions > group.category.Budget)
+                                                        {
+                                                            <div class="me-3">Overspending: @((group.sumOfTransactions - group.category.Budget).ToString("C2", Model.Culture))</div>
+                                                        }
+                                                        <div>Balance: @group.sumOfTransactions.ToString("C2", Model.Culture) / @group.category.Budget.ToString("C2", Model.Culture)</div>
+                                                    </div>
+                                                    <div class="progress">
+                                                        <div class="progress-bar progress-bar-striped progress-bar-animated @color" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="border-animation"></div>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
-                                <div class="border-animation"></div>
                             </div>
                         </div>
-                    }
+                    </div>
+
+                    <div class="accordion my-2" id="group_3" data-id="3">
+                        <div class="accordion-item">
+                            <div id="accordion-head-savings" class="accordion-head d-flex">
+                                <h5 class="accordion-header me-auto" id="accordionSavingsHeader">
+                                    Savings
+                                </h5>
+                                <h5 class="accordion-header">
+                                    @Model.PageModel.Savings.Sum(c => c.Transactions.Sum(t => t.Amount)).ToString("C2", Model.Culture) / @Model.PageModel.Savings.Sum(c => c.Budget).ToString("C2", Model.Culture)
+                                </h5>
+                                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                                <div class="accordion-caret rotate"></div>
+                            </div>
+                            <div id="collapseSavings" class="accordion-collapse collapse show" aria-labelledby="accordionSavingsHeader">
+                                <div class="accordion-body">
+                                    @foreach (var category in Model.PageModel.Savings)
+                                    {
+                                        var sumTransactions = category.Transactions.Sum(t => t.Amount);
+                                        <div class="category" id="category_@category.Id"
+                                             data-id="@category.Id"
+                                             data-name="@Html.Encode(category.Name)"
+                                             data-budget="@category.Budget.ToString("F2", CultureInfo.InvariantCulture)"
+                                             data-groupid="@category.GroupId">
+                                            <div class="border-container">
+                                                <div class="content">
+                                                    <div class="category-body">
+                                                        <div>@Html.Encode(category.Name)</div>
+                                                        <div class="ms-auto">Balance: @sumTransactions.ToString("C2", Model.Culture)  / @category.Budget.ToString("C2", Model.Culture)</div>
+                                                    </div>
+                                                    <div class="progress">
+                                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="border-animation"></div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="flip-content-back">
+            <div class="reevaluation border">
+                <h1>Reevaluate Transactions</h1>
+            </div>
+        </div>
     </div>
-</section>
+</div>
+
+
 
 @await Html.PartialAsync("_IndexModals", Model.PageModel.Category)
 @await Html.PartialAsync("_CategoryModals", Model.PageModel.Transaction)

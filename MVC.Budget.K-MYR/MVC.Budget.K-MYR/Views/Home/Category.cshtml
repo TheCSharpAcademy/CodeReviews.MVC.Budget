@@ -101,8 +101,8 @@
                                 <div class="content">
                                     <div class="category-body">
                                         <div>@Html.Encode(transaction.Title)</div>
-                                        <div class="ms-auto me-3">@transaction.DateTime.ToShortDateString()</div>
-                                        <div>@transaction.Amount.ToString("C2", Model.Culture)</div>
+                                        <div class="transaction-date">@transaction.DateTime.ToShortDateString()</div>
+                                        <div class="transaction-value">@transaction.Amount.ToString("C2", Model.Culture)</div>
                                     </div>
                                 </div>
                                 <div class="border-animation"></div>

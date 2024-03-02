@@ -5,6 +5,7 @@ const sidebar = document.getElementById("sidebar");
 const updateCategoryModal = $("#update-category-modal");
 const addCategoryModal = $("#add-category-modal");
 const addTransactionModal = $("#add-transaction-modal");
+const flipContainer = document.getElementById("flip-container-inner");
 Chart.defaults.color = '#ffffff';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -74,11 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         else {
             $(this).next().collapse('toggle');
             var caret = $('.accordion-caret', this)[0];
-            if (caret.classList.contains("rotate")) {
-                caret.classList.remove("rotate");
-            } else {
-                caret.classList.add("rotate");
-            }
+            caret.classList.toggle("rotate");           
         }
     });
 
@@ -163,6 +160,10 @@ document.addEventListener("DOMContentLoaded", () => {
         var id = menu.dataset.category;    
         window.location.href = "Category/" + id;
     };
+
+    $('#reevaluation-button').on("click", function () {
+        flipContainer.classList.toggle("flip");
+    });
 });
 
 async function addTransaction(data) {

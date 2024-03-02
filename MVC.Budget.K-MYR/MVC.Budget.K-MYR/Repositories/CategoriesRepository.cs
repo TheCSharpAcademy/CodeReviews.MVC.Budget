@@ -18,7 +18,7 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                 .SingleOrDefaultAsync(c => c.Id == id);
     }
 
-    public async Task<IEnumerable<Category>> GetCategoryWithFilteredTransactionsAsync(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>,
+    public async Task<List<Category>> GetCategoriesWithFilteredTransactionsAsync(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>,
                                                 IOrderedQueryable<Category>>? orderBy = null,
                                                 Expression<Func<Category,
                                                 IOrderedEnumerable<Transaction>>>? filterTransactions = null)
