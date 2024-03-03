@@ -39,8 +39,8 @@ public class CategoriesController : ControllerBase
 
         return Ok(await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
                 c => c.GroupId == 2,
-                q => q.OrderBy(t => t.Name),
-                c => c.Transactions.Where(t => t.Evaluated != false && t.DateTime < cutoffDate)
+                q => q.OrderBy(c => c.Name),
+                c => c.Transactions.Where(t => t.Evaluated == false && t.DateTime < cutoffDate)
                     .OrderByDescending(d => d.DateTime)));
     }
 

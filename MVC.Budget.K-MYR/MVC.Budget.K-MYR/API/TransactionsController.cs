@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
@@ -77,8 +78,8 @@ public class TransactionsController : ControllerBase
         entity.DateTime = transaction.DateTime;
         entity.CategoryId = transaction.CategoryId;
         entity.Evaluated = transaction.Evaluated;
-        entity.EvaluatedIsNecessary = transaction.EvaluatedIsNecessary;
-        entity.EvaluatedIsHappy = transaction.EvaluatedIsHappy;
+        entity.PreviousIsNecessary = transaction.PreviousIsNecessary;
+        entity.PreviousIsHappy = transaction.PreviousIsHappy;
 
         try
         {
@@ -88,6 +89,60 @@ public class TransactionsController : ControllerBase
         }
 
         catch (DbUpdateConcurrencyException) when (!TransactionExists(entity.Id))
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpPatch("{id}")]
+    public async Task<ActionResult> PatchTransaction([FromRoute] int id, [FromBody] JsonPatchDocument<TransactionPut> patchDoc)
+    {
+        if (patchDoc is null)
+            return BadRequest();
+
+        var transaction = await _unitOfWork.TransactionsRepository.GetByIDAsync(id);
+
+        if (transaction is null)
+            return NotFound();
+
+        TransactionPut transactionToPatch = new()
+        {
+            Id = transaction.Id,
+            CategoryId = transaction.CategoryId,
+            Title = transaction.Title,
+            Description = transaction.Description,
+            DateTime = transaction.DateTime,
+            Amount = transaction.Amount,
+            IsHappy = transaction.IsHappy,
+            IsNecessary = transaction.IsNecessary,
+            PreviousIsNecessary = transaction.PreviousIsNecessary,
+            PreviousIsHappy = transaction.PreviousIsHappy,
+            Evaluated = transaction.Evaluated
+        };
+
+        patchDoc.ApplyTo(transactionToPatch, ModelState);
+
+        if (!ModelState.IsValid)
+            return BadRequest();
+
+        transaction.Id = transactionToPatch.Id;
+        transaction.Title = transactionToPatch.Title;
+        transaction.Description = transactionToPatch.Description;
+        transaction.DateTime = transactionToPatch.DateTime;
+        transaction.Amount = transactionToPatch.Amount;
+        transaction.IsHappy = transactionToPatch.IsHappy;
+        transaction.IsNecessary = transactionToPatch.IsNecessary;
+        transaction.Evaluated = transactionToPatch.Evaluated;
+        transaction.PreviousIsHappy = transactionToPatch.PreviousIsHappy;
+        transaction.PreviousIsNecessary = transactionToPatch.PreviousIsNecessary;
+        
+
+        try
+        {
+            await _unitOfWork.Save();
+            return NoContent();
+        }
+        catch (DbUpdateConcurrencyException) when (!TransactionExists(transaction.Id))
         {
             return NotFound();
         }

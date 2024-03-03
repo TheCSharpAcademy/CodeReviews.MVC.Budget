@@ -50,10 +50,15 @@ namespace MVC.Budget.K_MYR.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(19,4)", precision: 19, scale: 4, nullable: false),
+                    IsHappy = table.Column<bool>(type: "bit", nullable: false),
+                    IsNecessary = table.Column<bool>(type: "bit", nullable: false),
+                    Evaluated = table.Column<bool>(type: "bit", nullable: false),
+                    PreviousIsHappy = table.Column<bool>(type: "bit", nullable: false),
+                    PreviousIsNecessary = table.Column<bool>(type: "bit", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

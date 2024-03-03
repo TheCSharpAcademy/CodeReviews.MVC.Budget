@@ -4493,8 +4493,8 @@ textarea.form-control-lg {
   --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
   --bs-accordion-btn-focus-border-color: #818281;
   --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(2, 4, 3, 0.25);
-  --bs-accordion-body-padding-x: 1.25rem;
-  --bs-accordion-body-padding-y: 1rem;
+  --bs-accordion-body-padding-x: 10px;
+  --bs-accordion-body-padding-y: 8px;
   --bs-accordion-active-color: white;
   --bs-accordion-active-bg: #1c1c1c;
 }
@@ -11907,6 +11907,7 @@ textarea.form-control-lg {
 }
 body {
   color: white;
+  overflow: hidden;
 }
 
 .form-control {
@@ -11926,6 +11927,14 @@ body {
 ::-webkit-scrollbar-thumb {
   background: white;
   border-radius: 5px;
+}
+
+.iconRadioButton {
+  display: none;
+}
+
+.iconRadioButton:checked + label {
+  box-shadow: white 0 0 0px 2px;
 }
 
 .navbar {
@@ -12134,6 +12143,49 @@ body {
   border-radius: var(--bs-border-radius);
   background-color: #1c1c1c;
   margin-top: 10px;
+  padding: 10px;
+}
+
+.transaction-body {
+  min-height: 35px;
+  background-color: #1c1c1c;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+
+.reevalIcon {
+  width: 40px;
+  height: 40px;
+}
+
+.reevalIconNecessity {
+  width: 25px;
+  height: 25px;
+}
+
+.reevalIconLabel {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.reevalIconContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reeval-submit-button {
+  background-color: transparent;
+  border: none;
+}
+
+.reeval-submit-svg {
+  stroke: white;
+  fill: transparent;
 }
 
 .dashboard {
@@ -12157,7 +12209,7 @@ body {
 }
 
 .accordion-header {
-  padding: 7px 5px 5px 10px;
+  padding: 5px 5px 5px 10px;
 }
 
 .accordion-caret {
@@ -12197,6 +12249,7 @@ body {
   min-height: 35px;
   background-color: #1c1c1c;
   display: flex;
+  align-items: center;
 }
 
 .border-animation {
@@ -12232,14 +12285,6 @@ body {
 .transaction-value {
   min-width: 80px;
   text-align: end;
-}
-
-.iconRadioButton {
-  display: none;
-}
-
-.iconRadioButton:checked + label {
-  box-shadow: 0 0 2px 2px white;
 }
 
 .form-group {

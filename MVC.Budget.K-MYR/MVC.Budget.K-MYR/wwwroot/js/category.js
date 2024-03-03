@@ -1,7 +1,17 @@
 ﻿const transactionsAPI = "https://localhost:7246/api/Transactions";
 const menu = document.getElementById('menu-container');
 const addTransactionModal = $("#add-transaction-modal");
-const updateTransactionModal = $("#update-transaction-modal");
+const updateTransactionModal = $("#updateTransaction-modal");
+const transactionModalLabel = updateTransactionModal.find("#updateTransaction-label");
+const transactionModalId = updateTransactionModal.find("#updateTransaction_id");
+const transactionModalTitle = updateTransactionModal.find("#updateTransaction_title");
+const transactionModalAmount = updateTransactionModal.find("#updateTransaction_amount");
+const transactionModalCategoryId = updateTransactionModal.find("#updateTransaction_categoryId");
+const transactionModalDateTime = updateTransactionModal.find("#updateTransaction_dateTime");
+const transactionModalEvaluated = updateTransactionModal.find("#updateTransaction_evaluated");
+const transactionModalEvaluatedIsHappy = updateTransactionModal.find("#updateTransaction_evaluatedIsHappy");
+const transactionModalEvaluatedIsNecessary = updateTransactionModal.find("#updateTransaction_evaluatedIsNecessary");
+
 
 Chart.defaults.color = '#ffffff';
 
@@ -93,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     $('.transaction').on("click", function (event) {
         if (menu.dataset.transaction != 0) {
+            console.log(`transaction_${menu.dataset.transaction}`);
             var borderBox = document.getElementById(`transaction_${menu.dataset.transaction}`).querySelector('.border-animation');
             borderBox.classList.remove('border-rotate');
         }
@@ -124,27 +135,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById('edit-menu').onclick = function () {
         var transaction = document.getElementById(`transaction_${menu.dataset.transaction}`);
-        var id = transaction.dataset.id;
-        var categoryId = transaction.dataset.categoryid;
-        var title = transaction.dataset.title;
-        var amount = transaction.dataset.amount;
-        var datetime = transaction.dataset.date;
-        var isNecessary = transaction.dataset.isnecessary;
-        var isHappy = transaction.dataset.ishappy;
-        var evaluated = transaction.dataset.evaluated;
-        var evaluatedIsNecessary = transaction.dataset.evaluatedisnecessary;
-        var evaluatedIsHappy = transaction.dataset.evaluatedishappy;
-        updateTransactionModal.find("#update-transaction-label").text(`Edit ${title}`);
-        updateTransactionModal.find("#Id").val(id);
-        updateTransactionModal.find("#Title").val(title);
-        updateTransactionModal.find("#Amount").val(amount);
-        updateTransactionModal.find("#CategoryId").val(categoryId);
-        updateTransactionModal.find("#DateTime").val(datetime);
-        updateTransactionModal.find("#Evaluated").val(evaluated);
-        updateTransactionModal.find("#EvaluatedIsHappy").val(evaluatedIsHappy);
-        updateTransactionModal.find("#EvaluatedIsNecessary").val(evaluatedIsNecessary);
-        updateTransactionModal.find(`#IsHappy${isHappy}`).prop("checked", true)
-        updateTransactionModal.find(`#IsNecessary${isNecessary}`).prop("checked", true)
+     
+        transactionModalLabel.text(`Edit ${transaction.dataset.title}`);
+        transactionModalId.val(transaction.dataset.id);
+        transactionModalCategoryId.val(transaction.dataset.categoryid);
+        transactionModalTitle.val(transaction.dataset.title);
+        transactionModalAmount.val(transaction.dataset.amount);
+        transactionModalDateTime.val(transaction.dataset.date);
+        transactionModalEvaluated.val(transaction.dataset.evaluated);
+        transactionModalEvaluatedIsHappy.val(transaction.dataset.evaluatedishappy);
+        transactionModalEvaluatedIsNecessary.val(transaction.dataset.evaluatedisnecessary);
+        updateTransactionModal.find(`#updateTransaction_isHappy${transaction.dataset.ishappy}`).prop("checked", true);
+        updateTransactionModal.find(`#updateTransaction_isNecessary${transaction.dataset.isnecessary}`).prop("checked", true);
+
         updateTransactionModal.modal('show');
     };
 });

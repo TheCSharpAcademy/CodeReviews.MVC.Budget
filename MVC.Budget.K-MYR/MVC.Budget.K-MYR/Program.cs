@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Repositories;
 using System.Globalization;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
@@ -12,8 +15,12 @@ builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddTransient<ITransactionsRepository, TransactionsRepository>();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")));
-builder.Services.AddControllersWithViews();
-
+builder.Services.AddControllersWithViews()
+     .AddNewtonsoftJson(options =>
+     {
+         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+     });
+     
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

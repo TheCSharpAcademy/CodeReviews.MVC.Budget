@@ -2,14 +2,19 @@
 const transactionsAPI = "https://localhost:7246/api/Transactions";
 const menu = document.getElementById('menu-container');
 const sidebar = document.getElementById("sidebar");
-const updateCategoryModal = $("#update-category-modal");
+const updateCategoryModal = $("#updateCategory-modal");
+const categoryModalLabel = updateCategoryModal.find("#updateCategory-label");
+const categoryModalId = updateCategoryModal.find("#updateCategory_id");
+const categoryModalName = updateCategoryModal.find("#updateCategory_name");
+const categoryModalBudget = updateCategoryModal.find("#updateCategory_budget");
+const categoryModalGroupId = updateCategoryModal.find("#updateCategory_groupId");
 const addCategoryModal = $("#add-category-modal");
 const addTransactionModal = $("#add-transaction-modal");
 const flipContainer = document.getElementById("flip-container-inner");
 Chart.defaults.color = '#ffffff';
 
 document.addEventListener("DOMContentLoaded", () => {
-    $("#country").countrySelect({        
+    $("#country").countrySelect({
         preferredCountries: []
     });
 
@@ -75,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
         else {
             $(this).next().collapse('toggle');
             var caret = $('.accordion-caret', this)[0];
-            caret.classList.toggle("rotate");           
+            caret.classList.toggle("rotate");
         }
     });
 
@@ -103,17 +108,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    $('.category').on("click", function (event) { 
+    $("#reevaluate-transaction-form").on("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+             await patchTransaction(new FormData(this));
+        }
+    });
+
+    $('.category').on("click", function (event) {
         if (menu.dataset.category != 0) {
             var borderBox = document.getElementById(`category_${menu.dataset.category}`).querySelector('.border-animation');
             borderBox.classList.remove('border-rotate');
         }
 
-        menu.dataset.category = this.dataset.id;           
+        menu.dataset.category = this.dataset.id;
         menu.style.left = `${this.style.left + event.pageX - 100}px`;
-        menu.style.top = `${event.pageY - 100}px`;   
-        menu.classList.add('active');     
-        
+        menu.style.top = `${event.pageY - 100}px`;
+        menu.classList.add('active');
+
         this.querySelector('.border-animation').classList.add('border-rotate');
     });
 
@@ -137,37 +149,41 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     document.getElementById('add-menu').onclick = function () {
-        var id = menu.dataset.category;        
-        addTransactionModal.find("#CategoryId").val(id);   
+        var id = menu.dataset.category;
+        addTransactionModal.find("#CategoryId").val(id);
         addTransactionModal.modal('show');
     };
 
-    document.getElementById('edit-menu').onclick = function () {      
+    document.getElementById('edit-menu').onclick = function () {
         var category = document.getElementById(`category_${menu.dataset.category}`);
-        var id = category.dataset.id;   
-        var groupId = category.dataset.groupid;   
-        var name = category.dataset.name;   
-        var budget = category.dataset.budget;   
-        updateCategoryModal.find("#update-category-label").text(`Edit ${name}`);
-        updateCategoryModal.find("#Id").val(id);    
-        updateCategoryModal.find("#Name").val(name);    
-        updateCategoryModal.find("#Budget").val(budget);    
-        updateCategoryModal.find("#GroupId").val(groupId); 
+
+        categoryModalLabel.text(`Edit ${category.dataset.name}`);
+        categoryModalId.val(category.dataset.id);
+        categoryModalName.val(category.dataset.name);
+        categoryModalBudget.val(category.dataset.budget);
+        categoryModalGroupId.val(category.dataset.groupid);
+
         updateCategoryModal.modal('show');
     };
 
     document.getElementById('details-menu').onclick = function () {
-        var id = menu.dataset.category;    
+        var id = menu.dataset.category;
         window.location.href = "Category/" + id;
     };
 
-    $('#reevaluation-button').on("click", function () {
-        flipContainer.classList.toggle("flip");
+    $('#reevaluation-button').on("click", async function () {
+        if (flipContainer.classList.contains("flip")) {
+            flipContainer.classList.remove("flip");
+        } else {
+            flipContainer.classList.add("flip");
+            var categories = await getFilteredCategories();
+        }
+
     });
 });
 
 async function addTransaction(data) {
-    try { 
+    try {
         var response = await fetch(`${transactionsAPI}`, {
             method: "POST",
             headers: {
@@ -185,7 +201,77 @@ async function addTransaction(data) {
         });
 
         if (response.ok) {
-            //document.querySelector(`#transactions .accordion-body`).innerHTML += createCategoryElement(await response.json());
+        } else {
+            console.error(`HTTP Post Error: ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error(error);
+    };
+}
+
+async function patchTransaction(data) {
+    try {
+        var id = parseInt(data.get("PageModel.Transaction.Id"));
+        var transaction = document.getElementById(`reeval_transaction_${id}`);   
+
+        var patchDoc =
+            [{
+                op: "replace",
+                path: "/IsHappy",
+                value: data.get("PageModel.Transaction.IsHappy") === "true" ? true : false
+            },
+            {
+                op: "replace",
+                path: "/IsNecessary",
+                value: data.get("PageModel.Transaction.IsNecessary") === "true" ? true : false
+            }, {
+                op: "replace",
+                path: "/PreviousIsHappy",
+                value: transaction.dataset.ishappy === "True" ? true : false
+            },
+            {
+                op: "replace",
+                path: "/PreviousIsNecessary",
+                value: transaction.dataset.isnecessary === "True" ? true : false
+            },
+            {
+                op: "replace",
+                path: "/Evaluated",
+                value: true
+            }];
+
+        var response = await fetch(`${transactionsAPI}/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json-patch+json"
+            },
+            body: JSON.stringify(patchDoc)
+        });
+
+        if (response.ok) {
+            document.getElementById(`reeval_transaction_${id}`).remove();
+        } else {
+            console.error(`HTTP Patch Error: ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error(error);
+    };
+}
+
+async function getFilteredCategories() {
+    try {
+        var response = await fetch(`${categoriesAPI}/filteredByEvaluation`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+
+        if (response.ok) {
+            var categories = await response.json();
+            return categories;
         } else {
             console.error(`HTTP Post Error: ${response.status}`);
         }
@@ -196,7 +282,7 @@ async function addTransaction(data) {
 }
 
 async function addCategory(data) {
-    try {   
+    try {
         var response = await fetch(`${categoriesAPI}`, {
             method: "POST",
             headers: {
@@ -209,7 +295,7 @@ async function addCategory(data) {
                 GroupId: parseInt(data.get("GroupId"))
             })
         });
-        
+
         if (response.ok) {
             document.querySelector(`#group_${data.get("GroupId")} .accordion-body`).innerHTML += createCategoryElement(await response.json());
             return true;
@@ -258,7 +344,7 @@ async function deleteCategory(id, token) {
     try {
         var response = await fetch(`${categoriesAPI}/${id}`, {
             method: "DELETE",
-            headers: {                
+            headers: {
                 "RequestVerificationToken": token
             }
         });
@@ -274,11 +360,11 @@ async function deleteCategory(id, token) {
     } catch (error) {
         console.error(error);
         return false;
-    }  
+    }
 }
 
-function createCategoryElement(category) {        
-    return  `
+function createCategoryElement(category) {
+    return `
     <div class="category border p-2">
         <div class="d-flex">
             <div>${category.name}</div>
@@ -287,5 +373,5 @@ function createCategoryElement(category) {
         <div class="progress">
             <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-    </div>`;   
+    </div>`;
 }

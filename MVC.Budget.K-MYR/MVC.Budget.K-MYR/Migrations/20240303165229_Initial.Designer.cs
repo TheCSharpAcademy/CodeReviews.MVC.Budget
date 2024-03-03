@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVC.Budget.K_MYR.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240227090738_ChangedColumnNames")]
-    partial class ChangedColumnNames
+    [Migration("20240303165229_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -89,19 +89,20 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Property<bool>("Evaluated")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("EvaluatedIsHappy")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("EvaluatedIsNecessary")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsHappy")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsNecessary")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("PreviousIsHappy")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PreviousIsNecessary")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

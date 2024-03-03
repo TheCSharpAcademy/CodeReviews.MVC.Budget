@@ -6,7 +6,7 @@ namespace MVC.Budget.K_MYR.Models;
 public class TransactionPut
 {
     public int Id { get; set; }
-    public string? Title { get; set; }
+    public string Title { get; set; }
     public string? Description { get; set; }
     [Display(Name = "Date & Time")]
     [DataType(DataType.DateTime)]
@@ -17,7 +17,7 @@ public class TransactionPut
     public bool IsHappy { get; set; }
     public bool IsNecessary { get; set; }
     public bool Evaluated { get; set; }
-    public bool EvaluatedIsHappy { get; set; }
-    public bool EvaluatedIsNecessary { get; set; }
+    public bool PreviousIsHappy { get; set; }
+    public bool PreviousIsNecessary { get; set; }
     public int CategoryId { get; set; }
 }

@@ -9,6 +9,8 @@ $accordion-bg: $secondary;
 $accordion-button-active-bg: $secondary;
 $accordion-button-active-color: white;
 $accordion-icon-active-color: white;
+$accordion-body-padding-y: 8px;
+$accordion-body-padding-x: 10px;
 
 $navbar-light-color: white;
 $navbar-light-brand-color: white;
@@ -20,6 +22,7 @@ $navbar-light-brand-color: white;
 
 body {    
     color: white;
+    overflow: hidden;
 }
 
 .form-control {
@@ -39,6 +42,14 @@ body {
 ::-webkit-scrollbar-thumb {
     background: white;
     border-radius: 5px;
+}
+
+.iconRadioButton {
+    display: none;
+}
+
+.iconRadioButton:checked + label {
+    box-shadow: white 0 0 0px 2px;
 }
 
 //Navbar
@@ -253,15 +264,59 @@ body {
     transform: rotateY(180deg);
 }
 
+// Reevaluation
+
 .reevaluation {
     height: calc(100% - 10px);
     border-radius: var(--bs-border-radius);
     background-color: $secondary;
     margin-top: 10px;
+    padding: 10px,
+}
+
+.transaction-body {
+    min-height: 35px;
+    background-color: $secondary;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.reevalIcon {
+    width: 40px;
+    height: 40px;
+}
+
+.reevalIconNecessity {
+    width: 25px;
+    height: 25px;
+}
+
+.reevalIconLabel {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+.reevalIconContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+}
+
+.reeval-submit-button {
+    background-color: transparent;
+    border: none;
+}
+
+.reeval-submit-svg {
+    stroke: white;
+    fill: transparent;
 }
 
 // Dashboard
-
 .dashboard {
     border-radius: var(--bs-border-radius);
     padding: 10px;
@@ -285,7 +340,7 @@ body {
 }
 
 .accordion-header {
-    padding: 7px 5px 5px 10px;
+    padding: 5px 5px 5px 10px;
 }
 
 .accordion-caret {
@@ -327,6 +382,7 @@ body {
     min-height: 35px;
     background-color: $secondary;
     display: flex;
+    align-items: center;
 }
 
 .border-animation {
@@ -367,14 +423,6 @@ body {
 }
 
 // Modals
-.iconRadioButton {
-   display:none;
-}
-
-.iconRadioButton:checked + label {
-    box-shadow: 0 0 2px 2px white;
-}
-
 .form-group {
     margin-top: 10px;
 }

@@ -182,39 +182,39 @@
         </div>
     </div>
 
-    <div class="modal fade" id="update-transaction-modal" tabindex="-1" aria-labelledby="update-transaction-label" aria-hidden="true">
+    <div class="modal fade" id="updateTransaction-modal" tabindex="-1" aria-labelledby="updateTransaction-label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-truncate text-center flex-grow-1" id="update-transaction-label"></h5>
+                    <h5 class="modal-title text-truncate text-center flex-grow-1" id="updateTransaction-label"></h5>
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="update-transaction-form" asp-controller="Transactions" asp-action="PutTransaction" method="PUT">
-                        <input type="hidden" asp-for="Id" value="" />
-                        <input type="hidden" asp-for="CategoryId" value="" />
-                        <input type="hidden" asp-for="Evaluated" value="" />
-                        <input type="hidden" asp-for="EvaluatedIsHappy" value="" />
-                        <input type="hidden" asp-for="EvaluatedIsNecessary" value="" />
+                        <input type="hidden" asp-for="Id" value="" id="updateTransaction_id"/>
+                        <input type="hidden" asp-for="CategoryId" value="" id="updateTransaction_categoryId" />
+                        <input type="hidden" asp-for="Evaluated" value="" id="updateTransaction_evaluated" />
+                        <input type="hidden" asp-for="PreviousIsHappy" value="" id="updateTransaction_evaluatedIsHappy" />
+                        <input type="hidden" asp-for="PreviousIsNecessary" value="" id="updateTransaction_evaluatedIsNecessary" />
                         <div class="form-group">
                             <label asp-for="Title" class="control-label"></label>
-                            <input asp-for="Title" class="form-control" />
+                            <input asp-for="Title" class="form-control" id="updateTransaction_title"/>
                             <span asp-validation-for="Title" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="DateTime" class="control-label"></label>
-                            <input asp-for="DateTime" class="form-control" value="@DateTime.UtcNow.ToString("s")" />
+                            <input asp-for="DateTime" class="form-control" value="@DateTime.UtcNow.ToString("s")" id="updateTransaction_datetime" />
                             <span asp-validation-for="DateTime" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label asp-for="Amount" class="control-label"></label>
-                            <input asp-for="Amount" class="form-control" />
+                            <input asp-for="Amount" class="form-control" id="updateTransaction_amount" />
                             <span asp-validation-for="Amount" class="text-danger"></span>
                         </div>
                         <div class="form-group d-flex justify-content-around">
                             <div>
-                                <input asp-for="IsHappy" type="radio" value="true" id="IsHappyTrue-update" class="iconRadioButton" />
-                                <label class="modalIconLabel" for="IsHappyTrue-update">
+                                <input asp-for="IsHappy" type="radio" value="true" id="updateTransaction_isHappyTrue" class="iconRadioButton" />
+                                <label class="modalIconLabel" for="updateTransaction_isHappyTrue">
                                     <div class="modalIconContainer">
                                         <svg width="50px" height="50px" viewBox="0 0 2050 2050" class="modalIcon">
                                             <g data-name="Layer 3" id="Layer_3">
@@ -232,8 +232,8 @@
                                         </svg>
                                     </div>
                                 </label>
-                                <input asp-for="IsHappy" type="radio" value="false" id="IsHappyFalse-update" class="iconRadioButton" checked />
-                                <label class="modalIconLabel" for="IsHappyFalse-update">
+                                <input asp-for="IsHappy" type="radio" value="false" id="updateTransaction_isHappyFalse" class="iconRadioButton" checked />
+                                <label class="modalIconLabel" for="updateTransaction_isHappyFalse">
                                     <div class="modalIconContainer">
                                         <svg width="50px" height="50px" viewBox="0 0 2050 2050" class="modalIcon">
                                             <g data-name="Layer 3" id="Layer_3">
@@ -253,8 +253,8 @@
                                 </label>
                             </div>
                             <div>
-                                <input asp-for="IsNecessary" type="radio" value="true" id="IsNecessaryTrue-update" class="iconRadioButton" />
-                                <label class="modalIconLabel" for="IsNecessaryTrue-update">
+                                <input asp-for="IsNecessary" type="radio" value="true" id="updateTransaction_isNecessaryTrue" class="iconRadioButton" />
+                                <label class="modalIconLabel" for="updateTransaction_isNecessaryTrue">
                                     <div class="modalIconContainer">
                                         <svg height="30px" width="30px" viewBox="0 0 512 512" class="modalIconNecessity">
                                             <path style="fill:#FFC61B;" d="M452.656,499.209c-7.881,0-14.269-6.39-14.269-14.269V234.027l-32.225,30.763
@@ -303,8 +303,8 @@
                                         </svg>
                                     </div>
                                 </label>
-                                <input asp-for="IsNecessary" type="radio" value="false" id="IsNecessaryFalse-update" class="iconRadioButton" checked />
-                                <label class="modalIconLabel" for="IsNecessaryFalse-update">
+                                <input asp-for="IsNecessary" type="radio" value="false" id="updateTransaction_isNecessaryFalse" class="iconRadioButton" checked />
+                                <label class="modalIconLabel" for="updateTransaction_isNecessaryFalse">
                                     <div class="modalIconContainer">
                                         <svg height="30px" width="30px" viewBox="0 0 512 512" class="modalIconNecessity">
                                             <path style="fill:#FFC61B;" d="M14.183,471.406C6.35,471.406,0,465.055,0,457.223V174.677c0-5.678,3.386-10.806,8.603-13.039
