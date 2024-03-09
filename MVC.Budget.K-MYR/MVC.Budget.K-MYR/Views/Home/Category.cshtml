@@ -43,7 +43,7 @@
             <div class="chart-container">
                 <h1 class="text-center text-truncate">@Html.Encode(Model.PageModel.Name)</h1>
                 <h4 class="text-center">February 2024</h4>
-                <div class="statistics mt-4">
+                <div class="dashboardStatistics mt-4">
                     <h5 class="text-center">Budget: @Model.PageModel.Budget.ToString("C2", Model.Culture) </h5>
                     <h5 class="text-center">Spent: @expensesTotal.ToString("C2", Model.Culture) </h5>
                     @{

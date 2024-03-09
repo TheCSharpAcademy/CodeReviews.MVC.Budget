@@ -20,16 +20,15 @@
 
     var overspending = expensesPerCategory.Sum(c => Math.Max(0, c.sumOfTransactions - c.category.Budget));
 
-    var transactionsCount = Model.PageModel.Expenses.Sum(c => c.Transactions.Where(t => t.Evaluated).Count());
-    var evaluatedTransactions = Model.PageModel.Expenses.SelectMany(c => c.Transactions).Where(t => t.Evaluated);
+    var evaluatedTransactions = Model.PageModel.Expenses.SelectMany(c => c.Transactions).Where(t => t.Evaluated).ToList();
 
     decimal sentimentTurnOverRate = 0;
     decimal necessityTurnOverRate = 0;
 
-    if (transactionsCount > 0)
+    if (evaluatedTransactions.Count > 0)
     {
-        sentimentTurnOverRate = evaluatedTransactions.Count(t => t.IsHappy != t.PreviousIsHappy) / (decimal)transactionsCount;
-        necessityTurnOverRate = evaluatedTransactions.Count(t => t.IsNecessary != t.PreviousIsNecessary) / (decimal)transactionsCount;
+        sentimentTurnOverRate = evaluatedTransactions.Count(t => t.IsHappy != t.PreviousIsHappy) / (decimal)evaluatedTransactions.Count;
+        necessityTurnOverRate = evaluatedTransactions.Count(t => t.IsNecessary != t.PreviousIsNecessary) / (decimal)evaluatedTransactions.Count;
     }
 }
 
@@ -58,33 +57,32 @@
 
 <div class="flip-container">
     <div id="flip-container-inner" class="flip-container-inner">
-        <div class="flip-content">
+        <div class="flip-content" style="--s:0">
             <div class="flip-scroll-container">
                 <div class="flip-content-container">
                     <div class="dashboard border">
                         <div class="dashboard-container">
                             <div class="chart-container">
-                                <canvas id="chart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                                <canvas id="sentimentChart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
                                         data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
                                 </canvas>
                             </div>
                             <div class="chart-container">
                                 <h1 class="text-center">My Budget</h1>
                                 <h4 class="text-center">February 2024</h4>
-                                <div class="statistics mt-4">
-                                    <h5 class="text-center">Total Overspending: @overspending.ToString("C2", Model.Culture) </h5>
-                                    <h5 class="text-center">Sentiment Turnover Rate: @sentimentTurnOverRate.ToString("P2")</h5>
-                                    <h5 class="text-center">Necessity Turnover Rate: @necessityTurnOverRate.ToString("P2")</h5>
+                                <div class="dashboardStatistics mt-4">
+                                    <h5 class="text-center">Overspending: @overspending.ToString("C2", Model.Culture) </h5>
+                                    <h5 class="text-center">Sentiment TR: @sentimentTurnOverRate.ToString("P2")</h5>
+                                    <h5 class="text-center">Necessity TR: @necessityTurnOverRate.ToString("P2")</h5>
                                 </div>
                             </div>
                             <div class="chart-container">
-                                <canvas id="chart2" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                                <canvas id="necessityChart" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
                                         data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
                                 </canvas>
                             </div>
                         </div>
                     </div>
-
                     <div class="accordion my-2" id="group_1" data-id="1">
                         <div class="accordion-item">
                             <div id="accordion-head-income" class="accordion-head d-flex">
@@ -313,88 +311,90 @@
                 </div>
             </div>
         </div>
-        <div class="flip-content-back">
-            <div class="reevaluation border">
-                <h1>Reevaluate Transactions</h1>
-                <div class="accordion my-2">
-                    <div class="accordion-item">
-                        <div id="accordion-head-reevalCategory" class="accordion-head d-flex">
-                            <h5 class="accordion-header me-auto" id="accordionCategoryHeader">
-                                Category
-                            </h5>
-                            <div class="accordion-caret rotate"></div>
-                        </div>
-                        <div id="collapseReevalCategory" class="accordion-collapse collapse show" aria-labelledby="accordionCategoryHeader">
-                            <div class="accordion-body">
-                                @{
-                                    var transaction = Model.PageModel.Expenses[0].Transactions.ToList()[0];
-                                }
+        <div class="flip-content" style="--s:1">
+            <div id="reevaluation" class="reevaluation border">
+                <h1 class="reeval-header">Reevaluate Transactions</h1>
+                <div id="reevalCategories-scrollcontainer">
+                    <div id="reevalCategories-container">
+                        @*<div class="accordion my-2">
+                            <div class="accordion-item">
+                                <div id="accordion-head-reevalCategory" class="accordion-head d-flex">
+                                    <h5 class="accordion-header me-auto" id="accordionCategoryHeader">
+                                        Category
+                                    </h5>
+                                    <div class="accordion-caret rotate"></div>
+                                </div>
+                                <div id="collapseReevalCategory" class="accordion-collapse collapse show" aria-labelledby="accordionCategoryHeader">
+                                    <div class="accordion-body">
+                                        @{
+                                            var transaction = Model.PageModel.Expenses[0].Transactions.ToList()[0];
+                                        }
 
-                                <div id="reeval_transaction_@transaction.Id" class="transaction-body"
-                                     data-id="@transaction.Id"
-                                     data-ishappy="@transaction.IsHappy"
-                                     data-isnecessary="@transaction.IsNecessary">
-                                    <div>@Html.Encode(transaction.Title)</div>
-                                    <div class="ms-2">@transaction.DateTime.ToShortDateString()</div>
-                                    <div class="ms-2 me-auto">@transaction.Amount.ToString("C2", Model.Culture)</div>
-                                    <form id="reevaluate-transaction-form">
-                                        <input type="hidden" asp-for="PageModel.Transaction.Id" value="@transaction.Id" />
-                                        <div class="d-flex justify-content-around">
-                                            <div class="me-3 d-flex align-items-center">
-                                                <input asp-for="PageModel.Transaction.IsHappy" type="radio" value="true" id="reeval_isHappyTrue" class="iconRadioButton" />
-                                                <label class="reevalIconLabel" for="reeval_isHappyTrue">
-                                                    <div class="reevalIconContainer">
-                                                        <svg width="50px" height="50px" viewBox="0 0 2050 2050" class="reevalIcon">
-                                                            <g data-name="Layer 3" id="Layer_3">
-                                                                <circle fill="#ffc500" cx="1025" cy="1025" r="613.7" />
-                                                                <path fill="#ff9f1e" d="M1068.5,1551.8c-339,0-613.7-274.8-613.7-613.7a613.5,613.5,0,0,1,44.4-229.8A610.7,610.7,0,0,0,411.3,1025c0,338.9,274.8,613.7,613.7,613.7,257.7,0,478.3-158.8,569.2-383.9C1486.8,1432.8,1291.5,1551.8,1068.5,1551.8Z" />
-                                                                <path fill="#ffe059" d="M1025,411.3A610.4,610.4,0,0,0,659.9,531.7a706.9,706.9,0,0,1,453.2-18.9,27.8,27.8,0,0,0-3.3,5.1c-18.2,33.9,18.9,89.1,82.7,123.3s130.4,34.6,148.6.8a38.6,38.6,0,0,0,3.7-10.5c165.2,128,271.9,328.1,272.9,553.1a613.3,613.3,0,0,0,21-159.6C1638.7,686.1,1363.9,411.3,1025,411.3Z" />
-                                                                <ellipse fill="#ffe059" cx="1339.4" cy="698.8" rx="30.8" ry="52.8" transform="translate(396.9 1879.5) rotate(-79)" />
-                                                                <ellipse fill="#ffe059" cx="1235.1" cy="718.7" rx="17.2" ry="25" transform="translate(-4.9 1429) rotate(-60)" />
-                                                                <path fill="#00305f" d="M1146.1,883.2a30.6,30.6,0,0,1-13.7-3.2,30,30,0,0,1-13-40.4c26.2-51.3,63.4-79.5,104.7-79.5s78.5,28.2,104.7,79.5a30,30,0,1,1-53.4,27.3c-15-29.3-34.2-46.8-51.3-46.8s-36.3,17.5-51.3,46.8A29.9,29.9,0,0,1,1146.1,883.2Z" />
-                                                                <path fill="#00305f" d="M903.9,883.2a29.9,29.9,0,0,1-26.7-16.3c-15-29.3-34.2-46.8-51.3-46.8s-36.3,17.5-51.3,46.8a30,30,0,1,1-53.4-27.3c26.2-51.3,63.4-79.5,104.7-79.5s78.5,28.2,104.7,79.5a30,30,0,0,1-13,40.4A30.6,30.6,0,0,1,903.9,883.2Z" />
-                                                                <path fill="#00305f" d="M863.1,1280.8a29.4,29.4,0,0,1-15.8-4.5,29.9,29.9,0,0,1-9.6-41.3,89.9,89.9,0,0,0,13.4-47.4,88.9,88.9,0,0,0-16.9-52.5,30,30,0,0,1,48.6-35.2,150.2,150.2,0,0,1,5.8,166.8A30.1,30.1,0,0,1,863.1,1280.8Z" />
-                                                                <path fill="#00305f" d="M1186.9,1280.8a30.1,30.1,0,0,1-25.5-14.1,150.2,150.2,0,0,1,5.8-166.8,30,30,0,1,1,48.6,35.2,88.9,88.9,0,0,0-16.9,52.5,89.9,89.9,0,0,0,13.4,47.4,29.9,29.9,0,0,1-9.6,41.3A29.4,29.4,0,0,1,1186.9,1280.8Z" />
-                                                                <path fill="#00305f" d="M1025,1247.3a293.2,293.2,0,0,1-135.5-33.1,30,30,0,1,1,27.6-53.2,234.3,234.3,0,0,0,215.8,0c46.2-19.3,34.3,19.6,27.6,53.2A293.2,293.2,0,0,1,1025,1247.3Z" />
-                                                            </g>
-                                                        </svg>
+                                        <div id="reeval_transaction_@transaction.Id" class="transaction-body"
+                                             data-id="@transaction.Id"
+                                             data-ishappy="@transaction.IsHappy"
+                                             data-isnecessary="@transaction.IsNecessary">
+                                            <div>@Html.Encode(transaction.Title)</div>
+                                            <div class="ms-2">@transaction.DateTime.ToShortDateString()</div>
+                                            <div class="ms-2 me-auto">@transaction.Amount.ToString("C2", Model.Culture)</div>
+                                            <form id="reevaluate-transaction-form">
+                                                <input type="hidden" asp-for="PageModel.Transaction.Id" value="@transaction.Id" id="reeval_transaction_@transaction.Id" />
+                                                <div class="d-flex justify-content-around">
+                                                    <div class="me-3 d-flex align-items-center">
+                                                        <input asp-for="PageModel.Transaction.IsHappy" type="radio" value="true" id="isHappyTrue_@transaction.Id" class="iconRadioButton" />
+                                                        <label class="reevalIconLabel" for="isHappyTrue_@transaction.Id">
+                                                            <div class="reevalIconContainer">
+                                                                <svg width="50px" height="50px" viewBox="0 0 2050 2050" class="reevalIcon">
+                                                                    <g data-name="Layer 3" id="Layer_3">
+                                                                        <circle fill="#ffc500" cx="1025" cy="1025" r="613.7" />
+                                                                        <path fill="#ff9f1e" d="M1068.5,1551.8c-339,0-613.7-274.8-613.7-613.7a613.5,613.5,0,0,1,44.4-229.8A610.7,610.7,0,0,0,411.3,1025c0,338.9,274.8,613.7,613.7,613.7,257.7,0,478.3-158.8,569.2-383.9C1486.8,1432.8,1291.5,1551.8,1068.5,1551.8Z" />
+                                                                        <path fill="#ffe059" d="M1025,411.3A610.4,610.4,0,0,0,659.9,531.7a706.9,706.9,0,0,1,453.2-18.9,27.8,27.8,0,0,0-3.3,5.1c-18.2,33.9,18.9,89.1,82.7,123.3s130.4,34.6,148.6.8a38.6,38.6,0,0,0,3.7-10.5c165.2,128,271.9,328.1,272.9,553.1a613.3,613.3,0,0,0,21-159.6C1638.7,686.1,1363.9,411.3,1025,411.3Z" />
+                                                                        <ellipse fill="#ffe059" cx="1339.4" cy="698.8" rx="30.8" ry="52.8" transform="translate(396.9 1879.5) rotate(-79)" />
+                                                                        <ellipse fill="#ffe059" cx="1235.1" cy="718.7" rx="17.2" ry="25" transform="translate(-4.9 1429) rotate(-60)" />
+                                                                        <path fill="#00305f" d="M1146.1,883.2a30.6,30.6,0,0,1-13.7-3.2,30,30,0,0,1-13-40.4c26.2-51.3,63.4-79.5,104.7-79.5s78.5,28.2,104.7,79.5a30,30,0,1,1-53.4,27.3c-15-29.3-34.2-46.8-51.3-46.8s-36.3,17.5-51.3,46.8A29.9,29.9,0,0,1,1146.1,883.2Z" />
+                                                                        <path fill="#00305f" d="M903.9,883.2a29.9,29.9,0,0,1-26.7-16.3c-15-29.3-34.2-46.8-51.3-46.8s-36.3,17.5-51.3,46.8a30,30,0,1,1-53.4-27.3c26.2-51.3,63.4-79.5,104.7-79.5s78.5,28.2,104.7,79.5a30,30,0,0,1-13,40.4A30.6,30.6,0,0,1,903.9,883.2Z" />
+                                                                        <path fill="#00305f" d="M863.1,1280.8a29.4,29.4,0,0,1-15.8-4.5,29.9,29.9,0,0,1-9.6-41.3,89.9,89.9,0,0,0,13.4-47.4,88.9,88.9,0,0,0-16.9-52.5,30,30,0,0,1,48.6-35.2,150.2,150.2,0,0,1,5.8,166.8A30.1,30.1,0,0,1,863.1,1280.8Z" />
+                                                                        <path fill="#00305f" d="M1186.9,1280.8a30.1,30.1,0,0,1-25.5-14.1,150.2,150.2,0,0,1,5.8-166.8,30,30,0,1,1,48.6,35.2,88.9,88.9,0,0,0-16.9,52.5,89.9,89.9,0,0,0,13.4,47.4,29.9,29.9,0,0,1-9.6,41.3A29.4,29.4,0,0,1,1186.9,1280.8Z" />
+                                                                        <path fill="#00305f" d="M1025,1247.3a293.2,293.2,0,0,1-135.5-33.1,30,30,0,1,1,27.6-53.2,234.3,234.3,0,0,0,215.8,0c46.2-19.3,34.3,19.6,27.6,53.2A293.2,293.2,0,0,1,1025,1247.3Z" />
+                                                                    </g>
+                                                                </svg>
+                                                            </div>
+                                                        </label>
+                                                        <input asp-for="PageModel.Transaction.IsHappy" type="radio" value="false" id="isHappyFalse_@transaction.Id" class="iconRadioButton" checked />
+                                                        <label class="reevalIconLabel" for="isHappyFalse_@transaction.Id">
+                                                            <div class="reevalIconContainer">
+                                                                <svg width="50px" height="50px" viewBox="0 0 2050 2050" class="reevalIcon">
+                                                                    <g data-name="Layer 3" id="Layer_3">
+                                                                        <circle fill="#ffc500" cx="1025" cy="1025" r="613.7" />
+                                                                        <path fill="#ff9f1e" d="M1068.5,1551.8c-339,0-613.7-274.8-613.7-613.7a613.5,613.5,0,0,1,44.4-229.8A610.7,610.7,0,0,0,411.3,1025c0,338.9,274.8,613.7,613.7,613.7,257.7,0,478.3-158.8,569.2-383.9C1486.8,1432.8,1291.5,1551.8,1068.5,1551.8Z" />
+                                                                        <ellipse fill="#00305f" cx="773.9" cy="896.3" rx="94.9" ry="60.2" transform="translate(-155.1 1630.7) rotate(-87.5)" />
+                                                                        <circle fill="#00305f" cx="803.6" cy="857.7" r="16.6" />
+                                                                        <ellipse fill="#00305f" cx="1276.1" cy="896.3" rx="60.2" ry="94.9" transform="translate(-37.7 56.1) rotate(-2.5)" />
+                                                                        <circle fill="#00305f" cx="1296.4" cy="857.7" r="16.6" />
+                                                                        <path fill="#ffe059" d="M1025,411.3A610.4,610.4,0,0,0,659.9,531.7a706.9,706.9,0,0,1,453.2-18.9,27.8,27.8,0,0,0-3.3,5.1c-18.2,33.9,18.9,89.1,82.7,123.3s130.4,34.6,148.6.8a38.6,38.6,0,0,0,3.7-10.5c165.2,128,271.9,328.1,272.9,553.1a613.3,613.3,0,0,0,21-159.6C1638.7,686.1,1363.9,411.3,1025,411.3Z" />
+                                                                        <ellipse fill="#ffe059" cx="1339.4" cy="698.8" rx="30.8" ry="52.8" transform="translate(396.9 1879.5) rotate(-79)" />
+                                                                        <ellipse fill="#ffe059" cx="1235.1" cy="718.7" rx="17.2" ry="25" transform="translate(-4.9 1429) rotate(-60)" />
+                                                                        <path fill="#00305f" d="M1296.4,1314.5a29.7,29.7,0,0,1-23-10.7c-32.3-38.4-70-68.5-112-89.5s-88.8-32.4-136-32.4c-91.6,0-178.2,41.6-243.9,117.1a30,30,0,0,1-45.3-39.4c37.5-43,81-76.8,129.5-100.5a361.4,361.4,0,0,1,322.6,1.6c49.3,24.7,93.4,59.8,131,104.5a29.9,29.9,0,0,1-22.9,49.3Z" />
+                                                                    </g>
+                                                                </svg>
+                                                            </div>
+                                                        </label>
                                                     </div>
-                                                </label>
-                                                <input asp-for="PageModel.Transaction.IsHappy" type="radio" value="false" id="reeval_isHappyFalse" class="iconRadioButton" checked />
-                                                <label class="reevalIconLabel" for="reeval_isHappyFalse">
-                                                    <div class="reevalIconContainer">
-                                                        <svg width="50px" height="50px" viewBox="0 0 2050 2050" class="reevalIcon">
-                                                            <g data-name="Layer 3" id="Layer_3">
-                                                                <circle fill="#ffc500" cx="1025" cy="1025" r="613.7" />
-                                                                <path fill="#ff9f1e" d="M1068.5,1551.8c-339,0-613.7-274.8-613.7-613.7a613.5,613.5,0,0,1,44.4-229.8A610.7,610.7,0,0,0,411.3,1025c0,338.9,274.8,613.7,613.7,613.7,257.7,0,478.3-158.8,569.2-383.9C1486.8,1432.8,1291.5,1551.8,1068.5,1551.8Z" />
-                                                                <ellipse fill="#00305f" cx="773.9" cy="896.3" rx="94.9" ry="60.2" transform="translate(-155.1 1630.7) rotate(-87.5)" />
-                                                                <circle fill="#00305f" cx="803.6" cy="857.7" r="16.6" />
-                                                                <ellipse fill="#00305f" cx="1276.1" cy="896.3" rx="60.2" ry="94.9" transform="translate(-37.7 56.1) rotate(-2.5)" />
-                                                                <circle fill="#00305f" cx="1296.4" cy="857.7" r="16.6" />
-                                                                <path fill="#ffe059" d="M1025,411.3A610.4,610.4,0,0,0,659.9,531.7a706.9,706.9,0,0,1,453.2-18.9,27.8,27.8,0,0,0-3.3,5.1c-18.2,33.9,18.9,89.1,82.7,123.3s130.4,34.6,148.6.8a38.6,38.6,0,0,0,3.7-10.5c165.2,128,271.9,328.1,272.9,553.1a613.3,613.3,0,0,0,21-159.6C1638.7,686.1,1363.9,411.3,1025,411.3Z" />
-                                                                <ellipse fill="#ffe059" cx="1339.4" cy="698.8" rx="30.8" ry="52.8" transform="translate(396.9 1879.5) rotate(-79)" />
-                                                                <ellipse fill="#ffe059" cx="1235.1" cy="718.7" rx="17.2" ry="25" transform="translate(-4.9 1429) rotate(-60)" />
-                                                                <path fill="#00305f" d="M1296.4,1314.5a29.7,29.7,0,0,1-23-10.7c-32.3-38.4-70-68.5-112-89.5s-88.8-32.4-136-32.4c-91.6,0-178.2,41.6-243.9,117.1a30,30,0,0,1-45.3-39.4c37.5-43,81-76.8,129.5-100.5a361.4,361.4,0,0,1,322.6,1.6c49.3,24.7,93.4,59.8,131,104.5a29.9,29.9,0,0,1-22.9,49.3Z" />
-                                                            </g>
-                                                        </svg>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                            <div class="me-3  ms-1 d-flex align-items-center">
-                                                <input asp-for="PageModel.Transaction.IsNecessary" type="radio" value="true" id="reeval_isNecessaryTrue" class="iconRadioButton" />
-                                                <label class="reevalIconLabel" for="reeval_isNecessaryTrue">
-                                                    <div class="reevalIconContainer">
-                                                        <svg height="30px" width="30px" viewBox="0 0 512 512" class="reevalIconNecessity">
-                                                            <path style="fill:#FFC61B;" d="M452.656,499.209c-7.881,0-14.269-6.39-14.269-14.269V234.027l-32.225,30.763
+                                                    <div class="me-3  ms-1 d-flex align-items-center">
+                                                        <input asp-for="PageModel.Transaction.IsNecessary" type="radio" value="true" id="isNecessaryTrue_@transaction.Id" class="iconRadioButton" />
+                                                        <label class="reevalIconLabel" for="isNecessaryTrue_@transaction.Id">
+                                                            <div class="reevalIconContainer">
+                                                                <svg height="30px" width="30px" viewBox="0 0 512 512" class="reevalIconNecessity">
+                                                                    <path style="fill:#FFC61B;" d="M452.656,499.209c-7.881,0-14.269-6.39-14.269-14.269V234.027l-32.225,30.763
 	                                                            c-5.701,5.442-14.732,5.233-20.176-0.468c-5.441-5.701-5.233-14.733,0.468-20.175l56.347-53.791
 	                                                            c4.131-3.944,10.215-5.046,15.467-2.797c5.251,2.246,8.656,7.407,8.656,13.118V484.94
 	                                                            C466.925,492.819,460.537,499.209,452.656,499.209z" />
-                                                            <g>
-                                                                <path style="fill:#FEE187;" d="M338.188,309.953c-2.499,2.386-5.849,3.683-9.302,3.584c-3.455-0.093-6.729-1.56-9.097-4.075
+                                                                    <g>
+                                                                        <path style="fill:#FEE187;" d="M338.188,309.953c-2.499,2.386-5.849,3.683-9.302,3.584c-3.455-0.093-6.729-1.56-9.097-4.075
 		                                    l-51.775-54.994l-21.981,22.543V484.94h103.312V299.302L338.188,309.953z" />
-                                                                <polygon style="fill:#FEE187;" points="121.207,318.315 37.615,404.139 37.615,484.94 140.927,484.94 140.927,340.529" />
-                                                            </g>
-                                                            <path style="fill:#FFC61B;" d="M396.309,470.671h-32.695V299.302c0-0.645-0.059-1.276-0.141-1.899
+                                                                        <polygon style="fill:#FEE187;" points="121.207,318.315 37.615,404.139 37.615,484.94 140.927,484.94 140.927,340.529" />
+                                                                    </g>
+                                                                    <path style="fill:#FFC61B;" d="M396.309,470.671h-32.695V299.302c0-0.645-0.059-1.276-0.141-1.899
 	                                    c-0.02-0.148-0.043-0.295-0.067-0.444c-0.098-0.595-0.224-1.179-0.394-1.747c-0.007-0.023-0.011-0.047-0.019-0.07
 	                                    c-0.184-0.606-0.417-1.19-0.676-1.759c-0.051-0.114-0.107-0.225-0.163-0.338c-0.251-0.512-0.525-1.01-0.833-1.485
 	                                    c-0.033-0.05-0.06-0.103-0.093-0.153c-0.337-0.507-0.711-0.983-1.107-1.441c-0.098-0.113-0.2-0.221-0.301-0.332
@@ -418,8 +418,8 @@
 	                                    h103.312h46.965c7.881,0,14.269-6.39,14.269-14.269C410.585,477.066,404.19,470.671,396.309,470.671z M51.884,409.94l68.837-70.676
 	                                    l5.935,6.687v124.72H51.884V409.94z M260.302,282.815l7.531-7.723l41.567,44.151c4.94,5.247,11.904,8.365,19.078,8.556
 	                                    c2.24,0.057,4.455-0.148,6.597-0.615v143.484h-74.773V282.815z" />
-                                                            <polygon style="fill:#FEE187;" points="407.582,51.21 497.729,27.055 473.575,117.203 " />
-                                                            <path style="fill:#FFC61B;" d="M507.82,16.965c-3.606-3.603-8.861-5.014-13.784-3.693l-90.147,24.155
+                                                                    <polygon style="fill:#FEE187;" points="407.582,51.21 497.729,27.055 473.575,117.203 " />
+                                                                    <path style="fill:#FFC61B;" d="M507.82,16.965c-3.606-3.603-8.861-5.014-13.784-3.693l-90.147,24.155
 	                                    c-4.924,1.32-8.77,5.166-10.09,10.09c-1.32,4.923,0.089,10.178,3.693,13.783l23.831,23.831l-91.555,87.464l-51.201-54.382
 	                                    c-2.667-2.832-6.374-4.453-10.264-4.489c-3.878-0.006-7.626,1.523-10.341,4.308l-95.528,97.966l-30.114-33.924
 	                                    c-2.631-2.964-6.378-4.7-10.341-4.792c-3.988-0.098-7.787,1.468-10.552,4.309L4.048,291.838c-5.499,5.645-5.38,14.679,0.265,20.178
@@ -428,22 +428,22 @@
 	                                    c2.607,2.768,6.21,4.382,10.011,4.483c3.766,0.118,7.484-1.318,10.234-3.947l102.419-97.845l21.976,21.976
 	                                    c2.711,2.71,6.356,4.18,10.09,4.18c1.231,0,2.471-0.158,3.693-0.487c4.924-1.32,8.77-5.166,10.09-10.09l24.155-90.147
 	                                    C512.833,25.825,511.424,20.571,507.82,16.965z M466.189,89.636L435.15,58.598l42.4-11.361L466.189,89.636z" />
-                                                        </svg>
-                                                    </div>
-                                                </label>
-                                                <input asp-for="PageModel.Transaction.IsNecessary" type="radio" value="false" id="reeval_isNecessaryFalse" class="iconRadioButton" checked />
-                                                <label class="reevalIconLabel" for="reeval_isNecessaryFalse">
-                                                    <div class="reevalIconContainer">
-                                                        <svg height="30px" width="30px" viewBox="0 0 512 512" class="reevalIconNecessity">
-                                                            <path style="fill:#FFC61B;" d="M14.183,471.406C6.35,471.406,0,465.055,0,457.223V174.677c0-5.678,3.386-10.806,8.603-13.039
+                                                                </svg>
+                                                            </div>
+                                                        </label>
+                                                        <input asp-for="PageModel.Transaction.IsNecessary" type="radio" value="false" id="isNecessaryFalse_@transaction.Id" class="iconRadioButton" checked />
+                                                        <label class="reevalIconLabel" for="isNecessaryFalse_@transaction.Id">
+                                                            <div class="reevalIconContainer">
+                                                                <svg height="30px" width="30px" viewBox="0 0 512 512" class="reevalIconNecessity">
+                                                                    <path style="fill:#FFC61B;" d="M14.183,471.406C6.35,471.406,0,465.055,0,457.223V174.677c0-5.678,3.386-10.806,8.603-13.039
 	                                    c5.219-2.235,11.267-1.14,15.373,2.78l56.006,53.466c5.666,5.408,5.875,14.387,0.465,20.054c-5.408,5.665-14.386,5.875-20.052,0.465
 	                                    l-32.03-30.577v249.398C28.366,465.055,22.016,471.406,14.183,471.406z" />
-                                                            <g>
-                                                                <path style="fill:#FEE187;" d="M127.957,283.293c2.483,2.371,5.814,3.661,9.246,3.563c3.434-0.092,6.689-1.55,9.042-4.051
+                                                                    <g>
+                                                                        <path style="fill:#FEE187;" d="M127.957,283.293c2.483,2.371,5.814,3.661,9.246,3.563c3.434-0.092,6.689-1.55,9.042-4.051
 		                                    l51.462-54.662l21.848,22.407v206.672H116.87V272.708L127.957,283.293z" />
-                                                                <polygon style="fill:#FEE187;" points="343.628,291.605 426.715,376.91 426.715,457.223 324.028,457.223 324.028,313.686 	" />
-                                                            </g>
-                                                            <path style="fill:#FFC61B;" d="M436.875,367.013l-83.086-85.305c-2.749-2.821-6.527-4.402-10.49-4.283
+                                                                        <polygon style="fill:#FEE187;" points="343.628,291.605 426.715,376.91 426.715,457.223 324.028,457.223 324.028,313.686 	" />
+                                                                    </g>
+                                                                    <path style="fill:#FFC61B;" d="M436.875,367.013l-83.086-85.305c-2.749-2.821-6.527-4.402-10.49-4.283
 	                                    c-3.939,0.091-7.663,1.817-10.279,4.763l-19.6,22.08c-0.06,0.067-0.111,0.14-0.169,0.208c-0.136,0.159-0.265,0.322-0.394,0.488
 	                                    c-0.142,0.182-0.279,0.363-0.411,0.55c-0.128,0.182-0.251,0.367-0.37,0.555c-0.113,0.179-0.224,0.36-0.33,0.543
 	                                    c-0.119,0.206-0.233,0.414-0.34,0.625c-0.089,0.176-0.174,0.353-0.257,0.532c-0.104,0.225-0.204,0.452-0.296,0.685
@@ -468,8 +468,8 @@
 	                                    c1.882,0.411,3.818,0.621,5.784,0.621c0.003,0,0.004,0,0.007,0c0.255,0,0.511-0.004,0.738-0.011
 	                                    c7.161-0.19,14.084-3.29,18.991-8.506l41.315-43.883l7.486,7.676V443.04H205.373z M412.531,443.04h-74.32V319.072l5.899-6.646
 	                                    l68.421,70.249V443.04z" />
-                                                            <polygon style="fill:#FEE187;" points="408.215,298.51 497.817,322.519 473.808,232.917 " />
-                                                            <path style="fill:#FFC61B;" d="M511.516,318.847l-24.009-89.602c-1.312-4.895-5.134-8.717-10.029-10.029
+                                                                    <polygon style="fill:#FEE187;" points="408.215,298.51 497.817,322.519 473.808,232.917 " />
+                                                                    <path style="fill:#FFC61B;" d="M511.516,318.847l-24.009-89.602c-1.312-4.895-5.134-8.717-10.029-10.029
 	                                    c-4.896-1.315-10.117,0.089-13.699,3.671l-22.947,22.947l-87.482-90.125c-2.749-2.822-6.55-4.37-10.488-4.283
 	                                    c-3.939,0.091-7.662,1.817-10.279,4.763l-29.932,33.719l-94.95-97.374c-2.699-2.767-6.414-4.275-10.28-4.282
 	                                    c-3.866,0.034-7.551,1.645-10.202,4.462l-50.892,54.055L29.3,44.521c-5.663-5.409-14.641-5.205-20.052,0.457
@@ -478,25 +478,68 @@
 	                                    l-22.587,22.587c-3.583,3.583-4.983,8.806-3.671,13.699c1.312,4.895,5.134,8.717,10.029,10.029l89.602,24.009
 	                                    c1.213,0.325,2.447,0.484,3.669,0.484c3.713,0,7.336-1.459,10.03-4.154C511.43,328.964,512.828,323.742,511.516,318.847z
 	                                    M435.615,291.167l30.851-30.851l11.293,42.144L435.615,291.167z" />
-                                                        </svg>
+                                                                </svg>
+                                                            </div>
+                                                        </label>
                                                     </div>
-                                                </label>
-                                            </div>
-                                            <div>
-                                                <button class="reeval-submit-button" type="submit" value="">
-                                                    <svg class="reeval-submit-svg" width="40px" height="40px" viewBox="0 0 24 24">
-                                                        <circle cx="12" cy="12" r="10" stroke-width="1.5" />
-                                                        <path d="M8.5 12.5L10.5 14.5L15.5 9.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                                    </svg>
-                                                </button>
-                                            </div>
+                                                    <div>
+                                                        <button class="reeval-submit-button" type="submit" value="">
+                                                            <svg class="reeval-submit-svg" width="40px" height="40px" viewBox="0 0 24 24">
+                                                                <circle cx="12" cy="12" r="10" stroke-width="1.5" />
+                                                                <path d="M8.5 12.5L10.5 14.5L15.5 9.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <span asp-validation-for="PageModel.Transaction.IsHappy" class="text-danger"></span>
+                                                <span asp-validation-for="PageModel.Transaction.IsNecessary" class="text-danger"></span>
+                                            </form>
                                         </div>
-                                        <span asp-validation-for="PageModel.Transaction.IsHappy" class="text-danger"></span>
-                                        <span asp-validation-for="PageModel.Transaction.IsNecessary" class="text-danger"></span>
-                                    </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flip-content" style="--s:2">
+            <div id="statistics" class="statistics border">
+                <h1 id="statistics-header">Yearly Statistics</h1>
+                <div id="statistics-scrollcontainer">
+                    <div id="statistics-container">   
+                        <div class="dashboard border">
+                            <div class="dashboard-container">
+                                <div class="chart-container">
+                                    <canvas id="sentimentChartYear" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                                            data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                                    </canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h1 class="text-center">My Budget</h1>
+                                    <h4 class="text-center">February 2024</h4>
+                                    <div class="dashboardStatistics mt-4">
+                                        <h5 class="text-center">Overspending: @overspending.ToString("C2", Model.Culture) </h5>
+                                        <h5 class="text-center">Sentiment TR: @sentimentTurnOverRate.ToString("P2")</h5>
+                                        <h5 class="text-center">Necessity TR: @necessityTurnOverRate.ToString("P2")</h5>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="necessityChartYear" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                                            data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                                    </canvas>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flip-content" style="--s:3">
+            <div id="wf" class="wf border">
+                <h1 class="wf-header">WF</h1>
+                <div id="wf-scrollcontainer">
+                    <div id="wf-container">
                     </div>
                 </div>
             </div>
