@@ -12238,6 +12238,18 @@ main {
   margin-right: 5px;
 }
 
+.lineCharts-container {
+  border-radius: var(--bs-border-radius);
+  margin-top: 10px;
+  display: flex;
+}
+
+.lineChart-container {
+  width: 50%;
+  padding: 2px;
+  min-height: 200px;
+}
+
 .wf {
   height: calc(100% - 10px);
   border-radius: var(--bs-border-radius);

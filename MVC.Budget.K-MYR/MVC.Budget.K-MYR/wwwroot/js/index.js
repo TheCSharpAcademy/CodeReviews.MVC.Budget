@@ -7,9 +7,6 @@ const sidebar = document.getElementById("sidebar");
 const sentimentChart = document.getElementById('sentimentChart');
 const necessityChart = document.getElementById('necessityChart');
 
-const sentimentChartYearly = document.getElementById('sentimentChartYear');
-const necessityChartYearly = document.getElementById('necessityChartYear');
-
 const updateCategoryModal = $("#updateCategory-modal");
 const categoryModalLabel = updateCategoryModal.find("#updateCategory-label");
 const categoryModalId = updateCategoryModal.find("#updateCategory_id");
@@ -21,18 +18,18 @@ const addTransactionModal = $("#add-transaction-modal");
 
 const flipContainer = document.getElementById("flip-container-inner");
 const reevaluationContainer = document.getElementById("reevalCategories-container");
+
 Chart.defaults.color = '#ffffff';
+Chart.defaults.scales.linear.min = 0;
 
 var currentSideIndex = 0;
 var currentDeg = 0;
-const flipContainerAnimationDuration = 1000;
-
 
 createReevaluationElements();
 
 $("#country").countrySelect({
     preferredCountries: []
-});   
+});
 
 new Chart(sentimentChart, {
     type: 'doughnut',
@@ -67,52 +64,6 @@ new Chart(necessityChart, {
         datasets: [{
             label: 'Total Amount',
             data: [necessityChart.dataset.necessary, necessityChart.dataset.unnecessary],
-            backgroundColor: [
-                'rgb(25,135,84)',
-                'rgb(220,53,69)'
-            ],
-            hoverOffset: 4
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
-    }
-});
-
-new Chart(sentimentChartYearly, {
-    type: 'doughnut',
-    data: {
-        labels: [
-            'Happy',
-            'Unhappy'
-        ],
-        datasets: [{
-            label: 'Total Amount',
-            data: [sentimentChartYearly.dataset.happy, sentimentChartYearly.dataset.unhappy],
-            backgroundColor: [
-                'rgb(25,135,84)',
-                'rgb(220,53,69)'
-            ],
-            hoverOffset: 4
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
-    }
-});
-
-new Chart(necessityChartYearly, {
-    type: 'doughnut',
-    data: {
-        labels: [
-            'Necessary',
-            'Unnecessary'
-        ],
-        datasets: [{
-            label: 'Total Amount',
-            data: [necessityChartYearly.dataset.necessary, necessityChartYearly.dataset.unnecessary],
             backgroundColor: [
                 'rgb(25,135,84)',
                 'rgb(220,53,69)'
@@ -240,14 +191,13 @@ $('#action-sidebar').on("click", '.sidebar-button-container', async function (ev
 flipContainer.addEventListener("transitionend", () => {
     if (currentDeg >= 360) {
         currentDeg -= 360;
-        resetStyle(flipContainer, `transform: rotateY(${currentDeg}deg)`);
-
     } else if (currentDeg <= -360) {
         currentDeg += 360;
-        resetStyle(flipContainer, `transform: rotateY(${currentDeg}deg)`);
     }
-});
 
+    resetStyle(flipContainer, `transform: rotateY(${currentDeg}deg)`);
+
+});
 
 async function addTransaction(data) {
     try {
@@ -507,7 +457,7 @@ function createEvaluationElement(category) {
         });
 
         transactionForm.innerHTML =
-                        `<input type="hidden" value="${transaction.id}" data-val="true" data-val-required="The Id field is required." id="reeval_transaction_${transaction.id}" name="PageModel.Transaction.Id">
+            `<input type="hidden" value="${transaction.id}" data-val="true" data-val-required="The Id field is required." id="reeval_transaction_${transaction.id}" name="PageModel.Transaction.Id">
                             <div class="d-flex justify-content-around">
                                 <div class="me-3 d-flex align-items-center">
                                     <input type="radio" value="true" id="isHappyTrue_${transaction.id}" class="iconRadioButton" data-val="true" data-val-required="The IsHappy field is required." name="PageModel.Transaction.IsHappy">
@@ -669,7 +619,7 @@ function createEvaluationElement(category) {
         transactionBody.appendChild(transactionForm);
 
         accordionBody.appendChild(transactionBody);
-    }    
+    }
 
     accordionHead.appendChild(accordionHeader);
     accordionHead.appendChild(accordionCaret);
@@ -681,7 +631,7 @@ function createEvaluationElement(category) {
     return accordion;
 }
 
-async function createReevaluationElements() { 
+async function createReevaluationElements() {
     var categories = await getFilteredCategories();
     var frag = document.createDocumentFragment();
 
@@ -692,7 +642,7 @@ async function createReevaluationElements() {
     }
 
     reevaluationContainer.innerHTML = "";
-    reevaluationContainer.appendChild(frag);    
+    reevaluationContainer.appendChild(frag);
 }
 
 function htmlEscape(str) {
@@ -704,7 +654,7 @@ function htmlEscape(str) {
         .replace(/</g, '&lt');
 }
 
-function shortestAngle(index1, index2) {   
+function shortestAngle(index1, index2) {
     var diff = (index2 - index1 + 4) % 4;
 
     if (diff === 1) {
@@ -716,8 +666,164 @@ function shortestAngle(index1, index2) {
     } else {
         return 0;
     }
-}   
+}
 
-function resetStyle(element, style) {    
+function resetStyle(element, style) {
     element.style = style + '; transition: transform 0s';
 }
+
+class Statistics {
+    year;
+    overspending;
+    sentimentTurnOverRate;
+    necessityTurnOverRate;
+    sentimentPerMonth;
+    necessityPerMonth;
+    sentimentEvaluatedPerMonth;
+    necessityEvaluatedPerMonth;
+    expensesPerMonth;
+    incomePerMonth;
+    savingsPerMonth;
+
+
+    #sentimentChartYearly = document.getElementById('sentimentChartYear');
+    #necessityChartYearly = document.getElementById('necessityChartYear');
+    #sentimentLineChart = document.getElementById('sentimentLineChartYear');
+    #necessityLineChart = document.getElementById('necessityLineChartYear');
+
+    constructor() {
+    }
+
+    render() {
+        new Chart(this.#sentimentChartYearly, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Happy',
+                    'Unhappy'
+                ],
+                datasets: [{
+                    label: 'Total Amount',
+                    data: [this.#sentimentChartYearly.dataset.happy, this.#sentimentChartYearly.dataset.unhappy],
+                    backgroundColor: [
+                        'rgb(25,135,84)',
+                        'rgb(220,53,69)'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(this.#necessityChartYearly, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Necessary',
+                    'Unnecessary'
+                ],
+                datasets: [{
+                    label: 'Total Amount',
+                    data: [this.#necessityChartYearly.dataset.necessary, this.#necessityChartYearly.dataset.unnecessary],
+                    backgroundColor: [
+                        'rgb(25,135,84)',
+                        'rgb(220,53,69)'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(this.#sentimentLineChart, {
+            type: 'line',
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
+                datasets: [{
+                    fill: {
+                    },
+                    label: 'Happy',
+                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
+                    borderColor: '#20c997',
+                    backgroundColor: '#20c997'
+
+                },
+                {
+                    fill: {
+                        target: '0',
+                        above: 'rgb(25,135,84)',
+                        below: 'rgb(220,53,69)'
+                    },
+                    label: 'Happy (Evaluated)',
+                    data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
+                    borderColor: '#fd7e14',
+                    backgroundColor: '#fd7e14',
+                },
+                {
+                    fill: null,
+                    label: 'Total',
+                    data: [800, 600, 600, 500, 700, 900, 900, 1100, 900, 1000, 1200, 800],
+                    borderColor: '#0dcaf0',
+                    backgroundColor: '#0dcaf0'
+                },
+
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+
+        new Chart(this.#necessityLineChart, {
+            type: 'line',
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
+                datasets: [{
+                    fill: {
+                    },
+                    label: 'Necessary',
+                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
+                    borderColor: '#20c997',
+                    backgroundColor: '#20c997'
+
+                },
+                {
+                    fill: {
+                        target: '0',
+                        above: 'rgb(25,135,84)',
+                        below: 'rgb(220,53,69)'
+                    },
+                    label: 'Necessary (Evaluated)',
+                    data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
+                    borderColor: '#fd7e14',
+                    backgroundColor: '#fd7e14',
+                },
+                {
+                    fill: null,
+                    label: 'Total',
+                    data: [800, 600, 600, 500, 700, 900, 900, 1100, 900, 1000, 1200, 800],
+                    borderColor: '#0dcaf0',
+                    backgroundColor: '#0dcaf0'
+                },
+
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+    }
+}
+
+const statistics = new Statistics();
+statistics.render();
