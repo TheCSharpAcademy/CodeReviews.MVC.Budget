@@ -1,0 +1,53 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+    background-color: #031A27;
+}
+
+body {
+    margin-bottom: 60px;
+    background-color: #031A27;
+}
+
+nav > *{
+    background-color: #031A27;
+   }
+
+main {
+    background-color: #031A27;
+}
+
+.transactionfilter, .categorypulldown {
+    background-color: #b4f0e1 !important;
+}
+    .transactionfilter:hover {
+        background-color: #B4E1F0 !important;
+        color: black;
+    }
+    .categorypulldown:hover {
+        background-color: #B4E1F0 !important;
+        color: black;
+    }
+
+#searchbox {
+    background-color: #b4f0e1 !important;
+    color: black;
+}
+    #searchbox:hover {
+        background-color: #B4E1F0 !important;
+        color: black;
+    }
