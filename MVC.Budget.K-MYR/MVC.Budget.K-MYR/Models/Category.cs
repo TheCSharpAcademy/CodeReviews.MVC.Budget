@@ -16,5 +16,6 @@ public class Category
     public decimal Budget { get; set; }
     public int GroupId { get; set; }
     public Group Group { get; set; }
-    public ICollection<Transaction> Transactions { get; } = new List<Transaction>();
+    public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+    public ICollection<CategoryStatistic> Statistics { get; set;  } = new List<CategoryStatistic>();
 }

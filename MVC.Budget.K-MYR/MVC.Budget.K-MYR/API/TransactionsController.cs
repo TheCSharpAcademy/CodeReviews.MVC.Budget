@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
+using MVC.Budget.K_MYR.Services;
 
 namespace MVC.Budget.K_MYR.API;
 
@@ -10,85 +11,74 @@ namespace MVC.Budget.K_MYR.API;
 [ApiController]
 public class TransactionsController : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<CategoriesController> _logger;
+    private readonly ILogger<TransactionsController> _logger;
+    private readonly ITransactionsService _transactionsService;
 
-    public TransactionsController(IUnitOfWork unitOfWork, ILogger<CategoriesController> logger)
+
+    public TransactionsController(ILogger<TransactionsController> logger, ITransactionsService transactionsService)
     {
-        _unitOfWork = unitOfWork;
         _logger = logger;
+        _transactionsService = transactionsService;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Transaction>>> GetTransactions()
     {
-        return Ok(await _unitOfWork.TransactionsRepository.GetAsync());
+        return Ok(await _transactionsService.GetTransactions());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Transaction>> GetTransaction(int id)
     {
-        var transaction = await _unitOfWork.TransactionsRepository.GetByIDAsync(id);
+        var transaction = await _transactionsService.GetByIDAsync(id);
 
         return transaction is null ? NotFound() : Ok(transaction);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostTransaction([FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, CategoryId")] TransactionPost postTransaction)
+    public async Task<ActionResult> PostTransaction([FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, CategoryId")] TransactionPost transactionPost)
     {
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var transaction = new Transaction()
-        {
-            Title = postTransaction.Title,
-            DateTime = postTransaction.DateTime,
-            Amount = postTransaction.Amount,
-            IsHappy = postTransaction.IsHappy,
-            IsNecessary = postTransaction.IsNecessary,
-            CategoryId = postTransaction.CategoryId,            
-        };
+        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionPost.CategoryId, s => s.Month.Month == transactionPost.DateTime.Month && s.Month.Year == transactionPost.DateTime.Year);
 
-        _unitOfWork.TransactionsRepository.Insert(transaction);
-        await _unitOfWork.Save();
+        if (category is null)
+            return NotFound();
+
+        var transaction = await _transactionsService.AddTransaction(transactionPost, category);
 
         return CreatedAtAction(nameof(Transaction), new { id = transaction.Id }, transaction);
     }
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutTransaction(int id, [FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, Evaluated, EvaluatedIsHappy, EvaluatedIsNecessary, Id")] TransactionPut transaction)
+    public async Task<ActionResult> PutTransaction(int id, [FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, Evaluated, EvaluatedIsHappy, EvaluatedIsNecessary, Id")] TransactionPut transactionPut)
     {
-        if (id != transaction.Id)
+        if (id != transactionPut.Id)
             return BadRequest();
 
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var entity = await _unitOfWork.TransactionsRepository.GetByIDAsync(id);
+        var transaction = await _transactionsService.GetByIDAsync(id);
 
-        if (entity is null)
+        if (transaction is null)
             return NotFound();
+        
+        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionPut.CategoryId, s => s.Month.Month == transactionPut.DateTime.Month && s.Month.Year == transactionPut.DateTime.Year);      
 
-        entity.Title = transaction.Title;
-        entity.Amount = transaction.Amount;
-        entity.IsHappy = transaction.IsHappy;
-        entity.IsNecessary = transaction.IsNecessary;
-        entity.DateTime = transaction.DateTime;
-        entity.CategoryId = transaction.CategoryId;
-        entity.Evaluated = transaction.Evaluated;
-        entity.PreviousIsNecessary = transaction.PreviousIsNecessary;
-        entity.PreviousIsHappy = transaction.PreviousIsHappy;
+        if (category is null)
+            return NotFound();      
 
         try
         {
-            _unitOfWork.TransactionsRepository.Update(entity);
-            await _unitOfWork.Save();
+            await _transactionsService.UpdateTransaction(category, transaction, transactionPut);
             return NoContent();
         }
 
-        catch (DbUpdateConcurrencyException) when (!TransactionExists(entity.Id))
+        catch (DbUpdateConcurrencyException) when (!TransactionExists(transaction.Id))
         {
             return NotFound();
         }
@@ -100,10 +90,10 @@ public class TransactionsController : ControllerBase
         if (patchDoc is null)
             return BadRequest();
 
-        var transaction = await _unitOfWork.TransactionsRepository.GetByIDAsync(id);
+        var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
-            return NotFound();
+            return NotFound();        
 
         TransactionPut transactionToPatch = new()
         {
@@ -122,24 +112,20 @@ public class TransactionsController : ControllerBase
 
         patchDoc.ApplyTo(transactionToPatch, ModelState);
 
-        if (!ModelState.IsValid)
+        if(transactionToPatch.Id != transaction.Id)
             return BadRequest();
 
-        transaction.Id = transactionToPatch.Id;
-        transaction.Title = transactionToPatch.Title;
-        transaction.Description = transactionToPatch.Description;
-        transaction.DateTime = transactionToPatch.DateTime;
-        transaction.Amount = transactionToPatch.Amount;
-        transaction.IsHappy = transactionToPatch.IsHappy;
-        transaction.IsNecessary = transactionToPatch.IsNecessary;
-        transaction.Evaluated = transactionToPatch.Evaluated;
-        transaction.PreviousIsHappy = transactionToPatch.PreviousIsHappy;
-        transaction.PreviousIsNecessary = transactionToPatch.PreviousIsNecessary;
-        
+        if (!ModelState.IsValid)
+            return BadRequest();        
+
+        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionToPatch.CategoryId, s => s.Month.Month == transactionToPatch.DateTime.Month && s.Month.Year == transactionToPatch.DateTime.Year);
+
+        if (category is null)
+            return NotFound();
 
         try
         {
-            await _unitOfWork.Save();
+            await _transactionsService.UpdateTransaction(category, transaction, transactionToPatch);
             return NoContent();
         }
         catch (DbUpdateConcurrencyException) when (!TransactionExists(transaction.Id))
@@ -152,15 +138,14 @@ public class TransactionsController : ControllerBase
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> DeleteTransaction(int id)
     {
-        var transaction = await _unitOfWork.TransactionsRepository.GetByIDAsync(id);
+        var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
             return NotFound();
 
         try
         {
-            await _unitOfWork.TransactionsRepository.DeleteAsync(id);
-            await _unitOfWork.Save();
+            await _transactionsService.DeleteTransaction(transaction);
             return NoContent();
         }
 
@@ -170,5 +155,5 @@ public class TransactionsController : ControllerBase
         }
     }
 
-    private bool TransactionExists(int id) => _unitOfWork.TransactionsRepository.GetByID(id) is null;
+    private bool TransactionExists(int id) => _transactionsService.GetByID(id) is not null;
 }

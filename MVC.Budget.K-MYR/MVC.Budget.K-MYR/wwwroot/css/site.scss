@@ -368,7 +368,7 @@ main {
     margin-right: 5px;
 }
 
-.lineCharts-container {
+.Charts-container {
     border-radius: var(--bs-border-radius);
     margin-top: 10px;
     display: flex;
@@ -379,6 +379,13 @@ main {
     width: 50%;
     padding: 2px;
     min-height: 200px;
+}
+
+.overspendingChart-container {
+    width: 100%;
+    padding: 2px;
+    min-height: 320px;
+    
 }
 
 // WF

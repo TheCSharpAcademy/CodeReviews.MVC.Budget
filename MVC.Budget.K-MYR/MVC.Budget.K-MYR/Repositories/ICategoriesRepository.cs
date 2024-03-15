@@ -7,4 +7,5 @@ public interface ICategoriesRepository : IGenericRepository<Category>
 {
     Task<Category?> GetCategoryAsync(int id);
     Task<List<Category>> GetCategoriesWithFilteredTransactionsAsync(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null, Expression<Func<Category, IOrderedEnumerable<Transaction>>>? filterTransactions = null);
+    Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<CategoryStatistic, bool>> filter);
 }

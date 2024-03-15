@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
+using MVC.Budget.K_MYR.Services;
 
 namespace MVC.Budget.K_MYR.API;
 
@@ -9,25 +9,25 @@ namespace MVC.Budget.K_MYR.API;
 [ApiController]
 public class CategoriesController : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CategoriesController> _logger;
+    private readonly ICategoriesService _categoriesService;
 
-    public CategoriesController(IUnitOfWork unitOfWork, ILogger<CategoriesController> logger)
+    public CategoriesController(ILogger<CategoriesController> logger, ICategoriesService categoriesService)
     {
-        _unitOfWork = unitOfWork;
         _logger = logger;
+        _categoriesService = categoriesService;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Category>>> GetCategories()
     {
-        return Ok(await _unitOfWork.CategoriesRepository.GetAsync());
+        return Ok(await _categoriesService.GetCategories());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Category>> GetCategory(int id)
     {
-        var category = await _unitOfWork.CategoriesRepository.GetByIDAsync(id);
+        var category = await _categoriesService.GetByIDAsync(id);
 
         return category is null ? NotFound() : Ok(category);
     }
@@ -35,62 +35,44 @@ public class CategoriesController : ControllerBase
     [HttpGet("filteredByEvaluation")]
     public async Task<ActionResult<List<Category>>> GetCategoriesWithUnevaluatedTransactions()
     {
-        var cutoffDate = DateTime.UtcNow.AddDays(-14);
-
-        return Ok(await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
-                c => c.GroupId == 2,
-                q => q.OrderBy(c => c.Name),
-                c => c.Transactions.Where(t => t.Evaluated == false && t.DateTime < cutoffDate)
-                    .OrderByDescending(d => d.DateTime)));
+        return Ok(await _categoriesService.GetCategoriesWithUnevaluatedTransactions());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, GroupId")] CategoryPost postCategory)
+    public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, GroupId")] CategoryPost categoryPost)
     {
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var category = new Category()
-        {
-            Name = postCategory.Name,
-            Budget = postCategory.Budget,
-            GroupId = postCategory.GroupId,
-        };
-
-        _unitOfWork.CategoriesRepository.Insert(category);
-        await _unitOfWork.Save();
+        var category = await _categoriesService.AddCategory(categoryPost);
 
         return CreatedAtAction(nameof(Category), new { id = category.Id }, category);
     }
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutCategory(int id, [Bind("Name,Budget,Id")] CategoryPut category)
+    public async Task<ActionResult> PutCategory(int id, [Bind("Name,Budget,Id")] CategoryPut categoryPut)
     {
-        if (id != category.Id)
+        if (id != categoryPut.Id)
             return BadRequest();
 
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var entity = await _unitOfWork.CategoriesRepository.GetByIDAsync(id);
+        var currentDate = DateTime.UtcNow;
 
-        if (entity is null)
-            return NotFound();
+        var category = await _categoriesService.GetCategoryWithFilteredStatistics(categoryPut.Id, s => s.Month.Month == currentDate.Month && s.Month.Year == currentDate.Year);
 
-        entity.Name = category.Name;
-        entity.Budget = category.Budget;
-        entity.GroupId = category.GroupId;
+        if (category is null)
+            return NotFound();       
 
         try
         {
-            _unitOfWork.CategoriesRepository.Update(entity);
-            await _unitOfWork.Save();
+            await _categoriesService.UpdateCategory(category, categoryPut);
             return NoContent();
         }
-
-        catch (DbUpdateConcurrencyException) when (!CategoryExists(entity.Id))
+        catch (DbUpdateConcurrencyException) when (!CategoryExists(category.Id))
         {
             return NotFound();
         }
@@ -100,23 +82,21 @@ public class CategoriesController : ControllerBase
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> DeleteCategory(int id)
     {
-        var category = await _unitOfWork.CategoriesRepository.GetByIDAsync(id);
+        var category = await _categoriesService.GetByIDAsync(id);
 
         if (category is null)
             return NotFound();
 
         try
         {
-            await _unitOfWork.CategoriesRepository.DeleteAsync(id);
-            await _unitOfWork.Save();
+            await _categoriesService.DeleteCategory(category);         
             return NoContent();
         }
-
         catch (DbUpdateConcurrencyException) when (!CategoryExists(id))
         {
             return NotFound();
         }
     }
 
-    private bool CategoryExists(int id) => _unitOfWork.CategoriesRepository.GetByID(id) is null;
+    private bool CategoryExists(int id) => _categoriesService.GetByID(id) is not null;
 }

@@ -18,6 +18,12 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                 .SingleOrDefaultAsync(c => c.Id == id);
     }
 
+    public  Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<CategoryStatistic, bool>> filter)
+    {
+        return _dbSet.Include(p => p.Statistics.AsQueryable().Where(filter))
+                     .SingleOrDefaultAsync(c => c.Id == id);
+    }
+
     public async Task<List<Category>> GetCategoriesWithFilteredTransactionsAsync(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>,
                                                 IOrderedQueryable<Category>>? orderBy = null,
                                                 Expression<Func<Category,
@@ -37,5 +43,5 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
             return await orderBy(query).ToListAsync();
 
         return await query.ToListAsync();
-    }
+    }   
 }

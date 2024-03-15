@@ -688,8 +688,11 @@ class Statistics {
 
     #sentimentChartYearly = document.getElementById('sentimentChartYear');
     #necessityChartYearly = document.getElementById('necessityChartYear');
-    #sentimentLineChart = document.getElementById('sentimentLineChartYear');
+    #sentimentBarChart = document.getElementById('sentimentLineChartYear');
     #necessityLineChart = document.getElementById('necessityLineChartYear');
+    #overspendingChart = document.getElementById('overspendingChart');
+    #savingsChart = document.getElementById('savingsChart');
+    #incomeChart = document.getElementById('incomeChart');
 
     constructor() {
     }
@@ -704,7 +707,7 @@ class Statistics {
                 ],
                 datasets: [{
                     label: 'Total Amount',
-                    data: [this.#sentimentChartYearly.dataset.happy, this.#sentimentChartYearly.dataset.unhappy],
+                    data: [50, 60],
                     backgroundColor: [
                         'rgb(25,135,84)',
                         'rgb(220,53,69)'
@@ -727,7 +730,7 @@ class Statistics {
                 ],
                 datasets: [{
                     label: 'Total Amount',
-                    data: [this.#necessityChartYearly.dataset.necessary, this.#necessityChartYearly.dataset.unnecessary],
+                    data: [50, 60],
                     backgroundColor: [
                         'rgb(25,135,84)',
                         'rgb(220,53,69)'
@@ -741,39 +744,40 @@ class Statistics {
             }
         });
 
-        new Chart(this.#sentimentLineChart, {
-            type: 'line',
+        new Chart(this.#sentimentBarChart, {
+            type: 'bar',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
                 datasets: [{
-                    fill: {
-                    },
                     label: 'Happy',
+                    stack: 'Unevaluated',
                     data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
                     borderColor: '#20c997',
                     backgroundColor: '#20c997'
 
                 },
                 {
-                    fill: {
-                        target: '0',
-                        above: 'rgb(25,135,84)',
-                        below: 'rgb(220,53,69)'
-                    },
-                    label: 'Happy (Evaluated)',
+                    label: 'Unhappy',
+                    stack: 'Unevaluated',
                     data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
-                    borderColor: '#fd7e14',
-                    backgroundColor: '#fd7e14',
+                    borderColor: 'rgb(220,53,69)',
+                    backgroundColor: 'rgb(220,53,69)'
+
                 },
                 {
-                    fill: null,
-                    label: 'Total',
-                    data: [800, 600, 600, 500, 700, 900, 900, 1100, 900, 1000, 1200, 800],
+                    label: 'Happy (Evaluated)',
+                    stack: 'Evaluated',
+                    data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
                     borderColor: '#0dcaf0',
-                    backgroundColor: '#0dcaf0'
+                    backgroundColor: '#0dcaf0',
                 },
-
-                ]
+                {
+                    label: 'Unhappy (Evaluated)',
+                    stack: 'Evaluated',
+                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
+                    borderColor: '#fd7e14',
+                    backgroundColor: '#fd7e14',
+                }]
             },
             options: {
                 responsive: true,
@@ -781,14 +785,11 @@ class Statistics {
             }
         });
 
-
         new Chart(this.#necessityLineChart, {
             type: 'line',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
                 datasets: [{
-                    fill: {
-                    },
                     label: 'Necessary',
                     data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
                     borderColor: '#20c997',
@@ -815,6 +816,92 @@ class Statistics {
                 },
 
                 ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(this.#overspendingChart, {
+            type: 'bar',
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
+                datasets: [{
+                    label: 'Category 1',
+                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
+                    borderColor: '#20c997',
+                    backgroundColor: '#20c997'
+
+                },
+                {
+                    label: 'Category 2',
+                    data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
+                    borderColor: '#fd7e14',
+                    backgroundColor: '#fd7e14',
+                },
+                {
+                    label: 'Category 3',
+                    data: [800, 600, 600, 500, 700, 900, 900, 1100, 900, 1000, 1200, 800],
+                    borderColor: '#0dcaf0',
+                    backgroundColor: '#0dcaf0'
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Monthly Overspending Per Category'
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: {
+                            callback: function (value, index, ticks) {
+                                return value + ' $';
+                            }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                    }
+                }
+            }
+        });
+
+        new Chart(this.#savingsChart, {
+            type: 'line',
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
+                datasets: [{
+                    label: 'Savings',
+                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
+                    borderColor: '#20c997',
+                    backgroundColor: '#20c997'
+
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(this.#incomeChart, {
+            type: 'line',
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
+                datasets: [{
+                    label: 'Income',
+                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
+                    borderColor: '#20c997',
+                    backgroundColor: '#20c997'
+
+                }]
             },
             options: {
                 responsive: true,
