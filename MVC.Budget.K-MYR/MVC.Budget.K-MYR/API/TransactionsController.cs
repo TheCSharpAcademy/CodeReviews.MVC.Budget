@@ -42,7 +42,8 @@ public class TransactionsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionPost.CategoryId, s => s.Month.Month == transactionPost.DateTime.Month && s.Month.Year == transactionPost.DateTime.Year);
+        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionPost.CategoryId, 
+            c => c.Statistics.Where(s => s.Month.Month == transactionPost.DateTime.Month && s.Month.Year == transactionPost.DateTime.Year));
 
         if (category is null)
             return NotFound();
@@ -67,7 +68,8 @@ public class TransactionsController : ControllerBase
         if (transaction is null)
             return NotFound();
         
-        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionPut.CategoryId, s => s.Month.Month == transactionPut.DateTime.Month && s.Month.Year == transactionPut.DateTime.Year);      
+        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionPut.CategoryId,
+            c => c.Statistics.Where(s => s.Month.Month == transactionPut.DateTime.Month && s.Month.Year == transactionPut.DateTime.Year));      
 
         if (category is null)
             return NotFound();      
@@ -118,7 +120,8 @@ public class TransactionsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();        
 
-        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionToPatch.CategoryId, s => s.Month.Month == transactionToPatch.DateTime.Month && s.Month.Year == transactionToPatch.DateTime.Year);
+        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionToPatch.CategoryId,
+            c => c.Statistics.Where(s => s.Month.Month == transactionToPatch.DateTime.Month && s.Month.Year == transactionToPatch.DateTime.Year));
 
         if (category is null)
             return NotFound();

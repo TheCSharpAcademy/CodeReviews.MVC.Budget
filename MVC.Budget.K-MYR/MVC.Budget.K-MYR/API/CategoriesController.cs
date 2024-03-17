@@ -62,7 +62,7 @@ public class CategoriesController : ControllerBase
 
         var currentDate = DateTime.UtcNow;
 
-        var category = await _categoriesService.GetCategoryWithFilteredStatistics(categoryPut.Id, s => s.Month.Month == currentDate.Month && s.Month.Year == currentDate.Year);
+        var category = await _categoriesService.GetCategoryWithFilteredStatistics(categoryPut.Id,c => c.Statistics.Where(s => s.Month.Month == currentDate.Month && s.Month.Year == currentDate.Year));
 
         if (category is null)
             return NotFound();       

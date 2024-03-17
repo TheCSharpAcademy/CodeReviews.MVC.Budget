@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVC.Budget.K_MYR.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240303165229_Initial")]
+    [Migration("20240317100116_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -50,6 +50,54 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.HasIndex("GroupId");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.CategoryStatistic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Budget")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HappyEvaluatedTransactions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HappyTransactions")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Month")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NecessaryEvaluatedTransactions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NecessaryTransactions")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Overspending")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<decimal>("TotalSpent")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<int>("TotalTransactions")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("CategoryStatistics");
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Group", b =>
@@ -123,6 +171,17 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.CategoryStatistic", b =>
+                {
+                    b.HasOne("MVC.Budget.K_MYR.Models.Category", "Category")
+                        .WithMany("Statistics")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Transaction", b =>
                 {
                     b.HasOne("MVC.Budget.K_MYR.Models.Category", "Category")
@@ -136,6 +195,8 @@ namespace MVC.Budget.K_MYR.Migrations
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Category", b =>
                 {
+                    b.Navigation("Statistics");
+
                     b.Navigation("Transactions");
                 });
 

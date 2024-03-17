@@ -16,141 +16,147 @@ const transactionModalEvaluatedIsNecessary = updateTransactionModal.find("#updat
 Chart.defaults.color = '#ffffff';
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    $("#country").countrySelect();
 
-    const chart1 = document.getElementById('chart');
-    const chart2 = document.getElementById('chart2');
+$("#country").countrySelect();
 
-    new Chart(chart1, {
-        type: 'doughnut',
-        data: {
-            labels: [
-                'Happy',
-                'Unhappy'
+const chart1 = document.getElementById('chart');
+const chart2 = document.getElementById('chart2');
+
+new Chart(chart1, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            'Happy',
+            'Unhappy'
+        ],
+        datasets: [{
+            label: 'Total Amount',
+            data: [chart1.dataset.happy, chart1.dataset.unhappy],
+            backgroundColor: [
+                'rgb(25,135,84)',
+                'rgb(220,53,69)'
             ],
-            datasets: [{
-                label: 'Total Amount',
-                data: [chart1.dataset.happy, chart1.dataset.unhappy],
-                backgroundColor: [
-                    'rgb(25,135,84)',
-                    'rgb(220,53,69)'
-                ],
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-    new Chart(chart2, {
-        type: 'doughnut',
-        data: {
-            labels: [
-                'Necessary',
-                'Unnecessary'
-            ],
-            datasets: [{
-                label: 'Total Amount',
-                data: [chart2.dataset.necessary, chart2.dataset.unnecessary],
-                backgroundColor: [
-                    'rgb(25,135,84)',
-                    'rgb(220,53,69)'
-                ],
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-    $(".accordion-head").on("click", function (event) {
-        if (event.target.matches("img.add-icon.ms-auto")) {
-            var id = $(this).closest('.accordion').data("id");
-            addTransactionModal.modal('show');
-            addTransactionModal.find("#CategoryId").val(id);
-        }
-        else {
-            $(this).next().collapse('toggle');
-            var caret = $('.accordion-caret', this)[0];
-            if (caret.classList.contains("rotate")) {
-                caret.classList.remove("rotate");
-            } else {
-                caret.classList.add("rotate");
-            }
-        }
-    });
-
-    $('#add-transaction-form').on("submit", async function (event) {
-        event.preventDefault();
-        if ($(this).valid()) {
-            addTransactionModal.modal('hide');
-            await addTransaction(new FormData(this));
-        }
-    });  
-
-    $('#update-transaction-form').on("submit", async function (event) {
-        event.preventDefault();
-        if ($(this).valid()) {
-            updateTransactionModal.modal('hide');
-            await updateTransaction(new FormData(this));
-        }
-    }); 
-
-    $('.transaction').on("click", function (event) {
-        if (menu.dataset.transaction != 0) {
-            console.log(`transaction_${menu.dataset.transaction}`);
-            var borderBox = document.getElementById(`transaction_${menu.dataset.transaction}`).querySelector('.border-animation');
-            borderBox.classList.remove('border-rotate');
-        }
-
-        menu.dataset.transaction = this.dataset.id;
-        menu.style.left = `${this.style.left + event.pageX - 100}px`;
-        menu.style.top = `${event.pageY - 100}px`;
-        menu.classList.add('active');
-
-        this.querySelector('.border-animation').classList.add('border-rotate');
-    });
-
-    document.getElementById('close-menu').onclick = function () {
-        menu.classList.remove('active');
-        var id = menu.dataset.transaction;
-        var borderBox = document.getElementById(`transaction_${id}`).querySelector('.border-animation');
-        borderBox.classList.remove('border-rotate');
-        menu.dataset.transaction = 0;
-    };
-
-    document.getElementById('delete-menu').onclick = function () {
-        var token = menu.querySelector('input').value;
-        var id = menu.dataset.transaction;
-        if (deleteTransaction(id, token)) {
-            menu.classList.remove('active');
-            menu.dataset.transaction = 0;
-        }
-    };
-
-    document.getElementById('edit-menu').onclick = function () {
-        var transaction = document.getElementById(`transaction_${menu.dataset.transaction}`);
-     
-        transactionModalLabel.text(`Edit ${transaction.dataset.title}`);
-        transactionModalId.val(transaction.dataset.id);
-        transactionModalCategoryId.val(transaction.dataset.categoryid);
-        transactionModalTitle.val(transaction.dataset.title);
-        transactionModalAmount.val(transaction.dataset.amount);
-        transactionModalDateTime.val(transaction.dataset.date);
-        transactionModalEvaluated.val(transaction.dataset.evaluated);
-        transactionModalEvaluatedIsHappy.val(transaction.dataset.evaluatedishappy);
-        transactionModalEvaluatedIsNecessary.val(transaction.dataset.evaluatedisnecessary);
-        updateTransactionModal.find(`#updateTransaction_isHappy${transaction.dataset.ishappy}`).prop("checked", true);
-        updateTransactionModal.find(`#updateTransaction_isNecessary${transaction.dataset.isnecessary}`).prop("checked", true);
-
-        updateTransactionModal.modal('show');
-    };
+            hoverOffset: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
 });
+
+new Chart(chart2, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            'Necessary',
+            'Unnecessary'
+        ],
+        datasets: [{
+            label: 'Total Amount',
+            data: [chart2.dataset.necessary, chart2.dataset.unnecessary],
+            backgroundColor: [
+                'rgb(25,135,84)',
+                'rgb(220,53,69)'
+            ],
+            hoverOffset: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+
+$(".accordion-head").on("click", function (event) {
+    if (event.target.matches("img.add-icon.ms-auto")) {
+        var id = $(this).closest('.accordion').data("id");
+        addTransactionModal.modal('show');
+        addTransactionModal.find("#CategoryId").val(id);
+    }
+    else {
+        $(this).next().collapse('toggle');
+        var caret = $('.accordion-caret', this)[0];
+        if (caret.classList.contains("rotate")) {
+            caret.classList.remove("rotate");
+        } else {
+            caret.classList.add("rotate");
+        }
+    }
+});
+
+$('#add-transaction-form').on("submit", async function (event) {
+    event.preventDefault();
+    if ($(this).valid()) {
+        addTransactionModal.modal('hide');
+        const start = performance.now();
+        await addTransaction(new FormData(this));
+        const end = performance.now();
+        console.log(`Execution time: ${end - start} ms`);
+    }
+});
+
+$('#update-transaction-form').on("submit", async function (event) {
+    event.preventDefault();
+    if ($(this).valid()) {
+        updateTransactionModal.modal('hide');
+        const start = performance.now();
+        await updateTransaction(new FormData(this));
+        const end = performance.now();
+        console.log(`Execution time: ${end - start} ms`);
+    }
+});
+
+$('.transaction').on("click", function (event) {
+    if (menu.dataset.transaction != 0) {
+        console.log(`transaction_${menu.dataset.transaction}`);
+        var borderBox = document.getElementById(`transaction_${menu.dataset.transaction}`).querySelector('.border-animation');
+        borderBox.classList.remove('border-rotate');
+    }
+
+    menu.dataset.transaction = this.dataset.id;
+    menu.style.left = `${this.style.left + event.pageX - 100}px`;
+    menu.style.top = `${event.pageY - 100}px`;
+    menu.classList.add('active');
+
+    this.querySelector('.border-animation').classList.add('border-rotate');
+});
+
+document.getElementById('close-menu').onclick = function () {
+    menu.classList.remove('active');
+    var id = menu.dataset.transaction;
+    var borderBox = document.getElementById(`transaction_${id}`).querySelector('.border-animation');
+    borderBox.classList.remove('border-rotate');
+    menu.dataset.transaction = 0;
+};
+
+document.getElementById('delete-menu').onclick = function () {
+    var token = menu.querySelector('input').value;
+    var id = menu.dataset.transaction;
+    if (deleteTransaction(id, token)) {
+        menu.classList.remove('active');
+        menu.dataset.transaction = 0;
+    }
+};
+
+document.getElementById('edit-menu').onclick = function () {
+    var transaction = document.getElementById(`transaction_${menu.dataset.transaction}`);
+
+    transactionModalLabel.text(`Edit ${transaction.dataset.title}`);
+    transactionModalId.val(transaction.dataset.id);
+    transactionModalCategoryId.val(transaction.dataset.categoryid);
+    transactionModalTitle.val(transaction.dataset.title);
+    transactionModalAmount.val(transaction.dataset.amount);
+    transactionModalDateTime.val(transaction.dataset.date);
+    transactionModalEvaluated.val(transaction.dataset.evaluated);
+    transactionModalEvaluatedIsHappy.val(transaction.dataset.evaluatedishappy);
+    transactionModalEvaluatedIsNecessary.val(transaction.dataset.evaluatedisnecessary);
+    updateTransactionModal.find(`#updateTransaction_isHappy${transaction.dataset.ishappy}`).prop("checked", true);
+    updateTransactionModal.find(`#updateTransaction_isNecessary${transaction.dataset.isnecessary}`).prop("checked", true);
+
+    updateTransactionModal.modal('show');
+};
+
 
 async function addTransaction(data) {
     try {

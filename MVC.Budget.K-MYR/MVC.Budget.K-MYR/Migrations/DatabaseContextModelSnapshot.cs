@@ -64,8 +64,20 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<int>("HappyEvaluatedTransactions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HappyTransactions")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Month")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("NecessaryEvaluatedTransactions")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NecessaryTransactions")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Overspending")
                         .HasPrecision(19, 4)
@@ -74,6 +86,9 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Property<decimal>("TotalSpent")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
+
+                    b.Property<int>("TotalTransactions")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

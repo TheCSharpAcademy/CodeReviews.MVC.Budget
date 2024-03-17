@@ -18,10 +18,103 @@ public class CategoryStatistic
     [DataType(DataType.Currency)]
     [Precision(19, 4)]
     public decimal Overspending { get; set; } = 0;
+    public int TotalTransactions { get; set; } = 0;
+    public int HappyTransactions { get; set; } = 0;
+    public int NecessaryTransactions { get; set; } = 0;
+    public int HappyEvaluatedTransactions { get; set; } = 0;
+    public int NecessaryEvaluatedTransactions { get; set; } = 0;
 
-    public void ChangeTotalSpent(decimal change)
+    public void AddTransaction(Transaction transaction)
     {
-        TotalSpent += change;
+        TotalSpent += transaction.Amount;
         Overspending = Math.Max(0, TotalSpent - Budget);
+        TotalTransactions++;
+
+        if(transaction.Evaluated)
+        {
+            if (transaction.IsHappy)
+                HappyEvaluatedTransactions++;
+
+            if (transaction.IsNecessary)
+                NecessaryEvaluatedTransactions++;
+
+            if (transaction.PreviousIsHappy)
+                HappyEvaluatedTransactions++;
+
+            if (transaction.PreviousIsNecessary)
+                NecessaryEvaluatedTransactions++;
+        }
+
+        else
+        {
+            if (transaction.IsHappy)
+                HappyTransactions++;
+
+            if (transaction.IsNecessary)
+                NecessaryTransactions++;
+        }
+    }
+
+    public void AddTransaction(TransactionPut transaction)
+    {
+        TotalSpent += transaction.Amount;
+        Overspending = Math.Max(0, TotalSpent - Budget);
+        TotalTransactions++;
+
+        if (transaction.Evaluated)
+        {
+            if (transaction.IsHappy)
+                HappyEvaluatedTransactions++;
+
+            if (transaction.IsNecessary)
+                NecessaryEvaluatedTransactions++;
+
+            if (transaction.PreviousIsHappy)
+                HappyEvaluatedTransactions++;
+
+            if (transaction.PreviousIsNecessary)
+                NecessaryEvaluatedTransactions++;
+        }
+
+        else
+        {
+            if (transaction.IsHappy)
+                HappyTransactions++;
+
+            if (transaction.IsNecessary)
+                NecessaryTransactions++;
+        }
+    }
+
+    public void RemoveTransaction(Transaction transaction)
+    {
+        TotalSpent -= transaction.Amount;
+        Overspending = Math.Max(0, TotalSpent - Budget);
+        TotalTransactions--;
+
+        if (transaction.Evaluated)
+        {
+            if (transaction.IsHappy)
+                HappyEvaluatedTransactions--;
+
+            if (transaction.IsNecessary)
+                NecessaryEvaluatedTransactions--;
+
+            if (transaction.PreviousIsHappy)
+                HappyEvaluatedTransactions--;
+
+            if (transaction.PreviousIsNecessary)
+                NecessaryEvaluatedTransactions--;
+        }
+
+        else
+        {
+            if (transaction.IsHappy)
+                HappyTransactions--;
+
+            if (transaction.IsNecessary)
+                NecessaryTransactions--;
+        }
+
     }
 }

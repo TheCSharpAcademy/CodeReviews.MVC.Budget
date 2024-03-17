@@ -54,14 +54,15 @@ public class TransactionsService : ITransactionsService
                 CategoryId = category.Id,
                 Budget = category.Budget,
                 TotalSpent = transaction.Amount,
-                Month = transaction.DateTime
+                Month = transaction.DateTime,
+                TotalTransactions = 1,
+                HappyTransactions = transaction.IsHappy ? 1 : 0,
+                NecessaryTransactions = transaction.IsHappy ? 1 : 0
             });
         }
         else
         {
-            statistic.TotalSpent += transaction.Amount;
-            statistic.Budget = category.Budget;
-            statistic.Overspending = Math.Max(0, statistic.TotalSpent - statistic.Budget);
+            statistic.AddTransaction(transaction);
 
             _unitOfWork.CategoryStatisticsRepository.Update(statistic);
         }
@@ -73,34 +74,34 @@ public class TransactionsService : ITransactionsService
 
     public async Task UpdateTransaction(Category category, Transaction transaction, TransactionPut transactionPut)
     {
-        if(transaction.DateTime.Month != transactionPut.DateTime.Month || transaction.DateTime.Year != transactionPut.DateTime.Year || transaction.CategoryId != transactionPut.CategoryId)
-        {
-            var oldStatistic = await _unitOfWork.CategoryStatisticsRepository.GetByCategoryIdAndDateTimeAsync(transaction.CategoryId, transaction.DateTime);
-
-            if(oldStatistic is not null)
-            {
-                oldStatistic.ChangeTotalSpent(-transaction.Amount);
-                _unitOfWork.CategoryStatisticsRepository.Update(oldStatistic);
-            }
-        }
-
-        var statistic = category.Statistics.SingleOrDefault();
+        var statistic = category.Statistics.SingleOrDefault(s => s.Month.Month == transactionPut.DateTime.Month && s.Month.Year == transactionPut.DateTime.Year);
 
         if (statistic is null)
         {
-            _unitOfWork.CategoryStatisticsRepository.Insert(new CategoryStatistic
+            statistic = new CategoryStatistic
             {
                 CategoryId = category.Id,
                 Budget = category.Budget,
-                TotalSpent = transactionPut.Amount,
-                Month = DateTime.UtcNow
-            });
+                Month = transactionPut.DateTime
+            };
+            _unitOfWork.CategoryStatisticsRepository.Insert(statistic);
+        }
+
+        if (transaction.DateTime.Month != transactionPut.DateTime.Month || transaction.DateTime.Year != transactionPut.DateTime.Year || transaction.CategoryId != transactionPut.CategoryId)
+        {
+            var oldStatistic = await _unitOfWork.CategoryStatisticsRepository.GetByCategoryIdAndDateTimeAsync(transaction.CategoryId, transaction.DateTime);
+
+            if (oldStatistic is not null)
+            {
+                oldStatistic.RemoveTransaction(transaction);
+            }
         }
         else
         {
-            statistic.ChangeTotalSpent(transactionPut.Amount - transaction.Amount);
-            _unitOfWork.CategoryStatisticsRepository.Update(statistic);
+            statistic.RemoveTransaction(transaction);
         }
+
+        statistic.AddTransaction(transactionPut);
 
         transaction.Title = transactionPut.Title;
         transaction.Description = transactionPut.Description;
@@ -113,9 +114,6 @@ public class TransactionsService : ITransactionsService
         transaction.PreviousIsNecessary = transactionPut.PreviousIsNecessary;
         transaction.PreviousIsHappy = transactionPut.PreviousIsHappy;
 
-
-        _unitOfWork.TransactionsRepository.Update(transaction);
-
         await _unitOfWork.Save();
     }
 
@@ -125,7 +123,7 @@ public class TransactionsService : ITransactionsService
 
         if (statistic != null)
         {
-            statistic.ChangeTotalSpent(-transaction.Amount);
+            statistic.RemoveTransaction(transaction);
             _unitOfWork.CategoryStatisticsRepository.Update(statistic);
         }
 
@@ -133,7 +131,7 @@ public class TransactionsService : ITransactionsService
         await _unitOfWork.Save();
     }
 
-    public Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<CategoryStatistic, bool>> filter)
+    public Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryStatistic>>> filter)
     {
         return _unitOfWork.CategoriesRepository.GetCategoryWithFilteredStatistics(id, filter);
     }

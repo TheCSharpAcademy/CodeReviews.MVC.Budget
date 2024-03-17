@@ -18,9 +18,9 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                 .SingleOrDefaultAsync(c => c.Id == id);
     }
 
-    public  Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<CategoryStatistic, bool>> filter)
+    public  Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryStatistic>>> filter)
     {
-        return _dbSet.Include(p => p.Statistics.AsQueryable().Where(filter))
+        return _dbSet.Include(filter)
                      .SingleOrDefaultAsync(c => c.Id == id);
     }
 

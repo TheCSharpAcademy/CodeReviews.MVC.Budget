@@ -9,7 +9,7 @@ namespace MVC.Budget.K_MYR.Services
         Task DeleteTransaction(Transaction transaction);
         Transaction? GetByID(int id);
         ValueTask<Transaction?> GetByIDAsync(int id);
-        Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<CategoryStatistic, bool>> filter);
+        Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryStatistic>>> filter);
         Task<List<Transaction>> GetTransactions();
         Task UpdateTransaction(Category category, Transaction transaction, TransactionPut transactionPut);
     }

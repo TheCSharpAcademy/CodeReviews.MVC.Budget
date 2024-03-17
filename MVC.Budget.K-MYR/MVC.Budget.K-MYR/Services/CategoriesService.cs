@@ -75,10 +75,7 @@ public class CategoriesService : ICategoriesService
         category.Budget = categoryPut.Budget;
         category.GroupId = categoryPut.GroupId;
 
-        var currentDate = DateTime.UtcNow;
-
-        var statistic = category.Statistics.Where(s => s.Month.Year == currentDate.Year && s.Month.Month == currentDate.Month)
-                                           .SingleOrDefault();
+        var statistic = category.Statistics.SingleOrDefault();
 
         if(statistic is null)
         {
@@ -93,11 +90,8 @@ public class CategoriesService : ICategoriesService
         {
             statistic.Budget = category.Budget;
             statistic.Overspending = Math.Max(0, statistic.TotalSpent - statistic.Budget);
-
-            _unitOfWork.CategoryStatisticsRepository.Update(statistic);            
         }
 
-        _unitOfWork.CategoriesRepository.Update(category);
         await _unitOfWork.Save();
     }
 
@@ -107,7 +101,7 @@ public class CategoriesService : ICategoriesService
         await _unitOfWork.Save();
     }
 
-    public Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<CategoryStatistic, bool>> filter)
+    public Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryStatistic>>> filter)
     {
         return _unitOfWork.CategoriesRepository.GetCategoryWithFilteredStatistics(id, filter);
     }
