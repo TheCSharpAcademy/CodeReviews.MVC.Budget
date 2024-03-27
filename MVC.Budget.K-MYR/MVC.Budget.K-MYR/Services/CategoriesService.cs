@@ -55,7 +55,7 @@ public class CategoriesService : ICategoriesService
 
         await _unitOfWork.Save();
 
-        var categoryStatistics = new CategoryStatistic()
+        var categoryStatistics = new CategoryBudget()
         {
             CategoryId = category.Id,
             Budget = category.Budget,
@@ -71,26 +71,28 @@ public class CategoriesService : ICategoriesService
 
     public async Task UpdateCategory(Category category, CategoryPut categoryPut)
     {
+        if (categoryPut.Budget != category.Budget) 
+        {
+            var currentBudget = category.PreviousBudgets.SingleOrDefault(b => b.Month.Month == DateTime.UtcNow.Month && b.Month.Year == DateTime.UtcNow.Year);
+
+            if (currentBudget is null)
+            {
+                _unitOfWork.CategoryStatisticsRepository.Insert(new CategoryBudget
+                {
+                    CategoryId = category.Id,
+                    Budget = category.Budget,
+                    Month = DateTime.UtcNow
+                });
+            }
+            else
+            {
+                currentBudget.Budget = categoryPut.Budget;
+            }
+        }
+
         category.Name = categoryPut.Name;
         category.Budget = categoryPut.Budget;
-        category.GroupId = categoryPut.GroupId;
-
-        var statistic = category.Statistics.SingleOrDefault();
-
-        if(statistic is null)
-        {
-            _unitOfWork.CategoryStatisticsRepository.Insert(new CategoryStatistic
-            {
-                CategoryId = category.Id,
-                Budget = category.Budget,
-                Month = DateTime.UtcNow
-            });
-        }
-        else
-        {
-            statistic.Budget = category.Budget;
-            statistic.Overspending = Math.Max(0, statistic.TotalSpent - statistic.Budget);
-        }
+        category.GroupId = categoryPut.GroupId;    
 
         await _unitOfWork.Save();
     }
@@ -101,7 +103,7 @@ public class CategoriesService : ICategoriesService
         await _unitOfWork.Save();
     }
 
-    public Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryStatistic>>> filter)
+    public Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter)
     {
         return _unitOfWork.CategoriesRepository.GetCategoryWithFilteredStatistics(id, filter);
     }

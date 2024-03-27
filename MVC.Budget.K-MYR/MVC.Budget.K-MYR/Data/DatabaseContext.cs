@@ -8,7 +8,7 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
     public DbSet<Group> Groups { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Category> Categories { get; set; }
-    public DbSet<CategoryStatistic> CategoryStatistics { get; set; }
+    public DbSet<CategoryBudget> CategoryBudgets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,24 +25,16 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Category>()
-            .HasMany(c => c.Statistics)
+            .HasMany(c => c.PreviousBudgets)
             .WithOne(s => s.Category)
             .HasForeignKey(s => s.CategoryId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade);           
 
-        modelBuilder.Entity<CategoryStatistic>()
+        modelBuilder.Entity<Category>()
             .Property(m => m.Budget)
             .HasPrecision(19, 4);
 
-        modelBuilder.Entity<CategoryStatistic>()
-            .Property(m => m.Overspending)
-            .HasPrecision(19, 4);
-
-        modelBuilder.Entity<CategoryStatistic>()
-            .Property(m => m.TotalSpent)
-            .HasPrecision(19, 4);
-
-        modelBuilder.Entity<Category>()
+        modelBuilder.Entity<CategoryBudget>()
             .Property(m => m.Budget)
             .HasPrecision(19, 4);
 

@@ -1,5 +1,4 @@
-﻿using MVC.Budget.K_MYR.Models;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace MVC.Budget.K_MYR.Repositories;
 

@@ -45,27 +45,20 @@ namespace MVC.Budget.K_MYR.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CategoryStatistics",
+                name: "CategoryBudgets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     Budget = table.Column<decimal>(type: "decimal(19,4)", precision: 19, scale: 4, nullable: false),
-                    Month = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalSpent = table.Column<decimal>(type: "decimal(19,4)", precision: 19, scale: 4, nullable: false),
-                    Overspending = table.Column<decimal>(type: "decimal(19,4)", precision: 19, scale: 4, nullable: false),
-                    TotalTransactions = table.Column<int>(type: "int", nullable: false),
-                    HappyTransactions = table.Column<int>(type: "int", nullable: false),
-                    NecessaryTransactions = table.Column<int>(type: "int", nullable: false),
-                    HappyEvaluatedTransactions = table.Column<int>(type: "int", nullable: false),
-                    NecessaryEvaluatedTransactions = table.Column<int>(type: "int", nullable: false)
+                    Month = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CategoryStatistics", x => x.Id);
+                    table.PrimaryKey("PK_CategoryBudgets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CategoryStatistics_Categories_CategoryId",
+                        name: "FK_CategoryBudgets_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "Id",
@@ -106,8 +99,8 @@ namespace MVC.Budget.K_MYR.Migrations
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoryStatistics_CategoryId",
-                table: "CategoryStatistics",
+                name: "IX_CategoryBudgets_CategoryId",
+                table: "CategoryBudgets",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
@@ -120,7 +113,7 @@ namespace MVC.Budget.K_MYR.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CategoryStatistics");
+                name: "CategoryBudgets");
 
             migrationBuilder.DropTable(
                 name: "Transactions");

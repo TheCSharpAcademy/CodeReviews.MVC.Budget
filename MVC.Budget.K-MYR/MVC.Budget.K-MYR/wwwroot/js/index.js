@@ -1,5 +1,6 @@
 ﻿const categoriesAPI = "https://localhost:7246/api/Categories";
 const transactionsAPI = "https://localhost:7246/api/Transactions";
+const groupsAPI = "https://localhost:7246/api/Groups";
 
 const menu = document.getElementById('menu-container');
 const sidebar = document.getElementById("sidebar");
@@ -199,6 +200,8 @@ flipContainer.addEventListener("transitionend", () => {
 
 });
 
+initializeStatisticsDashboard();
+
 async function addTransaction(data) {
     try {
         var response = await fetch(`${transactionsAPI}`, {
@@ -377,6 +380,25 @@ async function deleteCategory(id, token) {
     } catch (error) {
         console.error(error);
         return false;
+    }
+}
+
+async function getStatistics() {
+    try {
+        var response = await fetch(`${groupsAPI}/2?year=2024`, { /////// FIX GROUPD ID HERE
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error(`HTTP Post Error: ${response.status}`);
+        }
+    } catch (error) {
+        console.error(error);
     }
 }
 
@@ -671,30 +693,39 @@ function shortestAngle(index1, index2) {
 function resetStyle(element, style) {
     element.style = style + '; transition: transform 0s';
 }
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+async function initializeStatisticsDashboard() {
+
+    var data = await getStatistics()
+    var statistics = new Statistics(data);
+    statistics.render();
+}
 
 class Statistics {
-    year;
-    overspending;
-    sentimentTurnOverRate;
-    necessityTurnOverRate;
-    sentimentPerMonth;
-    necessityPerMonth;
-    sentimentEvaluatedPerMonth;
-    necessityEvaluatedPerMonth;
-    expensesPerMonth;
-    incomePerMonth;
-    savingsPerMonth;
-
-
+    #data;
     #sentimentChartYearly = document.getElementById('sentimentChartYear');
     #necessityChartYearly = document.getElementById('necessityChartYear');
     #sentimentBarChart = document.getElementById('sentimentLineChartYear');
-    #necessityLineChart = document.getElementById('necessityLineChartYear');
+    #necessityBarChart = document.getElementById('necessityLineChartYear');
     #overspendingChart = document.getElementById('overspendingChart');
     #savingsChart = document.getElementById('savingsChart');
     #incomeChart = document.getElementById('incomeChart');
+    #overspendingHeading = document.getElementById('statistics-overspending');
 
-    constructor() {
+    constructor(data) {
+        this.#data = data;
+    }
+
+    async loadData() {
+        this.#data = await getStatistics();
     }
 
     render() {
@@ -706,8 +737,8 @@ class Statistics {
                     'Unhappy'
                 ],
                 datasets: [{
-                    label: 'Total Amount',
-                    data: [50, 60],
+                    label: '# of Transactions',
+                    data: [this.#data.happyTransactionsTotal, this.#data.unhappyTransactionsTotal],
                     backgroundColor: [
                         'rgb(25,135,84)',
                         'rgb(220,53,69)'
@@ -730,7 +761,7 @@ class Statistics {
                 ],
                 datasets: [{
                     label: 'Total Amount',
-                    data: [50, 60],
+                    data: [this.#data.necessaryTransactionsTotal, this.#data.unnecessaryTransactionsTotal],
                     backgroundColor: [
                         'rgb(25,135,84)',
                         'rgb(220,53,69)'
@@ -751,7 +782,7 @@ class Statistics {
                 datasets: [{
                     label: 'Happy',
                     stack: 'Unevaluated',
-                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
+                    data: this.#data.happyPerMonth,
                     borderColor: '#20c997',
                     backgroundColor: '#20c997'
 
@@ -759,93 +790,159 @@ class Statistics {
                 {
                     label: 'Unhappy',
                     stack: 'Unevaluated',
-                    data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
+                    data: this.#data.unhappyPerMonth,
                     borderColor: 'rgb(220,53,69)',
                     backgroundColor: 'rgb(220,53,69)'
 
                 },
                 {
-                    label: 'Happy (Evaluated)',
+                    label: 'Happy (Eval.)',
                     stack: 'Evaluated',
-                    data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
-                    borderColor: '#0dcaf0',
-                    backgroundColor: '#0dcaf0',
+                    data: this.#data.happyEvaluatedPerMonth,
+                    borderColor: '#0f7c5c',
+                    backgroundColor: '#0f7c5c',
                 },
                 {
-                    label: 'Unhappy (Evaluated)',
+                    label: 'Unhappy (Eval.)',
                     stack: 'Evaluated',
-                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
-                    borderColor: '#fd7e14',
-                    backgroundColor: '#fd7e14',
+                    data: this.#data.unhappyEvaluatedPerMonth,
+                    borderColor: '#881d27',
+                    backgroundColor: '#881d27',
+                },
+                {
+                    label: 'Unevaluated',
+                    stack: 'Evaluated',
+                    data: this.#data.unevaluatedPerMonth,                   
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
+                    backgroundColor: '#1c1c1c',
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            color: '#d3d3d3',
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
+                    },
+                    x: {
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            display: false,
+                            tickColor: '#d3d3d3',
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
+                    },
+                }
             }
         });
 
-        new Chart(this.#necessityLineChart, {
-            type: 'line',
+        new Chart(this.#necessityBarChart, {
+            type: 'bar',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
                 datasets: [{
                     label: 'Necessary',
-                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
+                    stack: 'Unevaluated',
+                    data: this.#data.necessaryPerMonth,
                     borderColor: '#20c997',
                     backgroundColor: '#20c997'
 
                 },
                 {
-                    fill: {
-                        target: '0',
-                        above: 'rgb(25,135,84)',
-                        below: 'rgb(220,53,69)'
-                    },
-                    label: 'Necessary (Evaluated)',
-                    data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
-                    borderColor: '#fd7e14',
-                    backgroundColor: '#fd7e14',
+                    label: 'Unnecessary',
+                    stack: 'Unevaluated',
+                    data: this.#data.unnecessaryPerMonth,
+                    borderColor: 'rgb(220,53,69)',
+                    backgroundColor: 'rgb(220,53,69)'
+
                 },
                 {
-                    fill: null,
-                    label: 'Total',
-                    data: [800, 600, 600, 500, 700, 900, 900, 1100, 900, 1000, 1200, 800],
-                    borderColor: '#0dcaf0',
-                    backgroundColor: '#0dcaf0'
+                    label: 'Necessary (Eval.)',
+                    stack: 'Evaluated',
+                    data: this.#data.necessaryEvaluatedPerMonth,
+                    borderColor: '#0f7c5c',
+                    backgroundColor: '#0f7c5c',
                 },
-
-                ]
+                {
+                    label: 'Unnecessary (Eval.)',
+                    stack: 'Evaluated',
+                    data: this.#data.unnecessaryEvaluatedPerMonth,
+                    borderColor: '#881d27',
+                    backgroundColor: '#881d27',
+                },
+                {
+                    label: 'Unevaluated',
+                    stack: 'Evaluated',
+                    data: this.#data.unevaluatedPerMonth,
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
+                    backgroundColor: '#1c1c1c',
+                }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            color: '#d3d3d3',
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
+                    },
+                    x: {
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            display: false,
+                            tickColor: '#d3d3d3',
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
+                    },   
+                }
             }
         });
+
+        var datasets = [];
+
+        for (var i = 0; i < this.#data.monthlyOverspendingPerCategory.length; i++) {
+            var categoryData = this.#data.monthlyOverspendingPerCategory[i];
+            var color = getRandomColor();
+            datasets.push({
+                label: categoryData.category,
+                data: categoryData.overspendingPerMonth,
+                borderColor: color,
+                backgroundColor: color
+            });
+        }
 
         new Chart(this.#overspendingChart, {
             type: 'bar',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
-                datasets: [{
-                    label: 'Category 1',
-                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
-                    borderColor: '#20c997',
-                    backgroundColor: '#20c997'
-
-                },
-                {
-                    label: 'Category 2',
-                    data: [600, 500, 400, 300, 300, 400, 600, 800, 700, 600, 700, 600],
-                    borderColor: '#fd7e14',
-                    backgroundColor: '#fd7e14',
-                },
-                {
-                    label: 'Category 3',
-                    data: [800, 600, 600, 500, 700, 900, 900, 1100, 900, 1000, 1200, 800],
-                    borderColor: '#0dcaf0',
-                    backgroundColor: '#0dcaf0'
-                }]
+                datasets: datasets
             },
             options: {
                 plugins: {
@@ -871,7 +968,9 @@ class Statistics {
                     }
                 }
             }
-        });
+        });        
+
+        this.#overspendingHeading.innerHTML = htmlEscape(`Overspending: ${this.#data.overspendingTotal} `)
 
         new Chart(this.#savingsChart, {
             type: 'line',
@@ -908,9 +1007,5 @@ class Statistics {
                 maintainAspectRatio: false
             }
         });
-
     }
 }
-
-const statistics = new Statistics();
-statistics.render();

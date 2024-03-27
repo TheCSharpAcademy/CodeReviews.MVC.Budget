@@ -13,12 +13,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<IGroupsRepository, GroupsRepository>();
 builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddTransient<ITransactionsRepository, TransactionsRepository>();
-builder.Services.AddTransient<ICategoryStatisticsRepository, CategoryStatisticsRepository>();
+builder.Services.AddTransient<ICategoryBudgetsRepository, CategoryBudgetsRepository>();
 builder.Services.AddTransient<ICategoriesService, CategoriesService>();
+builder.Services.AddTransient<ICategoryStatisticsService, CategoryStatisticsService>();
 builder.Services.AddTransient<ITransactionsService, TransactionsService>();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MSQL")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")));
 builder.Services.AddControllersWithViews()
      .AddNewtonsoftJson(options =>
      {

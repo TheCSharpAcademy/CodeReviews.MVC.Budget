@@ -100,10 +100,7 @@ $('#update-transaction-form').on("submit", async function (event) {
     event.preventDefault();
     if ($(this).valid()) {
         updateTransactionModal.modal('hide');
-        const start = performance.now();
         await updateTransaction(new FormData(this));
-        const end = performance.now();
-        console.log(`Execution time: ${end - start} ms`);
     }
 });
 

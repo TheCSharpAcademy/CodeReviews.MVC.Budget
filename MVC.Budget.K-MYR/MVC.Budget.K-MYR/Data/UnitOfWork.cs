@@ -8,9 +8,9 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     public ICategoriesRepository CategoriesRepository { get; }
     public ITransactionsRepository TransactionsRepository { get; }
     public IGroupsRepository GroupsRepository { get; }
-    public ICategoryStatisticsRepository CategoryStatisticsRepository { get; }
+    public ICategoryBudgetsRepository CategoryStatisticsRepository { get; }
 
-    public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepo, ITransactionsRepository transactionsRepo, IGroupsRepository groupsRepo, ICategoryStatisticsRepository categoryStatisticsRepository)
+    public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepo, ITransactionsRepository transactionsRepo, IGroupsRepository groupsRepo, ICategoryBudgetsRepository categoryStatisticsRepository)
     {
         _context = context;
         CategoriesRepository = categoriesRepo;

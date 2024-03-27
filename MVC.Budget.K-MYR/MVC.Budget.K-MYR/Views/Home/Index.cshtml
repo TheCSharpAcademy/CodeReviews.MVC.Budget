@@ -19,17 +19,6 @@
     var incomeBudget = Model.PageModel.Income.Sum(c => c.Budget);
 
     var overspending = expensesPerCategory.Sum(c => Math.Max(0, c.sumOfTransactions - c.category.Budget));
-
-    var evaluatedTransactions = Model.PageModel.Expenses.SelectMany(c => c.Transactions).Where(t => t.Evaluated).ToList();
-
-    decimal sentimentTurnOverRate = 0;
-    decimal necessityTurnOverRate = 0;
-
-    if (evaluatedTransactions.Count > 0)
-    {
-        sentimentTurnOverRate = evaluatedTransactions.Count(t => t.IsHappy != t.PreviousIsHappy) / (decimal)evaluatedTransactions.Count;
-        necessityTurnOverRate = evaluatedTransactions.Count(t => t.IsNecessary != t.PreviousIsNecessary) / (decimal)evaluatedTransactions.Count;
-    }
 }
 
 <section>
@@ -71,9 +60,7 @@
                                 <h1 class="text-center">My Budget</h1>
                                 <h4 class="text-center">February 2024</h4>
                                 <div class="dashboardStatistics mt-4">
-                                    <h5 class="text-center">Overspending: @overspending.ToString("C2", Model.Culture) </h5>
-                                    <h5 class="text-center">Sentiment TR: @sentimentTurnOverRate.ToString("P2")</h5>
-                                    <h5 class="text-center">Necessity TR: @necessityTurnOverRate.ToString("P2")</h5>
+                                    <h5 class="text-center">Overspending: @overspending.ToString("C2", Model.Culture) </h5>                                    
                                 </div>
                             </div>
                             <div class="chart-container">
@@ -511,22 +498,18 @@
                         <div class="dashboard border">
                             <div class="dashboard-container">
                                 <div class="chart-container">
-                                    <canvas id="sentimentChartYear" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
-                                            data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                                    <canvas id="sentimentChartYear">
                                     </canvas>
                                 </div>
                                 <div class="chart-container">
                                     <h1 class="text-center">My Budget</h1>
                                     <h4 class="text-center">2024</h4>
                                     <div class="dashboardStatistics mt-4">
-                                        <h5 class="text-center">Overspending: @overspending.ToString("C2", Model.Culture) </h5>
-                                        <h5 class="text-center">Sentiment TR: @sentimentTurnOverRate.ToString("P2")</h5>
-                                        <h5 class="text-center">Necessity TR: @necessityTurnOverRate.ToString("P2")</h5>
+                                        <h5 id="statistics-overspending" class="text-center">Overspending: @overspending.ToString("C2", Model.Culture) </h5>                                      
                                     </div>
                                 </div>
                                 <div class="chart-container">
-                                    <canvas id="necessityChartYear" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
-                                            data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                                    <canvas id="necessityChartYear">
                                     </canvas>
                                 </div>
                             </div>

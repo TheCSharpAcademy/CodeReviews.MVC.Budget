@@ -12,6 +12,6 @@ namespace MVC.Budget.K_MYR.Services
         Task<List<Category>> GetCategoriesWithUnevaluatedTransactions();
         Category? GetByID(int id);
         Task DeleteCategory(Category category);
-        Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryStatistic>>> filter);
+        Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter);
     }
 }

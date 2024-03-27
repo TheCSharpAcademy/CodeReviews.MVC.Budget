@@ -30,7 +30,7 @@ public class TransactionsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Transaction>> GetTransaction(int id)
     {
-        var transaction = await _transactionsService.GetByIDAsync(id);
+        var transaction = await _transactionsService.GetByIdAsync(id);
 
         return transaction is null ? NotFound() : Ok(transaction);
     }
@@ -42,13 +42,10 @@ public class TransactionsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionPost.CategoryId, 
-            c => c.Statistics.Where(s => s.Month.Month == transactionPost.DateTime.Month && s.Month.Year == transactionPost.DateTime.Year));
-
-        if (category is null)
+        if (!await _transactionsService.CategoryExists(transactionPost.CategoryId))
             return NotFound();
 
-        var transaction = await _transactionsService.AddTransaction(transactionPost, category);
+        var transaction = await _transactionsService.AddTransaction(transactionPost);
 
         return CreatedAtAction(nameof(Transaction), new { id = transaction.Id }, transaction);
     }
@@ -63,20 +60,17 @@ public class TransactionsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var transaction = await _transactionsService.GetByIDAsync(id);
+        var transaction = await _transactionsService.GetByIdAsync(id);
 
         if (transaction is null)
             return NotFound();
         
-        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionPut.CategoryId,
-            c => c.Statistics.Where(s => s.Month.Month == transactionPut.DateTime.Month && s.Month.Year == transactionPut.DateTime.Year));      
-
-        if (category is null)
-            return NotFound();      
+        if (!await _transactionsService.CategoryExists(transactionPut.CategoryId))
+            return NotFound();
 
         try
         {
-            await _transactionsService.UpdateTransaction(category, transaction, transactionPut);
+            await _transactionsService.UpdateTransaction(transaction, transactionPut);
             return NoContent();
         }
 
@@ -92,10 +86,10 @@ public class TransactionsController : ControllerBase
         if (patchDoc is null)
             return BadRequest();
 
-        var transaction = await _transactionsService.GetByIDAsync(id);
+        var transaction = await _transactionsService.GetByIdAsync(id);
 
         if (transaction is null)
-            return NotFound();        
+            return NotFound();
 
         TransactionPut transactionToPatch = new()
         {
@@ -114,21 +108,18 @@ public class TransactionsController : ControllerBase
 
         patchDoc.ApplyTo(transactionToPatch, ModelState);
 
-        if(transactionToPatch.Id != transaction.Id)
+        if (transactionToPatch.Id != transaction.Id)
             return BadRequest();
 
         if (!ModelState.IsValid)
-            return BadRequest();        
+            return BadRequest();
 
-        var category = await _transactionsService.GetCategoryWithFilteredStatistics(transactionToPatch.CategoryId,
-            c => c.Statistics.Where(s => s.Month.Month == transactionToPatch.DateTime.Month && s.Month.Year == transactionToPatch.DateTime.Year));
-
-        if (category is null)
+        if (!await _transactionsService.CategoryExists(transactionToPatch.CategoryId))
             return NotFound();
 
         try
         {
-            await _transactionsService.UpdateTransaction(category, transaction, transactionToPatch);
+            await _transactionsService.UpdateTransaction(transaction, transactionToPatch);
             return NoContent();
         }
         catch (DbUpdateConcurrencyException) when (!TransactionExists(transaction.Id))
@@ -141,7 +132,7 @@ public class TransactionsController : ControllerBase
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> DeleteTransaction(int id)
     {
-        var transaction = await _transactionsService.GetByIDAsync(id);
+        var transaction = await _transactionsService.GetByIdAsync(id);
 
         if (transaction is null)
             return NotFound();

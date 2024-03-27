@@ -49,7 +49,7 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("MVC.Budget.K_MYR.Models.CategoryStatistic", b =>
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.CategoryBudget", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -64,37 +64,14 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("HappyEvaluatedTransactions")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HappyTransactions")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Month")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("NecessaryEvaluatedTransactions")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NecessaryTransactions")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Overspending")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
-                    b.Property<decimal>("TotalSpent")
-                        .HasPrecision(19, 4)
-                        .HasColumnType("decimal(19,4)");
-
-                    b.Property<int>("TotalTransactions")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("CategoryStatistics");
+                    b.ToTable("CategoryBudgets");
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Group", b =>
@@ -168,10 +145,10 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Navigation("Group");
                 });
 
-            modelBuilder.Entity("MVC.Budget.K_MYR.Models.CategoryStatistic", b =>
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.CategoryBudget", b =>
                 {
                     b.HasOne("MVC.Budget.K_MYR.Models.Category", "Category")
-                        .WithMany("Statistics")
+                        .WithMany("PreviousBudgets")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -192,7 +169,7 @@ namespace MVC.Budget.K_MYR.Migrations
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Category", b =>
                 {
-                    b.Navigation("Statistics");
+                    b.Navigation("PreviousBudgets");
 
                     b.Navigation("Transactions");
                 });

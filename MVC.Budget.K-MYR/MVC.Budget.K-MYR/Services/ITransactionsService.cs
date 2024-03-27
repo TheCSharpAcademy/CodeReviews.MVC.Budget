@@ -5,12 +5,13 @@ namespace MVC.Budget.K_MYR.Services
 {
     public interface ITransactionsService
     {
-        Task<Transaction> AddTransaction(TransactionPost transactionPost, Category category);
-        Task DeleteTransaction(Transaction transaction);
-        Transaction? GetByID(int id);
-        ValueTask<Transaction?> GetByIDAsync(int id);
-        Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryStatistic>>> filter);
         Task<List<Transaction>> GetTransactions();
-        Task UpdateTransaction(Category category, Transaction transaction, TransactionPut transactionPut);
+        Transaction? GetByID(int id);
+        ValueTask<Transaction?> GetByIdAsync(int id);
+        Task<Transaction> AddTransaction(TransactionPost transactionPost);
+        Task UpdateTransaction(Transaction transaction, TransactionPut transactionPut);
+        Task DeleteTransaction(Transaction transaction);
+        Task<bool> CategoryExists(int id);
+
     }
 }
