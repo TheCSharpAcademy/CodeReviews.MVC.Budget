@@ -1,4 +1,7 @@
-﻿const categoriesAPI = "https://localhost:7246/api/Categories";
+﻿const locale = new Intl.Locale("en-at");
+const numberFormat = new Intl.NumberFormat("en-at", { style: 'currency', currency: "EUR" });
+
+const categoriesAPI = "https://localhost:7246/api/Categories";
 const transactionsAPI = "https://localhost:7246/api/Transactions";
 const groupsAPI = "https://localhost:7246/api/Groups";
 
@@ -19,6 +22,7 @@ const addTransactionModal = $("#add-transaction-modal");
 
 const flipContainer = document.getElementById("flip-container-inner");
 const reevaluationContainer = document.getElementById("reevalCategories-container");
+const reevaluatioInfo = document.getElementById("reevalInfo");
 
 Chart.defaults.color = '#ffffff';
 Chart.defaults.scales.linear.min = 0;
@@ -29,7 +33,7 @@ var currentDeg = 0;
 createReevaluationElements();
 
 $("#country").countrySelect({
-    preferredCountries: []
+    preferredCountries: ["at"]
 });
 
 new Chart(sentimentChart, {
@@ -230,7 +234,7 @@ async function addTransaction(data) {
     };
 }
 
-async function patchTransaction(data) {
+async function reevaluateTransaction(data, transactionElement, accordionBody, accordion) {
     try {
         var id = parseInt(data.get("PageModel.Transaction.Id"));
         var transaction = document.getElementById(`reeval_transaction_${id}`);
@@ -270,7 +274,11 @@ async function patchTransaction(data) {
         });
 
         if (response.ok) {
-            document.getElementById(`reeval_transaction_${id}`).remove();
+            transactionElement.remove();            
+            if (accordionBody.childElementCount == 0) {
+                accordion.remove();
+            }
+            showReevaluationInfo();
         } else {
             console.error(`HTTP Patch Error: ${response.status}`);
         }
@@ -461,11 +469,11 @@ function createEvaluationElement(category) {
 
         var dateDiv = document.createElement('div');
         dateDiv.className = 'ms-2';
-        dateDiv.textContent = new Date(transaction.dateTime).toLocaleDateString();
+        dateDiv.textContent = new Date(transaction.dateTime).toLocaleDateString(locale);
 
         var amountDiv = document.createElement('div');
         amountDiv.className = 'ms-2 me-auto';
-        amountDiv.textContent = transaction.amount;
+        amountDiv.textContent = numberFormat.format(transaction.amount);
 
         var transactionForm = document.createElement('form');
         transactionForm.id = `reevaluate-transaction-form_${transaction.id}`;
@@ -474,7 +482,7 @@ function createEvaluationElement(category) {
         transactionForm.addEventListener("submit", async function (event) {
             event.preventDefault();
             if ($(transactionForm).valid()) {
-                await patchTransaction(new FormData(this));
+                await reevaluateTransaction(new FormData(this), transactionBody, accordionBody, accordion);
             }
         });
 
@@ -665,6 +673,16 @@ async function createReevaluationElements() {
 
     reevaluationContainer.innerHTML = "";
     reevaluationContainer.appendChild(frag);
+
+    showReevaluationInfo();
+}
+
+function showReevaluationInfo() {
+    if (reevaluationContainer.childElementCount == 0) {
+        reevaluatioInfo.style.display = 'block';
+    } else {
+        reevaluatioInfo.style.display = 'none';
+    }
 }
 
 function htmlEscape(str) {
@@ -689,10 +707,10 @@ function shortestAngle(index1, index2) {
         return 0;
     }
 }
-
 function resetStyle(element, style) {
     element.style = style + '; transition: transform 0s';
 }
+
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
@@ -737,7 +755,7 @@ class Statistics {
                     'Unhappy'
                 ],
                 datasets: [{
-                    label: '# of Transactions',
+                    label: 'Total Amount',
                     data: [this.#data.happyTransactionsTotal, this.#data.unhappyTransactionsTotal],
                     backgroundColor: [
                         'rgb(25,135,84)',
@@ -959,18 +977,41 @@ class Statistics {
                         stacked: true,
                         ticks: {
                             callback: function (value, index, ticks) {
-                                return value + ' $';
+                                return numberFormat.format(value);
                             }
+                        },
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            color: '#d3d3d3',
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
                         }
                     },
                     y: {
                         stacked: true,
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            display: false,
+                            tickColor: '#d3d3d3',
+                            
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
                     }
                 }
             }
-        });        
+        });     
 
-        this.#overspendingHeading.innerHTML = htmlEscape(`Overspending: ${this.#data.overspendingTotal} `)
+        numberFormat.c
+
+        this.#overspendingHeading.innerHTML = htmlEscape(`Overspending: ${numberFormat.format(this.#data.overspendingTotal)}`)
 
         new Chart(this.#savingsChart, {
             type: 'line',
@@ -986,7 +1027,33 @@ class Statistics {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            color: '#d3d3d3',
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
+                    },
+                    x: {
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            display: false,
+                            tickColor: '#d3d3d3',
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
+                    },
+                }
             }
         });
 
@@ -1004,7 +1071,33 @@ class Statistics {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            color: '#d3d3d3',
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
+                    },
+                    x: {
+                        border: {
+                            color: '#d3d3d3',
+                        },
+                        grid: {
+                            display: false,
+                            tickColor: '#d3d3d3',
+                        },
+                        ticks: {
+                            color: '#d3d3d3',
+                        }
+                    },
+                }
             }
         });
     }

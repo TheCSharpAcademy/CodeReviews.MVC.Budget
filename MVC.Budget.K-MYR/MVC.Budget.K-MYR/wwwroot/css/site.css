@@ -12140,37 +12140,70 @@ main {
   transform: rotateY(calc(90deg * var(--s))) translateZ(50cqw);
 }
 
-.flip-scroll-container {
-  height: calc(100% - 10px);
-  overflow-y: scroll;
+#statistics-scrollcontainer::before, #home-scrollcontainer::before, #reevalCategories-scrollcontainer::before {
+  content: "";
+  left: -5px;
+  display: block;
+  height: 10px;
+  width: calc(100% - 5px);
+  position: absolute;
+  background: linear-gradient(0deg, rgba(2, 4, 3, 0.05), 40%, rgb(2, 4, 3));
+  z-index: 100;
 }
 
-.flip-content-container {
-  position: relative;
-  margin-right: 20px;
+#statistics-scrollcontainer::after, #home-scrollcontainer::after, #reevalCategories-scrollcontainer::after {
+  content: "";
+  bottom: 10px;
+  display: block;
+  height: 15px;
+  width: calc(100% - 25px);
+  position: absolute;
+  background: linear-gradient(180deg, rgba(2, 4, 3, 0.05), rgb(2, 4, 3));
+  z-index: 100;
 }
 
-.reevaluation {
+#home {
   height: calc(100% - 10px);
-  border-radius: var(--bs-border-radius);
-  background-color: #1c1c1c;
   overflow: hidden;
 }
 
-.reeval-header {
+#home-scrollcontainer {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#home-container {
+  margin: 10px 5px 10px 0;
+}
+
+#reevaluation {
+  position: relative;
+  height: calc(100% - 10px);
+  overflow: hidden;
+}
+
+#reevalInfo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 75%;
+  transform: translate(-50%, -50%);
   text-align: center;
-  margin: 10px;
-  height: 50px;
+  margin: 0;
+  padding: 10px;
+  border: groove 2px #d3d3d3;
+  border-radius: var(--bs-border-radius);
+  background-color: #1c1c1c;
 }
 
 #reevalCategories-scrollcontainer {
-  margin: 10px 5px 10px 15px;
-  height: calc(100% - 80px);
+  margin: 0 5px 0 15px;
+  height: calc(100% - 20px);
   overflow-y: scroll;
 }
 
 #reevalCategories-container {
-  margin-right: 5px;
+  margin: 10px 5px 10px 0;
 }
 
 .transaction-body {
@@ -12217,25 +12250,17 @@ main {
 
 .statistics {
   height: calc(100% - 10px);
-  border-radius: var(--bs-border-radius);
-  background-color: #1c1c1c;
   overflow: hidden;
 }
 
-#statistics-header {
-  text-align: center;
-  margin: 10px;
-  height: 50px;
-}
-
 #statistics-scrollcontainer {
-  margin: 10px 5px 10px 15px;
-  height: calc(100% - 80px);
+  margin: 0 5px 0 15px;
+  height: 100%;
   overflow-y: scroll;
 }
 
 #statistics-container {
-  margin-right: 5px;
+  margin: 10px 5px 10px 0;
 }
 
 .Charts-container {
@@ -12248,12 +12273,16 @@ main {
   width: 50%;
   padding: 2px;
   min-height: 200px;
+  background-color: #1c1c1c;
+  border-radius: var(--bs-border-radius);
 }
 
 .overspendingChart-container {
   width: 100%;
   padding: 2px;
   min-height: 320px;
+  background-color: #1c1c1c;
+  border-radius: var(--bs-border-radius);
 }
 
 .wf {
@@ -12349,6 +12378,17 @@ main {
   background: radial-gradient(circle, rgb(74, 1, 105) 0%, rgb(0, 44, 255) 50%, rgb(163, 23, 23) 100%);
   animation: rotate 4s cubic-bezier(0.8, 0, 0.2, 1) infinite;
   opacity: 1;
+}
+
+.overspending-text {
+  display: inline-block;
+  min-width: 180px;
+}
+
+.balance-text {
+  display: inline-block;
+  min-width: 160px;
+  text-align: end;
 }
 
 .progress {
