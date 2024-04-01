@@ -8,7 +8,7 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     public ICategoriesRepository CategoriesRepository { get; }
     public ITransactionsRepository TransactionsRepository { get; }
     public IGroupsRepository GroupsRepository { get; }
-    public ICategoryBudgetsRepository CategoryStatisticsRepository { get; }
+    public ICategoryBudgetsRepository CategoryBudgetRepository { get; }
 
     public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepo, ITransactionsRepository transactionsRepo, IGroupsRepository groupsRepo, ICategoryBudgetsRepository categoryStatisticsRepository)
     {
@@ -16,7 +16,7 @@ public class UnitOfWork : IDisposable, IUnitOfWork
         CategoriesRepository = categoriesRepo;
         TransactionsRepository = transactionsRepo;
         GroupsRepository = groupsRepo;
-        CategoryStatisticsRepository = categoryStatisticsRepository;
+        CategoryBudgetRepository = categoryStatisticsRepository;
     }
 
     public async Task Save()

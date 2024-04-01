@@ -88,12 +88,12 @@
                              data-amount="@transaction.Amount.ToString("F2", CultureInfo.InvariantCulture)"
                              data-date="@transaction.DateTime.ToString("yyyy-MM-ddTHH:mm")"
                              data-title="@Html.Encode(transaction.Title)"
-                             data-categoryid="@transaction.CategoryId"
-                             data-ishappy="@transaction.IsHappy"
-                             data-isnecessary="@transaction.IsNecessary"
+                             data-categoryId="@transaction.CategoryId"
+                             data-isHappy="@transaction.IsHappy"
+                             data-isNecessary="@transaction.IsNecessary"
                              data-evaluated="@transaction.Evaluated"
-                             data-evaluatedishappy="@transaction.PreviousIsHappy"
-                             data-evaluatedisnecessary="@transaction.PreviousIsNecessary">
+                             data-evaluatedIsHappy="@transaction.PreviousIsHappy"
+                             data-evaluatedIsNecessary="@transaction.PreviousIsNecessary">
 
                             <div class="border-container">
                                 <div class="content">

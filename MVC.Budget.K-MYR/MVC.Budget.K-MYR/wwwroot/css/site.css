@@ -12270,9 +12270,9 @@ main {
 }
 
 .lineChart-container {
-  width: 50%;
+  width: 100%;
   padding: 2px;
-  min-height: 200px;
+  min-height: 250px;
   background-color: #1c1c1c;
   border-radius: var(--bs-border-radius);
 }

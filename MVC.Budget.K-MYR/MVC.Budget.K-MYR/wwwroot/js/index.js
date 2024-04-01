@@ -1,5 +1,5 @@
-﻿const locale = new Intl.Locale("en-at");
-const numberFormat = new Intl.NumberFormat("en-at", { style: 'currency', currency: "EUR" });
+﻿var locale = new Intl.Locale("en-at");
+var numberFormat = new Intl.NumberFormat("en-at", { style: 'currency', currency: "EUR" });
 
 const categoriesAPI = "https://localhost:7246/api/Categories";
 const transactionsAPI = "https://localhost:7246/api/Transactions";
@@ -33,7 +33,7 @@ var currentDeg = 0;
 createReevaluationElements();
 
 $("#country").countrySelect({
-    preferredCountries: ["at"]
+    preferredCountries: ["at", "us"]
 });
 
 new Chart(sentimentChart, {
@@ -55,7 +55,24 @@ new Chart(sentimentChart, {
     },
     options: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        let label = context.dataset.label || '';
+
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += numberFormat.format(context.parsed);
+                        }
+                        return label;
+                    }
+                }
+            }
+        }
     }
 });
 
@@ -78,7 +95,24 @@ new Chart(necessityChart, {
     },
     options: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function (context) {
+                        let label = context.dataset.label || '';
+
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += numberFormat.format(context.parsed);
+                        }
+                        return label;
+                    }
+                }
+            }
+        }
     }
 });
 
@@ -252,12 +286,12 @@ async function reevaluateTransaction(data, transactionElement, accordionBody, ac
             }, {
                 op: "replace",
                 path: "/PreviousIsHappy",
-                value: transaction.dataset.ishappy === "True" ? true : false
+                value: transaction.dataset.isHappy === "true" ? true : false
             },
             {
                 op: "replace",
                 path: "/PreviousIsNecessary",
-                value: transaction.dataset.isnecessary === "True" ? true : false
+                value: transaction.dataset.isNecessary === "true" ? true : false
             },
             {
                 op: "replace",
@@ -734,8 +768,7 @@ class Statistics {
     #sentimentBarChart = document.getElementById('sentimentLineChartYear');
     #necessityBarChart = document.getElementById('necessityLineChartYear');
     #overspendingChart = document.getElementById('overspendingChart');
-    #savingsChart = document.getElementById('savingsChart');
-    #incomeChart = document.getElementById('incomeChart');
+    #totalSpentChart = document.getElementById('totalSpentChart');
     #overspendingHeading = document.getElementById('statistics-overspending');
 
     constructor(data) {
@@ -766,7 +799,24 @@ class Statistics {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += numberFormat.format(context.parsed);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
             }
         });
 
@@ -789,7 +839,24 @@ class Statistics {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,               
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += numberFormat.format(context.parsed);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
             }
         });
 
@@ -801,30 +868,32 @@ class Statistics {
                     label: 'Happy',
                     stack: 'Unevaluated',
                     data: this.#data.happyPerMonth,
-                    borderColor: '#20c997',
-                    backgroundColor: '#20c997'
-
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
+                    backgroundColor: '#20c997',
                 },
                 {
                     label: 'Unhappy',
                     stack: 'Unevaluated',
                     data: this.#data.unhappyPerMonth,
-                    borderColor: 'rgb(220,53,69)',
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
                     backgroundColor: 'rgb(220,53,69)'
-
                 },
                 {
                     label: 'Happy (Eval.)',
                     stack: 'Evaluated',
                     data: this.#data.happyEvaluatedPerMonth,
-                    borderColor: '#0f7c5c',
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
                     backgroundColor: '#0f7c5c',
                 },
                 {
                     label: 'Unhappy (Eval.)',
                     stack: 'Evaluated',
                     data: this.#data.unhappyEvaluatedPerMonth,
-                    borderColor: '#881d27',
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
                     backgroundColor: '#881d27',
                 },
                 {
@@ -850,6 +919,9 @@ class Statistics {
                         },
                         ticks: {
                             color: '#d3d3d3',
+                            callback: function (value, index, ticks) {
+                                return numberFormat.format(value);
+                            }
                         }
                     },
                     x: {
@@ -864,6 +936,23 @@ class Statistics {
                             color: '#d3d3d3',
                         }
                     },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += numberFormat.format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -876,31 +965,36 @@ class Statistics {
                     label: 'Necessary',
                     stack: 'Unevaluated',
                     data: this.#data.necessaryPerMonth,
-                    borderColor: '#20c997',
-                    backgroundColor: '#20c997'
+                    backgroundColor: '#20c997',
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
 
                 },
                 {
                     label: 'Unnecessary',
                     stack: 'Unevaluated',
                     data: this.#data.unnecessaryPerMonth,
-                    borderColor: 'rgb(220,53,69)',
-                    backgroundColor: 'rgb(220,53,69)'
+                    backgroundColor: 'rgb(220,53,69)',
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
 
                 },
                 {
                     label: 'Necessary (Eval.)',
                     stack: 'Evaluated',
                     data: this.#data.necessaryEvaluatedPerMonth,
-                    borderColor: '#0f7c5c',
                     backgroundColor: '#0f7c5c',
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
+
                 },
                 {
                     label: 'Unnecessary (Eval.)',
                     stack: 'Evaluated',
                     data: this.#data.unnecessaryEvaluatedPerMonth,
-                    borderColor: '#881d27',
                     backgroundColor: '#881d27',
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
                 },
                 {
                     label: 'Unevaluated',
@@ -908,7 +1002,7 @@ class Statistics {
                     data: this.#data.unevaluatedPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
-                    backgroundColor: '#1c1c1c',
+                    backgroundColor: '#1c1c1c'
                 }]
             },
             options: {
@@ -925,6 +1019,9 @@ class Statistics {
                         },
                         ticks: {
                             color: '#d3d3d3',
+                            callback: function (value, index, ticks) {
+                                return numberFormat.format(value);
+                            }
                         }
                     },
                     x: {
@@ -939,6 +1036,23 @@ class Statistics {
                             color: '#d3d3d3',
                         }
                     },   
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += numberFormat.format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
                 }
             }
         });
@@ -946,13 +1060,13 @@ class Statistics {
         var datasets = [];
 
         for (var i = 0; i < this.#data.monthlyOverspendingPerCategory.length; i++) {
-            var categoryData = this.#data.monthlyOverspendingPerCategory[i];
-            var color = getRandomColor();
+            var categoryData = this.#data.monthlyOverspendingPerCategory[i];            
             datasets.push({
                 label: categoryData.category,
                 data: categoryData.overspendingPerMonth,
-                borderColor: color,
-                backgroundColor: color
+                borderWidth: 2,
+                borderColor: '#d3d3d3',
+                backgroundColor: getRandomColor()
             });
         }
 
@@ -974,12 +1088,7 @@ class Statistics {
                 indexAxis: 'y',
                 scales: {
                     x: {
-                        stacked: true,
-                        ticks: {
-                            callback: function (value, index, ticks) {
-                                return numberFormat.format(value);
-                            }
-                        },
+                        stacked: true,                       
                         border: {
                             color: '#d3d3d3',
                         },
@@ -989,6 +1098,9 @@ class Statistics {
                         },
                         ticks: {
                             color: '#d3d3d3',
+                            callback: function (value, index, ticks) {
+                                return numberFormat.format(value);
+                            }
                         }
                     },
                     y: {
@@ -1005,22 +1117,38 @@ class Statistics {
                             color: '#d3d3d3',
                         }
                     }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += numberFormat.format(context.parsed.x);
+                                }
+                                return label;
+                            }
+                        }
+                    }
                 }
             }
-        });     
+        });            
 
-        numberFormat.c
-
-        this.#overspendingHeading.innerHTML = htmlEscape(`Overspending: ${numberFormat.format(this.#data.overspendingTotal)}`)
-
-        new Chart(this.#savingsChart, {
+        this.#overspendingHeading.innerHTML = htmlEscape(`Overspending: ${numberFormat.format(this.#data.overspendingTotal)}`);
+        
+        new Chart(this.#totalSpentChart, {
             type: 'line',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
                 datasets: [{
-                    label: 'Savings',
-                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
-                    borderColor: '#20c997',
+                    label: 'Total Spent Per Month',
+                    data: this.#data.totalPerMonth,
+                    borderWidth: 2,
+                    borderColor: '#d3d3d3',
                     backgroundColor: '#20c997'
 
                 }]
@@ -1039,50 +1167,9 @@ class Statistics {
                         },
                         ticks: {
                             color: '#d3d3d3',
-                        }
-                    },
-                    x: {
-                        border: {
-                            color: '#d3d3d3',
-                        },
-                        grid: {
-                            display: false,
-                            tickColor: '#d3d3d3',
-                        },
-                        ticks: {
-                            color: '#d3d3d3',
-                        }
-                    },
-                }
-            }
-        });
-
-        new Chart(this.#incomeChart, {
-            type: 'line',
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
-                datasets: [{
-                    label: 'Income',
-                    data: [500, 400, 300, 200, 400, 500, 600, 700, 800, 700, 800, 500],
-                    borderColor: '#20c997',
-                    backgroundColor: '#20c997'
-
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        border: {
-                            color: '#d3d3d3',
-                        },
-                        grid: {
-                            color: '#d3d3d3',
-                            lineWidth: 0.2,
-                        },
-                        ticks: {
-                            color: '#d3d3d3',
+                            callback: function (value, index, ticks) {
+                                return numberFormat.format(value);
+                            }
                         }
                     },
                     x: {

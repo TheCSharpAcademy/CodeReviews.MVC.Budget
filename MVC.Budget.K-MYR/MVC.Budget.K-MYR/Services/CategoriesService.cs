@@ -62,7 +62,7 @@ public class CategoriesService : ICategoriesService
             Month = DateTime.UtcNow
         };
 
-        _unitOfWork.CategoryStatisticsRepository.Insert(categoryStatistics);
+        _unitOfWork.CategoryBudgetRepository.Insert(categoryStatistics);
         
         await _unitOfWork.Save();
 
@@ -77,7 +77,7 @@ public class CategoriesService : ICategoriesService
 
             if (currentBudget is null)
             {
-                _unitOfWork.CategoryStatisticsRepository.Insert(new CategoryBudget
+                _unitOfWork.CategoryBudgetRepository.Insert(new CategoryBudget
                 {
                     CategoryId = category.Id,
                     Budget = category.Budget,

@@ -7,7 +7,7 @@ namespace MVC.Budget.K_MYR.Data
         ICategoriesRepository CategoriesRepository { get; }
         ITransactionsRepository TransactionsRepository { get; }
         IGroupsRepository GroupsRepository { get; }
-        ICategoryBudgetsRepository CategoryStatisticsRepository { get; }
+        ICategoryBudgetsRepository CategoryBudgetRepository { get; }
 
         void Dispose();
         Task Save();
