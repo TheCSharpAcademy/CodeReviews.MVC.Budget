@@ -50,7 +50,7 @@
             <div id="home">
                 <div id="home-scrollcontainer">
                     <div id="home-container">
-                        <div class="dashboard border">
+                        <div class="dashboard">
                             <div class="dashboard-container">
                                 <div class="chart-container">
                                     <canvas id="sentimentChart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
@@ -71,16 +71,25 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="accordion my-2" id="group_1" data-id="1">
+                        <div class="accordion my-3" id="group_1" data-id="1">
                             <div class="accordion-item">
-                                <div id="accordion-head-income" class="accordion-head d-flex">
+                                <div id="accordion-head-income" class="accordion-head">
                                     <h5 class="accordion-header me-auto" id="accordionIncomeHeader">
                                         Income
                                     </h5>
                                     <h5 class="accordion-header">
                                         @incomeTotal.ToString("C2", Model.Culture) / @incomeBudget.ToString("C2", Model.Culture)
                                     </h5>
-                                    <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                                    <svg class="add-icon" fill="none" viewBox="0 0 14 14" height="23" width="23"><g id="plus">
+                                        <defs>
+                                            <radialGradient id="gradient1" x1="0" x2="1" y1="0" y2="1">                                                    
+                                                <stop offset="0%" stop-color="#CCFBE5" />
+                                                <stop offset="50%" stop-color="#A2D6CB" />
+                                                <stop offset="100%" stop-color="#7EB1B1" />
+                                            </radialGradient>
+                                        </defs>
+                                        <path id="Union" fill="url(#gradient1)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
+                                    </g></svg>
                                     <div class="accordion-caret rotate"></div>
                                 </div>
                                 <div id="collapseIncome" class="accordion-collapse collapse show" aria-labelledby="accordionIncomeHeader">
@@ -116,14 +125,25 @@
 
                         <div class="accordion my-2" id="group_2" data-id="2">
                             <div class="accordion-item">
-                                <div id="accordion-head-expenses" class="accordion-head d-flex">
+                                <div id="accordion-head-expenses" class="accordion-head">
                                     <h5 class="accordion-header me-auto" id="accordionExpensesHeader">
                                         Expenses
                                     </h5>
                                     <h5 class="accordion-header">
                                         @expensesTotal.ToString("C2", Model.Culture) / @expensesBudget.ToString("C2", Model.Culture)
                                     </h5>
-                                    <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                                    <svg class="add-icon" fill="none" viewBox="0 0 14 14" height="23" width="23">
+                                        <g id="plus">
+                                            <defs>
+                                                <radialGradient id="gradient1" x1="0" x2="1" y1="0" y2="1">
+                                                    <stop offset="0%" stop-color="#CCFBE5" />
+                                                    <stop offset="50%" stop-color="#A2D6CB" />
+                                                    <stop offset="100%" stop-color="#7EB1B1" />
+                                                </radialGradient>
+                                            </defs>
+                                            <path id="Union" fill="url(#gradient1)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
+                                        </g>
+                                    </svg>
                                     <div class="accordion-caret rotate"></div>
                                 </div>
                                 <div id="collapseExpenses" class="accordion-collapse collapse show" aria-labelledby="accordionExpensesHeader">
@@ -304,7 +324,9 @@
         </div>
         <div class="flip-content" style="--s:1">
             <div id="reevaluation">
-                <h2 id="reevalInfo">You have reevaluated all of your previous expenses. Good job!</h2>
+                <div id="reevalInfo">
+                    <h2 id="reevalInfoText">You have reevaluated all of your previous expenses. Good job!</h2>
+                </div>
                 <div id="reevalCategories-scrollcontainer">
                     <div id="reevalCategories-container">
                         @*<div class="accordion my-2">
@@ -498,7 +520,7 @@
             <div id="statistics" class="statistics">
                 <div id="statistics-scrollcontainer">
                     <div id="statistics-container">
-                        <div class="dashboard border">
+                        <div class="dashboard">
                             <div class="dashboard-container">
                                 <div class="chart-container">
                                     <canvas id="sentimentChartYear">
@@ -517,22 +539,22 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="Charts-container border">
+                        <div class="Charts-container">
                             <div class="lineChart-container">
                                 <canvas id="sentimentLineChartYear"></canvas>
                             </div>
                         </div>
-                        <div class="Charts-container border">
+                        <div class="Charts-container">
                             <div class="lineChart-container">
                                 <canvas id="necessityLineChartYear"></canvas>
                             </div>
                         </div>
-                        <div class="Charts-container border">
+                        <div class="Charts-container">
                             <div class="overspendingChart-container">
                                 <canvas id="overspendingChart"></canvas>
                             </div>
                         </div>                        
-                        <div class="Charts-container border">
+                        <div class="Charts-container">
                             <div class="lineChart-container">
                                 <canvas id="totalSpentChart"></canvas>
                             </div>

@@ -4480,14 +4480,14 @@ textarea.form-control-lg {
   --bs-accordion-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
   --bs-accordion-border-color: var(--bs-border-color);
   --bs-accordion-border-width: var(--bs-border-width);
-  --bs-accordion-border-radius: var(--bs-border-radius);
-  --bs-accordion-inner-border-radius: calc(var(--bs-border-radius) - (var(--bs-border-width)));
+  --bs-accordion-border-radius: 10px;
+  --bs-accordion-inner-border-radius: calc(10px - (var(--bs-border-width)));
   --bs-accordion-btn-padding-x: 1.25rem;
   --bs-accordion-btn-padding-y: 1rem;
   --bs-accordion-btn-color: var(--bs-body-color);
   --bs-accordion-btn-bg: var(--bs-accordion-bg);
-  --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-  --bs-accordion-btn-icon-width: 1.25rem;
+  --bs-accordion-btn-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 15' fill='white'%3E%3Cdefs%3E%3CradialGradient id='gradient1' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23CCFBE5' /%3E%3Cstop offset='50%25' stop-color='%23A2D6CB' /%3E%3Cstop offset='100%25' stop-color='%237EB1B1' /%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath fill='url%28%23gradient1%29' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  --bs-accordion-btn-icon-width: 20px;
   --bs-accordion-btn-icon-transform: rotate(-180deg);
   --bs-accordion-btn-icon-transition: transform 0.2s ease-in-out;
   --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
@@ -11925,7 +11925,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: white;
+  background: #456977;
   border-radius: 5px;
 }
 
@@ -11937,20 +11937,36 @@ body {
   box-shadow: white 0 0 0px 2px;
 }
 
+.add-icon {
+  box-sizing: content-box;
+  margin-left: auto;
+  height: 23px;
+  width: 23px;
+}
+
 .navbar {
-  background-color: #1c1c1c;
+  background: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
   position: fixed;
   width: 100%;
   top: 0px;
   z-index: 100;
 }
 
+.navbar-brand, .nav-link {
+  color: #020403;
+}
+
 .nav-link:hover, .navbar-brand:hover {
-  color: #cccccc;
+  color: #244836;
 }
 
 #country, .country-name {
   color: black;
+}
+
+#country {
+  border-radius: 5px;
+  border: none;
 }
 
 .sidebar {
@@ -12153,12 +12169,13 @@ main {
 
 #statistics-scrollcontainer::after, #home-scrollcontainer::after, #reevalCategories-scrollcontainer::after {
   content: "";
+  left: -5px;
   bottom: 10px;
   display: block;
-  height: 15px;
-  width: calc(100% - 25px);
+  height: 10px;
+  width: calc(100% - 5px);
   position: absolute;
-  background: linear-gradient(180deg, rgba(2, 4, 3, 0.05), rgb(2, 4, 3));
+  background: linear-gradient(180deg, rgba(2, 4, 3, 0.05), 40%, rgb(2, 4, 3));
   z-index: 100;
 }
 
@@ -12169,17 +12186,29 @@ main {
 
 #home-scrollcontainer {
   height: 100%;
+  margin: 0 5px 0 15px;
   overflow-y: scroll;
 }
 
 #home-container {
-  margin: 10px 5px 10px 0;
+  margin: 10px 10px 10px 5px;
 }
 
 #reevaluation {
-  position: relative;
   height: calc(100% - 10px);
   overflow: hidden;
+}
+
+#reevalCategories-scrollcontainer {
+  margin: 0 5px 0 15px;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#reevalCategories-container {
+  margin: 10px 10px 10px 5px;
+  display: grid;
+  gap: 1rem;
 }
 
 #reevalInfo {
@@ -12188,22 +12217,30 @@ main {
   left: 50%;
   width: 75%;
   transform: translate(-50%, -50%);
-  text-align: center;
-  margin: 0;
-  padding: 10px;
   border: groove 2px #d3d3d3;
   border-radius: var(--bs-border-radius);
+  text-align: center;
   background-color: #1c1c1c;
 }
 
-#reevalCategories-scrollcontainer {
-  margin: 0 5px 0 15px;
-  height: calc(100% - 20px);
-  overflow-y: scroll;
+#reevalInfo::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -4px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
 }
 
-#reevalCategories-container {
-  margin: 10px 5px 10px 0;
+#reevalInfoText {
+  padding: 10px;
+  text-align: center;
+  margin: 0;
+  background-color: #1c1c1c;
 }
 
 .transaction-body {
@@ -12254,19 +12291,35 @@ main {
 }
 
 #statistics-scrollcontainer {
-  margin: 0 5px 0 15px;
+  margin: 0 0 0 10px;
   height: 100%;
   overflow-y: scroll;
 }
 
 #statistics-container {
-  margin: 10px 5px 10px 0;
+  margin: 10px 10px 10px 5px;
 }
 
 .Charts-container {
-  border-radius: var(--bs-border-radius);
+  border-radius: 10px;
   margin-top: 10px;
   display: flex;
+  position: relative;
+  background-clip: padding-box;
+  border: solid 4px transparent;
+}
+
+.Charts-container:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -4px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
 }
 
 .lineChart-container {
@@ -12293,14 +12346,31 @@ main {
 }
 
 .dashboard {
-  border-radius: var(--bs-border-radius);
+  border-radius: 10px;
   padding: 10px;
   background-color: #1c1c1c;
+  position: relative;
+  background-clip: padding-box;
+  border: solid 4px transparent;
+}
+
+.dashboard:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -4px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
 }
 
 .dashboard-container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  border-radius: inherit;
 }
 
 .chart-container {
@@ -12315,6 +12385,33 @@ main {
 
 .accordion {
   cursor: pointer;
+  background-clip: padding-box;
+  border: solid 4px transparent;
+  position: relative;
+  border-radius: 10px;
+}
+
+.accordion:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -4px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
+}
+
+.accordion-item {
+  border-radius: 6px !important;
+  border: none;
+}
+
+.accordion-head {
+  display: flex;
+  align-items: center;
 }
 
 .accordion-header {

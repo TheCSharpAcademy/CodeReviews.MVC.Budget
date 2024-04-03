@@ -33,85 +33,98 @@
 </section>
 
 <section>
-    <div class="dashboard border">
-        <div class="dashboard-container">
-            <div class="chart-container">
-                <canvas id="chart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
-                        data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
-                </canvas>
-            </div>
-            <div class="chart-container">
-                <h1 class="text-center text-truncate">@Html.Encode(Model.PageModel.Name)</h1>
-                <h4 class="text-center">February 2024</h4>
-                <div class="dashboardStatistics mt-4">
-                    <h5 class="text-center">Budget: @Model.PageModel.Budget.ToString("C2", Model.Culture) </h5>
-                    <h5 class="text-center">Spent: @expensesTotal.ToString("C2", Model.Culture) </h5>
-                    @{
-                        var difference = Model.PageModel.Budget - expensesTotal;
+    <div class="flip-container">
+        <div id="flip-container-inner" class="flip-container-inner">
+            <div class="flip-content" style="--s:0">
+                <div id="home">
+                    <div id="home-scrollcontainer">
+                        <div id="home-container">
+                            <div class="dashboard">
+                                <div class="dashboard-container">
+                                    <div class="chart-container">
+                                        <canvas id="chart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                                                data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                                        </canvas>
+                                    </div>
+                                    <div class="chart-container">
+                                        <h1 class="text-center text-truncate">@Html.Encode(Model.PageModel.Name)</h1>
+                                        <h4 class="text-center">February 2024</h4>
+                                        <div class="dashboardStatistics mt-4">
+                                            <h5 class="text-center">Budget: @Model.PageModel.Budget.ToString("C2", Model.Culture) </h5>
+                                            <h5 class="text-center">Spent: @expensesTotal.ToString("C2", Model.Culture) </h5>
+                                            @{
+                                                var difference = Model.PageModel.Budget - expensesTotal;
 
-                        if (difference < 0)
-                        {
-                            <h5 class="text-center">Overspending: @((-difference).ToString("C2", Model.Culture)) </h5>
-                        }
-                        else
-                        {
-                            <h5 class="text-center">Available: @(difference.ToString("C2", Model.Culture)) </h5>
-                        }
-                    }                  
-                </div>
-            </div>
-            <div class="chart-container">
-                <canvas id="chart2" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
-                        data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
-                </canvas>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section>
-    <div class="accordion my-2" id="transactions" data-id="@Model.PageModel.Id">
-        <div class="accordion-item">
-            <div id="accordion-head-transaction" class="accordion-head d-flex">
-                <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
-                    Transactions
-                </h5>
-                <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
-                <div class="accordion-caret rotate"></div>
-            </div>
-            <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
-                <div class="accordion-body">
-                    @foreach (var transaction in monthlyTransactions)
-                    {
-                        <div id="transaction_@transaction.Id" class="transaction"
-                             data-id="@transaction.Id"
-                             data-amount="@transaction.Amount.ToString("F2", CultureInfo.InvariantCulture)"
-                             data-date="@transaction.DateTime.ToString("yyyy-MM-ddTHH:mm")"
-                             data-title="@Html.Encode(transaction.Title)"
-                             data-categoryId="@transaction.CategoryId"
-                             data-isHappy="@transaction.IsHappy"
-                             data-isNecessary="@transaction.IsNecessary"
-                             data-evaluated="@transaction.Evaluated"
-                             data-evaluatedIsHappy="@transaction.PreviousIsHappy"
-                             data-evaluatedIsNecessary="@transaction.PreviousIsNecessary">
-
-                            <div class="border-container">
-                                <div class="content">
-                                    <div class="category-body">
-                                        <div>@Html.Encode(transaction.Title)</div>
-                                        <div class="transaction-date">@transaction.DateTime.ToShortDateString()</div>
-                                        <div class="transaction-value">@transaction.Amount.ToString("C2", Model.Culture)</div>
+                                                if (difference < 0)
+                                                {
+                                                    <h5 class="text-center">Overspending: @((-difference).ToString("C2", Model.Culture)) </h5>
+                                                }
+                                                else
+                                                {
+                                                    <h5 class="text-center">Available: @(difference.ToString("C2", Model.Culture)) </h5>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="chart2" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
+                                                data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
+                                        </canvas>
                                     </div>
                                 </div>
-                                <div class="border-animation"></div>
+                            </div>
+
+
+
+                            <div class="accordion my-2" id="transactions" data-id="@Model.PageModel.Id">
+                                <div class="accordion-item">
+                                    <div id="accordion-head-transaction" class="accordion-head d-flex">
+                                        <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
+                                            Transactions
+                                        </h5>
+                                        <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
+                                        <div class="accordion-caret rotate"></div>
+                                    </div>
+                                    <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
+                                        <div class="accordion-body">
+                                            @foreach (var transaction in monthlyTransactions)
+                                            {
+                                                <div id="transaction_@transaction.Id" class="transaction"
+                                                     data-id="@transaction.Id"
+                                                     data-amount="@transaction.Amount.ToString("F2", CultureInfo.InvariantCulture)"
+                                                     data-date="@transaction.DateTime.ToString("yyyy-MM-ddTHH:mm")"
+                                                     data-title="@Html.Encode(transaction.Title)"
+                                                     data-categoryId="@transaction.CategoryId"
+                                                     data-isHappy="@transaction.IsHappy"
+                                                     data-isNecessary="@transaction.IsNecessary"
+                                                     data-evaluated="@transaction.Evaluated"
+                                                     data-evaluatedIsHappy="@transaction.PreviousIsHappy"
+                                                     data-evaluatedIsNecessary="@transaction.PreviousIsNecessary">
+
+                                                    <div class="border-container">
+                                                        <div class="content">
+                                                            <div class="category-body">
+                                                                <div>@Html.Encode(transaction.Title)</div>
+                                                                <div class="transaction-date">@transaction.DateTime.ToShortDateString()</div>
+                                                                <div class="transaction-value">@transaction.Amount.ToString("C2", Model.Culture)</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="border-animation"></div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
 
 @await Html.PartialAsync("_CategoryModals", new Transaction())
 

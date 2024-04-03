@@ -116,12 +116,14 @@ new Chart(necessityChart, {
     }
 });
 
+/*
 document.getElementById("sidebar-caret").addEventListener("click", () => {
     sidebar.classList.toggle('collapsed');
 });
+*/
 
 $(".accordion-head").on("click", function (event) {
-    if (event.target.matches("img.add-icon.ms-auto")) {
+    if (event.target.matches("svg.add-icon")) {
         var id = $(this).closest('.accordion').data("id");
         addCategoryModal.modal('show');
         addCategoryModal.find("#GroupId").val(id);
@@ -271,6 +273,7 @@ async function addTransaction(data) {
 async function reevaluateTransaction(data, transactionElement, accordionBody, accordion) {
     try {
         var id = parseInt(data.get("PageModel.Transaction.Id"));
+        console.log("Removed Transaction with id " + id);
         var transaction = document.getElementById(`reeval_transaction_${id}`);
 
         var patchDoc =
@@ -459,7 +462,7 @@ function createCategoryElement(category) {
 
 function createEvaluationElement(category) {
     var accordion = document.createElement("div");
-    accordion.classList.add("accordion", "my-2");
+    accordion.classList.add("accordion");
 
     var accordionItem = document.createElement("div");
     accordionItem.classList.add("accordion-item");
@@ -488,9 +491,9 @@ function createEvaluationElement(category) {
     accordionBody.classList.add("accordion-body");
 
     for (var i = 0; i < category.transactions.length; i++) {
-        var transaction = category.transactions[i];
+        let transaction = category.transactions[i];
 
-        var transactionBody = document.createElement('div');
+        let transactionBody = document.createElement('div');
 
         transactionBody.id = `reeval_transaction_${transaction.id}`;
         transactionBody.className = 'transaction-body';
@@ -516,7 +519,8 @@ function createEvaluationElement(category) {
         transactionForm.addEventListener("submit", async function (event) {
             event.preventDefault();
             if ($(transactionForm).valid()) {
-                await reevaluateTransaction(new FormData(this), transactionBody, accordionBody, accordion);
+                let element = transactionBody;
+                await reevaluateTransaction(new FormData(this), element, accordionBody, accordion);
             }
         });
 
