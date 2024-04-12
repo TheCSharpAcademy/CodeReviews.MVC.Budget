@@ -344,7 +344,7 @@ function transactionModal(id){
         const values = data.getElementsByTagName('td')
         input[1].value = values[0].innerText
         input[2].value = values[1].innerText
-        input[3].valueAsDate = new Date(Date.parse(values[2].innerText))
+        input[3].value = new Date(Date.parse(values[2].innerText)).toISOString().slice(0, 16)
         input[5].value = values[3].innerText.replace("$", "")
         category.value = values[4].innerText
     }
