@@ -7,4 +7,5 @@ public class HomeModel
     public List<Category> Savings { get; set; }
     public Category Category { get; set; }
     public Transaction Transaction { get; set; }    
+    public SearchModel Search { get; set; }
 }

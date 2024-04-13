@@ -12038,9 +12038,9 @@ body {
   height: 45px;
 }
 
-#wf-button {
+#search-button {
   width: 45px;
-  height: 50px;
+  height: 45px;
 }
 
 #menu-container {
@@ -12156,7 +12156,7 @@ main {
   transform: rotateY(calc(90deg * var(--s))) translateZ(50cqw);
 }
 
-#statistics-scrollcontainer::before, #home-scrollcontainer::before, #reevalCategories-scrollcontainer::before {
+#statistics-scrollcontainer::before, #home-scrollcontainer::before, #reevalCategories-scrollcontainer::before, #search-scrollcontainer::before {
   content: "";
   left: -5px;
   display: block;
@@ -12167,7 +12167,7 @@ main {
   z-index: 100;
 }
 
-#statistics-scrollcontainer::after, #home-scrollcontainer::after, #reevalCategories-scrollcontainer::after {
+#statistics-scrollcontainer::after, #home-scrollcontainer::after, #reevalCategories-scrollcontainer::after, #search-scrollcontainer::after {
   content: "";
   left: -5px;
   bottom: 10px;
@@ -12338,11 +12338,41 @@ main {
   border-radius: var(--bs-border-radius);
 }
 
-.wf {
+#search {
   height: calc(100% - 10px);
-  border-radius: var(--bs-border-radius);
-  background-color: #1c1c1c;
   overflow: hidden;
+}
+
+#search-scrollcontainer {
+  margin: 0 0 0 10px;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#search-container {
+  margin: 10px 10px 10px 5px;
+}
+
+.filter-container {
+  position: relative;
+  padding: 10px;
+  border-radius: 10px;
+  background-clip: padding-box;
+  background-color: #1c1c1c;
+  border: solid 4px transparent;
+}
+
+.filter-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -4px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
 }
 
 .dashboard {

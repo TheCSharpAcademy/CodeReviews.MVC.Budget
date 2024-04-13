@@ -37,7 +37,8 @@ public class HomeController : Controller
                 c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month)
                     .OrderByDescending(d => d.DateTime)),
             Category = new(),
-            Transaction = new()
+            Transaction = new(),
+            Search = new(),
         };
 
         return View(new LayoutModel<HomeModel>(HomeModel, new CultureInfo("en-US")));

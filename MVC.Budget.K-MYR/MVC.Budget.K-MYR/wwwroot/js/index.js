@@ -159,6 +159,12 @@ $('#update-category-form').on("submit", async function (event) {
     }
 });
 
+$('#search-form').on("submit", async function (event) {
+    event.preventDefault();
+    if ($(this).valid()) { // Add API-Call implementation here     
+    }
+});
+
 $('.category').on("click", function (event) {
     if (menu.dataset.category != 0) {
         var borderBox = document.getElementById(`category_${menu.dataset.category}`).querySelector('.border-animation');
