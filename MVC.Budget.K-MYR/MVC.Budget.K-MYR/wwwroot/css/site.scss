@@ -474,7 +474,7 @@ main {
 
 // Search Transactions
 
-#search{
+#search {
     height: calc(100% - 10px);
     overflow: hidden;
 }
@@ -511,7 +511,62 @@ main {
     background: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
 }
 
+.category-select {
+    min-width: 50px;
+    border-radius: var(--bs-border-radius);
+}
 
+.irs {
+    flex-grow: 1;
+    margin-right: 5px;
+}
+
+.irs-from, .irs-to, .irs-single {
+    background-color: #CCFBE5 !important;
+    border-radius: 10px;
+    color: black !important;
+}
+
+.irs-bar {
+    background-color: #CCFBE5 !important;
+}
+
+.irs-handle {
+    border: 3px solid #CCFBE5 !important;
+}
+
+.irs--square .irs-handle {
+    background-color: #456977 !important;
+}
+
+#maxAmount, #minAmount {
+    max-width: 75px;
+    text-align: center;
+    border-radius: var(--bs-border-radius);
+}
+
+#minDate, #maxDate {
+    max-width: 150px;
+    border-radius: var(--bs-border-radius);
+}
+
+.dates-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.date-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 15px;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+}
 // Dashboard
 
 .dashboard {
@@ -551,7 +606,6 @@ main {
     display: flex;
     flex-direction: column;
 }
-
 //Accordion
 
 .accordion {
@@ -605,7 +659,6 @@ main {
 .rotate {
     transform: rotate(180deg);
 }
-
 // Category
 
 .border-container {
@@ -666,7 +719,6 @@ main {
     z-index: 10;
     height: 0.4rem;
 }
-
 // Transaction (Details)
 
 .transaction-date {
@@ -679,7 +731,6 @@ main {
     min-width: 80px;
     text-align: end;
 }
-
 // Modals
 
 .form-group {

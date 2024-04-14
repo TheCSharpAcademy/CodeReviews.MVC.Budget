@@ -32,6 +32,55 @@ var currentDeg = 0;
 
 createReevaluationElements();
 
+const $amountRange = $("#amountRange");
+const $inputAmountFrom = $("#minAmount");
+const $inputAmountTo = $("#maxAmount");
+const amountMin = 0;
+const amountMax = 100000;
+var amountFrom = amountMin;
+var amountTo = amountMax;
+
+$amountRange.ionRangeSlider({
+    type: "double",
+    min: amountMin,
+    max: amountMax,
+    step: 1,
+    skin: "square",
+    min_interval: 0,
+    prettify_enabled: false,
+    hide_min_max: true,
+    onStart: updateAmountInputs,
+    onChange: updateAmountInputs
+});
+
+$inputAmountFrom.on("input", function () {
+    var val = this.value;
+
+    if (val < amountMin) {
+        val = amountMin;
+    } else if (val > amountTo) {
+        val = amountTo;
+    }
+
+    $amountRange.data("ionRangeSlider").update({
+        from: val
+    });
+});
+
+$inputAmountTo.on("input", function () {
+    var val = this.value;
+
+    if (val < amountFrom) {
+        val = amountFrom;
+    } else if (val > amountMax) {
+        val = amountMax;
+    }
+
+    $amountRange.data("ionRangeSlider").update({
+        to: val
+    });
+});
+
 $("#country").countrySelect({
     preferredCountries: ["at", "us"]
 });
@@ -751,6 +800,7 @@ function shortestAngle(index1, index2) {
         return 0;
     }
 }
+
 function resetStyle(element, style) {
     element.style = style + '; transition: transform 0s';
 }
@@ -763,6 +813,11 @@ function getRandomColor() {
     }
     return color;
 }
+
+function updateAmountInputs(data) {
+    $inputAmountFrom.val(data.from);
+    $inputAmountTo.val(data.to);
+};
 
 async function initializeStatisticsDashboard() {
 

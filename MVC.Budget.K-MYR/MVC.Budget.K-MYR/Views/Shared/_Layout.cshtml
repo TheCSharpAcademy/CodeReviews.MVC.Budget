@@ -7,6 +7,8 @@
     <title>@ViewData["Title"] - MVC.Budget.K_MYR</title>
     <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/node_modules/country-select-js/build/css/countrySelect.css" asp-append-version="true">
+    @await RenderSectionAsync("Stylesheets", required: false)
+
 </head>
 <body>
     <header>
