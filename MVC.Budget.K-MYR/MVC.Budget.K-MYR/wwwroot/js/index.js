@@ -21,8 +21,11 @@ const addCategoryModal = $("#add-category-modal");
 const addTransactionModal = $("#add-transaction-modal");
 
 const flipContainer = document.getElementById("flip-container-inner");
+
 const reevaluationContainer = document.getElementById("reevalCategories-container");
 const reevaluatioInfo = document.getElementById("reevalInfo");
+
+
 
 Chart.defaults.color = '#ffffff';
 Chart.defaults.scales.linear.min = 0;
@@ -32,53 +35,27 @@ var currentDeg = 0;
 
 createReevaluationElements();
 
-const $amountRange = $("#amountRange");
-const $inputAmountFrom = $("#minAmount");
-const $inputAmountTo = $("#maxAmount");
-const amountMin = 0;
-const amountMax = 100000;
-var amountFrom = amountMin;
-var amountTo = amountMax;
-
-$amountRange.ionRangeSlider({
-    type: "double",
-    min: amountMin,
-    max: amountMax,
-    step: 1,
-    skin: "square",
-    min_interval: 0,
-    prettify_enabled: false,
-    hide_min_max: true,
-    onStart: updateAmountInputs,
-    onChange: updateAmountInputs
-});
-
-$inputAmountFrom.on("input", function () {
-    var val = this.value;
-
-    if (val < amountMin) {
-        val = amountMin;
-    } else if (val > amountTo) {
-        val = amountTo;
-    }
-
-    $amountRange.data("ionRangeSlider").update({
-        from: val
-    });
-});
-
-$inputAmountTo.on("input", function () {
-    var val = this.value;
-
-    if (val < amountFrom) {
-        val = amountFrom;
-    } else if (val > amountMax) {
-        val = amountMax;
-    }
-
-    $amountRange.data("ionRangeSlider").update({
-        to: val
-    });
+const transactionsTable = $('#transactions-table').DataTable({
+    info: false,
+    dom: '<"pb-1" t<"d-flex justify-content-between mt-3"<"pt-1"l>p>>',
+    columns: [
+        { data: 'title' }, { data: 'dateTime' }, { data: 'amount' }, { data: 'category' }, {
+            data: null,
+            defaultContent:
+                `<svg  width='20' height='20' fill='rgba(255, 255, 255, 1)' class='me-1' viewBox='0 0 16 16'>
+                    <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z'/>
+                    <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z'>
+                </svg >
+                <svg width="20" height="20" fill="rgba(255, 255, 255, 1)" class="bi bi-trash" viewBox="0 0 16 16">
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                  <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                </svg>`,
+            targets: -1,
+            sortable: false
+        }
+    ],
+    scrollX: true,
+    scrollCollapse: true
 });
 
 $("#country").countrySelect({
@@ -210,7 +187,8 @@ $('#update-category-form').on("submit", async function (event) {
 
 $('#search-form').on("submit", async function (event) {
     event.preventDefault();
-    if ($(this).valid()) { // Add API-Call implementation here     
+    if ($(this).valid()) {
+        await populateTable(new FormData(this));
     }
 });
 
@@ -383,10 +361,7 @@ async function reevaluateTransaction(data, transactionElement, accordionBody, ac
 async function getFilteredCategories() {
     try {
         var response = await fetch(`${categoriesAPI}/filteredByEvaluation`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            }
+            method: "GET"          
         });
 
         if (response.ok) {
@@ -486,10 +461,7 @@ async function deleteCategory(id, token) {
 async function getStatistics() {
     try {
         var response = await fetch(`${groupsAPI}/2?year=2024`, { /////// FIX GROUPD ID HERE
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
+            method: "GET"            
         });
 
         if (response.ok) {
@@ -497,6 +469,38 @@ async function getStatistics() {
         } else {
             console.error(`HTTP Post Error: ${response.status}`);
         }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function populateTable(data) {     
+    try {       
+        let params = new URLSearchParams();
+
+        for (let [key, value] of data.entries()) {
+            if (value !== undefined && value !== '') {
+                params.append(key, value);
+            }
+        }
+
+        let query_string = params.toString();
+        console.log(`${transactionsAPI}?${query_string}`);
+
+        var response = await fetch(`${transactionsAPI}?${query_string}`, {
+            method: "GET",            
+        });
+
+        if (response.ok) {
+            var data = await response.json();
+            transactionsTable.clear();
+            transactionsTable.rows.add(data);
+            transactionsTable.draw();
+        } else {
+            transactionsTable.clear();
+            console.error(`HTTP GET Error: ${response.status}`);
+        }
+
     } catch (error) {
         console.error(error);
     }
@@ -813,11 +817,6 @@ function getRandomColor() {
     }
     return color;
 }
-
-function updateAmountInputs(data) {
-    $inputAmountFrom.val(data.from);
-    $inputAmountTo.val(data.to);
-};
 
 async function initializeStatisticsDashboard() {
 

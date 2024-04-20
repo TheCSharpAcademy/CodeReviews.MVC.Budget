@@ -1853,15 +1853,15 @@ progress {
   --bs-table-bg-type: initial;
   --bs-table-color-state: initial;
   --bs-table-bg-state: initial;
-  --bs-table-color: var(--bs-emphasis-color);
-  --bs-table-bg: var(--bs-body-bg);
+  --bs-table-color: white;
+  --bs-table-bg: #1c1c1c;
   --bs-table-border-color: var(--bs-border-color);
   --bs-table-accent-bg: transparent;
-  --bs-table-striped-color: var(--bs-emphasis-color);
+  --bs-table-striped-color: white;
   --bs-table-striped-bg: rgba(var(--bs-emphasis-color-rgb), 0.05);
-  --bs-table-active-color: var(--bs-emphasis-color);
+  --bs-table-active-color: white;
   --bs-table-active-bg: rgba(var(--bs-emphasis-color-rgb), 0.1);
-  --bs-table-hover-color: var(--bs-emphasis-color);
+  --bs-table-hover-color: white;
   --bs-table-hover-bg: rgba(var(--bs-emphasis-color-rgb), 0.075);
   width: 100%;
   margin-bottom: 1rem;
@@ -4651,7 +4651,7 @@ textarea.form-control-lg {
   --bs-pagination-padding-y: 0.375rem;
   --bs-pagination-font-size: 1rem;
   --bs-pagination-color: var(--bs-link-color);
-  --bs-pagination-bg: var(--bs-body-bg);
+  --bs-pagination-bg: white;
   --bs-pagination-border-width: var(--bs-border-width);
   --bs-pagination-border-color: var(--bs-border-color);
   --bs-pagination-border-radius: var(--bs-border-radius);
@@ -4664,7 +4664,7 @@ textarea.form-control-lg {
   --bs-pagination-active-color: #fff;
   --bs-pagination-active-bg: #020403;
   --bs-pagination-active-border-color: #020403;
-  --bs-pagination-disabled-color: var(--bs-secondary-color);
+  --bs-pagination-disabled-color: #BDC3C7;
   --bs-pagination-disabled-bg: var(--bs-secondary-bg);
   --bs-pagination-disabled-border-color: var(--bs-border-color);
   display: flex;
@@ -11915,6 +11915,11 @@ body {
   color: black;
 }
 
+.form-select {
+  background-color: white;
+  color: black;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
   padding-left: 10px;
@@ -12119,8 +12124,6 @@ body {
 
 .main-container {
   padding-top: 57px;
-  padding-right: 0;
-  padding-left: 25px;
   height: 100vh;
   width: 100vw;
 }
@@ -12412,17 +12415,12 @@ main {
 #minDate, #maxDate {
   max-width: 150px;
   border-radius: var(--bs-border-radius);
+  display: inline;
 }
 
-.dates-container {
+.inputs-container {
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.date-container {
-  display: flex;
-  justify-content: space-around;
+  flex-wrap: wrap;
   align-items: center;
   gap: 15px;
 }
@@ -12430,6 +12428,14 @@ main {
 .slider-container {
   display: flex;
   align-items: center;
+}
+
+#transactions-table_wrapper th {
+  text-align: center;
+}
+
+#transactions-table_wrapper td {
+  text-align: center;
 }
 
 .dashboard {

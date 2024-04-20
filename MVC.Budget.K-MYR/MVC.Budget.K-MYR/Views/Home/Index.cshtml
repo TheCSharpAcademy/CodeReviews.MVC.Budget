@@ -24,6 +24,7 @@
 @section Stylesheets {
     @{
         <link rel="stylesheet" href="~/lib/node_modules/ion-rangeslider/css/ion.rangeSlider.min.css" asp-append-version="true">
+        <link rel="stylesheet" href="~/lib/node_modules/datatables.net-bs5/css/dataTables.bootstrap5.css" asp-append-version="true">
     }
 }
 
@@ -576,74 +577,72 @@
                 <div id="search-scrollcontainer">
                     <div id="search-container">
                         <div class="filter-container">
-                            <form id="search-form">
-                                <div class="d-flex mb-3">
-                                    <svg class="my-2 me-2" id="search-button" fill="#000000" version="1.1"
-                                         width="45px" height="45px" viewBox="0 0 24 24">
-                                        <path d="M11 6C13.7614 6 16 8.23858 16 11M16.6588 16.6549L21 21M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                    <input asp-for="PageModel.Search.SearchString" class="form-control w-100 my-2" id="transaction-search" type="text" />
-                                </div>
-                                <div id="filter-accordion" class="accordion mb-1">
-                                    <div class="accordion-item">
-                                        <div class="accordion-head">
-                                            <h2 class="accordion-header me-auto">Filters</h2>
-                                            <div class="accordion-caret rotate"></div>
-                                        </div>
-                                        <div id="collapseFilters" class="accordion-collapse collapse show" aria-labelledby="filterHeader">
-                                            <div class="accordion-body">
-                                                <div class="form-group mb-1">
-                                                    <label id="category_search-label" class="me-2" for="CategoryId">Category</label>
-                                                    <select class="category-select" asp-for="PageModel.Search.CategoryId" asp-items="Model.PageModel.Categories" aria-labelledby="category_search-label">
-                                                        <option value="">All</option>
-                                                    </select>
-                                                </div>
-                                                <div class="text-center">
-                                                    <h5 id="Date-label" class="mt-3">Transaction Date</h5>
-                                                    <div class="dates-container">
-                                                        <div class="date-container">
-                                                            <span>From: </span>
-                                                            <input asp-for="PageModel.Search.MinDate" id="minDate" class="form-control" value="" aria-label="Transaction date range start" />
-                                                        </div>
-                                                        <div class="date-container">
-                                                            <span>To: </span>
-                                                            <input asp-for="PageModel.Search.MaxDate" id="maxDate" class="form-control" value="" aria-label="Transaction date range end" />
-                                                        </div>
-
-                                                    </div>
-                                                    <div>
-                                                        <span class="mx-auto" asp-validation-for="PageModel.Search.MinDate" class="text-danger"></span>
-                                                        <span class="mx-auto" asp-validation-for="PageModel.Search.MaxDate" class="text-danger"></span>
-                                                    </div>
-                                                </div>
-                                                <div class="text-center">
-                                                    <h5 id="releaseDate-label" class="mt-3">Transaction Value</h5>
-                                                    <div class="slider-container">
-                                                        <input asp-for="PageModel.Search.MinAmount" id="minAmount" class="range-input h-50 me-4" value="" aria-label="Transaction value range start" />
-                                                        <input type="text" class="range-slider" id="amountRange" aria-label="Transaction value range slider text input" />
-                                                        <input asp-for="PageModel.Search.MaxAmount" id="maxAmount" class="range-input h-50 ms-4" value="" aria-label="Transaction value range end" />
-
-                                                    </div>
-                                                    <div>
-                                                        <span asp-validation-for="PageModel.Search.MinAmount" class="text-danger"></span>
-                                                        <span asp-validation-for="PageModel.Search.MaxAmount" class="text-danger"></span>
-                                                    </div>
-                                                </div>
-                                                <div class="text-center mt-4">
-                                                    <input class="search-btn" type="submit" value="Filter" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </form>
+                            @await Html.PartialAsync("_SearchForm", Model.PageModel.Search)
+                        </div>
+                        <div class="filter-container mt-3">
+                            <table class="table table-hover table-borderless w-100 px-2" id="transactions-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Title
+                                        </th>
+                                        <th>
+                                            Date
+                                        </th>
+                                        <th>
+                                            Amount
+                                        </th>         
+                                        <th>
+                                            Category
+                                        </th>
+                                        <th>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @*
+                                    @foreach (var item in Model.PageModel.Expenses.Se)
+                                    {
+                                    <tr data-movie-id="@item.Id">
+                                    <td class="text-truncate">
+                                    @Html.DisplayFor(modelItem => item.Title)
+                                    </td>
+                                    <td class="text-truncate">
+                                    @Html.DisplayFor(modelItem => item.ReleaseDate)
+                                    </td>
+                                    <td class="text-truncate">
+                                    @Html.DisplayFor(modelItem => item.Genre)
+                                    </td>
+                                    <td class="text-truncate">
+                                    @Html.DisplayFor(modelItem => item.Price)
+                                    </td>
+                                    <td class="text-truncate">
+                                    @Html.DisplayFor(modelItem => item.Rating)
+                                    </td>
+                                    <td class="px-1">
+                                    <button type="button" class="table-btn px-0" onclick="openUpdateMovieModal(
+                                    '@item.Id', '@item.Title', '@item.ReleaseDate.ToString("yyyy-MM-dd")', '@item.Genre', '@Math.Round(item.Price, 2)', '@item.Rating')">
+                                    <img class="updateIcon" src="/img/pencil_white.svg" />
+                                    </button>
+                                    </td>
+                                    <td class="px-1">
+                                    <button type="button" class="table-btn px-0" onclick="openDeleteMovieModal(
+                                    '@item.Id', '@item.Title')">
+                                    <img class="deleteIcon" src="/img/trash_white.svg" />
+                                    </button>
+                                    </td>
+                                    </tr>
+                                    }
+                                    *@
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 
@@ -655,6 +654,8 @@
     @{
         <script src="~/lib/node_modules/chart.js/dist/chart.umd.js"></script>
         <script src="~/lib/node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"></script>
+        <script src="~/lib/node_modules/datatables.net/js/dataTables.min.js"></script>
+        <script src="~/lib/node_modules/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
         <script src="~/js/index.js" asp-append-version="true"></script>
     }

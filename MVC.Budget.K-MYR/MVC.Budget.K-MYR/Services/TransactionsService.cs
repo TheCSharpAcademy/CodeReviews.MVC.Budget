@@ -15,9 +15,9 @@ public class TransactionsService : ITransactionsService
         _logger = logger;
     }
 
-    public Task<List<Transaction>> GetTransactions()
+    public Task<List<TransactionDTO>> GetTransactions(int? categoryId = null, string? searchString = null, DateTime? minDate = null, DateTime? maxDate = null, decimal? minAmount = null, decimal? maxAmount = null)
     {
-        return _unitOfWork.TransactionsRepository.GetAsync();
+        return _unitOfWork.TransactionsRepository.GetFilteredTransactionsAsync(categoryId, searchString, minDate, maxDate, minAmount, maxAmount);
     }
 
     public ValueTask<Transaction?> GetByIdAsync(int id)

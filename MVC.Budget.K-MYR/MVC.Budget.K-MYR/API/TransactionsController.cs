@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
 using MVC.Budget.K_MYR.Services;
 
@@ -22,9 +21,10 @@ public class TransactionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Transaction>>> GetTransactions()
+    public async Task<ActionResult<List<Transaction>>> GetTransactions([FromQuery] SearchModel? searchModel)
     {
-        return Ok(await _transactionsService.GetTransactions());
+        return Ok(await _transactionsService.GetTransactions(searchModel?.CategoryId, searchModel?.SearchString, searchModel?.MinDate, searchModel?.MaxDate,  searchModel?.MinAmount, searchModel?.MaxAmount));
+
     }
 
     [HttpGet("{id}")]

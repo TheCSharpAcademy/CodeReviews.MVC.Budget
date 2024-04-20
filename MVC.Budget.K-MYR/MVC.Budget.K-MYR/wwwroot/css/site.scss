@@ -14,8 +14,15 @@ $accordion-body-padding-x: 10px;
 $accordion-border-radius: 10px;
 $accordion-button-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 15' fill='white'%3E%3Cdefs%3E%3CradialGradient id='gradient1' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23CCFBE5' /%3E%3Cstop offset='50%25' stop-color='%23A2D6CB' /%3E%3Cstop offset='100%25' stop-color='%237EB1B1' /%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath fill='url(%23gradient1)' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
 $accordion-icon-width: 20px;
+
 $navbar-light-color: white;
 $navbar-light-brand-color: white;
+
+$table-color: white;
+$table-bg: $secondary;
+$pagination-bg: white;
+$pagination-disabled-color: #BDC3C7;
+
 
 //Import Bootstrap
 @import "../lib/node_modules/bootstrap/scss/bootstrap";
@@ -28,6 +35,11 @@ body {
 }
 
 .form-control {
+    background-color: white;
+    color: black;
+}
+
+.form-select {
     background-color: white;
     color: black;
 }
@@ -246,8 +258,6 @@ body {
 
 .main-container {
     padding-top: 57px;
-    padding-right: 0;
-    padding-left: 25px;
     height: 100vh;
     width: 100vw;
 }
@@ -548,25 +558,31 @@ main {
 #minDate, #maxDate {
     max-width: 150px;
     border-radius: var(--bs-border-radius);
+    display: inline;
 }
 
-.dates-container {
+.inputs-container {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
-}
-
-.date-container {
-    display: flex;
-    justify-content: space-around;
+    flex-wrap: wrap;
     align-items: center;
     gap: 15px;
+
 }
 
 .slider-container {
     display: flex;
     align-items: center;
 }
+
+#transactions-table_wrapper th {
+
+    text-align: center;
+} 
+
+#transactions-table_wrapper td {
+    text-align: center;
+}
+
 // Dashboard
 
 .dashboard {
