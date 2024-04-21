@@ -22,11 +22,7 @@ public class CategoryStatisticsService : ICategoryStatisticsService
         var months = Enumerable.Range(1, 12);
 
         var stats = new YearlyStatisticsDto
-        {
-            HappyTransactionsTotal = monthlyStatistics.Sum(a => a.Statistics.Sum(a => a.HappyTransactions)),
-            UnhappyTransactionsTotal = monthlyStatistics.Sum(a => a.Statistics.Sum(a => a.UnhappyTransactions)),
-            NecessaryTransactionsTotal = monthlyStatistics.Sum(a => a.Statistics.Sum(a => a.NecessaryTransactions)),
-            UnnecessaryTransactionsTotal = monthlyStatistics.Sum(a => a.Statistics.Sum(a => a.UnnecessaryTransactions)),
+        {   
             TotalPerMonth = months.Select(month => grouped.FirstOrDefault(g => g.Key == month)?.Sum(a => a.TotalSpent) ?? 0),
             HappyPerMonth = months.Select(month => grouped.FirstOrDefault(g => g.Key == month)?.Sum(a => a.HappyTransactions) ?? 0),
             HappyEvaluatedPerMonth = months.Select(month => grouped.FirstOrDefault(g => g.Key == month)?.Sum(a => a.HappyEvaluatedTransactions) ?? 0),
@@ -46,7 +42,12 @@ public class CategoryStatisticsService : ICategoryStatisticsService
             }).OrderBy(c => c.Category)
         };
 
-        stats.OverspendingTotal = stats.MonthlyOverspendingPerCategory.Sum(s => s.OverspendingPerMonth.Sum());
+        stats.TotalSpent = stats.TotalPerMonth.Sum();
+        stats.OverspendingTotal = stats.MonthlyOverspendingPerCategory.SelectMany(s => s.OverspendingPerMonth).Sum();
+        stats.HappyEvaluatedTotal = stats.HappyEvaluatedPerMonth.Sum();        
+        stats.UnhappyEvaluatedTotal = stats.TotalSpent - stats.HappyEvaluatedTotal;
+        stats.NecessaryEvaluatedTotal = stats.NecessaryEvaluatedPerMonth.Sum();
+        stats.UnnecessaryEvaluatedTotal = stats.TotalSpent - stats.NecessaryEvaluatedTotal;
 
         return stats;
     }

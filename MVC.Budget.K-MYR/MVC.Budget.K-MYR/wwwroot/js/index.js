@@ -46,14 +46,25 @@ const transactionsTable = $('#transactions-table').DataTable({
                     <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z'/>
                     <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z'>
                 </svg >
-                <svg width="20" height="20" fill="rgba(255, 255, 255, 1)" class="bi bi-trash" viewBox="0 0 16 16">
+                <svg width="20" height="20" fill="rgba(255, 255, 255, 1)" viewBox="0 0 16 16">
                   <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
                   <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
                 </svg>`,
             targets: -1,
             sortable: false
-        }
+        },
     ],
+    columnDefs: [{
+        targets: 2,
+        render: function (data, type, row) {
+            return numberFormat.format(data);
+        }
+    }, {
+        targets: 1,
+        render: function (data, type, row) {
+            return new Date(data).toLocaleString(locale);
+        }
+    }],
     scrollX: true,
     scrollCollapse: true
 });
@@ -147,6 +158,12 @@ document.getElementById("sidebar-caret").addEventListener("click", () => {
     sidebar.classList.toggle('collapsed');
 });
 */
+
+transactionsTable.on('click', 'svg', function () {
+    var row = transactionsTable.row($(this).parents('tr'));
+    var data = row.data();
+    console.log(data); // This will log the data of the row to the console
+});
 
 $(".accordion-head").on("click", function (event) {
     if (event.target.matches("svg.add-icon")) {
@@ -344,7 +361,7 @@ async function reevaluateTransaction(data, transactionElement, accordionBody, ac
         });
 
         if (response.ok) {
-            transactionElement.remove();            
+            transactionElement.remove();
             if (accordionBody.childElementCount == 0) {
                 accordion.remove();
             }
@@ -361,7 +378,7 @@ async function reevaluateTransaction(data, transactionElement, accordionBody, ac
 async function getFilteredCategories() {
     try {
         var response = await fetch(`${categoriesAPI}/filteredByEvaluation`, {
-            method: "GET"          
+            method: "GET"
         });
 
         if (response.ok) {
@@ -461,7 +478,7 @@ async function deleteCategory(id, token) {
 async function getStatistics() {
     try {
         var response = await fetch(`${groupsAPI}/2?year=2024`, { /////// FIX GROUPD ID HERE
-            method: "GET"            
+            method: "GET"
         });
 
         if (response.ok) {
@@ -474,8 +491,8 @@ async function getStatistics() {
     }
 }
 
-async function populateTable(data) {     
-    try {       
+async function populateTable(data) {
+    try {
         let params = new URLSearchParams();
 
         for (let [key, value] of data.entries()) {
@@ -488,7 +505,7 @@ async function populateTable(data) {
         console.log(`${transactionsAPI}?${query_string}`);
 
         var response = await fetch(`${transactionsAPI}?${query_string}`, {
-            method: "GET",            
+            method: "GET",
         });
 
         if (response.ok) {
@@ -853,7 +870,7 @@ class Statistics {
                 ],
                 datasets: [{
                     label: 'Total Amount',
-                    data: [this.#data.happyTransactionsTotal, this.#data.unhappyTransactionsTotal],
+                    data: [this.#data.happyEvaluatedTotal, this.#data.unhappyEvaluatedTotal],
                     backgroundColor: [
                         'rgb(25,135,84)',
                         'rgb(220,53,69)'
@@ -893,7 +910,7 @@ class Statistics {
                 ],
                 datasets: [{
                     label: 'Total Amount',
-                    data: [this.#data.necessaryTransactionsTotal, this.#data.unnecessaryTransactionsTotal],
+                    data: [this.#data.necessaryEvaluatedTotal, this.#data.unnecessaryEvaluatedTotal],
                     backgroundColor: [
                         'rgb(25,135,84)',
                         'rgb(220,53,69)'
@@ -903,7 +920,7 @@ class Statistics {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,               
+                maintainAspectRatio: false,
                 plugins: {
                     tooltip: {
                         callbacks: {
@@ -963,7 +980,7 @@ class Statistics {
                 {
                     label: 'Unevaluated',
                     stack: 'Evaluated',
-                    data: this.#data.unevaluatedPerMonth,                   
+                    data: this.#data.unevaluatedPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#1c1c1c',
@@ -1099,7 +1116,7 @@ class Statistics {
                         ticks: {
                             color: '#d3d3d3',
                         }
-                    },   
+                    },
                 },
                 plugins: {
                     tooltip: {
@@ -1124,7 +1141,7 @@ class Statistics {
         var datasets = [];
 
         for (var i = 0; i < this.#data.monthlyOverspendingPerCategory.length; i++) {
-            var categoryData = this.#data.monthlyOverspendingPerCategory[i];            
+            var categoryData = this.#data.monthlyOverspendingPerCategory[i];
             datasets.push({
                 label: categoryData.category,
                 data: categoryData.overspendingPerMonth,
@@ -1152,7 +1169,7 @@ class Statistics {
                 indexAxis: 'y',
                 scales: {
                     x: {
-                        stacked: true,                       
+                        stacked: true,
                         border: {
                             color: '#d3d3d3',
                         },
@@ -1175,7 +1192,7 @@ class Statistics {
                         grid: {
                             display: false,
                             tickColor: '#d3d3d3',
-                            
+
                         },
                         ticks: {
                             color: '#d3d3d3',
@@ -1200,10 +1217,10 @@ class Statistics {
                     }
                 }
             }
-        });            
+        });
 
         this.#overspendingHeading.innerHTML = htmlEscape(`Overspending: ${numberFormat.format(this.#data.overspendingTotal)}`);
-        
+
         new Chart(this.#totalSpentChart, {
             type: 'line',
             data: {

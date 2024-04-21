@@ -599,41 +599,7 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @*
-                                    @foreach (var item in Model.PageModel.Expenses.Se)
-                                    {
-                                    <tr data-movie-id="@item.Id">
-                                    <td class="text-truncate">
-                                    @Html.DisplayFor(modelItem => item.Title)
-                                    </td>
-                                    <td class="text-truncate">
-                                    @Html.DisplayFor(modelItem => item.ReleaseDate)
-                                    </td>
-                                    <td class="text-truncate">
-                                    @Html.DisplayFor(modelItem => item.Genre)
-                                    </td>
-                                    <td class="text-truncate">
-                                    @Html.DisplayFor(modelItem => item.Price)
-                                    </td>
-                                    <td class="text-truncate">
-                                    @Html.DisplayFor(modelItem => item.Rating)
-                                    </td>
-                                    <td class="px-1">
-                                    <button type="button" class="table-btn px-0" onclick="openUpdateMovieModal(
-                                    '@item.Id', '@item.Title', '@item.ReleaseDate.ToString("yyyy-MM-dd")', '@item.Genre', '@Math.Round(item.Price, 2)', '@item.Rating')">
-                                    <img class="updateIcon" src="/img/pencil_white.svg" />
-                                    </button>
-                                    </td>
-                                    <td class="px-1">
-                                    <button type="button" class="table-btn px-0" onclick="openDeleteMovieModal(
-                                    '@item.Id', '@item.Title')">
-                                    <img class="deleteIcon" src="/img/trash_white.svg" />
-                                    </button>
-                                    </td>
-                                    </tr>
-                                    }
-                                    *@
+                                <tbody>                                    
                                 </tbody>
                             </table>
                         </div>
@@ -643,12 +609,9 @@
         </div>
     </div>
 </div>
-</div>
 
-
-
-@await Html.PartialAsync("_IndexModals", Model.PageModel.Category)
-@await Html.PartialAsync("_CategoryModals", Model.PageModel.Transaction)
+@await Html.PartialAsync("_CategoryModals", Model.PageModel.Category)
+@await Html.PartialAsync("_TransactionModals", Model.PageModel.Transaction)
 
 @section Scripts {
     @{

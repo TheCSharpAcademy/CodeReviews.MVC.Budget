@@ -2,10 +2,12 @@
 
 public class YearlyStatisticsDto
 {
-    public decimal HappyTransactionsTotal { get; set; }
-    public decimal UnhappyTransactionsTotal { get; set; }
-    public decimal NecessaryTransactionsTotal { get; set; }
-    public decimal UnnecessaryTransactionsTotal { get; set; }
+
+    public decimal HappyEvaluatedTotal { get; set; }
+    public decimal UnhappyEvaluatedTotal { get; set; }
+    public decimal NecessaryEvaluatedTotal { get; set; }
+    public decimal UnnecessaryEvaluatedTotal { get; set; }
+    public decimal TotalSpent { get; set; }
     public decimal OverspendingTotal { get; set; }
     public IEnumerable<decimal> TotalPerMonth { get; set; }
     public IEnumerable<decimal> HappyPerMonth { get; set; }
