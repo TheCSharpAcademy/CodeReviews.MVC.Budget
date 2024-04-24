@@ -292,7 +292,7 @@ main {
     backface-visibility: hidden;
     height: calc(100vh - 67px);
     width: 100%;
-    transform: rotateY(calc(90deg * var(--s))) translateZ(calc(50cqw));
+    transform: rotateY(calc(90deg * var(--s))) translateZ(50cqw);
 }
 
 #statistics-scrollcontainer::before, #home-scrollcontainer::before, #reevalCategories-scrollcontainer::before, #search-scrollcontainer::before {
@@ -327,7 +327,7 @@ main {
 
 #home-scrollcontainer {
     height: 100%;
-    margin: 0 5px 0 15px;
+    margin: 0 0 0 10px;
     overflow-y: scroll;
 }
 
@@ -343,7 +343,7 @@ main {
 }
 
 #reevalCategories-scrollcontainer {
-    margin: 0 5px 0 15px;
+    margin: 0 0 0 10px;
     height: 100%;
     overflow-y: scroll;
 }
@@ -427,6 +427,7 @@ main {
     stroke: white;
     fill: transparent;
 }
+
 // Statistics
 
 .statistics {

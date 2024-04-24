@@ -12189,7 +12189,7 @@ main {
 
 #home-scrollcontainer {
   height: 100%;
-  margin: 0 5px 0 15px;
+  margin: 0 0 0 10px;
   overflow-y: scroll;
 }
 
@@ -12203,7 +12203,7 @@ main {
 }
 
 #reevalCategories-scrollcontainer {
-  margin: 0 5px 0 15px;
+  margin: 0 0 0 10px;
   height: 100%;
   overflow-y: scroll;
 }

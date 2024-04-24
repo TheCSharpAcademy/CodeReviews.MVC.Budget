@@ -378,7 +378,7 @@
             }
         });
 
-        this.#overspendingHeading.innerHTML = htmlEscape(`Overspending: ${numberFormat.format(this.#data.overspendingTotal)}`);
+        this.#overspendingHeading.textContent = `Overspending: ${numberFormat.format(this.#data.overspendingTotal)}`;
 
         new Chart(this.#totalSpentChart, {
             type: 'line',
@@ -724,14 +724,8 @@ $('#action-sidebar').on("click", '.sidebar-button-container', async function (ev
 });
 
 flipContainer.addEventListener("transitionend", () => {
-    if (currentDeg >= 360) {
-        currentDeg -= 360;
-    } else if (currentDeg <= -360) {
-        currentDeg += 360;
-    }
-
+    currentDeg = currentDeg % 360;
     resetStyle(flipContainer, `transform: rotateY(${currentDeg}deg)`);
-
 });
 
 async function addTransaction(data) {
@@ -851,7 +845,7 @@ async function addCategory(data) {
         });
 
         if (response.ok) {
-            document.querySelector(`#group_${data.get("GroupId")} .accordion-body`).innerHTML += createCategoryElement(await response.json());
+            document.querySelector(`#group_${data.get("GroupId")} .accordion-body`).appendChild(createCategoryElement(await response.json()));
             return true;
         } else {
             console.error(`HTTP Post Error: ${response.status}`);
@@ -966,16 +960,39 @@ async function populateTable(data) {
 }
 
 function createCategoryElement(category) {
-    return `
-    <div class="category border p-2">
-        <div class="d-flex">
-            <div>${category.name}</div>
-            <div class="ms-auto">Balance: 700 / 700</div>
-        </div>
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-    </div>`;
+    let div = document.createElement('div');
+    div.className = 'category border p-2';
+
+    let innerDiv = document.createElement('div');
+    innerDiv.className = 'd-flex';
+
+    let nameDiv = document.createElement('div');
+    nameDiv.textContent = decodeURIComponent(category.name);
+
+    let balanceDiv = document.createElement('div');
+    balanceDiv.className = 'ms-auto';
+    balanceDiv.textContent = 'Balance: 700 / 700';
+
+    innerDiv.appendChild(nameDiv);
+    innerDiv.appendChild(balanceDiv);
+
+    let progressDiv = document.createElement('div');
+    progressDiv.className = 'progress';
+
+    let progressBarDiv = document.createElement('div');
+    progressBarDiv.className = 'progress-bar progress-bar-striped progress-bar-animated bg-success';
+    progressBarDiv.role = 'progressbar';
+    progressBarDiv.style.width = '100%';
+    progressBarDiv.setAttribute('aria-valuenow', '100');
+    progressBarDiv.setAttribute('aria-valuemin', '0');
+    progressBarDiv.setAttribute('aria-valuemax', '100');
+
+    progressDiv.appendChild(progressBarDiv);
+
+    div.appendChild(innerDiv);
+    div.appendChild(progressDiv);
+
+    return div;
 }
 
 function createEvaluationElement(category) {
@@ -987,7 +1004,7 @@ function createEvaluationElement(category) {
 
     var accordionHeader = document.createElement("h5");
     accordionHeader.id = `accordionHeader_${category.id}`;
-    accordionHeader.innerHTML = `${htmlEscape(category.name)}`;
+    accordionHeader.textContent = `${decodeURIComponent(category.name)}`;
     accordionHeader.classList.add("accordion-header", "me-auto")
 
     var accordionCaret = document.createElement("div");
@@ -1020,7 +1037,7 @@ function createEvaluationElement(category) {
         transactionBody.setAttribute('data-isnecessary', transaction.isNecessary);
 
         var titleDiv = document.createElement('div');
-        titleDiv.textContent = htmlEscape(transaction.title);
+        titleDiv.textContent = decodeURIComponent(transaction.title);
 
         var dateDiv = document.createElement('div');
         dateDiv.className = 'ms-2';
@@ -1246,15 +1263,6 @@ function showReevaluationInfo() {
     } else {
         reevaluatioInfo.style.display = 'none';
     }
-}
-
-function htmlEscape(str) {
-    return str
-        .replace(/&/g, '&amp')
-        .replace(/'/g, '&apos')
-        .replace(/"/g, '&quot')
-        .replace(/>/g, '&gt')
-        .replace(/</g, '&lt');
 }
 
 function shortestAngle(index1, index2) {
