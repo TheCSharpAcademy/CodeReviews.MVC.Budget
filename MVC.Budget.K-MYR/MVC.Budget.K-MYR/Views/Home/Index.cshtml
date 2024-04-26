@@ -20,14 +20,13 @@
 
     var overspending = expensesPerCategory.Sum(c => Math.Max(0, c.sumOfTransactions - c.category.Budget));
 }
-
+@*
 @section Stylesheets {
     @{
-        <link rel="stylesheet" href="~/lib/node_modules/ion-rangeslider/css/ion.rangeSlider.min.css" asp-append-version="true">
         <link rel="stylesheet" href="~/lib/node_modules/datatables.net-bs5/css/dataTables.bootstrap5.css" asp-append-version="true">
     }
 }
-
+*@
 <section>
     <div id="menu-container" data-category="0">
         <div id="menu" class="menu">
@@ -613,6 +612,7 @@
 @await Html.PartialAsync("_CategoryModals", Model.PageModel.Category)
 @await Html.PartialAsync("_TransactionModals", Model.PageModel.Transaction)
 
+@*
 @section Scripts {
     @{
         <script src="~/lib/node_modules/chart.js/dist/chart.umd.js"></script>
@@ -623,3 +623,4 @@
         <script src="~/js/index.js" asp-append-version="true"></script>
     }
 }
+*@

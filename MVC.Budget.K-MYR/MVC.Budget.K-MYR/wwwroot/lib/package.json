@@ -1,9 +1,23 @@
 {
+  "name": "net8npmwebpack",
+  "description": "ASP.NET Core MVC project with npm and webpack front-end configuration.",
+  "repository": "https://gitlab.com/kdg-ti/integratieproject-1/guides/net8npmwebpack",
+  "license": "MIT",
+  "version": "5.0.0",
   "dependencies": {
     "bootstrap": "^5.3.2",
     "chart.js": "^4.4.1",
     "country-select-js": "^2.1.0",
     "datatables.net": "^2.0.3",
     "datatables.net-bs5": "^2.0.3"
+  },
+  "devDependencies": {
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "css-loader": "^6.10.0",
+    "style-loader": "^3.3.4"
+  },
+  "scripts": {
+    "build": "webpack"
   }
 }

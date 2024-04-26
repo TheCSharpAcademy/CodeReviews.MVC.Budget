@@ -1,0 +1,30 @@
+{
+  "name": "thebudgeteer",
+  "description": "",
+  "repository": "",
+  "license": "MIT",
+  "version": "",
+  "dependencies": {
+    "chart.js": "^4.4.1",
+    "country-select-js": "^2.1.0",
+    "datatables.net": "^2.0.3",
+    "datatables.net-bs5": "^2.0.3",
+    "@popperjs/core": "^2.11.8",
+    "jquery": "^3.7.1",
+    "jquery-validation": "^1.20.0",
+    "jquery-validation-unobtrusive": "^4.0.0",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3"
+  },
+  "devDependencies": {
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "css-loader": "^6.10.0",
+    "style-loader": "^3.3.4",
+    "sass": "^1.72.0",
+    "sass-loader": "^14.1.1"
+  },
+  "scripts": {
+    "build": "webpack"
+  }
+}
