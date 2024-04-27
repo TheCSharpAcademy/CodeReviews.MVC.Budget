@@ -125,13 +125,4 @@
     </div>
 </section>
 
-
 @await Html.PartialAsync("_TransactionModals", new Transaction())
-
-@section Scripts {
-    @{
-        <script src="~/lib/node_modules/chart.js/dist/chart.umd.js"></script>
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        <script src="~/js/category.js" asp-append-version="true"></script>
-    }
-}

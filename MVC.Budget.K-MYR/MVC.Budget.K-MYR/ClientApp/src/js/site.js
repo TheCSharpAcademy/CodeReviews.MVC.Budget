@@ -10,7 +10,7 @@ import 'jquery-validation-unobtrusive';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // Custom JS imports
-import '../js/index.js'
+import '../js/index.js';
 
 // Custom CSS imports
 import '../scss/site.scss';
