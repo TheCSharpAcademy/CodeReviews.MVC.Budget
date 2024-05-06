@@ -26,6 +26,9 @@ $pagination-disabled-color: #BDC3C7;
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
 // --- Custom Styles ---
+
+// Sitewide styles
+
 body {
     color: white;
     overflow: hidden;
@@ -68,6 +71,20 @@ body {
     margin-left: auto;
     height: 23px;
     width: 23px;
+}
+
+.yearPicker .bi-calendar {
+    color: #456977;
+}
+
+.calendar-button {
+    cursor: pointer;
+}
+
+.yearSelector {
+    max-width: 60px;
+    margin: 0 0 0 auto;
+    cursor: pointer;
 }
 
 //Navbar
@@ -470,6 +487,7 @@ main {
     background-color: $secondary;
     border-radius: var(--bs-border-radius);
 }
+
 
 // Search Transactions
 

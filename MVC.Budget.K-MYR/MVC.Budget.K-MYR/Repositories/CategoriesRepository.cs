@@ -27,13 +27,13 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
     public async Task<List<CategoryStatistics>> GetMonthlyStatistics(int groupId, int year)
     {
         var query = _dbSet.Where(c => c.GroupId == groupId)
-                     .Include(c => c.Transactions.Where(t => t.DateTime.Year == year))
-                     .Include(c => c.PreviousBudgets.Where(t => t.Month.Year == year))
+                     .Include(c => c.Transactions)
+                     .Include(c => c.PreviousBudgets)
                      .Select(c => new CategoryStatistics
                      {
                          Category = c.Name,
                          Budget = c.Budget,
-                         Statistics = c.Transactions.GroupBy(t => t.DateTime.Month)
+                         Statistics = c.Transactions.Where(t => t.DateTime.Year == year).GroupBy(t => t.DateTime.Month)
                                                .Select(g => new MonthlyStatistics
                                                {
                                                    Month = g.Key,
@@ -48,7 +48,7 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                                                    UnnecessaryEvaluatedTransactions = g.Where(t => !t.IsNecessary && t.Evaluated).Sum(t => t.Amount),
                                                    UnevaluatedTransactions = g.Where(t => !t.Evaluated).Sum(t => t.Amount),
                                                }),
-                         BudgetLimits = c.PreviousBudgets.Select(s => new BudgetLimit { Budget = s.Budget, Month = s.Month })
+                         BudgetLimits = c.PreviousBudgets.Where(t => t.Month.Year == year).Select(s => new BudgetLimit { Budget = s.Budget, Month = s.Month })
                      });
 
         return await query.AsNoTracking().ToListAsync();

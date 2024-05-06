@@ -5,6 +5,8 @@ import 'datatables.net-bs5';
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css';
 import 'country-select-js';
 import 'country-select-js/build/css/countrySelect.min.css';
+import 'bootstrap-datepicker';
+import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css';
 
 const categoriesAPI = "https://localhost:7246/api/Categories";
 const transactionsAPI = "https://localhost:7246/api/Transactions";
@@ -47,7 +49,7 @@ var currentSideIndex = 0;
 var currentDeg = 0;
 
 createReevaluationElements();
-initializeStatisticsDashboard();
+const statisticsDashboard = new Statistics();
 
 const transactionsTable = $('#transactions-table').DataTable({
     info: false,
@@ -85,6 +87,21 @@ const transactionsTable = $('#transactions-table').DataTable({
 
 $("#country").countrySelect({
     preferredCountries: ["at", "us"]
+});
+
+$("#statistics-yearSelector").datepicker({
+    format: 'yyyy',
+    minViewMode: 'years'
+}).on('changeDate', async function () {
+    await statisticsDashboard.getData(this.value);
+    statisticsDashboard.updateCharts();
+});
+
+$('.yearPicker .calendar-button').on('click', function (e) {
+    let input = $(this).siblings('.yearSelector');
+    if (!input.data('datepicker').picker.is(':visible')) {
+        input.datepicker('show');
+    }
 });
 
 new Chart(sentimentChart, {
@@ -487,22 +504,6 @@ async function deleteCategory(id, token) {
     }
 }
 
-async function getStatistics() {
-    try {
-        var response = await fetch(`${groupsAPI}/2?year=2024`, { /////// FIX GROUPD ID HERE
-            method: "GET"
-        });
-
-        if (response.ok) {
-            return await response.json();
-        } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-        }
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 async function populateTable(data) {
     try {
         let params = new URLSearchParams();
@@ -514,7 +515,6 @@ async function populateTable(data) {
         }
 
         let query_string = params.toString();
-        console.log(`${transactionsAPI}?${query_string}`);
 
         var response = await fetch(`${transactionsAPI}?${query_string}`, {
             method: "GET",
@@ -801,13 +801,6 @@ async function createReevaluationElements() {
     reevaluationContainer.appendChild(frag);
 
     showReevaluationInfo();
-}
-
-async function initializeStatisticsDashboard() {
-
-    var data = await getStatistics()
-    var statistics = new Statistics(data);
-    statistics.render();
 }
 
 function showReevaluationInfo() {

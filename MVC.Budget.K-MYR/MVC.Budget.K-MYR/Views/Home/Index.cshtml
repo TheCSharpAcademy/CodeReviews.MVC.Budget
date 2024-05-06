@@ -536,8 +536,10 @@
                                 </div>
                                 <div class="chart-container">
                                     <h1 class="text-center">My Budget</h1>
-                                    <input class="yearSelector" type="text" value="" />
-                                    <h4 class="text-center">2024</h4>
+                                    <div class="input-group yearPicker">
+                                        <input id="statistics-yearSelector" type="text" class="yearSelector form-control ms-auto" value="@DateTime.UtcNow.Year" readonly>
+                                        <span class="input-group-text me-auto calendar-button"><i class="bi bi-calendar"></i></span>
+                                    </div>
                                     <div class="dashboardStatistics mt-4">
                                         <h5 id="statistics-overspending" class="text-center">Overspending: @overspending.ToString("C2", Model.Culture) </h5>
                                     </div>

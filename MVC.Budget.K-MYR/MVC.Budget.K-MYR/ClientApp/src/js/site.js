@@ -1,6 +1,5 @@
 ﻿// JS Dependencies: Popper, Bootstrap & JQuery
 import '@popperjs/core';
-import 'bootstrap';
 
 // Using the next two lines is like including partial view _ValidationScriptsPartial.cshtml
 import 'jquery-validation';

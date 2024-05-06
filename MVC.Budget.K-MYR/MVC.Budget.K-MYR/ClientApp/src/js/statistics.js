@@ -3,24 +3,22 @@ import { getRandomColor } from './utilities';
 
 export default class Statistics {
     #data;
-    #sentimentChartYearly = document.getElementById('sentimentChartYear');
-    #necessityChartYearly = document.getElementById('necessityChartYear');
-    #sentimentBarChart = document.getElementById('sentimentLineChartYear');
-    #necessityBarChart = document.getElementById('necessityLineChartYear');
-    #overspendingChart = document.getElementById('overspendingChart');
-    #totalSpentChart = document.getElementById('totalSpentChart');
-    #overspendingHeading = document.getElementById('statistics-overspending');
+    #sentimentChartYearly;
+    #necessityChartYearly;
+    #sentimentBarChart;
+    #necessityBarChart;
+    #overspendingChart;
+    #totalSpentChart;
+    #overspendingHeading;
 
-    constructor(data) {
-        this.#data = data;
+    constructor() {
+        this.initializeDashboard();
     }
 
-    async loadData() {
-        this.#data = await getStatistics();
-    }
+    async initializeDashboard() {
+        await this.getData(new Date().getFullYear());
 
-    render() {
-        new Chart(this.#sentimentChartYearly, {
+        this.#sentimentChartYearly = new Chart(document.getElementById('sentimentChartYear'), {
             type: 'doughnut',
             data: {
                 labels: [
@@ -60,7 +58,7 @@ export default class Statistics {
             }
         });
 
-        new Chart(this.#necessityChartYearly, {
+        this.#necessityChartYearly = new Chart(document.getElementById('necessityChartYear'), {
             type: 'doughnut',
             data: {
                 labels: [
@@ -100,7 +98,7 @@ export default class Statistics {
             }
         });
 
-        new Chart(this.#sentimentBarChart, {
+        this.#sentimentBarChart = new Chart(document.getElementById('sentimentLineChartYear'), {
             type: 'bar',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
@@ -198,7 +196,7 @@ export default class Statistics {
             }
         });
 
-        new Chart(this.#necessityBarChart, {
+        this.#necessityBarChart = new Chart(document.getElementById('necessityLineChartYear'), {
             type: 'bar',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
@@ -299,7 +297,7 @@ export default class Statistics {
             }
         });
 
-        var datasets = [];
+        let datasets = [];
 
         for (var i = 0; i < this.#data.monthlyOverspendingPerCategory.length; i++) {
             var categoryData = this.#data.monthlyOverspendingPerCategory[i];
@@ -312,7 +310,7 @@ export default class Statistics {
             });
         }
 
-        new Chart(this.#overspendingChart, {
+        this.#overspendingChart = new Chart(document.getElementById('overspendingChart'), {
             type: 'bar',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
@@ -381,9 +379,10 @@ export default class Statistics {
             }
         });
 
+        this.#overspendingHeading = document.getElementById('statistics-overspending');
         this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(this.#data.overspendingTotal)}`;
 
-        new Chart(this.#totalSpentChart, {
+        this.#totalSpentChart = new Chart(document.getElementById('totalSpentChart'), {
             type: 'line',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
@@ -433,5 +432,64 @@ export default class Statistics {
                 }
             }
         });
+    }
+
+    async getData(year) {        
+        try {
+            var response = await fetch(`https://localhost:7246/api/Groups/2?year=${year}`, { /////// FIX GROUPD ID HERE
+                method: "GET"
+            });
+
+            if (response.ok) {
+                this.#data = await response.json();
+            } else {
+                console.error(`HTTP Post Error: ${response.status}`);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async updateCharts() {
+        this.#sentimentChartYearly.data.datasets[0].data = [this.#data.happyEvaluatedTotal, this.#data.unhappyEvaluatedTotal, Number.MIN_VALUE];
+        this.#sentimentChartYearly.update();
+
+        this.#necessityChartYearly.data.datasets[0].data = [this.#data.necessaryEvaluatedTotal, this.#data.unnecessaryEvaluatedTotal, Number.MIN_VALUE]
+        this.#necessityChartYearly.update();
+
+        this.#sentimentBarChart.data.datasets[0].data = this.#data.happyPerMonth;
+        this.#sentimentBarChart.data.datasets[1].data = this.#data.unhappyPerMonth;
+        this.#sentimentBarChart.data.datasets[2].data = this.#data.happyEvaluatedPerMonth;
+        this.#sentimentBarChart.data.datasets[3].data = this.#data.unhappyEvaluatedPerMonth;
+        this.#sentimentBarChart.data.datasets[4].data = this.#data.unevaluatedPerMonth;
+        this.#sentimentBarChart.update();
+
+        this.#necessityBarChart.data.datasets[0].data = this.#data.necessaryPerMonth;
+        this.#necessityBarChart.data.datasets[1].data = this.#data.unnecessaryPerMonth;
+        this.#necessityBarChart.data.datasets[2].data = this.#data.necessaryEvaluatedPerMonth;
+        this.#necessityBarChart.data.datasets[3].data = this.#data.unnecessaryEvaluatedPerMonth;
+        this.#necessityBarChart.data.datasets[4].data = this.#data.unevaluatedPerMonth;
+        this.#necessityBarChart.update();
+
+        let datasets = [];
+
+        for (var i = 0; i < this.#data.monthlyOverspendingPerCategory.length; i++) {
+            var categoryData = this.#data.monthlyOverspendingPerCategory[i];
+            datasets.push({
+                label: categoryData.category,
+                data: categoryData.overspendingPerMonth,
+                borderWidth: 2,
+                borderColor: '#d3d3d3',
+                backgroundColor: getRandomColor()
+            });
+        }
+
+        this.#overspendingChart.data.datasets = datasets;
+        this.#overspendingChart.update();
+
+        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(this.#data.overspendingTotal)}`;
+
+        this.#totalSpentChart.data.datasets[0].data = this.#data.totalPerMonth;
+        this.#totalSpentChart.update();
     }
 }
