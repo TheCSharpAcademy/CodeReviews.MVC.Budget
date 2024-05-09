@@ -9,11 +9,7 @@
         window.userLocale = new Intl.Locale('@System.Globalization.CultureInfo.CurrentCulture.Name');
         window.userNumberFormat = new Intl.NumberFormat('@System.Globalization.CultureInfo.CurrentCulture.Name', { style: 'currency', currency: "EUR" });
     </script>
-    @*
-    <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/node_modules/country-select-js/build/css/countrySelect.css" asp-append-version="true">
-    @await RenderSectionAsync("Stylesheets", required: false)
-    *@
+    <link rel="stylesheet" href="~/dist/site.css" asp-append-version="true" />    
 
 </head>
 <body>   
@@ -137,11 +133,6 @@
         </main>
     </div>
 
-    <script src="~/dist/site.entry.js"></script>
-    @*<script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/node_modules/country-select-js/build/js/countrySelect.min.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)*@
-    
+    @await RenderSectionAsync("Scripts", false)
 </body>
 </html>

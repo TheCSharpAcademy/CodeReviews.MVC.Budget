@@ -15,8 +15,6 @@ const transactionModalEvaluatedIsNecessary = updateTransactionModal.find("#updat
 
 Chart.defaults.color = '#ffffff';
 
-
-
 $("#country").countrySelect();
 
 const chart1 = document.getElementById('chart');

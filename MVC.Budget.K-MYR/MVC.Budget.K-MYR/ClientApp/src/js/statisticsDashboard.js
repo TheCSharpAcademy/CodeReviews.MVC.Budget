@@ -1,8 +1,9 @@
 ﻿import Chart from 'chart.js/auto';
 import { getRandomColor } from './utilities';
 
-export default class Statistics {
+export default class StatisticsDashboard {
     #data;
+    #initPromise;
     #sentimentChartYearly;
     #necessityChartYearly;
     #sentimentBarChart;
@@ -12,10 +13,11 @@ export default class Statistics {
     #overspendingHeading;
 
     constructor() {
-        this.initializeDashboard();
+        this.#data = null;
+        this.#initPromise = this.init();
     }
 
-    async initializeDashboard() {
+    async init() {
         await this.getData(new Date().getFullYear());
 
         this.#sentimentChartYearly = new Chart(document.getElementById('sentimentChartYear'), {
@@ -434,7 +436,8 @@ export default class Statistics {
         });
     }
 
-    async getData(year) {        
+    async getData(year) {   
+        await this.#initPromise;
         try {
             var response = await fetch(`https://localhost:7246/api/Groups/2?year=${year}`, { /////// FIX GROUPD ID HERE
                 method: "GET"
@@ -451,6 +454,8 @@ export default class Statistics {
     }
 
     async updateCharts() {
+        await this.#initPromise;
+
         this.#sentimentChartYearly.data.datasets[0].data = [this.#data.happyEvaluatedTotal, this.#data.unhappyEvaluatedTotal, Number.MIN_VALUE];
         this.#sentimentChartYearly.update();
 

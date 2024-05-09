@@ -44,6 +44,12 @@ public class HomeController : Controller
         return View(new LayoutModel<HomeModel>(HomeModel, new CultureInfo("en-US")));
     }
 
+    [HttpGet("Index1")]
+    public async Task<IActionResult> Index1()
+    {     
+        return View(new LayoutModel<Models.Budget>(new Models.Budget(), new CultureInfo("en-US")));
+    }
+
     [HttpGet("Category/{id}")]
     public async Task<IActionResult> Category([FromRoute] int id)
     {

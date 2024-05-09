@@ -1,6 +1,7 @@
 ﻿const path = require('path');
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: {
@@ -9,27 +10,16 @@ module.exports = {
     output: {
         filename: '[name].entry.js',
         path: path.resolve(__dirname, '..', 'wwwroot', 'dist'),
-        clean: true
-    },    
-    plugins: [
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-            'window.jQuery': 'jquery'              
-        })
-    ],
-    devServer: {
-        static: path.resolve(__dirname, 'dist'),
-        port: 7246,
-        hot: true
+        clean: true,
+        publicPath: '/dist/'
     },
-    devtool: 'source-map',
-    mode: 'development',
+    devtool: 'inline-source-map',
+    mode: 'development',  
     module: {
         rules: [
             {
                 test: /\.s?css$/,
-                use: ['style-loader', 'css-loader', 'sass-loader']
+                use: [{ loader: MiniCssExtractPlugin.loader }, 'css-loader', 'sass-loader']
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif|webp)$/i,
@@ -45,4 +35,14 @@ module.exports = {
         minimize: true,
         minimizer: [new TerserPlugin()],
     },
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            'window.jQuery': 'jquery'
+        }),
+        new MiniCssExtractPlugin({
+            filename: "[name].css"
+        })
+    ]
 };

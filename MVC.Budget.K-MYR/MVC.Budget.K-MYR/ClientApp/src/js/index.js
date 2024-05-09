@@ -1,12 +1,9 @@
-﻿import Statistics from './statistics';
+﻿import StatisticsDashboard from './statisticsDashboard';
 import { shortestAngle, resetStyle } from './utilities';
 import Chart from 'chart.js/auto';
 import 'datatables.net-bs5';
-import 'datatables.net-bs5/css/dataTables.bootstrap5.css';
 import 'country-select-js';
-import 'country-select-js/build/css/countrySelect.min.css';
 import 'bootstrap-datepicker';
-import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css';
 
 const categoriesAPI = "https://localhost:7246/api/Categories";
 const transactionsAPI = "https://localhost:7246/api/Transactions";
@@ -49,7 +46,7 @@ var currentSideIndex = 0;
 var currentDeg = 0;
 
 createReevaluationElements();
-const statisticsDashboard = new Statistics();
+const statisticsDashboard = new StatisticsDashboard();
 
 const transactionsTable = $('#transactions-table').DataTable({
     info: false,
@@ -73,12 +70,20 @@ const transactionsTable = $('#transactions-table').DataTable({
     columnDefs: [{
         targets: 2,
         render: function (data, type, row) {
-            return window.userNumberFormat.format(data);
+            if (type === 'display') {
+                return window.userNumberFormat.format(data);
+            } else {
+                return data;
+            }
         }
     }, {
         targets: 1,
         render: function (data, type, row) {
-            return new Date(data).toLocaleString(window.userLocale);
+            if (type === 'display') {
+                return new Date(data).toLocaleString(window.userLocale);
+            } else {
+                return data;
+            }
         }
     }],
     scrollX: true,
@@ -86,19 +91,41 @@ const transactionsTable = $('#transactions-table').DataTable({
 });
 
 $("#country").countrySelect({
-    preferredCountries: ["at", "us"]
+    defaultCountry: window.userLocale.region.toLowerCase(),
+    preferredCountries: ["at", "us"],
+    responsiveDropdown: true
 });
 
-$("#statistics-yearSelector").datepicker({
+const statisticsYearPicker = $("#statistics-yearSelector").datepicker({
     format: 'yyyy',
-    minViewMode: 'years'
+    minViewMode: 'years',
+    autoclose: true
 }).on('changeDate', async function () {
-    await statisticsDashboard.getData(this.value);
+    await statisticsDashboard.getData($(this).datepicker('getDate').getFullYear());
     statisticsDashboard.updateCharts();
 });
 
-$('.yearPicker .calendar-button').on('click', function (e) {
+debugger;
+statisticsYearPicker.datepicker('setDate', new Date());
+
+$('.yearPicker .calendar-button').on('click', function () {
     let input = $(this).siblings('.yearSelector');
+    if (!input.data('datepicker').picker.is(':visible')) {
+        input.datepicker('show');
+    }
+});
+
+const homeMonthPicker = $("#home-monthSelector").datepicker({
+    format: 'MM yyyy',
+    startView: 'months',
+    minViewMode: 'months',
+    autoclose: true
+});
+
+homeMonthPicker.datepicker('setDate', new Date());
+
+$('.monthPicker .calendar-button').on('click', function () {
+    let input = $(this).siblings('.monthSelector');
     if (!input.data('datepicker').picker.is(':visible')) {
         input.datepicker('show');
     }
@@ -311,14 +338,9 @@ $('#action-sidebar').on("click", '.sidebar-button-container', async function (ev
 });
 
 flipContainer.addEventListener("transitionend", () => {
-    if (currentDeg >= 360) {
-        currentDeg -= 360;
-    } else if (currentDeg <= -360) {
-        currentDeg += 360;
-    }
 
+    currentDeg = currentDeg % 360;
     resetStyle(flipContainer, `transform: rotateY(${currentDeg}deg)`);
-
 });
 
 async function addTransaction(data) {
@@ -810,5 +832,3 @@ function showReevaluationInfo() {
         reevaluatioInfo.style.display = 'none';
     }
 }
-
-
