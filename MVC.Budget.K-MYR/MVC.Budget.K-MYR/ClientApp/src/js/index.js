@@ -224,7 +224,7 @@ transactionsTable.on('click', 'svg', function () {
 });
 
 $(".accordion-head").on("click", function (event) {
-    if (event.target.matches("svg.add-icon")) {
+    if (event.target.closest("svg.add-icon")) {
         var id = $(this).closest('.accordion').data("id");
         addCategoryModal.modal('show');
         addCategoryModal.find("#GroupId").val(id);
@@ -416,7 +416,7 @@ async function reevaluateTransaction(data, transactionElement, accordionBody, ac
             if (accordionBody.childElementCount == 0) {
                 accordion.remove();
             }
-            showReevaluationInfo();
+            toggleReevaluationInfo();
         } else {
             console.error(`HTTP Patch Error: ${response.status}`);
         }
@@ -822,10 +822,10 @@ async function createReevaluationElements() {
     reevaluationContainer.innerHTML = "";
     reevaluationContainer.appendChild(frag);
 
-    showReevaluationInfo();
+    toggleReevaluationInfo();
 }
 
-function showReevaluationInfo() {
+function toggleReevaluationInfo() {
     if (reevaluationContainer.childElementCount == 0) {
         reevaluatioInfo.style.display = 'block';
     } else {

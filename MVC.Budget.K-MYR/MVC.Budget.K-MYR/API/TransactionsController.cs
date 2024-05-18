@@ -30,7 +30,7 @@ public class TransactionsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Transaction>> GetTransaction(int id)
     {
-        var transaction = await _transactionsService.GetByIdAsync(id);
+        var transaction = await _transactionsService.GetByIDAsync(id);
 
         return transaction is null ? NotFound() : Ok(transaction);
     }
@@ -60,7 +60,7 @@ public class TransactionsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var transaction = await _transactionsService.GetByIdAsync(id);
+        var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
             return NotFound();
@@ -86,7 +86,7 @@ public class TransactionsController : ControllerBase
         if (patchDoc is null)
             return BadRequest();
 
-        var transaction = await _transactionsService.GetByIdAsync(id);
+        var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
             return NotFound();
@@ -132,7 +132,7 @@ public class TransactionsController : ControllerBase
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> DeleteTransaction(int id)
     {
-        var transaction = await _transactionsService.GetByIdAsync(id);
+        var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
             return NotFound();

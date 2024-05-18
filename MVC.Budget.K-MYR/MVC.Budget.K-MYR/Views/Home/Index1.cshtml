@@ -1,20 +1,31 @@
 ﻿@using System.Globalization
-@model LayoutModel<Budget>
+@model LayoutModel<FiscalPlan>
 
 @{
     ViewData["Title"] = "Budgets";
 }
 
-<div class="content-outer-container" id="budgets-container">
-    <div class="p-3">
-        <button>Add Budget</button>
-    </div>
+<div class="content-outer-container" id="budgets-container">    
     <div class="content-scrollcontainer">
         <div class="content-container">
-            <div class="bg-secondary p-3" style="height: 100px; width: 100%;">
-                <h5 class="text-center">My Budget</h5>
-
-            </div>
+            <div class="cards-container">
+                <div class="budget-card">
+                    <h4 class="text-center">My Budget</h4>
+                    <div>April 2024</div>
+                    <div class="ms-4">
+                        <div>Available: € 650</div>
+                        <div>Spent: € 350</div>
+                        <div>Overspending: € 30</div>
+                    </div>
+                </div>                
+                <div class="add-budget-card">
+                    <svg viewBox="0 0 14 14" height="23" width="23">
+                        <g id="plus">                            
+                            <path  fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
+                        </g>
+                    </svg>
+                </div>
+            </div>            
         </div>
     </div>
 </div>

@@ -8,15 +8,17 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     public ICategoriesRepository CategoriesRepository { get; }
     public ITransactionsRepository TransactionsRepository { get; }
     public IGroupsRepository GroupsRepository { get; }
-    public ICategoryBudgetsRepository CategoryBudgetRepository { get; }
+    public ICategoryBudgetsRepository CategoryBudgetsRepository { get; }
+    public IFiscalPlansRepository FiscalPlansRepository { get; }
 
-    public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepo, ITransactionsRepository transactionsRepo, IGroupsRepository groupsRepo, ICategoryBudgetsRepository categoryStatisticsRepository)
+    public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepo, ITransactionsRepository transactionsRepo, IGroupsRepository groupsRepo, ICategoryBudgetsRepository categoryBudgetsRepository, IFiscalPlansRepository fiscalPlansRepository)
     {
         _context = context;
         CategoriesRepository = categoriesRepo;
         TransactionsRepository = transactionsRepo;
         GroupsRepository = groupsRepo;
-        CategoryBudgetRepository = categoryStatisticsRepository;
+        CategoryBudgetsRepository = categoryBudgetsRepository;
+        FiscalPlansRepository = fiscalPlansRepository;
     }
 
     public async Task Save()

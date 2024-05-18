@@ -47,7 +47,7 @@ public class HomeController : Controller
     [HttpGet("Index1")]
     public async Task<IActionResult> Index1()
     {     
-        return View(new LayoutModel<Models.Budget>(new Models.Budget(), new CultureInfo("en-US")));
+        return View(new LayoutModel<Models.FiscalPlan>(new Models.FiscalPlan(), new CultureInfo("en-US")));
     }
 
     [HttpGet("Category/{id}")]

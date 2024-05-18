@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
 using MVC.Budget.K_MYR.Services;
 

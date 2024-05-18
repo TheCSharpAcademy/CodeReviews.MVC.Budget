@@ -20,9 +20,9 @@ public class TransactionsService : ITransactionsService
         return _unitOfWork.TransactionsRepository.GetFilteredTransactionsAsync(categoryId, searchString, minDate, maxDate, minAmount, maxAmount);
     }
 
-    public ValueTask<Transaction?> GetByIdAsync(int id)
+    public ValueTask<Transaction?> GetByIDAsync(int id)
     {
-        return _unitOfWork.TransactionsRepository.GetByIdAsync(id);
+        return _unitOfWork.TransactionsRepository.GetByIDAsync(id);
     }
 
     public Transaction? GetByID(int id)
@@ -71,7 +71,7 @@ public class TransactionsService : ITransactionsService
         await _unitOfWork.Save();
     }
 
-    public async Task<bool> CategoryExists(int id) => await _unitOfWork.CategoriesRepository.GetByIdAsync(id) is not null;
+    public async Task<bool> CategoryExists(int id) => await _unitOfWork.CategoriesRepository.GetByIDAsync(id) is not null;
     
 }
 

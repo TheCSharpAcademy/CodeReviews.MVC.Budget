@@ -23,7 +23,7 @@ public class CategoriesService : ICategoriesService
 
     public ValueTask<Category?> GetByIDAsync(int id)
     {
-        return _unitOfWork.CategoriesRepository.GetByIdAsync(id);
+        return _unitOfWork.CategoriesRepository.GetByIDAsync(id);
     }
 
     public Category? GetByID(int id)
@@ -62,7 +62,7 @@ public class CategoriesService : ICategoriesService
             Month = DateTime.UtcNow
         };
 
-        _unitOfWork.CategoryBudgetRepository.Insert(categoryStatistics);
+        _unitOfWork.CategoryBudgetsRepository.Insert(categoryStatistics);
         
         await _unitOfWork.Save();
 
@@ -77,7 +77,7 @@ public class CategoriesService : ICategoriesService
 
             if (currentBudget is null)
             {
-                _unitOfWork.CategoryBudgetRepository.Insert(new CategoryBudget
+                _unitOfWork.CategoryBudgetsRepository.Insert(new CategoryBudget
                 {
                     CategoryId = category.Id,
                     Budget = category.Budget,

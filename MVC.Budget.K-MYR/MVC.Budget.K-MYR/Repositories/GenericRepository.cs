@@ -40,7 +40,7 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         return _dbSet.Find(id);
     }
 
-    public virtual ValueTask<TEntity?> GetByIdAsync(int id)
+    public virtual ValueTask<TEntity?> GetByIDAsync(int id)
     {
         return _dbSet.FindAsync(id);
     }
