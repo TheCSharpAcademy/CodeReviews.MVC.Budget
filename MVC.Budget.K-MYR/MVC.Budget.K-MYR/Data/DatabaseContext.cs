@@ -9,6 +9,7 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<CategoryBudget> CategoryBudgets { get; set; }
+    public DbSet<FiscalPlan> FiscalPlans { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

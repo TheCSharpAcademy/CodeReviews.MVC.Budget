@@ -9,7 +9,7 @@
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="add-transaction-form" asp-controller="Transactions" asp-action="PostTransaction" method="POST">
+                    <form id="add-transaction-form" method="post">
                         <input type="hidden" asp-for="CategoryId" value="" />
                         <div class="form-group">
                             <label asp-for="Title" class="control-label"></label>
@@ -190,7 +190,7 @@
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="update-transaction-form" asp-controller="Transactions" asp-action="PutTransaction" method="PUT">
+                    <form id="update-transaction-form" method="post">
                         <input type="hidden" asp-for="Id" value="" id="updateTransaction_id"/>
                         <input type="hidden" asp-for="CategoryId" value="" id="updateTransaction_categoryId" />
                         <input type="hidden" asp-for="Evaluated" value="" id="updateTransaction_evaluated" />

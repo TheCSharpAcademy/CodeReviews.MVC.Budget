@@ -2,13 +2,16 @@
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { WebpackManifestPlugin }  = require('webpack-manifest-plugin');
 
 module.exports = {
     entry: {
-        site: './src/js/site.js'
+        index: './src/js/index-entry.js',
+        index1: './src/js/index1-entry.js'
+
     },
     output: {
-        filename: '[name].entry.js',
+        filename: '[name].[contenthash].js',
         path: path.resolve(__dirname, '..', 'wwwroot', 'dist'),
         clean: true,
         publicPath: '/dist/'
@@ -31,7 +34,7 @@ module.exports = {
             }
         ]
     },
-    optimization: {
+    optimization: {  
         minimize: true,
         minimizer: [new TerserPlugin()],
     },
@@ -43,6 +46,13 @@ module.exports = {
         }),
         new MiniCssExtractPlugin({
             filename: "[name].css"
-        })
+        }),
+        new WebpackManifestPlugin(
+            {
+                fileName: 'prod.manifest.json',
+                generate: (seed, files, entries) => {
+                    return entries;
+                }
+            }),
     ]
 };

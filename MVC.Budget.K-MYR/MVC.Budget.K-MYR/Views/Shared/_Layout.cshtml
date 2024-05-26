@@ -4,36 +4,33 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MVC.Budget.K_MYR</title>
+    <title>@ViewData["Title"] - MVC.Budget.K_MYR</title>   
     <script>
         window.userLocale = new Intl.Locale('@System.Globalization.CultureInfo.CurrentCulture.Name');
         window.userNumberFormat = new Intl.NumberFormat('@System.Globalization.CultureInfo.CurrentCulture.Name', { style: 'currency', currency: "EUR" });
     </script>
-    <link rel="stylesheet" href="~/dist/site.css" asp-append-version="true" />    
-
+    <link rel="stylesheet" href="~/dist/site.css" asp-append-version="true" />  
 </head>
 <body>   
-    <header>
-        <nav class="navbar navbar-light navbar-expand-sm navbar-toggleable-sm">
+    <header>        
+        <nav class="navbar navbar-expand-lg">
             <div class="container-md">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">The Budgeteer</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav  me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                     </ul>
-                </div>
-                <div class="ms-auto">
-                    <input type="text" id="country">
-                    <input type="hidden" id="country_code" />
+                    <form id="country-form" class="d-flex" role="form">
+                        <input type="text" id="country" aria-label="Country Selection">
+                        <input type="hidden" id="country_code" />
+                    </form>
                 </div>
             </div>
-
         </nav>
     </header>
 
@@ -133,6 +130,7 @@
         </main>
     </div>
 
+    <script src="~/dist/site.entry.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", false)
 </body>
 </html>

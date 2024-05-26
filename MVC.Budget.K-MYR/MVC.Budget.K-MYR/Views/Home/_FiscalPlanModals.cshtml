@@ -1,28 +1,22 @@
-﻿@model MVC.Budget.K_MYR.Models.Category;
+﻿@model MVC.Budget.K_MYR.Models.FiscalPlan;
 
-<section id="category-modals">
-    <div class="modal fade" id="add-category-modal" tabindex="-1" aria-labelledby="add-category-label" aria-hidden="true">
+<section id="fiscalPlan-modals">
+    <div class="modal fade" id="add-fiscalPlan-modal" tabindex="-1" aria-labelledby="add-fiscalPlan-label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-truncate text-center flex-grow-1" id="add-category-label">Add Category</h5>
+                    <h5 class="modal-title text-truncate text-center flex-grow-1" id="add-fiscalPlan-label">Add Fiscal Plan</h5>
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="add-category-form" method="post">
-                        <input type="hidden"asp-for="GroupId" value="" id="addCategory_groupId"/>
+                    <form id="add-category-form" method="POST">
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
                             <input asp-for="Name" class="form-control" />
                             <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Budget" class="control-label"></label>
-                            <input asp-for="Budget" class="form-control" />
-                            <span asp-validation-for="Budget" class="text-danger"></span>
-                        </div>
+                        </div>                        
                         <div class="form-group mt-2 d-flex align-items-center justify-content-center">
-                            <input type="submit" value="Add" class="px-4" /> 
+                            <input type="submit" value="Add" class="px-4" />
                         </div>
                     </form>
                 </div>
@@ -38,21 +32,15 @@
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="update-category-form" method="post">
-                        <input type="hidden" asp-for="GroupId" value="" id="updateCategory_groupId" />
-                        <input type="hidden" asp-for="Id" value="" id="updateCategory_id"/>
+                    <form id="update-category-form">
+                        <input type="hidden" asp-for="Id" value="" id="updateCategory_id" />
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
-                            <input asp-for="Name" class="form-control" id="updateCategory_name"/>
+                            <input asp-for="Name" class="form-control" id="updateCategory_name" />
                             <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Budget" class="control-label"></label>
-                            <input asp-for="Budget" class="form-control" id="updateCategory_budget" />
-                            <span asp-validation-for="Budget" class="text-danger"></span>
-                        </div>
+                        </div>                       
                         <div class="form-group mt-2 d-flex align-items-center justify-content-center">
-                            <input type="submit" value="Edit" class="px-4" /> 
+                            <input type="submit" value="Edit" class="px-4" />
                         </div>
                     </form>
                 </div>
@@ -60,5 +48,3 @@
         </div>
     </div>
 </section>
-
-

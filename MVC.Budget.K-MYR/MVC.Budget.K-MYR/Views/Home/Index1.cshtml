@@ -5,11 +5,11 @@
     ViewData["Title"] = "Budgets";
 }
 
-<div class="content-outer-container" id="budgets-container">    
+<div class="content-outer-container" id="fiscalPlans-container">
     <div class="content-scrollcontainer">
         <div class="content-container">
             <div class="cards-container">
-                <div class="budget-card">
+                <div class="fiscalPlan-card">
                     <h4 class="text-center">My Budget</h4>
                     <div>April 2024</div>
                     <div class="ms-4">
@@ -18,7 +18,7 @@
                         <div>Overspending: € 30</div>
                     </div>
                 </div>                
-                <div class="add-budget-card">
+                <div id="add-fiscalPlan-card" class="add-fiscalPlan-card">
                     <svg viewBox="0 0 14 14" height="23" width="23">
                         <g id="plus">                            
                             <path  fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
@@ -29,3 +29,11 @@
         </div>
     </div>
 </div>
+
+@await Html.PartialAsync("_FiscalPlanModals", Model.PageModel)
+
+@section Scripts {
+    @{
+        <script src="~/dist/index1.entry.js" asp-append-version="true"></script>
+    }
+}

@@ -100,7 +100,6 @@ body {
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    width: 100%;
 }
 
 .navbar-brand, .nav-link {
@@ -692,7 +691,7 @@ main {
 
 // Budget Selection
 
-#budgets-container {
+#fiscalPlans-container {
     background-image: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
     background-size: cover;
     background-position: center;
@@ -706,14 +705,14 @@ main {
     margin-top: 5px;
 }
 
-.budget-card {
+.fiscalPlan-card {
     background-color: $secondary;
     padding: 15px;
     height: 200px;
     border-radius: var(--bs-border-radius);
 }
 
-.add-budget-card {
+.add-fiscalPlan-card {
     background-color: transparent;
     padding: 20px;
     height: 200px;
@@ -722,7 +721,7 @@ main {
     cursor: pointer;
 }
 
-.add-budget-card svg {
+.add-fiscalPlan-card svg {
     fill: $secondary;
     flex-grow: 0;
     height: 100%;

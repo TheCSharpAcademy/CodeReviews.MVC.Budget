@@ -1,8 +1,10 @@
 ﻿import StatisticsDashboard from './statisticsDashboard';
 import { shortestAngle, resetStyle } from './utilities';
 import Chart from 'chart.js/auto';
-import 'datatables.net-bs5';
+import { Modal, Collapse } from 'bootstrap';
+import 'jquery-validation';
 import 'country-select-js';
+import 'datatables.net-bs5';
 import 'bootstrap-datepicker';
 
 const categoriesAPI = "https://localhost:7246/api/Categories";
@@ -15,19 +17,31 @@ const sidebar = document.getElementById("sidebar");
 const sentimentChart = document.getElementById('sentimentChart');
 const necessityChart = document.getElementById('necessityChart');
 
-const updateCategoryModal = $("#updateCategory-modal");
-const categoryModalLabel = updateCategoryModal.find("#updateCategory-label");
-const categoryModalId = updateCategoryModal.find("#updateCategory_id");
-const categoryModalName = updateCategoryModal.find("#updateCategory_name");
-const categoryModalBudget = updateCategoryModal.find("#updateCategory_budget");
-const categoryModalGroupId = updateCategoryModal.find("#updateCategory_groupId");
-const addCategoryModal = $("#add-category-modal");
-const addTransactionModal = $("#add-transaction-modal");
+const addCategoryModal = new Modal(document.getElementById("add-category-modal"));
+const addCategoryModalGroupId = document.getElementById("addCategory_groupId");
+
+const updateCategoryModal = new Modal(document.getElementById("updateCategory-modal"));
+const updateCategoryModalLabel = document.getElementById("updateCategory-label");
+const updateCategoryModalId = document.getElementById("updateCategory_id");
+const updateCategoryModalName = document.getElementById("updateCategory_name");
+const updateCategoryModalBudget = document.getElementById("updateCategory_budget");
+const updateCategoryModalGroupId = document.getElementById("updateCategory_groupId");
+
+const addTransactionModal = new Modal(document.getElementById("add-transaction-modal"));
 
 const flipContainer = document.getElementById("flip-container-inner");
 
 const reevaluationContainer = document.getElementById("reevalCategories-container");
 const reevaluatioInfo = document.getElementById("reevalInfo");
+
+$("#country").countrySelect({
+    defaultCountry: window.userLocale.region.toLowerCase(),
+    preferredCountries: ["at", "us"],
+    responsiveDropdown: true
+});
+document.getElementById("country-form").addEventListener('submit', function (event) {
+    event.preventDefault();
+});
 
 Chart.defaults.color = '#ffffff';
 Chart.defaults.scales.linear.min = 0;
@@ -89,13 +103,6 @@ const transactionsTable = $('#transactions-table').DataTable({
     scrollX: true,
     scrollCollapse: true
 });
-
-$("#country").countrySelect({
-    defaultCountry: window.userLocale.region.toLowerCase(),
-    preferredCountries: ["at", "us"],
-    responsiveDropdown: true
-});
-
 const statisticsYearPicker = $("#statistics-yearSelector").datepicker({
     format: 'yyyy',
     minViewMode: 'years',
@@ -105,7 +112,6 @@ const statisticsYearPicker = $("#statistics-yearSelector").datepicker({
     statisticsDashboard.updateCharts();
 });
 
-debugger;
 statisticsYearPicker.datepicker('setDate', new Date());
 
 $('.yearPicker .calendar-button').on('click', function () {
@@ -223,14 +229,17 @@ transactionsTable.on('click', 'svg', function () {
     console.log(data);
 });
 
+const collapseElementList = document.querySelectorAll('.collapse')
+const collapseList = [...collapseElementList].map(collapseElement => new Collapse(collapseElement, {toggle: false}))
+
 $(".accordion-head").on("click", function (event) {
     if (event.target.closest("svg.add-icon")) {
         var id = $(this).closest('.accordion').data("id");
-        addCategoryModal.modal('show');
-        addCategoryModal.find("#GroupId").val(id);
+        addCategoryModalGroupId.value = id;
+        addCategoryModal.show();
     }
     else {
-        $(this).next().collapse('toggle');
+        Collapse.getInstance($(this).next()).toggle();
         var caret = $('.accordion-caret', this)[0];
         caret.classList.toggle("rotate");
     }
@@ -239,7 +248,7 @@ $(".accordion-head").on("click", function (event) {
 $('#add-category-form').on("submit", async function (event) {
     event.preventDefault();
     if ($(this).valid()) {
-        addCategoryModal.modal('hide');
+        addCategoryModal.hide();
         await addCategory(new FormData(this));
     }
 });
@@ -309,11 +318,11 @@ document.getElementById('add-menu').onclick = function () {
 document.getElementById('edit-menu').onclick = function () {
     var category = document.getElementById(`category_${menu.dataset.category}`);
 
-    categoryModalLabel.text(`Edit ${category.dataset.name}`);
-    categoryModalId.val(category.dataset.id);
-    categoryModalName.val(category.dataset.name);
-    categoryModalBudget.val(category.dataset.budget);
-    categoryModalGroupId.val(category.dataset.groupid);
+    updateCategoryModalLabel.text(`Edit ${category.dataset.name}`);
+    updateCategoryModalId.val(category.dataset.id);
+    updateCategoryModalName.val(category.dataset.name);
+    updateCategoryModalBudget.val(category.dataset.budget);
+    updateCategoryModalGroupId.val(category.dataset.groupid);
 
     updateCategoryModal.modal('show');
 };
@@ -446,6 +455,7 @@ async function getFilteredCategories() {
 
 async function addCategory(data) {
     try {
+        console.log(data.get('__RequestVerificationToken'));
         var response = await fetch(`${categoriesAPI}`, {
             method: "POST",
             headers: {
