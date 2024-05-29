@@ -1,6 +1,13 @@
 ﻿@using System.Globalization
 @model LayoutModel<HomeModel>
 
+@section Stylesheets {
+    @{
+        <link rel="stylesheet" href="~/dist/styles-index~index1.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/dist/styles-index.css" asp-append-version="true" />
+    }
+}
+
 @{
     ViewData["Title"] = "Home Page";
 
@@ -613,7 +620,9 @@
 @await Html.PartialAsync("_TransactionModals", Model.PageModel.Transaction)
 
 @section Scripts {
-    @{        
-        <script src="~/dist/index.entry.js" asp-append-version="true"></script>
+    @{
+        <script src="~/dist/vendors-index~index1.js" asp-append-version="true"></script>
+        <script src="~/dist/vendors-index.js" asp-append-version="true"></script>
+        <script src="~/dist/index.js" asp-append-version="true"></script>
     }
 }

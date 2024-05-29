@@ -1,6 +1,12 @@
 ﻿@using System.Globalization
 @model LayoutModel<FiscalPlan>
 
+@section Stylesheets {
+    @{
+        <link rel="stylesheet" href="~/dist/styles-index~index1.css" asp-append-version="true" />
+    }
+}
+
 @{
     ViewData["Title"] = "Budgets";
 }
@@ -34,6 +40,7 @@
 
 @section Scripts {
     @{
-        <script src="~/dist/index1.entry.js" asp-append-version="true"></script>
+        <script src="~/dist/vendors-index~index1.js" asp-append-version="true"></script>
+        <script src="~/dist/index1.js" asp-append-version="true"></script>
     }
 }

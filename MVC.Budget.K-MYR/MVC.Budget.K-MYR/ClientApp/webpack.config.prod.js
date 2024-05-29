@@ -18,8 +18,7 @@ module.exports = {
         clean: true,
         publicPath: '/dist/'
     },
-    devtool: 'source-map',
-    mode: 'development',  
+    mode: 'production',
     module: {
         rules: [
             {
@@ -36,11 +35,11 @@ module.exports = {
             }
         ]
     },
-    optimization: {  
-        minimize: false,
-        minimizer: ['...' , new CssMinimizerPlugin()],
-        splitChunks: {            
-            cacheGroups: {    
+    optimization: {
+        minimize: true,
+        minimizer: ['...', new CssMinimizerPlugin()],
+        splitChunks: {
+            cacheGroups: {
                 styles: {
                     type: "css/mini-extract",
                     chunks: 'all',
@@ -48,17 +47,17 @@ module.exports = {
                     name(module, chunks, cacheGroupKey) {
                         const allChunksNames = chunks.map((item) => item.name).join('~');
                         return `${cacheGroupKey}-${allChunksNames}`;
-                    },  
+                    },
                 },
                 defaultVendors: {
                     test: /[\\/]node_modules[\\/]/,
                     chunks: 'all',
                     priority: -10,
                     reuseExistingChunk: true,
-                    name(module, chunks, cacheGroupKey) {                        
+                    name(module, chunks, cacheGroupKey) {
                         const allChunksNames = chunks.map((item) => item.name).join('~');
                         return `vendors-${allChunksNames}`;
-                    },                   
+                    },
                 },
                 default: {
                     chunks: 'all',
@@ -70,13 +69,13 @@ module.exports = {
         }
     },
     plugins: [
-        new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false}),
+        new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
             'window.jQuery': 'jquery'
         }),
-        new MiniCssExtractPlugin({            
+        new MiniCssExtractPlugin({
             filename: "[name].css"
         }),
         new WebpackManifestPlugin(

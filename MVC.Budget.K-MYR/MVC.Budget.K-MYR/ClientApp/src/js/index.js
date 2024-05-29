@@ -1,11 +1,29 @@
 ﻿import StatisticsDashboard from './statisticsDashboard';
 import { shortestAngle, resetStyle } from './utilities';
-import Chart from 'chart.js/auto';
-import { Modal, Collapse } from 'bootstrap';
+import { Modal, Collapse} from 'bootstrap';
 import 'jquery-validation';
 import 'country-select-js';
-import 'datatables.net-bs5';
+import DataTable from 'datatables.net-bs5';
 import 'bootstrap-datepicker';
+import {
+    Chart, BarController, BarElement, DoughnutController, ArcElement, LineController, LineElement,
+    PointElement, CategoryScale, LinearScale, Filler, Legend, Title, Tooltip
+} from 'chart.js';
+Chart.defaults.color = '#ffffff';
+Chart.defaults.scales.linear.min = 0;
+Chart.defaults.plugins.legend.labels.filter = (item) => item.text !== undefined;
+Chart.defaults.plugins.tooltip.filter = (item) => item.label !== "";
+
+Chart.register(  
+        BarController, BarElement, DoughnutController, ArcElement, LineController, LineElement,
+        PointElement, CategoryScale, LinearScale, Filler, Legend, Title, Tooltip,
+    {
+    id: "emptypiechart",
+    beforeInit: function (chart) {
+        chart.data.datasets[0].backgroundColor.push('#d2dee2');
+        chart.data.datasets[0].data.push(Number.MIN_VALUE);
+    }
+});
 
 const categoriesAPI = "https://localhost:7246/api/Categories";
 const transactionsAPI = "https://localhost:7246/api/Transactions";
@@ -43,26 +61,13 @@ document.getElementById("country-form").addEventListener('submit', function (eve
     event.preventDefault();
 });
 
-Chart.defaults.color = '#ffffff';
-Chart.defaults.scales.linear.min = 0;
-Chart.defaults.plugins.legend.labels.filter = (item) => item.text !== undefined;
-Chart.defaults.plugins.tooltip.filter = (item) => item.label !== "";    
-
-Chart.register({
-    id: "emptypiechart",
-    beforeInit: function (chart) {        
-        chart.data.datasets[0].backgroundColor.push('#d2dee2');
-        chart.data.datasets[0].data.push(Number.MIN_VALUE);               
-    }
-});
-
 var currentSideIndex = 0;
 var currentDeg = 0;
 
 createReevaluationElements();
 const statisticsDashboard = new StatisticsDashboard();
 
-const transactionsTable = $('#transactions-table').DataTable({
+const transactionsTable = new DataTable('#transactions-table', {
     info: false,
     dom: '<"pb-1" t<"d-flex justify-content-between mt-3"<"pt-1"l>p>>',
     columns: [
@@ -455,7 +460,6 @@ async function getFilteredCategories() {
 
 async function addCategory(data) {
     try {
-        console.log(data.get('__RequestVerificationToken'));
         var response = await fetch(`${categoriesAPI}`, {
             method: "POST",
             headers: {
@@ -842,3 +846,4 @@ function toggleReevaluationInfo() {
         reevaluatioInfo.style.display = 'none';
     }
 }
+

@@ -1,10 +1,14 @@
 {
   "index": [
-    "index.css",
-    "index.f27f175cd349d41d9dca.js"
+    "styles-index~index1.css",
+    "styles-index.css",
+    "vendors-index~index1.js",
+    "vendors-index.js",
+    "index.js"
   ],
   "index1": [
-    "index1.css",
-    "index1.a0112735d02a49d30b54.js"
+    "styles-index~index1.css",
+    "vendors-index~index1.js",
+    "index1.js"
   ]
 }
