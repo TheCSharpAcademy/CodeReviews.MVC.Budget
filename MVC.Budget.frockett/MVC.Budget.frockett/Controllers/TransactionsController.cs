@@ -1,75 +1,82 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.frockett.Data;
 using MVC.Budget.frockett.Models;
 
-namespace MVC.Budget.frockett.Controllers
+namespace MVC.Budget.frockett.Controllers;
+
+public class TransactionsController : Controller
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TransactionsController : ControllerBase
+    private readonly BudgetContext _context;
+
+    public TransactionsController(BudgetContext context)
     {
-        private readonly BudgetContext _context;
+        _context = context;
+    }
 
-        public TransactionsController(BudgetContext context)
+    // GET: TransactionsController
+    public async Task<IActionResult> Index()
+    {
+        return View(await _context.Transactions.Include(t => t.Category).ToListAsync());
+    }
+
+    // GET: TransactionsController/Details/5
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null) return NotFound();
+
+        var transaction = await  _context.Transactions.Include(t => t.Category).FirstOrDefaultAsync(t => t.Id == id);
+        
+        if (transaction == null) return NotFound();
+
+        return View(transaction);
+    }
+
+    // GET: TransactionsController/Create
+    public ActionResult Create()
+    {
+        return View();
+    }
+
+    // POST: TransactionsController/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(Transaction transaction)
+    {
+        if (ModelState.IsValid)
         {
-            _context = context;
+            _context.Transactions.Add(transaction);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
         }
+        return View(transaction);
+    }
 
-        // GET: api/Transactions
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
+    // GET: TransactionsController/Edit/5
+    public ActionResult Edit(int id)
+    {
+        return View();
+    }
+
+    // POST: TransactionsController/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Transaction transaction)
+    {
+        if (id != transaction.Id) return NotFound();
+
+        if (ModelState.IsValid)
         {
-            return await _context.Transactions.Include(t => t.Category).ToListAsync();
-        }
-
-        // GET: api/Transactions/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Transaction>> GetTransaction(int id)
-        {
-            var transaction = await _context.Transactions.Include(t => t.Category).FirstOrDefaultAsync(t => t.Id == id); 
-
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-
-            return transaction;
-        }
-
-        // PUT: api/Transactions/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTransaction(int id, Transaction transaction)
-        {
-            if (id != transaction.Id)
-            {
-                return BadRequest();
-            }
-
-            var category = await _context.Categories.FindAsync(transaction.CategoryId);
-            if (category == null)
-            {
-                return NotFound($"Category with ID {transaction.CategoryId} not found.");
-            }
-
-            transaction.Category = category;
-
-
-            _context.Entry(transaction).State = EntityState.Modified;
-
             try
             {
+                _context.Transactions.Update(transaction);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TransactionExists(id))
+                if (!_context.Categories.Any(e => e.Id == transaction.CategoryId))
                 {
                     return NotFound();
                 }
@@ -78,48 +85,40 @@ namespace MVC.Budget.frockett.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return RedirectToAction(nameof(Index));
         }
+        return View(transaction);
+    }
 
-        // POST: api/Transactions
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
+    // GET: TransactionsController/Delete/5
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var transactionToDelete = await _context.Transactions.FindAsync(id);
+        if (transactionToDelete != null)
         {
-            var category = await _context.Categories.FindAsync(transaction.CategoryId);
-            if (category == null)
-            {
-                return NotFound($"Category with ID {transaction.CategoryId} not found.");
-            }
-
-            transaction.Category = category;
-
-            _context.Transactions.Add(transaction);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetTransaction", new { id = transaction.Id }, transaction);
+            _context.Transactions.Remove(transactionToDelete);
         }
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
 
-        // DELETE: api/Transactions/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTransaction(int id)
+    // POST: TransactionsController/Delete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-
-            _context.Transactions.Remove(transaction);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return NotFound();
         }
 
-        private bool TransactionExists(int id)
+        var transaction = await _context.Transactions
+            .FirstOrDefaultAsync(m => m.Id == id);
+        if (transaction == null)
         {
-            return _context.Transactions.Any(e => e.Id == id);
+            return NotFound();
         }
+
+        return View(transaction);
     }
 }
