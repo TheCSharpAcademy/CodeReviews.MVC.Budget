@@ -147,6 +147,49 @@ function toggleAddModal() {
     }
 }
 
+function toggleAddCategoryModal() {
+    const addCategoryModal = document.getElementById('addCategoryModal');
+    const overlay = document.querySelector('.overlay');
+
+    if (addCategoryModal.style.display === 'block') {
+        overlay.classList.add("hidden");
+        addCategoryModal.style.display = 'none';
+        document.getElementById('add-categoryName').value = '';
+    } else {
+        addCategoryModal.style.display = 'block';
+        overlay.classList.remove("hidden");
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('addCategoryForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        addCategory();
+    });
+});
+
+function addCategory() {
+    const name = document.getElementById('add-categoryName').value;
+
+    const category = {
+        name: name
+    };
+
+    fetch('/api/CategoriesAPI', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(category)
+    })
+        .then(response => response.json())
+        .then(data => {
+            toggleAddCategoryModal();
+            fetchCategories();
+        })
+        .catch(error => console.error('Error adding category:', error));
+}
+
 document.addEventListener('DOMContentLoaded', (event) => {
     fetchCategories();
 
@@ -162,6 +205,7 @@ function fetchCategories() {
         .then(data => {
             const categories = data.$values
             const categorySelect = document.getElementById('add-transactionCategory');
+            categorySelect.innerHTML = '';
             categories.forEach(category => {
                 const option = document.createElement('option');
                 option.value = category.id;

@@ -42,7 +42,29 @@
                         <label for="transactionDate">Date</label>
                         <input type="date" class="form-control" id="add-transactionDate" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Transaction</button>
+                    <button type="submit" class="btn btn-primary" style="margin-top:1rem">Add Transaction</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true" style="display:none">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+                <button type="button" class="close" aria-label="Close" onclick="toggleAddCategoryModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <div class="form-group">
+                        <label for="categoryName">Name</label>
+                        <input type="text" class="form-control" id="add-categoryName" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top:1rem">Add Category</button>
                 </form>
             </div>
         </div>
@@ -60,7 +82,9 @@
 <button type="button" class="btn btn-primary" data-toggle="modal" onclick="toggleAddModal()">
     Add Transaction
 </button>
-
+<button type="button" class="btn btn-primary" onclick="toggleAddCategoryModal()">
+    Add Category
+</button>
 
 
 <div class="overlay hidden"></div>
