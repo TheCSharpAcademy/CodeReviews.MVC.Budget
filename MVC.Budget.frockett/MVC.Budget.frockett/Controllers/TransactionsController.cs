@@ -18,7 +18,7 @@ public class TransactionsController : Controller
     // GET: TransactionsController
     public async Task<IActionResult> Index()
     {
-        return View(await _context.Transactions.Include(t => t.Category).ToListAsync());
+        return View(await _context.Transactions.ToListAsync());
     }
 
     // GET: TransactionsController/Details/5
@@ -26,7 +26,7 @@ public class TransactionsController : Controller
     {
         if (id == null) return NotFound();
 
-        var transaction = await  _context.Transactions.Include(t => t.Category).FirstOrDefaultAsync(t => t.Id == id);
+        var transaction = await  _context.Transactions.FirstOrDefaultAsync(t => t.Id == id);
         
         if (transaction == null) return NotFound();
 

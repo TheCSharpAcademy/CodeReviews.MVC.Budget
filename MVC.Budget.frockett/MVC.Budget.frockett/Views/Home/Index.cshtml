@@ -7,6 +7,10 @@
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
+<input type="text" id="nameFilter" placeholder="Filter by name" oninput="filterTransactions()">
+<input type="text" id="categoryFilter" placeholder="Filter by category" oninput="filterTransactions()">
+<input type="number" id="amountFilter" placeholder="Filter by amount" oninput="filterTransactions()">
+
 <div class="table-container">
     <table id="transactionList" class="table table-hover">
 

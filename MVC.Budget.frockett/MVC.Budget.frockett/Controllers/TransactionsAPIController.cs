@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.frockett.Data;
 using MVC.Budget.frockett.Models;
+using MVC.Budget.frockett.Dtos;
 
 namespace MVC.Budget.frockett.Controllers;
 
@@ -23,16 +24,33 @@ public class TransactionsAPIController : ControllerBase
 
     // GET: api/Transactions
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
+    public async Task<ActionResult<IEnumerable<TransactionGetDto>>> GetTransactions()
     {
-        return await _context.Transactions.ToListAsync();
+        var transactions = await _context.Transactions.Include(t => t.Category).ToListAsync();
+
+        var transactionsToReturn = new List<TransactionGetDto>();
+
+        foreach(var transaction in transactions)
+        {
+            transactionsToReturn.Add(new TransactionGetDto
+            {
+                Id = transaction.Id,
+                Title = transaction.Title,
+                Amount = transaction.Amount,
+                DateTime = transaction.DateTime,
+                CategoryId = transaction.CategoryId,
+                CategoryName = transaction.Category.Name
+            });
+        }
+
+        return transactionsToReturn;
     }
 
     // GET: api/Transactions/5
     [HttpGet("{id}")]
     public async Task<ActionResult<Transaction>> GetTransaction(int id)
     {
-        var transaction = await _context.Transactions.Include(t => t.Category).FirstOrDefaultAsync(t => t.Id == id); 
+        var transaction = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == id); 
 
         if (transaction == null)
         {
@@ -57,8 +75,6 @@ public class TransactionsAPIController : ControllerBase
         {
             return NotFound($"Category with ID {transaction.CategoryId} not found.");
         }
-
-        transaction.Category = category;
 
 
         _context.Entry(transaction).State = EntityState.Modified;
@@ -85,15 +101,22 @@ public class TransactionsAPIController : ControllerBase
     // POST: api/Transactions
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
+    public async Task<ActionResult<Transaction>> PostTransaction(TransactionPostDto transactionDto)
     {
-        var category = await _context.Categories.FindAsync(transaction.CategoryId);
+        var category = await _context.Categories.FindAsync(transactionDto.CategoryId);
         if (category == null)
         {
-            return NotFound($"Category with ID {transaction.CategoryId} not found.");
+            return NotFound($"Category with ID {transactionDto.CategoryId} not found.");
         }
 
-        transaction.Category = category;
+        var transaction = new Transaction
+        {
+            Title = transactionDto.Title,
+            Amount = transactionDto.Amount,
+            DateTime = transactionDto.DateTime,
+            CategoryId = transactionDto.CategoryId,
+            Category = category
+        };
 
         _context.Transactions.Add(transaction);
         await _context.SaveChangesAsync();

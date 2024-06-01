@@ -5,7 +5,7 @@
 namespace MVC.Budget.frockett.Migrations
 {
     /// <inheritdoc />
-    public partial class MakeTransactionsInCategoryNullable : Migration
+    public partial class removeIsRequired : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

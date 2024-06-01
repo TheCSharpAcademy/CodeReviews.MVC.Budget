@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVC.Budget.frockett.Migrations
 {
     [DbContext(typeof(BudgetContext))]
-    [Migration("20240531064122_MakeCategoryNullable")]
-    partial class MakeCategoryNullable
+    [Migration("20240601111539_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

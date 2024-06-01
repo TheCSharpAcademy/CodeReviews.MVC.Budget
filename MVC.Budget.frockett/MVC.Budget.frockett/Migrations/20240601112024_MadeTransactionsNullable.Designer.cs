@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVC.Budget.frockett.Migrations
 {
     [DbContext(typeof(BudgetContext))]
-    [Migration("20240531062645_ChangeIdAndRemoveSetterFromCategory")]
-    partial class ChangeIdAndRemoveSetterFromCategory
+    [Migration("20240601112024_MadeTransactionsNullable")]
+    partial class MadeTransactionsNullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,7 +51,8 @@ namespace MVC.Budget.frockett.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
