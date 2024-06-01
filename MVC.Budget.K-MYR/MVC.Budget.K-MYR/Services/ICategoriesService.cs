@@ -5,13 +5,13 @@ namespace MVC.Budget.K_MYR.Services
 {
     public interface ICategoriesService
     {
-        Task<Category> AddCategory(CategoryPost categoryPost);
         Task<List<Category>> GetCategories();
-        ValueTask<Category?> GetByIDAsync(int id);
-        Task UpdateCategory(Category category, CategoryPut categoryPut);
-        Task<List<Category>> GetCategoriesWithUnevaluatedTransactions();
         Category? GetByID(int id);
-        Task DeleteCategory(Category category);
+        ValueTask<Category?> GetByIDAsync(int id);
+        Task<List<Category>> GetCategoriesWithUnevaluatedTransactions();
+        Task<T> AddCategory<T>(T categoryPost) where T : Category, new();
+        Task UpdateCategory<T>(T category, T categoryPut, DateTime month) where T : Category;
+        Task DeleteCategory<T>(T category) where T : Category;
         Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter);
     }
 }

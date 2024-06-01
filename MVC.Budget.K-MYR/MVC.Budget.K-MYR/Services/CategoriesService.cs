@@ -36,24 +36,20 @@ public class CategoriesService : ICategoriesService
         var cutoffDate = DateTime.UtcNow.AddDays(-14);
 
         return _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
-                c => c.GroupId == 2,
+                c => c.FiscalPlanId == 2,
                 q => q.OrderBy(c => c.Name),
                 c => c.Transactions.Where(t => t.Evaluated == false && t.DateTime < cutoffDate)
                     .OrderByDescending(d => d.DateTime));
     }
 
-    public async Task<Category> AddCategory(CategoryPost categoryPost)
+    public async Task<T> AddCategory<T>(T categoryPost) where T : Category, new()
     {
-        var category = new Category()
+        var category = new T()
         {
             Name = categoryPost.Name,
             Budget = categoryPost.Budget,
-            GroupId = categoryPost.GroupId,
+            FiscalPlanId = categoryPost.FiscalPlanId,
         };
-
-        _unitOfWork.CategoriesRepository.Insert(category);
-
-        await _unitOfWork.Save();
 
         var categoryStatistics = new CategoryBudget()
         {
@@ -62,26 +58,28 @@ public class CategoriesService : ICategoriesService
             Month = DateTime.UtcNow
         };
 
-        _unitOfWork.CategoryBudgetsRepository.Insert(categoryStatistics);
-        
+        category.PreviousBudgets.Add(categoryStatistics);
+
+        _unitOfWork.CategoriesRepository.Insert(category);
+
         await _unitOfWork.Save();
 
         return category;
     }
 
-    public async Task UpdateCategory(Category category, CategoryPut categoryPut)
+    public async Task UpdateCategory<T>(T category, T categoryPut, DateTime month) where T : Category
     {
         if (categoryPut.Budget != category.Budget) 
         {
-            var currentBudget = category.PreviousBudgets.SingleOrDefault(b => b.Month.Month == DateTime.UtcNow.Month && b.Month.Year == DateTime.UtcNow.Year);
+            var currentBudget = category.PreviousBudgets.SingleOrDefault(b => b.Month.Month == month.Month && b.Month.Year == month.Year);
 
             if (currentBudget is null)
             {
                 _unitOfWork.CategoryBudgetsRepository.Insert(new CategoryBudget
                 {
                     CategoryId = category.Id,
-                    Budget = category.Budget,
-                    Month = DateTime.UtcNow
+                    Budget = categoryPut.Budget,
+                    Month = month
                 });
             }
             else
@@ -90,14 +88,18 @@ public class CategoriesService : ICategoriesService
             }
         }
 
+        if(month.Year == DateTime.UtcNow.Year && month.Month == DateTime.UtcNow.Month) 
+        {
+            category.Budget = categoryPut.Budget;
+        }
+
         category.Name = categoryPut.Name;
-        category.Budget = categoryPut.Budget;
-        category.GroupId = categoryPut.GroupId;    
+        category.FiscalPlanId = categoryPut.FiscalPlanId;    
 
         await _unitOfWork.Save();
     }
 
-    public async Task DeleteCategory(Category category)
+    public async Task DeleteCategory<T>(T category) where T : Category
     {
         _unitOfWork.CategoriesRepository.Delete(category);
         await _unitOfWork.Save();

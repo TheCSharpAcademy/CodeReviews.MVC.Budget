@@ -8,7 +8,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 module.exports = {
     entry: {
         index: './src/js/index-entry.js',
-        index1: './src/js/index1-entry.js'
+        fiscalPlan: './src/js/fiscalPlan-entry.js'
 
     },
     output: {

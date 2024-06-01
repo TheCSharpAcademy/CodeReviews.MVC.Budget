@@ -9,7 +9,7 @@
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="add-category-form" method="POST">
+                    <form id="add-fiscalPlan-form" method="POST">
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
                             <input asp-for="Name" class="form-control" />
@@ -24,16 +24,16 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateCategory-modal" tabindex="-1" aria-labelledby="updateCategory-label" aria-hidden="true">
+    <div class="modal fade" id="updateFiscalPlan-modal" tabindex="-1" aria-labelledby="updateFiscalPlan-label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-truncate text-center flex-grow-1" id="updateCategory-label"></h5>
+                    <h5 class="modal-title text-truncate text-center flex-grow-1" id="updateFiscalPlan-label"></h5>
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="update-category-form">
-                        <input type="hidden" asp-for="Id" value="" id="updateCategory_id" />
+                    <form id="update-fiscalPlan-form">
+                        <input type="hidden" asp-for="Id" value="" id="updateFiscalPlan_id" />
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
                             <input asp-for="Name" class="form-control" id="updateCategory_name" />

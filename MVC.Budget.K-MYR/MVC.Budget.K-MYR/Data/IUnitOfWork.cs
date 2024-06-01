@@ -6,7 +6,6 @@ namespace MVC.Budget.K_MYR.Data
     {
         ICategoriesRepository CategoriesRepository { get; }
         ITransactionsRepository TransactionsRepository { get; }
-        IGroupsRepository GroupsRepository { get; }
         ICategoryBudgetsRepository CategoryBudgetsRepository { get; }
         IFiscalPlansRepository FiscalPlansRepository { get; }
 

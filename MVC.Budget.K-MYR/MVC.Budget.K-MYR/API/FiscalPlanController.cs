@@ -10,10 +10,10 @@ namespace MVC.Budget.K_MYR.API;
 public class FiscalPlanController : ControllerBase
 {
 
-    private readonly ILogger<CategoriesController> _logger;
+    private readonly ILogger<FiscalPlanController> _logger;
     private readonly IFiscalPlansService _fiscalPlanService;
 
-    public FiscalPlanController(ILogger<CategoriesController> logger, IFiscalPlansService budgetsService)
+    public FiscalPlanController(ILogger<FiscalPlanController> logger, IFiscalPlansService budgetsService)
     {
         _logger = logger;
         _fiscalPlanService = budgetsService;
@@ -25,12 +25,46 @@ public class FiscalPlanController : ControllerBase
         return Ok(await _fiscalPlanService.GetFiscalPlans());
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<FiscalPlan>> GetFiscalPlan(int id)
     {
         var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
         return fiscalPlan is null ? NotFound() : Ok(fiscalPlan);
+    }
+
+    [HttpGet("{id:int}/Month")]
+    public async Task<ActionResult<FiscalPlanDTO>> GetDataByMonth(int id, [FromQuery] DateTime? Month)
+    {
+       var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
+
+        if(fiscalPlan is null)
+        { 
+            return NotFound(); 
+        }
+        
+        var start = DateTime.UtcNow;
+        FiscalPlanDTO fiscalPlanDTO = await _fiscalPlanService.GetDataByMonth(id, Month ?? DateTime.UtcNow);
+        _logger.LogInformation("GetDataByMonth() Duration: {duration} ms", (DateTime.UtcNow - start).Milliseconds);
+
+        return Ok(fiscalPlanDTO);
+    }
+
+    [HttpGet("{id:int}/{year:int}")]
+    public async Task<ActionResult<YearlyStatisticsDto>> GetDataByYear([FromRoute] int id, [FromRoute] int year)
+    {
+        var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
+
+        if (fiscalPlan is null)
+        {
+            return NotFound();
+        }
+
+        var start = DateTime.UtcNow;
+        YearlyStatisticsDto fiscalPlanDTO = await _fiscalPlanService.GetDataByYear(id, year);
+        _logger.LogInformation("GetDataByYear() Duration: {duration} ms", (DateTime.UtcNow-start).Milliseconds);
+
+        return Ok(fiscalPlanDTO);
     }
 
     [HttpPost]

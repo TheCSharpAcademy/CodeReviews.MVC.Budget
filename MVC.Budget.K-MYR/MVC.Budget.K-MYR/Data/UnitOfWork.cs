@@ -7,16 +7,14 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     private readonly DatabaseContext _context;
     public ICategoriesRepository CategoriesRepository { get; }
     public ITransactionsRepository TransactionsRepository { get; }
-    public IGroupsRepository GroupsRepository { get; }
     public ICategoryBudgetsRepository CategoryBudgetsRepository { get; }
     public IFiscalPlansRepository FiscalPlansRepository { get; }
 
-    public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepo, ITransactionsRepository transactionsRepo, IGroupsRepository groupsRepo, ICategoryBudgetsRepository categoryBudgetsRepository, IFiscalPlansRepository fiscalPlansRepository)
+    public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepo, ITransactionsRepository transactionsRepo, ICategoryBudgetsRepository categoryBudgetsRepository, IFiscalPlansRepository fiscalPlansRepository)
     {
         _context = context;
         CategoriesRepository = categoriesRepo;
         TransactionsRepository = transactionsRepo;
-        GroupsRepository = groupsRepo;
         CategoryBudgetsRepository = categoryBudgetsRepository;
         FiscalPlansRepository = fiscalPlansRepository;
     }

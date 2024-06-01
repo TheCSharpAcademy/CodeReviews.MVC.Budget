@@ -29,6 +29,64 @@ public class FiscalPlansService : IFiscalPlansService
         return _unitOfWork.FiscalPlansRepository.GetByID(id);
     }
 
+    public async Task<FiscalPlanDTO> GetDataByMonth(int id, DateTime Month)
+    {
+        var categorieData = await _unitOfWork.CategoriesRepository.GetDataByMonth(id, Month);       
+
+        return new FiscalPlanDTO
+        {
+            Id = id,
+            IncomeCategories = categorieData?.IncomeCategories ?? [],
+            ExpenseCategories = categorieData?.ExpenseCategories ?? [],
+            ExpensesTotal = categorieData?.ExpenseCategories.Sum(c => c.Total) ?? 0,
+            ExpensesBudget = categorieData?.ExpenseCategories.Sum(c => c.BudgetLimit?.Budget ?? c.Budget) ?? 0,
+            ExpensesHappyTotal = categorieData?.ExpenseCategories.Sum(c => c.HappyTotal) ?? 0,
+            ExpensesNecessaryTotal = categorieData?.ExpenseCategories.Sum(c => c.NecessaryTotal) ?? 0,
+            IncomeTotal = categorieData?.IncomeCategories.Sum(c => c.Total) ?? 0,
+            IncomeBudget = categorieData?.IncomeCategories.Sum(c => c.BudgetLimit?.Budget ?? c.Budget) ?? 0,
+            Overspending = categorieData?.ExpenseCategories.Sum(c => Math.Max(0, c.Total - (c.BudgetLimit?.Budget ?? c.Budget))) ?? 0
+        };    
+    }
+
+    public async Task<YearlyStatisticsDto> GetDataByYear(int fiscalPlanId, int year)
+    {
+        var fiscalPlanDTO = await _unitOfWork.CategoriesRepository.GetDataByYear(fiscalPlanId, year);
+
+        var grouped = fiscalPlanDTO?.CategoryStatistics.SelectMany(a => a.Statistics).GroupBy(s => s.Month);
+
+        var months = Enumerable.Range(1, 12);
+
+        var stats = new YearlyStatisticsDto
+        {
+            TotalPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.TotalSpent) ?? 0),
+            HappyPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.HappyTransactions) ?? 0),
+            HappyEvaluatedPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.HappyEvaluatedTransactions) ?? 0),
+            UnhappyPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.UnhappyTransactions) ?? 0),
+            UnhappyEvaluatedPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.UnhappyEvaluatedTransactions) ?? 0),
+            NecessaryPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.NecessaryTransactions) ?? 0),
+            NecessaryEvaluatedPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.NecessaryEvaluatedTransactions) ?? 0),
+            UnnecessaryPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.UnnecessaryTransactions) ?? 0),
+            UnnecessaryEvaluatedPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.UnnecessaryEvaluatedTransactions) ?? 0),
+            UnevaluatedPerMonth = months.Select(month => grouped?.FirstOrDefault(g => g.Key == month)?.Sum(a => a.UnevaluatedTransactions) ?? 0),
+            MonthlyOverspendingPerCategory = fiscalPlanDTO?.CategoryStatistics?.OrderBy(c => c.Category).Select(c => new MonthlyOverspendingPerCategory
+            {
+                Category = c.Category,
+                OverspendingPerMonth = months.Select(month =>
+                    Math.Max(0, (c.Statistics.FirstOrDefault(s => s.Month == month)?.TotalSpent ?? 0)
+                    - (c.BudgetLimits.LastOrDefault(bl => bl.Month.Month <= month)?.Budget ?? c.Budget)))
+            }) ?? []
+        };    
+
+        stats.TotalSpent = stats.TotalPerMonth.Sum();
+        stats.OverspendingTotal = stats.MonthlyOverspendingPerCategory.SelectMany(s => s.OverspendingPerMonth).Sum();
+        stats.HappyEvaluatedTotal = stats.HappyEvaluatedPerMonth.Sum();
+        stats.UnhappyEvaluatedTotal = stats.TotalSpent - stats.HappyEvaluatedTotal;
+        stats.NecessaryEvaluatedTotal = stats.NecessaryEvaluatedPerMonth.Sum();
+        stats.UnnecessaryEvaluatedTotal = stats.TotalSpent - stats.NecessaryEvaluatedTotal;
+
+        return stats;
+    }
+
     public async Task<FiscalPlan> AddFiscalPlan(FiscalPlanPost fiscaPlanPost)
     {
         var fiscalPlan = new FiscalPlan()
@@ -55,7 +113,4 @@ public class FiscalPlansService : IFiscalPlansService
         _unitOfWork.FiscalPlansRepository.Delete(fiscalPlan);
         await _unitOfWork.Save();
     }
-
-    public async Task<bool> FiscalPlanExists(int id) => await _unitOfWork.FiscalPlansRepository.GetByIDAsync(id) is not null;
-
 }

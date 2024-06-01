@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
+using MVC.Budget.K_MYR.Models.ViewModels;
+using MVC.Budget.K_MYR.Services;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -8,52 +10,49 @@ namespace MVC.Budget.K_MYR.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IFiscalPlansService _fiscalPlanService;
+    private readonly ICategoriesService _categorieService;
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
+    public HomeController(ILogger<HomeController> logger, IFiscalPlansService fiscalPlanService, ICategoriesService categorieService)
     {
         _logger = logger;
-        _unitOfWork = unitOfWork;
+        _fiscalPlanService = fiscalPlanService;
+        _categorieService = categorieService;
     }
-
     public async Task<IActionResult> Index()
     {
-        HomeModel HomeModel = new()
+        return View(new LayoutModel<HomeModel>(new HomeModel
         {
-            Income = await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
-                c => c.GroupId == 1, 
-                q => q.OrderBy(t => t.Name), 
-                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month)
-                    .OrderByDescending(d => d.DateTime)),
-            Expenses = await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
-                c => c.GroupId == 2,
-                q => q.OrderBy(t => t.Name),
-                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month)
-                    .OrderByDescending(d => d.DateTime)),
-            Savings = await _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
-                c => c.GroupId == 3,
-                q => q.OrderBy(t => t.Name),
-                c => c.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month)
-                    .OrderByDescending(d => d.DateTime)),
-            Category = new(),
+            FiscalPlans = await _fiscalPlanService.GetFiscalPlans(),
+            FiscalPlan = new()
+        }, new CultureInfo("en-US"))); ;
+    }
+
+    [HttpGet("FiscalPlan/{id:int}")]
+    public async Task<IActionResult> FiscalPlan([FromRoute]int id, DateTime? Month)
+    {
+        var fiscalPlanData = await _fiscalPlanService.GetDataByMonth(id, Month ?? DateTime.UtcNow);
+
+        if (fiscalPlanData is null) 
+        {
+            return NotFound();
+        }
+
+        FiscalPlanModel fiscalPlanModel = new()
+        {
+            FiscalPlan = fiscalPlanData,        
+            Category = new (),
             Transaction = new(),
             Search = new(),
         };
-
-        return View(new LayoutModel<HomeModel>(HomeModel, new CultureInfo("en-US")));
-    }
-
-    [HttpGet("Index1")]
-    public async Task<IActionResult> Index1()
-    {     
-        return View(new LayoutModel<Models.FiscalPlan>(new Models.FiscalPlan(), new CultureInfo("en-US")));
-    }
+        return View(new LayoutModel<FiscalPlanModel>(fiscalPlanModel, new CultureInfo("en-US")));
+    }    
 
     [HttpGet("Category/{id}")]
     public async Task<IActionResult> Category([FromRoute] int id)
     {
-        var category = await _unitOfWork.CategoriesRepository.GetCategoryAsync(id);
+        var category = await _categorieService.GetByIDAsync(id);
 
         if (category is null)
             return NotFound();

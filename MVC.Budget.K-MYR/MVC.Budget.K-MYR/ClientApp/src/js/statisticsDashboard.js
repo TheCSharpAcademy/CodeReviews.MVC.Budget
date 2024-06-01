@@ -3,7 +3,7 @@ import { getRandomColor } from './utilities';
 
 export default class StatisticsDashboard {
     #data;
-    #initPromise;
+    #isLoading;
     #sentimentChartYearly;
     #necessityChartYearly;
     #sentimentBarChart;
@@ -14,12 +14,10 @@ export default class StatisticsDashboard {
 
     constructor() {
         this.#data = null;
-        this.#initPromise = this.init();
+        this.init();
     }
 
-    async init() {
-        await this.getData(new Date().getFullYear());
-
+    init() {
         this.#sentimentChartYearly = new Chart(document.getElementById('sentimentChartYear'), {
             type: 'doughnut',
             data: {
@@ -29,7 +27,7 @@ export default class StatisticsDashboard {
                 ],
                 datasets: [{
                     label: 'Total Amount',
-                    data: [this.#data.happyEvaluatedTotal, this.#data.unhappyEvaluatedTotal],
+                    data: [0, 0],
                     backgroundColor: [
                         'rgb(25,135,84)',
                         'rgb(220,53,69)'
@@ -69,7 +67,7 @@ export default class StatisticsDashboard {
                 ],
                 datasets: [{
                     label: 'Total Amount',
-                    data: [this.#data.necessaryEvaluatedTotal, this.#data.unnecessaryEvaluatedTotal],
+                    data: [0, 0],
                     backgroundColor: [
                         'rgb(25,135,84)',
                         'rgb(220,53,69)'
@@ -107,7 +105,6 @@ export default class StatisticsDashboard {
                 datasets: [{
                     label: 'Happy',
                     stack: 'Unevaluated',
-                    data: this.#data.happyPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#20c997',
@@ -115,7 +112,6 @@ export default class StatisticsDashboard {
                 {
                     label: 'Unhappy',
                     stack: 'Unevaluated',
-                    data: this.#data.unhappyPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: 'rgb(220,53,69)'
@@ -123,7 +119,6 @@ export default class StatisticsDashboard {
                 {
                     label: 'Happy (Eval.)',
                     stack: 'Evaluated',
-                    data: this.#data.happyEvaluatedPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#0f7c5c',
@@ -131,7 +126,6 @@ export default class StatisticsDashboard {
                 {
                     label: 'Unhappy (Eval.)',
                     stack: 'Evaluated',
-                    data: this.#data.unhappyEvaluatedPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#881d27',
@@ -139,7 +133,6 @@ export default class StatisticsDashboard {
                 {
                     label: 'Unevaluated',
                     stack: 'Evaluated',
-                    data: this.#data.unevaluatedPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#1c1c1c',
@@ -205,7 +198,6 @@ export default class StatisticsDashboard {
                 datasets: [{
                     label: 'Necessary',
                     stack: 'Unevaluated',
-                    data: this.#data.necessaryPerMonth,
                     backgroundColor: '#20c997',
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
@@ -214,7 +206,6 @@ export default class StatisticsDashboard {
                 {
                     label: 'Unnecessary',
                     stack: 'Unevaluated',
-                    data: this.#data.unnecessaryPerMonth,
                     backgroundColor: 'rgb(220,53,69)',
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
@@ -223,7 +214,6 @@ export default class StatisticsDashboard {
                 {
                     label: 'Necessary (Eval.)',
                     stack: 'Evaluated',
-                    data: this.#data.necessaryEvaluatedPerMonth,
                     backgroundColor: '#0f7c5c',
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
@@ -232,7 +222,6 @@ export default class StatisticsDashboard {
                 {
                     label: 'Unnecessary (Eval.)',
                     stack: 'Evaluated',
-                    data: this.#data.unnecessaryEvaluatedPerMonth,
                     backgroundColor: '#881d27',
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
@@ -240,7 +229,6 @@ export default class StatisticsDashboard {
                 {
                     label: 'Unevaluated',
                     stack: 'Evaluated',
-                    data: this.#data.unevaluatedPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#1c1c1c'
@@ -299,24 +287,10 @@ export default class StatisticsDashboard {
             }
         });
 
-        let datasets = [];
-
-        for (var i = 0; i < this.#data.monthlyOverspendingPerCategory.length; i++) {
-            var categoryData = this.#data.monthlyOverspendingPerCategory[i];
-            datasets.push({
-                label: categoryData.category,
-                data: categoryData.overspendingPerMonth,
-                borderWidth: 2,
-                borderColor: '#d3d3d3',
-                backgroundColor: getRandomColor()
-            });
-        }
-
         this.#overspendingChart = new Chart(document.getElementById('overspendingChart'), {
             type: 'bar',
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
-                datasets: datasets
             },
             options: {
                 plugins: {
@@ -382,7 +356,7 @@ export default class StatisticsDashboard {
         });
 
         this.#overspendingHeading = document.getElementById('statistics-overspending');
-        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(this.#data.overspendingTotal)}`;
+        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(0)}`;
 
         this.#totalSpentChart = new Chart(document.getElementById('totalSpentChart'), {
             type: 'line',
@@ -390,7 +364,6 @@ export default class StatisticsDashboard {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
                 datasets: [{
                     label: 'Total Spent Per Month',
-                    data: this.#data.totalPerMonth,
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#20c997'
@@ -436,50 +409,68 @@ export default class StatisticsDashboard {
         });
     }
 
-    async getData(year) {   
-        await this.#initPromise;
+    async refresh(id, year) {
+        if (this.#isLoading) {
+            console.log("Statistics are loading...")
+            return;
+        }
+
+        this.#isLoading = true;
+        let data = await this.#getData(id, year);
+        if (data) {
+            let hasUpdated = await this.#updateCharts(data);
+        }
+
+        this.#isLoading = false;
+    }
+
+    async #getData(id, year) {
         try {
-            var response = await fetch(`https://localhost:7246/api/Groups/2?year=${year}`, { /////// FIX GROUPD ID HERE
+            let response = await fetch(`https://localhost:7246/api/FiscalPlan/${id}/${year}`, {
                 method: "GET"
             });
 
             if (response.ok) {
-                this.#data = await response.json();
+                return await response.json();
             } else {
-                console.error(`HTTP Post Error: ${response.status}`);
+                console.error(`HTTP GET Error: ${response.status}`);
+                return null;
             }
         } catch (error) {
             console.error(error);
+            return null;
         }
     }
 
-    async updateCharts() {
-        await this.#initPromise;
+    async #updateCharts(data) {
+        if (!data) {
+            return false;
+        }
 
-        this.#sentimentChartYearly.data.datasets[0].data = [this.#data.happyEvaluatedTotal, this.#data.unhappyEvaluatedTotal, Number.MIN_VALUE];
+        this.#sentimentChartYearly.data.datasets[0].data = [data.happyEvaluatedTotal, data.unhappyEvaluatedTotal, Number.MIN_VALUE];
         this.#sentimentChartYearly.update();
 
-        this.#necessityChartYearly.data.datasets[0].data = [this.#data.necessaryEvaluatedTotal, this.#data.unnecessaryEvaluatedTotal, Number.MIN_VALUE]
+        this.#necessityChartYearly.data.datasets[0].data = [data.necessaryEvaluatedTotal, data.unnecessaryEvaluatedTotal, Number.MIN_VALUE]
         this.#necessityChartYearly.update();
 
-        this.#sentimentBarChart.data.datasets[0].data = this.#data.happyPerMonth;
-        this.#sentimentBarChart.data.datasets[1].data = this.#data.unhappyPerMonth;
-        this.#sentimentBarChart.data.datasets[2].data = this.#data.happyEvaluatedPerMonth;
-        this.#sentimentBarChart.data.datasets[3].data = this.#data.unhappyEvaluatedPerMonth;
-        this.#sentimentBarChart.data.datasets[4].data = this.#data.unevaluatedPerMonth;
+        this.#sentimentBarChart.data.datasets[0].data = data.happyPerMonth;
+        this.#sentimentBarChart.data.datasets[1].data = data.unhappyPerMonth;
+        this.#sentimentBarChart.data.datasets[2].data = data.happyEvaluatedPerMonth;
+        this.#sentimentBarChart.data.datasets[3].data = data.unhappyEvaluatedPerMonth;
+        this.#sentimentBarChart.data.datasets[4].data = data.unevaluatedPerMonth;
         this.#sentimentBarChart.update();
 
-        this.#necessityBarChart.data.datasets[0].data = this.#data.necessaryPerMonth;
-        this.#necessityBarChart.data.datasets[1].data = this.#data.unnecessaryPerMonth;
-        this.#necessityBarChart.data.datasets[2].data = this.#data.necessaryEvaluatedPerMonth;
-        this.#necessityBarChart.data.datasets[3].data = this.#data.unnecessaryEvaluatedPerMonth;
-        this.#necessityBarChart.data.datasets[4].data = this.#data.unevaluatedPerMonth;
+        this.#necessityBarChart.data.datasets[0].data = data.necessaryPerMonth;
+        this.#necessityBarChart.data.datasets[1].data = data.unnecessaryPerMonth;
+        this.#necessityBarChart.data.datasets[2].data = data.necessaryEvaluatedPerMonth;
+        this.#necessityBarChart.data.datasets[3].data = data.unnecessaryEvaluatedPerMonth;
+        this.#necessityBarChart.data.datasets[4].data = data.unevaluatedPerMonth;
         this.#necessityBarChart.update();
 
         let datasets = [];
 
-        for (var i = 0; i < this.#data.monthlyOverspendingPerCategory.length; i++) {
-            var categoryData = this.#data.monthlyOverspendingPerCategory[i];
+        for (let i = 0; i < data.monthlyOverspendingPerCategory.length; i++) {
+            let categoryData = data.monthlyOverspendingPerCategory[i];
             datasets.push({
                 label: categoryData.category,
                 data: categoryData.overspendingPerMonth,
@@ -492,9 +483,11 @@ export default class StatisticsDashboard {
         this.#overspendingChart.data.datasets = datasets;
         this.#overspendingChart.update();
 
-        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(this.#data.overspendingTotal)}`;
+        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(data.overspendingTotal)}`;
 
-        this.#totalSpentChart.data.datasets[0].data = this.#data.totalPerMonth;
+        this.#totalSpentChart.data.datasets[0].data = data.totalPerMonth;
         this.#totalSpentChart.update();
+
+        this.#data = data;
     }
 }

@@ -34,7 +34,10 @@ namespace MVC.Budget.K_MYR.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int>("CategoryType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FiscalPlanId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -44,9 +47,11 @@ namespace MVC.Budget.K_MYR.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GroupId");
+                    b.ToTable("Category");
 
-                    b.ToTable("Categories");
+                    b.HasDiscriminator<int>("CategoryType");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.CategoryBudget", b =>
@@ -89,19 +94,6 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FiscalPlans");
-                });
-
-            modelBuilder.Entity("MVC.Budget.K_MYR.Models.Group", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Transaction", b =>
@@ -151,15 +143,22 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.ToTable("Transactions");
                 });
 
-            modelBuilder.Entity("MVC.Budget.K_MYR.Models.Category", b =>
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.ExpenseCategory", b =>
                 {
-                    b.HasOne("MVC.Budget.K_MYR.Models.Group", "Group")
-                        .WithMany("Categories")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("MVC.Budget.K_MYR.Models.Category");
 
-                    b.Navigation("Group");
+                    b.HasIndex("FiscalPlanId");
+
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.IncomeCategory", b =>
+                {
+                    b.HasBaseType("MVC.Budget.K_MYR.Models.Category");
+
+                    b.HasIndex("FiscalPlanId");
+
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.CategoryBudget", b =>
@@ -184,6 +183,28 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.ExpenseCategory", b =>
+                {
+                    b.HasOne("MVC.Budget.K_MYR.Models.FiscalPlan", "FiscalPlan")
+                        .WithMany("ExpenseCategories")
+                        .HasForeignKey("FiscalPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FiscalPlan");
+                });
+
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.IncomeCategory", b =>
+                {
+                    b.HasOne("MVC.Budget.K_MYR.Models.FiscalPlan", "FiscalPlan")
+                        .WithMany("IncomeCategories")
+                        .HasForeignKey("FiscalPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FiscalPlan");
+                });
+
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Category", b =>
                 {
                     b.Navigation("PreviousBudgets");
@@ -191,9 +212,11 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("MVC.Budget.K_MYR.Models.Group", b =>
+            modelBuilder.Entity("MVC.Budget.K_MYR.Models.FiscalPlan", b =>
                 {
-                    b.Navigation("Categories");
+                    b.Navigation("ExpenseCategories");
+
+                    b.Navigation("IncomeCategories");
                 });
 #pragma warning restore 612, 618
         }

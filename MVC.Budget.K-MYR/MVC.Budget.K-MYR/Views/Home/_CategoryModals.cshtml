@@ -10,7 +10,8 @@
                 </div>
                 <div class="modal-body">
                     <form id="add-category-form" method="post">
-                        <input type="hidden"asp-for="GroupId" value="" id="addCategory_groupId"/>
+                        <input type="hidden" asp-for="FiscalPlanId" value="" id="addCategory_fiscalPlanId" />
+                        <input type="hidden" asp-for="CategoryType" value="" id="addCategory_type" name="type" />
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
                             <input asp-for="Name" class="form-control" />
@@ -39,8 +40,9 @@
                 </div>
                 <div class="modal-body">
                     <form id="update-category-form" method="post">
-                        <input type="hidden" asp-for="GroupId" value="" id="updateCategory_groupId" />
+                        <input type="hidden" asp-for="FiscalPlanId" value="" id="updateCategory_fiscalPlanId" />
                         <input type="hidden" asp-for="Id" value="" id="updateCategory_id"/>
+                        <input type="hidden" asp-for="CategoryType" value="" id="updateCategory_type" name="type" />
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
                             <input asp-for="Name" class="form-control" id="updateCategory_name"/>

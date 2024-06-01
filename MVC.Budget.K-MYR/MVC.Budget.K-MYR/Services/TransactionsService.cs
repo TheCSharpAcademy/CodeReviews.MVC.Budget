@@ -56,8 +56,7 @@ public class TransactionsService : ITransactionsService
         transaction.Amount = transactionPut.Amount;
         transaction.IsHappy = transactionPut.IsHappy;
         transaction.IsNecessary = transactionPut.IsNecessary;
-        transaction.DateTime = transactionPut.DateTime;
-        transaction.CategoryId = transactionPut.CategoryId;
+        transaction.DateTime = transactionPut.DateTime;        
         transaction.Evaluated = transactionPut.Evaluated;
         transaction.PreviousIsNecessary = transactionPut.PreviousIsNecessary;
         transaction.PreviousIsHappy = transactionPut.PreviousIsHappy;

@@ -18,41 +18,83 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                 .SingleOrDefaultAsync(c => c.Id == id);
     }
 
+    public async Task<FiscalPlanDTO?> GetDataByMonth(int id, DateTime month)
+    {
+        var query = _dbSet
+                      .Where(c => c.FiscalPlanId == id)
+                      .Include(c => c.Transactions)
+                      .Include(c => c.PreviousBudgets)
+                      .GroupBy(c => 1)
+                      .Select(g => new FiscalPlanDTO
+                      {
+                          Id = id,
+                          IncomeCategories = g.Where(c => c.CategoryType == 1).Select(c => new CategoryDTO
+                          {
+                              Id = c.Id,
+                              CategoryType = c.CategoryType,
+                              Name = c.Name,
+                              Budget = c.Budget,
+                              BudgetLimit = c.PreviousBudgets.Where(bl => bl.Month <= month.AddMonths(1)).OrderBy(b => b.Month).LastOrDefault(),
+                              Total = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month).Sum(t => t.Amount)
+                          }),
+                          ExpenseCategories = g.Where(c => c.CategoryType == 2).Select(c => new CategoryDTO
+                          {
+                              Id = c.Id,
+                              CategoryType = c.CategoryType,
+                              Name = c.Name,
+                              Budget = c.Budget,
+                              BudgetLimit = c.PreviousBudgets.Where(bl => bl.Month <= month.AddMonths(1)).OrderBy(b => b.Month).LastOrDefault(),
+                              Total = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month).Sum(t => t.Amount),
+                              HappyTotal = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month).Where(t => t.PreviousIsHappy && t.Evaluated || !t.Evaluated && t.IsHappy).Sum(t => t.Amount),
+                              NecessaryTotal = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month).Where(t => t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && t.IsNecessary).Sum(t => t.Amount),
+                          })
+                      });
+
+        return await query.AsNoTracking().SingleOrDefaultAsync();
+    }
+
+    public async Task<FiscalPlanByYear?> GetDataByYear(int id, int year)
+    {
+        var query = _dbSet.Where(c => c.FiscalPlanId == id)
+                      .Include(c => c.Transactions.Where(t => t.DateTime.Year == year))
+                      .Include(c => c.PreviousBudgets.Where(t => t.Month.Year <= year))
+                      .GroupBy(c => 1)
+                      .Select(g => new FiscalPlanByYear
+                      {
+                          Id = id,
+                          CategoryStatistics = g.Where(c => c.CategoryType == 2).Select(c => new CategoryStatistic
+                          {
+                              Category = c.Name,
+                              CategoryType = c.CategoryType,
+                              Budget = c.Budget,
+                              Statistics = c.Transactions.Where(t => t.DateTime.Year == year).GroupBy(t => t.DateTime.Month)
+                                                    .Select(g => new MonthlyStatistics
+                                                    {
+                                                        Month = g.Key,
+                                                        TotalSpent = g.Sum(t => t.Amount),
+                                                        HappyTransactions = g.Where(t => t.PreviousIsHappy && t.Evaluated || !t.Evaluated && t.IsHappy).Sum(t => t.Amount),
+                                                        UnhappyTransactions = g.Where(t => !t.PreviousIsHappy && t.Evaluated || !t.Evaluated && !t.IsHappy).Sum(t => t.Amount),
+                                                        HappyEvaluatedTransactions = g.Where(t => t.IsHappy && t.Evaluated).Sum(t => t.Amount),
+                                                        UnhappyEvaluatedTransactions = g.Where(t => !t.IsHappy && t.Evaluated).Sum(t => t.Amount),
+                                                        NecessaryTransactions = g.Where(t => t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && t.IsNecessary).Sum(t => t.Amount),
+                                                        UnnecessaryTransactions = g.Where(t => !t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && !t.IsNecessary).Sum(t => t.Amount),
+                                                        NecessaryEvaluatedTransactions = g.Where(t => t.IsNecessary && t.Evaluated).Sum(t => t.Amount),
+                                                        UnnecessaryEvaluatedTransactions = g.Where(t => !t.IsNecessary && t.Evaluated).Sum(t => t.Amount),
+                                                        UnevaluatedTransactions = g.Where(t => !t.Evaluated).Sum(t => t.Amount),
+                                                    }),
+                              BudgetLimits = c.PreviousBudgets.OrderBy(bl => bl.Month).Select(s => new BudgetLimit { Budget = s.Budget, Month = s.Month })
+                          })
+                      });
+
+        return await query.AsNoTracking().SingleOrDefaultAsync();
+    }
+
     public Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter)
     {
         return _dbSet.Include(filter)
                      .SingleOrDefaultAsync(c => c.Id == id);
     }
 
-    public async Task<List<CategoryStatistics>> GetMonthlyStatistics(int groupId, int year)
-    {
-        var query = _dbSet.Where(c => c.GroupId == groupId)
-                     .Include(c => c.Transactions)
-                     .Include(c => c.PreviousBudgets)
-                     .Select(c => new CategoryStatistics
-                     {
-                         Category = c.Name,
-                         Budget = c.Budget,
-                         Statistics = c.Transactions.Where(t => t.DateTime.Year == year).GroupBy(t => t.DateTime.Month)
-                                               .Select(g => new MonthlyStatistics
-                                               {
-                                                   Month = g.Key,
-                                                   TotalSpent = g.Sum(t => t.Amount),
-                                                   HappyTransactions = g.Where(t => t.PreviousIsHappy && t.Evaluated || !t.Evaluated && t.IsHappy).Sum(t => t.Amount),
-                                                   UnhappyTransactions = g.Where(t => !t.PreviousIsHappy && t.Evaluated || !t.Evaluated && !t.IsHappy).Sum(t => t.Amount),
-                                                   HappyEvaluatedTransactions = g.Where(t => t.IsHappy && t.Evaluated).Sum(t => t.Amount),
-                                                   UnhappyEvaluatedTransactions = g.Where(t => !t.IsHappy && t.Evaluated).Sum(t => t.Amount),
-                                                   NecessaryTransactions = g.Where(t => t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && t.IsNecessary).Sum(t => t.Amount),
-                                                   UnnecessaryTransactions = g.Where(t => !t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && !t.IsNecessary).Sum(t => t.Amount),
-                                                   NecessaryEvaluatedTransactions = g.Where(t => t.IsNecessary && t.Evaluated).Sum(t => t.Amount),
-                                                   UnnecessaryEvaluatedTransactions = g.Where(t => !t.IsNecessary && t.Evaluated).Sum(t => t.Amount),
-                                                   UnevaluatedTransactions = g.Where(t => !t.Evaluated).Sum(t => t.Amount),
-                                               }),
-                         BudgetLimits = c.PreviousBudgets.Where(t => t.Month.Year == year).Select(s => new BudgetLimit { Budget = s.Budget, Month = s.Month })
-                     });
-
-        return await query.AsNoTracking().ToListAsync();
-    }
 
     public Task<List<Category>> GetCategoriesWithFilteredTransactionsAsync(Expression<Func<Category, bool>>? filter = null, Func<IQueryable<Category>,
                                                 IOrderedQueryable<Category>>? orderBy = null,

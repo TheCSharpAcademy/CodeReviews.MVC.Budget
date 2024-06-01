@@ -12,34 +12,36 @@ namespace MVC.Budget.K_MYR.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Groups",
+                name: "FiscalPlans",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1")
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Groups", x => x.Id);
+                    table.PrimaryKey("PK_FiscalPlans", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Categories",
+                name: "Category",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Budget = table.Column<decimal>(type: "decimal(19,4)", precision: 19, scale: 4, nullable: false),
-                    GroupId = table.Column<int>(type: "int", nullable: false)
+                    FiscalPlanId = table.Column<int>(type: "int", nullable: false),
+                    CategoryType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
+                    table.PrimaryKey("PK_Category", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Categories_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
+                        name: "FK_Category_FiscalPlans_FiscalPlanId",
+                        column: x => x.FiscalPlanId,
+                        principalTable: "FiscalPlans",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -58,9 +60,9 @@ namespace MVC.Budget.K_MYR.Migrations
                 {
                     table.PrimaryKey("PK_CategoryBudgets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CategoryBudgets_Categories_CategoryId",
+                        name: "FK_CategoryBudgets_Category_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "Categories",
+                        principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -86,17 +88,17 @@ namespace MVC.Budget.K_MYR.Migrations
                 {
                     table.PrimaryKey("PK_Transactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transactions_Categories_CategoryId",
+                        name: "FK_Transactions_Category_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "Categories",
+                        principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_GroupId",
-                table: "Categories",
-                column: "GroupId");
+                name: "IX_Category_FiscalPlanId",
+                table: "Category",
+                column: "FiscalPlanId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CategoryBudgets_CategoryId",
@@ -119,10 +121,10 @@ namespace MVC.Budget.K_MYR.Migrations
                 name: "Transactions");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Category");
 
             migrationBuilder.DropTable(
-                name: "Groups");
+                name: "FiscalPlans");
         }
     }
 }

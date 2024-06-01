@@ -1,14 +1,14 @@
 {
   "index": [
-    "styles-index~index1.css",
-    "styles-index.css",
-    "vendors-index~index1.js",
-    "vendors-index.js",
+    "styles-index~fiscalPlan.css",
+    "vendors-index~fiscalPlan.js",
     "index.js"
   ],
-  "index1": [
-    "styles-index~index1.css",
-    "vendors-index~index1.js",
-    "index1.js"
+  "fiscalPlan": [
+    "styles-index~fiscalPlan.css",
+    "styles-fiscalPlan.css",
+    "vendors-index~fiscalPlan.js",
+    "vendors-fiscalPlan.js",
+    "fiscalPlan.js"
   ]
 }

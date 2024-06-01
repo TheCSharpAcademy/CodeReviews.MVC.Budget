@@ -5,21 +5,32 @@ namespace MVC.Budget.K_MYR.Data;
 
 public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options)
 {
-    public DbSet<Group> Groups { get; set; }
-    public DbSet<Transaction> Transactions { get; set; }
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<CategoryBudget> CategoryBudgets { get; set; }
     public DbSet<FiscalPlan> FiscalPlans { get; set; }
+    public DbSet<IncomeCategory> IncomeCategories { get; set; }
+    public DbSet<ExpenseCategory> ExpenseCategories { get; set; }
+    public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<CategoryBudget> CategoryBudgets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Group>()
-            .HasMany(s => s.Categories)
-            .WithOne(c => c.Group)
-            .HasForeignKey(c => c.GroupId)
+        modelBuilder.Entity<FiscalPlan>()
+            .HasMany(f => f.IncomeCategories)
+            .WithOne(c => c.FiscalPlan)
+            .HasForeignKey(c => c.FiscalPlanId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Category>()            
+        modelBuilder.Entity<FiscalPlan>()
+            .HasMany(f => f.ExpenseCategories)
+            .WithOne(c => c.FiscalPlan)
+            .HasForeignKey(c => c.FiscalPlanId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Category>()
+           .HasDiscriminator<int>("CategoryType")
+           .HasValue<IncomeCategory>(1)
+           .HasValue<ExpenseCategory>(2);
+
+        modelBuilder.Entity<Category>()
             .HasMany(c => c.Transactions)
             .WithOne(t => t.Category)
             .HasForeignKey(e => e.CategoryId)
@@ -29,7 +40,7 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
             .HasMany(c => c.PreviousBudgets)
             .WithOne(s => s.Category)
             .HasForeignKey(s => s.CategoryId)
-            .OnDelete(DeleteBehavior.Cascade);           
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Category>()
             .Property(m => m.Budget)

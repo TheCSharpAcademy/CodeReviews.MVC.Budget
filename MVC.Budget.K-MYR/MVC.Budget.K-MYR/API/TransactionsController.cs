@@ -42,12 +42,9 @@ public class TransactionsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        if (!await _transactionsService.CategoryExists(transactionPost.CategoryId))
-            return NotFound();
-
         var transaction = await _transactionsService.AddTransaction(transactionPost);
 
-        return CreatedAtAction(nameof(Transaction), new { id = transaction.Id }, transaction);
+        return CreatedAtAction(nameof(GetTransaction), new { id = transaction.Id }, transaction);
     }
 
     [HttpPut("{id}")]
@@ -63,9 +60,6 @@ public class TransactionsController : ControllerBase
         var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
-            return NotFound();
-        
-        if (!await _transactionsService.CategoryExists(transactionPut.CategoryId))
             return NotFound();
 
         try
