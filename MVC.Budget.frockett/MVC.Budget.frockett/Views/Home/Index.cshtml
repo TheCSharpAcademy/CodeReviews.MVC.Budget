@@ -7,12 +7,60 @@
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
-<input type="text" id="nameFilter" placeholder="Filter by name" oninput="filterTransactions()">
-<input type="text" id="categoryFilter" placeholder="Filter by category" oninput="filterTransactions()">
-<input type="number" id="amountFilter" placeholder="Filter by amount" oninput="filterTransactions()">
+<form id="filter-form">
+            <input type="text" class="filter-input" id="nameFilter" placeholder="Filter by name" oninput="filterTransactions()">
+            <input type="text" class="filter-input" id="categoryFilter" placeholder="Filter by category" oninput="filterTransactions()">
+            <input type="number" class="filter-input" id="amountFilter" placeholder="Filter by amount" oninput="filterTransactions()">
+</form>
+
+<div class="modal" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true" style="display:none">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTransactionModalLabel">Add Transaction</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="toggleAddModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addTransactionForm">
+                    <div class="form-group">
+                        <label for="transactionTitle">Title</label>
+                        <input type="text" class="form-control" id="add-transactionTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionCategory">Category</label>
+                        <select class="form-control" id="add-transactionCategory" required>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionAmount">Amount</label>
+                        <input type="number" class="form-control" id="add-transactionAmount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionDate">Date</label>
+                        <input type="date" class="form-control" id="add-transactionDate" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Transaction</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="overlay hidden"></div>
 
 <div class="table-container">
     <table id="transactionList" class="table table-hover">
 
     </table>
 </div>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" onclick="toggleAddModal()">
+    Add Transaction
+</button>
+
+
+
+<div class="overlay hidden"></div>

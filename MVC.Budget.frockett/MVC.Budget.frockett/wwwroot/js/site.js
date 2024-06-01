@@ -66,7 +66,7 @@ function renderTable(transactions) {
         category.textContent = transactionEntity.categoryName;
 
         const value = document.createElement('td');
-        value.textContent = transactionEntity.amount;
+        value.textContent = transactionEntity.amount.toFixed(2);
 
         const date = document.createElement('td');
         date.textContent = new Date(transactionEntity.dateTime).toLocaleDateString();
@@ -130,3 +130,67 @@ function filterTransactions() {
     renderTable(filteredTransactions);
 }
 
+function toggleAddModal() {
+    const addModal = document.getElementById('addTransactionModal');
+    const overlay = document.querySelector('.overlay');
+
+    if (addModal.style.display === 'block') {
+        overlay.classList.add("hidden");
+        addModal.style.display = 'none';
+        document.getElementById('add-transactionTitle').value = '';
+        document.getElementById('add-transactionAmount').value = '';
+        document.getElementById('add-transactionDate').value = '';
+    }
+    else {
+        addModal.style.display = 'block';
+        overlay.classList.remove("hidden");
+    }
+}
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    fetchCategories();
+
+    document.getElementById('addTransactionForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        addTransaction();
+    });
+});
+
+function fetchCategories() {
+    fetch('/api/CategoriesAPI')
+        .then(response => response.json())
+        .then(data => {
+            const categories = data.$values
+            const categorySelect = document.getElementById('add-transactionCategory');
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.text = category.name;
+                categorySelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching categories:', error));
+}
+
+function addTransaction() {
+    const transaction = {
+        title: document.getElementById('add-transactionTitle').value,
+        amount: parseFloat(document.getElementById('add-transactionAmount').value),
+        dateTime: new Date(document.getElementById('add-transactionDate').value).toISOString(),
+        categoryId: parseInt(document.getElementById('add-transactionCategory').value)
+    }
+
+    fetch('api/TransactionsAPI', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(transaction)
+    })
+    .then(response => response.json())
+    .then(data => {
+        toggleAddModal();
+        fetchDefaultTransactions();
+    })
+        .catch(error => console.error('Error adding transaction: ', error));
+}
