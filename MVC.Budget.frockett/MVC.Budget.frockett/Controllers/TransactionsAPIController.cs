@@ -25,7 +25,7 @@ public class TransactionsAPIController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
     {
-        return await _context.Transactions.Include(t => t.Category).ToListAsync();
+        return await _context.Transactions.ToListAsync();
     }
 
     // GET: api/Transactions/5
