@@ -63,18 +63,28 @@ public class TransactionsAPIController : ControllerBase
     // PUT: api/Transactions/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutTransaction(int id, Transaction transaction)
+    public async Task<IActionResult> PutTransaction(int id, TransactionPostDto transactionDto)
     {
-        if (id != transaction.Id)
+        if (id != transactionDto.Id)
         {
             return BadRequest();
         }
 
-        var category = await _context.Categories.FindAsync(transaction.CategoryId);
+        var category = await _context.Categories.FindAsync(transactionDto.CategoryId);
         if (category == null)
         {
-            return NotFound($"Category with ID {transaction.CategoryId} not found.");
+            return NotFound($"Category with ID {transactionDto.CategoryId} not found.");
         }
+
+        var transaction = new Transaction
+        {
+            Id = transactionDto.Id,
+            Title = transactionDto.Title,
+            Amount = transactionDto.Amount,
+            DateTime = transactionDto.DateTime,
+            CategoryId = transactionDto.CategoryId,
+            Category = category
+        };
 
 
         _context.Entry(transaction).State = EntityState.Modified;

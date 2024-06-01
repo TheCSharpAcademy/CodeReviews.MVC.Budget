@@ -18,6 +18,7 @@ function fetchDefaultTransactions() {
 }
 
 function renderTable(transactions) {
+    fetchCategories();
     const list = document.getElementById('transactionList');
     list.innerHTML = '';
 
@@ -76,12 +77,12 @@ function renderTable(transactions) {
 
         const editButton = document.createElement('button');
         editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>'
-        editButton.onclick = () => showEditForm(todo);
+        editButton.onclick = () => showEditForm(transactionEntity);
         editButton.className = 'btn btn-light btn-sm';
 
         const deleteButton = document.createElement('button');
         deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>'
-        deleteButton.onclick = () => showDeleteModal(todo);
+        deleteButton.onclick = () => showDeleteModal(transactionEntity);
         editButton.className = 'btn btn-light btn-sm';
 
         buttonContainer.appendChild(editButton);
@@ -99,19 +100,6 @@ function renderTable(transactions) {
 
     list.appendChild(tbody)
 }
-
-function fetchCategoryName(id) {
-        return fetch(`/api/CategoriesAPI/${id}`)
-            .then(response => response.json())
-            .then(data => {
-                return data;
-            })
-            .catch(error => {
-                console.error('Error fetching category name:', error);
-                return null;
-            });
-}
-
 
 function filterTransactions() {
     const nameFilterValue = document.getElementById('nameFilter').value.toLowerCase();
@@ -161,6 +149,69 @@ function toggleAddCategoryModal() {
     }
 }
 
+function toggleEditModal() {
+    const editModal = document.getElementById('editTransactionModal');
+    const overlay = document.querySelector('.overlay');
+
+    if (editModal.style.display === 'block') {
+        overlay.classList.add("hidden");
+        editModal.style.display = 'none';
+        document.getElementById('edit-transactionTitle').value = '';
+        document.getElementById('edit-transactionAmount').value = '';
+        document.getElementById('edit-transactionDate').value = '';
+    } else {
+        editModal.style.display = 'block';
+        overlay.classList.remove("hidden");
+    }
+}
+
+function showEditForm(transaction) {
+    document.getElementById('edit-transactionTitle').value = transaction.title;
+    document.getElementById('edit-transactionCategory').value = transaction.categoryId;
+    document.getElementById('edit-transactionAmount').value = transaction.amount.toFixed(2);
+    document.getElementById('edit-transactionDate').value = transaction.dateTime.split('T')[0];
+    document.getElementById('editTransactionForm').onsubmit = function (e) {
+        e.preventDefault();
+        updateTransaction(transaction.id);
+    };
+
+    toggleEditModal();
+}
+
+function updateTransaction(id) {
+    const title = document.getElementById('edit-transactionTitle').value;
+    const categoryId = document.getElementById('edit-transactionCategory').value;
+    const amount = document.getElementById('edit-transactionAmount').value;
+    const date = document.getElementById('edit-transactionDate').value;
+
+    const updatedTransaction = {
+        id: id,
+        title: title,
+        amount: parseFloat(amount),
+        dateTime: new Date(date).toISOString(),
+        categoryId: parseInt(categoryId),
+    };
+
+    fetch(`/api/TransactionsAPI/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedTransaction)
+    })
+        .then(response => {
+            if (response.status === 204) {
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            toggleEditModal();
+            fetchDefaultTransactions();
+        })
+        .catch(error => console.error('Error updating transaction:', error));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addCategoryForm').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -204,14 +255,17 @@ function fetchCategories() {
         .then(response => response.json())
         .then(data => {
             const categories = data.$values
-            const categorySelect = document.getElementById('add-transactionCategory');
-            categorySelect.innerHTML = '';
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.id;
-                option.text = category.name;
-                categorySelect.appendChild(option);
-            });
+            const categoryMenus = document.querySelectorAll('.category-menu');
+
+            categoryMenus.forEach(menu => {
+                menu.innerHTML = '';
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.text = category.name;
+                    menu.appendChild(option);
+                });
+            })
         })
         .catch(error => console.error('Error fetching categories:', error));
 }
