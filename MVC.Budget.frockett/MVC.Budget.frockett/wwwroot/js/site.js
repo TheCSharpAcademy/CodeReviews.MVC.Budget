@@ -8,7 +8,6 @@ function fetchDefaultTransactions() {
     fetch('/api/TransactionsAPI')
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             allTransactions = data.$values;
             renderTable(allTransactions);
         });
