@@ -98,7 +98,7 @@ function renderTable(transactions) {
 
         const deleteButton = document.createElement('button');
         deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>'
-        deleteButton.onclick = () => showDeleteModal(transactionEntity);
+        deleteButton.onclick = () => confirmDeleteTransaction(transactionEntity);
         editButton.className = 'btn btn-light btn-sm';
 
         buttonContainer.appendChild(editButton);
@@ -119,16 +119,20 @@ function renderTable(transactions) {
 
 function filterTransactions() {
     const nameFilterValue = document.getElementById('nameFilter').value.toLowerCase();
-    const amountFilterValue = parseFloat(document.getElementById('amountFilter').value);
+    const minAmountFilterValue = parseFloat(document.getElementById('minAmountFilter').value);
+    const maxAmountFilterValue = parseFloat(document.getElementById('maxAmountFilter').value);
     const categoryFilterValue = document.getElementById('categoryFilter').value.toLowerCase();
+    const dateFilterValue = document.getElementById('dateFilter').value;
 
 
     const filteredTransactions = allTransactions.filter(transaction => {
         const matchesName = transaction.title.toLowerCase().includes(nameFilterValue);
-        const matchesAmount = isNaN(amountFilterValue) || transaction.amount === amountFilterValue;
+        const matchesMinAmount = isNaN(minAmountFilterValue) || transaction.amount >= minAmountFilterValue;
+        const matchesMaxAmount = isNaN(maxAmountFilterValue) || transaction.amount <= maxAmountFilterValue;
         const matchesCategory = transaction.categoryName.toLowerCase().includes(categoryFilterValue);
-
-        return matchesName && matchesAmount && matchesCategory;
+        const generatedDate = transaction.dateTime.split('T')[0];
+        const matchesDate = dateFilterValue === '' || generatedDate === dateFilterValue;
+        return matchesName && matchesMinAmount && matchesMaxAmount && matchesCategory && matchesDate;
     });
 
     renderTable(filteredTransactions);
@@ -216,10 +220,12 @@ function toggleAddModal() {
 function toggleAddCategoryModal() {
     const addCategoryModal = document.getElementById('addCategoryModal');
     const overlay = document.querySelector('.overlay');
+    const addCategoryForm = document.getElementById('addCategoryForm');
 
     if (addCategoryModal.style.display === 'block') {
         overlay.classList.add("hidden");
         addCategoryModal.style.display = 'none';
+        addCategoryForm.style.display = 'none';
         document.getElementById('add-categoryName').value = '';
     } else {
         addCategoryModal.style.display = 'block';
@@ -291,6 +297,40 @@ function updateTransaction(id) {
         .catch(error => console.error('Error updating transaction:', error));
 }
 
+let transactionIdToDelete = null;
+
+function confirmDeleteTransaction(transaction) {
+    $('#confirmDeleteTransactionModal').modal('show');
+    document.getElementById('confirmDeleteTransactionButton').addEventListener('click', function () {
+        if (transaction.id !== null) {
+            fetch(`/api/TransactionsAPI/${transaction.id}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        fetchDefaultTransactions();
+                        $('#confirmDeleteTransactionModal').modal('hide');
+                    }
+                })
+                .catch(error => console.error('Error deleting transaction:', error));
+        }
+    });
+
+    document.getElementById('cancelDeleteTransactionButton').addEventListener('click', function () {
+        $('#confirmDeleteTransactionModal').modal('hide');
+    })
+}
+
+function showDeleteTransactionModal(transactionId) {
+    transactionIdToDelete = transactionId;
+    $('#confirmDeleteTransactionModal').modal('show');
+
+
+}
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addCategoryForm').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -347,7 +387,7 @@ function fetchCategories() {
                 const editButton = document.createElement('button');
                 editButton.className = 'btn btn-light btn-sm';
                 editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
-                editButton.onclick = () => showEditCategoryForm(category);
+                editButton.onclick = () => confirmEditCategory(category);
                 actionsCell.appendChild(editButton);
 
                 const deleteButton = document.createElement('button');
@@ -367,6 +407,7 @@ function fetchCategories() {
 function populateCategoryDropdowns(categories) {
     const categorySelect = document.getElementById('add-transactionCategory');
     const editCategorySelect = document.getElementById('edit-transactionCategory');
+    const categoryFilter = document.getElementById('categoryFilter');
 
     if (categorySelect) {
         categorySelect.innerHTML = '';
@@ -385,6 +426,16 @@ function populateCategoryDropdowns(categories) {
             option.value = category.id;
             option.text = category.name;
             editCategorySelect.appendChild(option);
+        });
+    }
+
+    if (categoryFilter) {
+        categoryFilter.innerHTML = '<option value="">All Categories</option>';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.name;
+            option.text = category.name;
+            categoryFilter.appendChild(option);
         });
     }
 }
@@ -420,18 +471,27 @@ function addCategory() {
         .catch(error => console.error('Error adding category:', error));
 }
 
-function showEditCategoryForm(category) {
-    toggleCategoryForm();
+let categoryIdToEdit = null;
 
-    document.getElementById('add-categoryName').value = category.name;
-    document.getElementById('addCategoryForm').onsubmit = function (e) {
+function confirmEditCategory(category) {
+    categoryIdToEdit = category.id;
+    document.getElementById('edit-categoryName').value = category.name;
+    $('#editCategoryModal').modal('show');
+    toggleAddCategoryModal();
+    document.getElementById('editCategoryForm').addEventListener('submit', function (e) {
         e.preventDefault();
-        updateCategory(category.id);
-    };
+        updateCategory(categoryIdToEdit);
+        toggleAddCategoryModal();
+    });
+
+    document.getElementById('cancelEditCategoryButton').addEventListener('click', function () {
+        $('#editCategoryModal').modal('hide');
+        toggleAddCategoryModal();
+    });
 }
 
 function updateCategory(id) {
-    const name = document.getElementById('add-categoryName').value;
+    const name = document.getElementById('edit-categoryName').value;
 
     const category = {
         id: id,
@@ -445,10 +505,13 @@ function updateCategory(id) {
         },
         body: JSON.stringify(category)
     })
-        .then(response => response.json())
-        .then(data => {
-            toggleAddCategoryModal();
-            fetchCategories();
+        .then(response => {
+            if (response.ok) {
+                $('#editCategoryModal').modal('hide');
+                fetchCategories();
+            } else {
+                console.error('Error updating category');
+            }
         })
         .catch(error => console.error('Error updating category:', error));
 }
@@ -457,10 +520,9 @@ let categoryIdToDelete = null;
 
 function confirmDelete(category) {
     categoryIdToDelete = category.id;
-    console.log(category);
     const confirmDeleteBody = document.getElementById('confirm-delete-modal-body');
     confirmDeleteBody.innerText = `Are you sure you want to delete ${category.name} and ${category.transactions.length} transactions?`;
-
+    toggleAddCategoryModal();
     $('#confirmDeleteModal').modal('show');
 
     document.getElementById('confirmDeleteButton').addEventListener('click', function () {
@@ -470,7 +532,7 @@ function confirmDelete(category) {
             })
                 .then(response => {
                     if (response.ok) {
-                        fetchCategories(fetchCategories);
+                        fetchCategories();
                         $('#confirmDeleteModal').modal('hide');
                     } else {
                         console.error('Error deleting category');
@@ -478,12 +540,15 @@ function confirmDelete(category) {
                 })
                 .catch(error => console.error('Error deleting category:', error));
         }
+        toggleAddCategoryModal();
     });
 
     document.getElementById('cancelDeleteButton').addEventListener('click', function () {
         $('#confirmDeleteModal').modal('hide');
+        toggleAddCategoryModal();
     })
 }
+
 
 
 

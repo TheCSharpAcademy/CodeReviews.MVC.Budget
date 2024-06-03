@@ -21,6 +21,18 @@ body {
   margin-bottom: 60px;
 }
 
+input {
+    padding: 0 5px;
+}
+
+.modal-backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+}
+
+.modal-backdrop.in {
+    opacity: 1 !important;
+}
 
 #filter-form {
     display: flex;
@@ -40,6 +52,10 @@ body {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+}
+
+.number-input {
+    max-width: 50px;
 }
 
 .top-buttons {
