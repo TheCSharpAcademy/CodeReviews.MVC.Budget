@@ -15,6 +15,7 @@ function fetchDefaultTransactions() {
 }
 
 function renderTable(transactions) {
+    handleFocus(null);
     fetchCategories();
     const list = document.getElementById('transactionList');
     list.innerHTML = '';
@@ -28,14 +29,14 @@ function renderTable(transactions) {
     headerTitle.innerText = 'Name';
     headerTitle.addEventListener('click', () => {
         sortTable(0);
-        addFocus(headerTitle);
+        handleFocus(headerTitle);
     });
 
     const headerCat = document.createElement('th');
     headerCat.scope = 'col';
     headerCat.addEventListener('click', () => {
         sortTable(1);
-        addFocus(headerCat);
+        handleFocus(headerCat);
     });
     headerCat.innerText = 'Category';
 
@@ -43,7 +44,7 @@ function renderTable(transactions) {
     headerAmount.scope = 'col';
     headerAmount.addEventListener('click', () => {
         sortTable(2);
-        addFocus(headerAmount);
+        handleFocus(headerAmount);
     });
     headerAmount.innerText = 'Amount';
 
@@ -51,7 +52,7 @@ function renderTable(transactions) {
     headerDate.scope = 'col';
     headerDate.addEventListener('click', () => {
         sortTable(3);
-        addFocus(headerDate);
+        handleFocus(headerDate);
     });
     headerDate.innerText = 'Date';
 
@@ -185,12 +186,15 @@ function sortTable(index) {
     }
 }
 
-function addFocus(header) {
+function handleFocus(header) {
     const allHeaders = document.getElementsByTagName("th");
     for (let i = 0; i < allHeaders.length; i++) {
         allHeaders[i].classList.remove('th-focus');
     }
-    header.classList.add('th-focus');
+    if (header !== null) {
+        header.classList.add('th-focus');
+    }
+    
 }
 function toggleAddModal() {
     const addModal = document.getElementById('addTransactionModal');
