@@ -1,5 +1,4 @@
-﻿
-fetchDefaultTransactions();
+﻿fetchDefaultTransactions();
 handleScroll();
 
 let allTransactions = [];

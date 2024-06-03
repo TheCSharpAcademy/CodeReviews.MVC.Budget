@@ -80,6 +80,10 @@ table th.th-focus {
     border-radius: 10px;
 }
 
+table th:hover {
+    cursor: pointer;
+}
+
 .overlay {
     position: fixed;
     top: 0;
