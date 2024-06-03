@@ -2,16 +2,17 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
 
 <form id="filter-form">
             <input type="text" class="filter-input" id="nameFilter" placeholder="Filter by name" oninput="filterTransactions()">
             <input type="text" class="filter-input" id="categoryFilter" placeholder="Filter by category" oninput="filterTransactions()">
             <input type="number" class="filter-input" id="amountFilter" placeholder="Filter by amount" oninput="filterTransactions()">
+    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="toggleAddModal()">
+        Add Transaction
+    </button>
 </form>
+
+
 
 <div class="modal" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true" style="display:none">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -36,7 +37,7 @@
                     </div>
                     <div class="form-group">
                         <label for="transactionAmount">Amount</label>
-                        <input type="number" class="form-control" id="add-transactionAmount" step="0.01" required>
+                        <input type="number" class="form-control" id="add-transactionAmount" min="0.01" step="0.01" required>
                     </div>
                     <div class="form-group">
                         <label for="transactionDate">Date</label>
@@ -115,9 +116,6 @@
     </table>
 </div>
 
-<button type="button" class="btn btn-primary" data-toggle="modal" onclick="toggleAddModal()">
-    Add Transaction
-</button>
 <button type="button" class="btn btn-primary" onclick="toggleAddCategoryModal()">
     Add Category
 </button>

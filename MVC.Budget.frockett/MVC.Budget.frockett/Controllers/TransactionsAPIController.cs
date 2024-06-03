@@ -26,7 +26,7 @@ public class TransactionsAPIController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TransactionGetDto>>> GetTransactions()
     {
-        var transactions = await _context.Transactions.Include(t => t.Category).ToListAsync();
+        var transactions = await _context.Transactions.Include(t => t.Category).OrderByDescending(t => t.DateTime).ToListAsync();
 
         var transactionsToReturn = new List<TransactionGetDto>();
 

@@ -4,6 +4,7 @@
 // Write your JavaScript code.
 
 fetchDefaultTransactions();
+handleScroll();
 
 let allTransactions = [];
 
@@ -23,6 +24,7 @@ function renderTable(transactions) {
     list.innerHTML = '';
 
     const tableHead = document.createElement('thead');
+    tableHead.classList.add('table-head')
     const headerRow = document.createElement('tr');
 
     const headerTitle = document.createElement('th');
@@ -55,6 +57,7 @@ function renderTable(transactions) {
     list.appendChild(tableHead);
 
     const tbody = document.createElement('tbody');
+    tbody.classList.add('table-body');
 
     transactions.forEach(transactionEntity => {
         const transaction = document.createElement('tr');
@@ -291,4 +294,18 @@ function addTransaction() {
         fetchDefaultTransactions();
     })
         .catch(error => console.error('Error adding transaction: ', error));
+}
+
+function handleScroll() {
+    $(window).scroll(function () {
+        const form = document.getElementById('filter-form')
+        let scroll = $(window).scrollTop();
+        console.log(scroll);
+        if (scroll >= 100) {
+            form.classList.add('scrolled');
+        }
+        else {
+            form.classList.remove('scrolled');
+        }
+    })
 }
