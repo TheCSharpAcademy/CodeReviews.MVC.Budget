@@ -485,7 +485,6 @@ function confirmEditCategory(category) {
     document.getElementById('editCategoryForm').addEventListener('submit', function (e) {
         e.preventDefault();
         updateCategory(categoryIdToEdit);
-        fetchDefaultTransactions();
         toggleAddCategoryModal();
     });
 
@@ -514,6 +513,9 @@ function updateCategory(id) {
             if (response.ok) {
                 $('#editCategoryModal').modal('hide');
                 fetchCategories();
+                setTimeout(() => {
+                    fetchDefaultTransactions();
+                }, 500); // Was having trouble getting updated list from DB
             } else {
                 console.error('Error updating category');
             }
