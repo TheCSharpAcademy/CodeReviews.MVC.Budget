@@ -4,12 +4,19 @@
 
 
 <form id="filter-form">
-            <input type="text" class="filter-input" id="nameFilter" placeholder="Filter by name" oninput="filterTransactions()">
-            <input type="text" class="filter-input" id="categoryFilter" placeholder="Filter by category" oninput="filterTransactions()">
-            <input type="number" class="filter-input" id="amountFilter" placeholder="Filter by amount" oninput="filterTransactions()">
-    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="toggleAddModal()">
+    <div class="filters">
+        <input type="text" class="filter-input" id="nameFilter" placeholder="Filter by name" oninput="filterTransactions()">
+        <input type="text" class="filter-input" id="categoryFilter" placeholder="Filter by category" oninput="filterTransactions()">
+        <input type="number" class="filter-input" id="amountFilter" placeholder="Filter by amount" oninput="filterTransactions()">
+    </div>
+    <div class="top-buttons">
+        <button type="button" class="btn btn-primary" data-toggle="modal" onclick="toggleAddModal()">
         Add Transaction
     </button>
+        <button type="button" class="btn btn-primary" onclick="toggleAddCategoryModal()">
+            Add Category
+        </button>
+    </div>
 </form>
 
 
@@ -116,9 +123,6 @@
     </table>
 </div>
 
-<button type="button" class="btn btn-primary" onclick="toggleAddCategoryModal()">
-    Add Category
-</button>
 
 
 <div class="overlay hidden"></div>

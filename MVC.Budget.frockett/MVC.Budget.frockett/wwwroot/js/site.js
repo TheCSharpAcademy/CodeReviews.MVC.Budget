@@ -1,13 +1,9 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-
+﻿
 fetchDefaultTransactions();
 handleScroll();
 
 let allTransactions = [];
-
+const sortDirections = {};
 function fetchDefaultTransactions() {
     fetch('/api/TransactionsAPI')
         .then(response => response.json())
@@ -30,17 +26,33 @@ function renderTable(transactions) {
     const headerTitle = document.createElement('th');
     headerTitle.scope = 'col';
     headerTitle.innerText = 'Name';
+    headerTitle.addEventListener('click', () => {
+        sortTable(0);
+        addFocus(headerTitle);
+    });
 
     const headerCat = document.createElement('th');
     headerCat.scope = 'col';
+    headerCat.addEventListener('click', () => {
+        sortTable(1);
+        addFocus(headerCat);
+    });
     headerCat.innerText = 'Category';
 
     const headerAmount = document.createElement('th');
     headerAmount.scope = 'col';
+    headerAmount.addEventListener('click', () => {
+        sortTable(2);
+        addFocus(headerAmount);
+    });
     headerAmount.innerText = 'Amount';
 
     const headerDate = document.createElement('th');
     headerDate.scope = 'col';
+    headerDate.addEventListener('click', () => {
+        sortTable(3);
+        addFocus(headerDate);
+    });
     headerDate.innerText = 'Date';
 
     const buttonCell = document.createElement('th');
@@ -121,6 +133,65 @@ function filterTransactions() {
     renderTable(filteredTransactions);
 }
 
+function sortTable(index) {
+    let table, rows, switching, i, x, y, shouldSwitch, direction, switchCount = 0;
+    table = document.getElementById("transactionList");
+    switching = true;
+
+    if (!sortDirections[index]) {
+        sortDirections[index] = "asc";
+    }
+
+    // Toggle the sorting direction:
+    direction = sortDirections[index] === "asc" ? "desc" : "asc";
+    sortDirections[index] = direction;
+
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+
+        for (i = 1; i < rows.length - 1; i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("td")[index];
+            y = rows[i + 1].getElementsByTagName("td")[index];
+
+            if (direction === "asc") {
+                // Sort alphabetically if not a number
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase() && isNaN(x.innerHTML)) {
+                    shouldSwitch = true;
+                    break;
+                }
+                // Sort numerically if it is a number
+                else if ((!isNaN(x.innerHTML) && !isNaN(y.innerHTML)) && parseFloat(x.innerHTML) > parseFloat(y.innerHTML)) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else if (direction === "desc") {
+                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase() && isNaN(x.innerHTML)) {
+                    shouldSwitch = true;
+                    break;
+                }
+                else if ((!isNaN(x.innerHTML) && !isNaN(y.innerHTML)) && parseFloat(x.innerHTML) < parseFloat(y.innerHTML)) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchCount++;
+        }
+    }
+}
+
+function addFocus(header) {
+    const allHeaders = document.getElementsByTagName("th");
+    for (let i = 0; i < allHeaders.length; i++) {
+        allHeaders[i].classList.remove('th-focus');
+    }
+    header.classList.add('th-focus');
+}
 function toggleAddModal() {
     const addModal = document.getElementById('addTransactionModal');
     const overlay = document.querySelector('.overlay');
@@ -296,11 +367,11 @@ function addTransaction() {
         .catch(error => console.error('Error adding transaction: ', error));
 }
 
+// Track scroll position, change background color of filter form once the user has scrolled
 function handleScroll() {
     $(window).scroll(function () {
         const form = document.getElementById('filter-form')
         let scroll = $(window).scrollTop();
-        console.log(scroll);
         if (scroll >= 100) {
             form.classList.add('scrolled');
         }

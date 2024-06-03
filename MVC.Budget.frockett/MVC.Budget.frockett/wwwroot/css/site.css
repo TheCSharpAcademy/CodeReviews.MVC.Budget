@@ -25,7 +25,7 @@ body {
 #filter-form {
     display: flex;
     gap: 1rem;
-    justify-content: flex-start;
+    justify-content: space-between;
 
     flex-wrap: wrap;
     flex: 1 1 80px;
@@ -34,6 +34,17 @@ body {
     padding: 1rem;
     z-index: 2;
     border-radius: 10px;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.top-buttons {
+    display: flex;
+    gap: 1rem;
 }
 
 .scrolled {
@@ -46,6 +57,11 @@ body {
     
     min-width: 80px;
     flex-shrink: 1;
+}
+
+table th.th-focus {
+    background: #f5f5f5;
+    border-radius: 10px;
 }
 
 .overlay {
@@ -63,12 +79,4 @@ body {
 
 .hidden {
     display:none;
-}
-
-.table-body {
-}
-
-.table-head {
-    position: sticky;
-    top: 0;
 }
