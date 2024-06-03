@@ -21,13 +21,17 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Optional for seeding. Will reset every time program is started
+using (var scope = app.Services.CreateScope())
+{
+    SeedDatabase.Seed(scope.ServiceProvider.GetService<BudgetContext>());
+}
+
 if(app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

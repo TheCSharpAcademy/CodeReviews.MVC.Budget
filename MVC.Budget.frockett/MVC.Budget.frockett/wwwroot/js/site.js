@@ -129,7 +129,7 @@ function filterTransactions() {
         const matchesName = transaction.title.toLowerCase().includes(nameFilterValue);
         const matchesMinAmount = isNaN(minAmountFilterValue) || transaction.amount >= minAmountFilterValue;
         const matchesMaxAmount = isNaN(maxAmountFilterValue) || transaction.amount <= maxAmountFilterValue;
-        const matchesCategory = transaction.categoryName.toLowerCase().includes(categoryFilterValue);
+        const matchesCategory = categoryFilterValue === '' || transaction.categoryName.toLowerCase() === categoryFilterValue;
         const generatedDate = transaction.dateTime.split('T')[0];
         const matchesDate = dateFilterValue === '' || generatedDate === dateFilterValue;
         return matchesName && matchesMinAmount && matchesMaxAmount && matchesCategory && matchesDate;
@@ -301,6 +301,12 @@ let transactionIdToDelete = null;
 
 function confirmDeleteTransaction(transaction) {
     $('#confirmDeleteTransactionModal').modal('show');
+
+    const modalText = document.getElementById('confirmDeleteTransactionBody');
+    const transactionDate = new Date(transaction.dateTime);
+    const dateString = transactionDate.toDateString();
+    modalText.innerHTML = `Delete: <strong>${transaction.title}</strong> for  <strong>$${transaction.amount}</strong> on <strong>${dateString}</strong> ?`;
+
     document.getElementById('confirmDeleteTransactionButton').addEventListener('click', function () {
         if (transaction.id !== null) {
             fetch(`/api/TransactionsAPI/${transaction.id}`, {
@@ -327,9 +333,6 @@ function showDeleteTransactionModal(transactionId) {
 
 
 }
-
-
-
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addCategoryForm').addEventListener('submit', function (e) {
@@ -430,6 +433,7 @@ function populateCategoryDropdowns(categories) {
     }
 
     if (categoryFilter) {
+        const selectedValue = categoryFilter.value;
         categoryFilter.innerHTML = '<option value="">All Categories</option>';
         categories.forEach(category => {
             const option = document.createElement('option');
@@ -437,6 +441,8 @@ function populateCategoryDropdowns(categories) {
             option.text = category.name;
             categoryFilter.appendChild(option);
         });
+
+        categoryFilter.value = selectedValue;
     }
 }
 
@@ -472,7 +478,6 @@ function addCategory() {
 }
 
 let categoryIdToEdit = null;
-
 function confirmEditCategory(category) {
     categoryIdToEdit = category.id;
     document.getElementById('edit-categoryName').value = category.name;
@@ -481,6 +486,7 @@ function confirmEditCategory(category) {
     document.getElementById('editCategoryForm').addEventListener('submit', function (e) {
         e.preventDefault();
         updateCategory(categoryIdToEdit);
+        fetchDefaultTransactions();
         toggleAddCategoryModal();
     });
 
@@ -517,11 +523,10 @@ function updateCategory(id) {
 }
 
 let categoryIdToDelete = null;
-
 function confirmDelete(category) {
     categoryIdToDelete = category.id;
     const confirmDeleteBody = document.getElementById('confirm-delete-modal-body');
-    confirmDeleteBody.innerText = `Are you sure you want to delete ${category.name} and ${category.transactions.length} transactions?`;
+    confirmDeleteBody.innerText = `Are you sure you want to delete ${category.name} and all associated transactions?`;
     toggleAddCategoryModal();
     $('#confirmDeleteModal').modal('show');
 
@@ -534,6 +539,9 @@ function confirmDelete(category) {
                     if (response.ok) {
                         fetchCategories();
                         $('#confirmDeleteModal').modal('hide');
+                        setTimeout(() => {
+                            fetchDefaultTransactions();
+                        }, 500); // Was having trouble getting updated list from DB
                     } else {
                         console.error('Error deleting category');
                     }
@@ -548,9 +556,6 @@ function confirmDelete(category) {
         toggleAddCategoryModal();
     })
 }
-
-
-
 
 function addTransaction() {
     const transaction = {
