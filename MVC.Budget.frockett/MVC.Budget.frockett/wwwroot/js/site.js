@@ -224,6 +224,7 @@ function toggleAddCategoryModal() {
     } else {
         addCategoryModal.style.display = 'block';
         overlay.classList.remove("hidden");
+        fetchCategories();
     }
 }
 
@@ -332,21 +333,159 @@ function fetchCategories() {
     fetch('/api/CategoriesAPI')
         .then(response => response.json())
         .then(data => {
-            const categories = data.$values
-            const categoryMenus = document.querySelectorAll('.category-menu');
+            const categories = data.$values;
+            const categoryList = document.getElementById('categoryList').getElementsByTagName('tbody')[0];
+            categoryList.innerHTML = '';
 
-            categoryMenus.forEach(menu => {
-                menu.innerHTML = '';
-                categories.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category.id;
-                    option.text = category.name;
-                    menu.appendChild(option);
-                });
-            })
+            categories.forEach(category => {
+                const row = document.createElement('tr');
+                const nameCell = document.createElement('td');
+                nameCell.textContent = category.name;
+                row.appendChild(nameCell);
+
+                const actionsCell = document.createElement('td');
+                const editButton = document.createElement('button');
+                editButton.className = 'btn btn-light btn-sm';
+                editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
+                editButton.onclick = () => showEditCategoryForm(category);
+                actionsCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn btn-light btn-sm';
+                deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
+                deleteButton.onclick = () => confirmDelete(category);
+                actionsCell.appendChild(deleteButton);
+
+                row.appendChild(actionsCell);
+                categoryList.appendChild(row);
+            });
+            populateCategoryDropdowns(categories);
         })
         .catch(error => console.error('Error fetching categories:', error));
 }
+
+function populateCategoryDropdowns(categories) {
+    const categorySelect = document.getElementById('add-transactionCategory');
+    const editCategorySelect = document.getElementById('edit-transactionCategory');
+
+    if (categorySelect) {
+        categorySelect.innerHTML = '';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.text = category.name;
+            categorySelect.appendChild(option);
+        });
+    }
+
+    if (editCategorySelect) {
+        editCategorySelect.innerHTML = '';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.text = category.name;
+            editCategorySelect.appendChild(option);
+        });
+    }
+}
+
+function showAddCategoryForm() {
+    toggleCategoryForm();
+}
+
+function toggleCategoryForm() {
+    const categoryForm = document.getElementById('addCategoryForm');
+    categoryForm.style.display = categoryForm.style.display === 'none' ? 'block' : 'none';
+}
+
+function addCategory() {
+    const name = document.getElementById('add-categoryName').value;
+
+    const category = {
+        name: name
+    };
+
+    fetch('/api/CategoriesAPI', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(category)
+    })
+        .then(response => response.json())
+        .then(data => {
+            toggleAddCategoryModal();
+            fetchCategories();
+        })
+        .catch(error => console.error('Error adding category:', error));
+}
+
+function showEditCategoryForm(category) {
+    toggleCategoryForm();
+
+    document.getElementById('add-categoryName').value = category.name;
+    document.getElementById('addCategoryForm').onsubmit = function (e) {
+        e.preventDefault();
+        updateCategory(category.id);
+    };
+}
+
+function updateCategory(id) {
+    const name = document.getElementById('add-categoryName').value;
+
+    const category = {
+        id: id,
+        name: name
+    };
+
+    fetch(`/api/CategoriesAPI/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(category)
+    })
+        .then(response => response.json())
+        .then(data => {
+            toggleAddCategoryModal();
+            fetchCategories();
+        })
+        .catch(error => console.error('Error updating category:', error));
+}
+
+let categoryIdToDelete = null;
+
+function confirmDelete(category) {
+    categoryIdToDelete = category.id;
+    console.log(category);
+    const confirmDeleteBody = document.getElementById('confirm-delete-modal-body');
+    confirmDeleteBody.innerText = `Are you sure you want to delete ${category.name} and ${category.transactions.length} transactions?`;
+
+    $('#confirmDeleteModal').modal('show');
+
+    document.getElementById('confirmDeleteButton').addEventListener('click', function () {
+        if (categoryIdToDelete !== null) {
+            fetch(`/api/CategoriesAPI/${categoryIdToDelete}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        fetchCategories(fetchCategories);
+                        $('#confirmDeleteModal').modal('hide');
+                    } else {
+                        console.error('Error deleting category');
+                    }
+                })
+                .catch(error => console.error('Error deleting category:', error));
+        }
+    });
+
+    document.getElementById('cancelDeleteButton').addEventListener('click', function () {
+        $('#confirmDeleteModal').modal('hide');
+    })
+}
+
+
 
 function addTransaction() {
     const transaction = {
