@@ -1,432 +1,448 @@
-﻿import Chart from 'chart.js/auto';
+﻿import { Chart, BarController, BarElement, CategoryScale, LinearScale, LineController, LineElement, PointElement, DoughnutController, ArcElement} from 'chart.js';
+Chart.register(BarController, BarElement, CategoryScale, LinearScale, LineController, LineElement, PointElement, DoughnutController, ArcElement);
 import { getRandomColor } from './utilities';
+import { getDatePicker } from './asyncComponents'
 
 export default class StatisticsDashboard {
     #data;
+    #initPromise;
     #isLoading;
+    #yearPicker
     #sentimentChartYearly;
     #necessityChartYearly;
     #sentimentBarChart;
     #necessityBarChart;
     #overspendingChart;
     #totalSpentChart;
-    #overspendingHeading;
+    #overspendingHeading; 
 
-    constructor() {
+    constructor(id, year) {
         this.#data = null;
-        this.init();
+        this.#initPromise = this.#init(id, year);
     }
 
-    init() {
-        this.#sentimentChartYearly = new Chart(document.getElementById('sentimentChartYear'), {
-            type: 'doughnut',
-            data: {
-                labels: [
-                    'Happy',
-                    'Unhappy'
-                ],
-                datasets: [{
-                    label: 'Total Amount',
-                    data: [0, 0],
-                    backgroundColor: [
-                        'rgb(25,135,84)',
-                        'rgb(220,53,69)'
+    async #init(id, year) {
+        try {
+            this.#isLoading = true;
+            this.#initializeDatePicker(id, year);
+            this.#sentimentChartYearly = new Chart(document.getElementById('sentimentChartYear'), {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Happy',
+                        'Unhappy'
                     ],
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                let label = context.dataset.label || '';
+                    datasets: [{
+                        label: 'Total Amount',
+                        data: [0, 0],
+                        backgroundColor: [
+                            'rgb(25,135,84)',
+                            'rgb(220,53,69)'
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
 
-                                if (label) {
-                                    label += ': ';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += window.userNumberFormat.format(context.parsed);
+                                    }
+                                    return label;
                                 }
-                                if (context.parsed.y !== null) {
-                                    label += window.userNumberFormat.format(context.parsed);
-                                }
-                                return label;
                             }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        this.#necessityChartYearly = new Chart(document.getElementById('necessityChartYear'), {
-            type: 'doughnut',
-            data: {
-                labels: [
-                    'Necessary',
-                    'Unnecessary'
-                ],
-                datasets: [{
-                    label: 'Total Amount',
-                    data: [0, 0],
-                    backgroundColor: [
-                        'rgb(25,135,84)',
-                        'rgb(220,53,69)'
+            this.#necessityChartYearly = new Chart(document.getElementById('necessityChartYear'), {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Necessary',
+                        'Unnecessary'
                     ],
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                let label = context.dataset.label || '';
+                    datasets: [{
+                        label: 'Total Amount',
+                        data: [0, 0],
+                        backgroundColor: [
+                            'rgb(25,135,84)',
+                            'rgb(220,53,69)'
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
 
-                                if (label) {
-                                    label += ': ';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += window.userNumberFormat.format(context.parsed);
+                                    }
+                                    return label;
                                 }
-                                if (context.parsed.y !== null) {
-                                    label += window.userNumberFormat.format(context.parsed);
-                                }
-                                return label;
                             }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        this.#sentimentBarChart = new Chart(document.getElementById('sentimentLineChartYear'), {
-            type: 'bar',
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
-                datasets: [{
-                    label: 'Happy',
-                    stack: 'Unevaluated',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
-                    backgroundColor: '#20c997',
+            this.#sentimentBarChart = new Chart(document.getElementById('sentimentLineChartYear'), {
+                type: 'bar',
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
+                    datasets: [{
+                        label: 'Happy',
+                        stack: 'Unevaluated',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
+                        backgroundColor: '#20c997',
+                    },
+                    {
+                        label: 'Unhappy',
+                        stack: 'Unevaluated',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
+                        backgroundColor: 'rgb(220,53,69)'
+                    },
+                    {
+                        label: 'Happy (Eval.)',
+                        stack: 'Evaluated',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
+                        backgroundColor: '#0f7c5c',
+                    },
+                    {
+                        label: 'Unhappy (Eval.)',
+                        stack: 'Evaluated',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
+                        backgroundColor: '#881d27',
+                    },
+                    {
+                        label: 'Unevaluated',
+                        stack: 'Evaluated',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
+                        backgroundColor: '#1c1c1c',
+                    }]
                 },
-                {
-                    label: 'Unhappy',
-                    stack: 'Unevaluated',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
-                    backgroundColor: 'rgb(220,53,69)'
-                },
-                {
-                    label: 'Happy (Eval.)',
-                    stack: 'Evaluated',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
-                    backgroundColor: '#0f7c5c',
-                },
-                {
-                    label: 'Unhappy (Eval.)',
-                    stack: 'Evaluated',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
-                    backgroundColor: '#881d27',
-                },
-                {
-                    label: 'Unevaluated',
-                    stack: 'Evaluated',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
-                    backgroundColor: '#1c1c1c',
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        border: {
-                            color: '#d3d3d3',
-                        },
-                        grid: {
-                            color: '#d3d3d3',
-                            lineWidth: 0.2,
-                        },
-                        ticks: {
-                            color: '#d3d3d3',
-                            callback: function (value, index, ticks) {
-                                return window.userNumberFormat.format(value);
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            border: {
+                                color: '#d3d3d3',
+                            },
+                            grid: {
+                                color: '#d3d3d3',
+                                lineWidth: 0.2,
+                            },
+                            ticks: {
+                                color: '#d3d3d3',
+                                callback: function (value, index, ticks) {
+                                    return window.userNumberFormat.format(value);
+                                }
                             }
-                        }
-                    },
-                    x: {
-                        border: {
-                            color: '#d3d3d3',
                         },
-                        grid: {
-                            display: false,
-                            tickColor: '#d3d3d3',
+                        x: {
+                            border: {
+                                color: '#d3d3d3',
+                            },
+                            grid: {
+                                display: false,
+                                tickColor: '#d3d3d3',
+                            },
+                            ticks: {
+                                color: '#d3d3d3',
+                            }
                         },
-                        ticks: {
-                            color: '#d3d3d3',
-                        }
                     },
-                },
-                plugins: {
-                    emptypiechart: false,
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                let label = context.dataset.label || '';
+                    plugins: {
+                        emptypiechart: false,
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
 
-                                if (label) {
-                                    label += ': ';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += window.userNumberFormat.format(context.parsed.y);
+                                    }
+                                    return label;
                                 }
-                                if (context.parsed.y !== null) {
-                                    label += window.userNumberFormat.format(context.parsed.y);
-                                }
-                                return label;
                             }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        this.#necessityBarChart = new Chart(document.getElementById('necessityLineChartYear'), {
-            type: 'bar',
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
-                datasets: [{
-                    label: 'Necessary',
-                    stack: 'Unevaluated',
-                    backgroundColor: '#20c997',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
+            this.#necessityBarChart = new Chart(document.getElementById('necessityLineChartYear'), {
+                type: 'bar',
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
+                    datasets: [{
+                        label: 'Necessary',
+                        stack: 'Unevaluated',
+                        backgroundColor: '#20c997',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
 
-                },
-                {
-                    label: 'Unnecessary',
-                    stack: 'Unevaluated',
-                    backgroundColor: 'rgb(220,53,69)',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
+                    },
+                    {
+                        label: 'Unnecessary',
+                        stack: 'Unevaluated',
+                        backgroundColor: 'rgb(220,53,69)',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
 
-                },
-                {
-                    label: 'Necessary (Eval.)',
-                    stack: 'Evaluated',
-                    backgroundColor: '#0f7c5c',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
+                    },
+                    {
+                        label: 'Necessary (Eval.)',
+                        stack: 'Evaluated',
+                        backgroundColor: '#0f7c5c',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
 
+                    },
+                    {
+                        label: 'Unnecessary (Eval.)',
+                        stack: 'Evaluated',
+                        backgroundColor: '#881d27',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
+                    },
+                    {
+                        label: 'Unevaluated',
+                        stack: 'Evaluated',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
+                        backgroundColor: '#1c1c1c'
+                    }]
                 },
-                {
-                    label: 'Unnecessary (Eval.)',
-                    stack: 'Evaluated',
-                    backgroundColor: '#881d27',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
-                },
-                {
-                    label: 'Unevaluated',
-                    stack: 'Evaluated',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
-                    backgroundColor: '#1c1c1c'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        border: {
-                            color: '#d3d3d3',
-                        },
-                        grid: {
-                            color: '#d3d3d3',
-                            lineWidth: 0.2,
-                        },
-                        ticks: {
-                            color: '#d3d3d3',
-                            callback: function (value, index, ticks) {
-                                return window.userNumberFormat.format(value);
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            border: {
+                                color: '#d3d3d3',
+                            },
+                            grid: {
+                                color: '#d3d3d3',
+                                lineWidth: 0.2,
+                            },
+                            ticks: {
+                                color: '#d3d3d3',
+                                callback: function (value, index, ticks) {
+                                    return window.userNumberFormat.format(value);
+                                }
                             }
-                        }
-                    },
-                    x: {
-                        border: {
-                            color: '#d3d3d3',
                         },
-                        grid: {
-                            display: false,
-                            tickColor: '#d3d3d3',
+                        x: {
+                            border: {
+                                color: '#d3d3d3',
+                            },
+                            grid: {
+                                display: false,
+                                tickColor: '#d3d3d3',
+                            },
+                            ticks: {
+                                color: '#d3d3d3',
+                            }
                         },
-                        ticks: {
-                            color: '#d3d3d3',
-                        }
                     },
-                },
-                plugins: {
-                    emptypiechart: false,
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                let label = context.dataset.label || '';
+                    plugins: {
+                        emptypiechart: false,
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
 
-                                if (label) {
-                                    label += ': ';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += window.userNumberFormat.format(context.parsed.y);
+                                    }
+                                    return label;
                                 }
-                                if (context.parsed.y !== null) {
-                                    label += window.userNumberFormat.format(context.parsed.y);
-                                }
-                                return label;
                             }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        this.#overspendingChart = new Chart(document.getElementById('overspendingChart'), {
-            type: 'bar',
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
-            },
-            options: {
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Monthly Overspending Per Category'
-                    }
+            this.#overspendingChart = new Chart(document.getElementById('overspendingChart'), {
+                type: 'bar',
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
                 },
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                scales: {
-                    x: {
-                        stacked: true,
-                        border: {
-                            color: '#d3d3d3',
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Monthly Overspending Per Category'
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            stacked: true,
+                            border: {
+                                color: '#d3d3d3',
+                            },
+                            grid: {
+                                color: '#d3d3d3',
+                                lineWidth: 0.2,
+                            },
+                            ticks: {
+                                color: '#d3d3d3',
+                                callback: function (value, index, ticks) {
+                                    return window.userNumberFormat.format(value);
+                                }
+                            }
                         },
-                        grid: {
-                            color: '#d3d3d3',
-                            lineWidth: 0.2,
-                        },
-                        ticks: {
-                            color: '#d3d3d3',
-                            callback: function (value, index, ticks) {
-                                return window.userNumberFormat.format(value);
+                        y: {
+                            stacked: true,
+                            border: {
+                                color: '#d3d3d3',
+                            },
+                            grid: {
+                                display: false,
+                                tickColor: '#d3d3d3',
+
+                            },
+                            ticks: {
+                                color: '#d3d3d3',
                             }
                         }
                     },
-                    y: {
-                        stacked: true,
-                        border: {
-                            color: '#d3d3d3',
-                        },
-                        grid: {
-                            display: false,
-                            tickColor: '#d3d3d3',
+                    plugins: {
+                        emptypiechart: false,
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
 
-                        },
-                        ticks: {
-                            color: '#d3d3d3',
-                        }
-                    }
-                },
-                plugins: {
-                    emptypiechart: false,
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                let label = context.dataset.label || '';
-
-                                if (label) {
-                                    label += ': ';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += window.userNumberFormat.format(context.parsed.x);
+                                    }
+                                    return label;
                                 }
-                                if (context.parsed.y !== null) {
-                                    label += window.userNumberFormat.format(context.parsed.x);
-                                }
-                                return label;
                             }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        this.#overspendingHeading = document.getElementById('statistics-overspending');
-        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(0)}`;
+            this.#overspendingHeading = document.getElementById('statistics-overspending');
+            this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(0)}`;
 
-        this.#totalSpentChart = new Chart(document.getElementById('totalSpentChart'), {
-            type: 'line',
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
-                datasets: [{
-                    label: 'Total Spent Per Month',
-                    borderWidth: 2,
-                    borderColor: '#d3d3d3',
-                    backgroundColor: '#20c997'
+            this.#totalSpentChart = new Chart(document.getElementById('totalSpentChart'), {
+                type: 'line',
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
+                    datasets: [{
+                        label: 'Total Spent Per Month',
+                        borderWidth: 2,
+                        borderColor: '#d3d3d3',
+                        backgroundColor: '#20c997'
 
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        border: {
-                            color: '#d3d3d3',
-                        },
-                        grid: {
-                            color: '#d3d3d3',
-                            lineWidth: 0.2,
-                        },
-                        ticks: {
-                            color: '#d3d3d3',
-                            callback: function (value, index, ticks) {
-                                return window.userNumberFormat.format(value);
-                            }
-                        }
-                    },
-                    x: {
-                        border: {
-                            color: '#d3d3d3',
-                        },
-                        grid: {
-                            display: false,
-                            tickColor: '#d3d3d3',
-                        },
-                        ticks: {
-                            color: '#d3d3d3',
-                        }
-                    },
+                    }]
                 },
-                plugins: {
-                    emptypiechart: false,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            border: {
+                                color: '#d3d3d3',
+                            },
+                            grid: {
+                                color: '#d3d3d3',
+                                lineWidth: 0.2,
+                            },
+                            ticks: {
+                                color: '#d3d3d3',
+                                callback: function (value, index, ticks) {
+                                    return window.userNumberFormat.format(value);
+                                }
+                            }
+                        },
+                        x: {
+                            border: {
+                                color: '#d3d3d3',
+                            },
+                            grid: {
+                                display: false,
+                                tickColor: '#d3d3d3',
+                            },
+                            ticks: {
+                                color: '#d3d3d3',
+                            }
+                        },
+                    },
+                    plugins: {
+                        emptypiechart: false,
+                    }
                 }
-            }
-        });
+            });
+
+            
+
+            let data = await this.#getData(id, year);
+            await this.#updateCharts(data);
+
+        } finally {
+            this.#isLoading = false;
+        }
     }
 
     async refresh(id, year) {
-        if (this.#isLoading) {
-            console.log("Statistics are loading...")
-            return;
-        }
+        try {
+            if (this.#isLoading) {
+                console.log("Dashboard is loading...")
+                return false;
+            }
 
-        this.#isLoading = true;
-        let data = await this.#getData(id, year);
-        if (data) {
-            let hasUpdated = await this.#updateCharts(data);
+            this.#isLoading = true;
+            let data = await this.#getData(id, year);
+            this.#updateCharts(data);
+        } finally {
+            this.#isLoading = false;
         }
-
-        this.#isLoading = false;
     }
 
     async #getData(id, year) {
         try {
-            let response = await fetch(`https://localhost:7246/api/FiscalPlan/${id}/${year}`, {
+            let response = await fetch(`https://localhost:7246/api/FiscalPlan/${id}/${year.getFullYear()}`, {
                 method: "GET"
             });
 
@@ -442,8 +458,10 @@ export default class StatisticsDashboard {
         }
     }
 
-    async #updateCharts(data) {
-        if (!data) {
+    #updateCharts(data) {
+        let dataObj = data ?? this.#data;
+
+        if (dataObj == null) {
             return false;
         }
 
@@ -487,7 +505,17 @@ export default class StatisticsDashboard {
 
         this.#totalSpentChart.data.datasets[0].data = data.totalPerMonth;
         this.#totalSpentChart.update();
-
+        
         this.#data = data;
+    }
+
+    async #initializeDatePicker(id, year) {
+        let self = this;
+        this.#yearPicker = await getDatePicker("#statistics-yearSelector");
+        this.#yearPicker.datepicker('setDate', year.toISOString());
+
+        this.#yearPicker.on('changeDate', async function () {
+            self.refresh(id, self.#yearPicker.datepicker('getUTCDate'))
+        });
     }
 }

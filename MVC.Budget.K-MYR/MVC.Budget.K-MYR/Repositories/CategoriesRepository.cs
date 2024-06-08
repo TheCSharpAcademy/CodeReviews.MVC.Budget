@@ -20,6 +20,8 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
 
     public async Task<FiscalPlanDTO?> GetDataByMonth(int id, DateTime month)
     {
+        var cutOffDate = month.AddMonths(1);
+        cutOffDate = new DateTime(cutOffDate.Year, cutOffDate.Month, 1);
         var query = _dbSet
                       .Where(c => c.FiscalPlanId == id)
                       .Include(c => c.Transactions)
@@ -28,26 +30,50 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                       .Select(g => new FiscalPlanDTO
                       {
                           Id = id,
-                          IncomeCategories = g.Where(c => c.CategoryType == 1).Select(c => new CategoryDTO
-                          {
-                              Id = c.Id,
-                              CategoryType = c.CategoryType,
-                              Name = c.Name,
-                              Budget = c.Budget,
-                              BudgetLimit = c.PreviousBudgets.Where(bl => bl.Month <= month.AddMonths(1)).OrderBy(b => b.Month).LastOrDefault(),
-                              Total = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month).Sum(t => t.Amount)
-                          }),
-                          ExpenseCategories = g.Where(c => c.CategoryType == 2).Select(c => new CategoryDTO
-                          {
-                              Id = c.Id,
-                              CategoryType = c.CategoryType,
-                              Name = c.Name,
-                              Budget = c.Budget,
-                              BudgetLimit = c.PreviousBudgets.Where(bl => bl.Month <= month.AddMonths(1)).OrderBy(b => b.Month).LastOrDefault(),
-                              Total = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month).Sum(t => t.Amount),
-                              HappyTotal = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month).Where(t => t.PreviousIsHappy && t.Evaluated || !t.Evaluated && t.IsHappy).Sum(t => t.Amount),
-                              NecessaryTotal = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month).Where(t => t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && t.IsNecessary).Sum(t => t.Amount),
-                          })
+                          IncomeCategories = g.Where(c => c.CategoryType == 1)
+                                              .Select(c => new CategoryDTO
+                                              {
+                                                  Id = c.Id,
+                                                  CategoryType = c.CategoryType,
+                                                  Name = c.Name,
+                                                  Budget = c.Budget, 
+                                                  BudgetLimit = c.PreviousBudgets
+                                                                    .Select(b => new BudgetLimit
+                                                                    {
+                                                                        Budget = b.Budget,
+                                                                        Month = b.Month   
+                                                                    })
+                                                                    .OrderBy(b => b.Month >= cutOffDate)
+                                                                    .ThenBy(b => Math.Abs(EF.Functions.DateDiffDay(cutOffDate, b.Month)))
+                                                                    .FirstOrDefault(),
+                                                  Total = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month)
+                                                                        .Sum(t => t.Amount)
+                                              }),
+                          ExpenseCategories = g.Where(c => c.CategoryType == 2)
+                                               .Select(c => new CategoryDTO
+                                              {
+                                                  Id = c.Id,
+                                                  CategoryType = c.CategoryType,
+                                                  Name = c.Name,
+                                                  Budget = c.Budget,
+                                                  BudgetLimit = c.PreviousBudgets
+                                                                    .Select(c => new BudgetLimit
+                                                                    {
+                                                                        Budget = c.Budget,
+                                                                        Month = c.Month
+                                                                    })
+                                                                    .OrderBy(b => b.Month >= cutOffDate)
+                                                                    .ThenBy(b => Math.Abs(EF.Functions.DateDiffDay(cutOffDate, b.Month)))
+                                                                    .FirstOrDefault(),
+                                                  Total = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month)
+                                                                        .Sum(t => t.Amount),
+                                                  HappyTotal = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month)
+                                                                             .Where(t => t.PreviousIsHappy && t.Evaluated || !t.Evaluated && t.IsHappy)
+                                                                             .Sum(t => t.Amount),
+                                                  NecessaryTotal = c.Transactions.Where(t => t.DateTime.Year == month.Year && t.DateTime.Month == month.Month)
+                                                                                 .Where(t => t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && t.IsNecessary)
+                                                                                 .Sum(t => t.Amount),
+                                              })
                       });
 
         return await query.AsNoTracking().SingleOrDefaultAsync();

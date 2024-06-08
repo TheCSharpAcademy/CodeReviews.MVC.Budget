@@ -1,16 +1,17 @@
-﻿import { Modal } from 'bootstrap';
-import 'country-select-js';
+﻿import { getCountrySelect, importChartDefaults,  importBootstrapModals} from './asyncComponents';
 import 'jquery-validation';
 
-const addFiscalPlanModal = new Modal(document.getElementById("add-fiscalPlan-modal"));
+const chartDefaultsTask = importChartDefaults();
+const modals = importBootstrapModals();
+const countrySelect = getCountrySelect("#country");
+
+
+const addFiscalPlanModal = async () => {
+    await modals;
+    return Modal.GetInstance(document.getElementById("add-fiscalPlan-modal"));
+    };
 const fiscalPlanApi = "https://localhost:7246/api/FiscalPlan";
 
-
-$("#country").countrySelect({
-    defaultCountry: window.userLocale.region.toLowerCase(),
-    preferredCountries: ["at", "us"],
-    responsiveDropdown: true
-});
 
 document.getElementById("country-form").addEventListener('submit', function (event) {
     event.preventDefault();

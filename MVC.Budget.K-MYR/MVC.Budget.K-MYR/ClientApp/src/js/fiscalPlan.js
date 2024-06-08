@@ -1,127 +1,60 @@
-﻿import StatisticsDashboard from './statisticsDashboard';
-import HomeDashboard from './homeDashboard'
-import { shortestAngle, resetStyle } from './utilities';
-import { Modal, Collapse } from 'bootstrap';
+﻿import { shortestAngle, resetStyle } from './utilities';
+import { getCountrySelect, importChartDefaults, importBootstrapModals, importBootstrapCollapses } from './asyncComponents';
 import 'jquery-validation';
-import 'country-select-js';
-import DataTable from 'datatables.net-bs5';
-import 'bootstrap-datepicker';
-import {
-    Chart, BarController, BarElement, DoughnutController, ArcElement, LineController, LineElement,
-    PointElement, CategoryScale, LinearScale, Filler, Legend, Title, Tooltip
-} from 'chart.js';
-Chart.defaults.color = '#ffffff';
-Chart.defaults.scales.linear.min = 0;
-Chart.defaults.plugins.legend.labels.filter = (item) => item.text !== undefined;
-Chart.defaults.plugins.tooltip.filter = (item) => item.label !== "";
 
-Chart.register(
-    BarController, BarElement, DoughnutController, ArcElement, LineController, LineElement,
-    PointElement, CategoryScale, LinearScale, Filler, Legend, Title, Tooltip,
-    {
-        id: "emptypiechart",
-        beforeInit: function (chart) {
-            chart.data.datasets[0].backgroundColor.push('#d2dee2');
-            chart.data.datasets[0].data.push(Number.MIN_VALUE);
-        }
-    });
+const currentDate = new Date();
+const chartDefaultsTask = importChartDefaults();
+const modals = importBootstrapModals();
+const collapses = importBootstrapCollapses();
 
 const incomeCategoriesAPI = "https://localhost:7246/api/IncomeCategories";
 const expenseCategoriesAPI = "https://localhost:7246/api/ExpenseCategories";
 const transactionsAPI = "https://localhost:7246/api/Transactions";
 const fiscalPlanId = document.getElementById("fiscalPlan_Id");
-
 const menu = document.getElementById('menu-container');
+
+const statisticsDashboard = getStatisticsDashboard(fiscalPlanId.value, currentDate);
+const homeDashboard = getHomeDashboard(menu, fiscalPlanId.value, currentDate);
+const transactionsTable = getTransactionsTable();
+const countrySelect = initializeCountrySelect();
+
 const sidebar = document.getElementById("sidebar");
 
-let modal = document.getElementById("add-category-modal")
-const addCategoryModal = new Modal(modal);
-const addCategoryModalType = document.getElementById("addCategory_type");
+const addCategoryModal = document.getElementById("add-category-modal")
+const addCategoryModalType = addCategoryModal.querySelector("#addCategory_type");
 
-modal = document.getElementById("updateCategory-modal")
-const updateCategoryModal = new Modal(modal);
-const updateCategoryModalLabel = modal.querySelector("#updateCategory-label");
-const updateCategoryModalId = modal.querySelector("#updateCategory_id");
-const updateCategoryModalName = modal.querySelector("#updateCategory_name");
-const updateCategoryModalBudget = modal.querySelector("#updateCategory_budget");
-const updateCategoryModalType = modal.querySelector("#updateCategory_type");
+const updateCategoryModal = document.getElementById("updateCategory-modal")
+const updateCategoryModalLabel = updateCategoryModal.querySelector("#updateCategory-label");
+const updateCategoryModalId = updateCategoryModal.querySelector("#updateCategory_id");
+const updateCategoryModalName = updateCategoryModal.querySelector("#updateCategory_name");
+const updateCategoryModalBudget = updateCategoryModal.querySelector("#updateCategory_budget");
+const updateCategoryModalType = updateCategoryModal.querySelector("#updateCategory_type");
 
-modal = document.getElementById("addTransaction-modal")
-const addTransactionModal = new Modal(modal);
-const addTransactionModalCategoryId = modal.querySelector("#addTransaction_categoryId");
-
+const addTransactionModal = document.getElementById("addTransaction-modal")
+const addTransactionModalCategoryId = addTransactionModal.querySelector("#addTransaction_categoryId");
 
 const flipContainer = document.getElementById("flip-container-inner");
 
 const reevaluationContainer = document.getElementById("reevalCategories-container");
 const reevaluatioInfo = document.getElementById("reevalInfo");
 
-$("#country").countrySelect({
-    defaultCountry: window.userLocale.region.toLowerCase(),
-    preferredCountries: ["at", "us"],
-    responsiveDropdown: true
-});
-document.getElementById("country-form").addEventListener('submit', function (event) {
-    event.preventDefault();
-});
-
 var currentSideIndex = 0;
 var currentDeg = 0;
 
+let elements = document.querySelectorAll('.flip-content');
+let observer = new ResizeObserver(entries => {
+    entries.forEach(entry => {
+        let width = entry.contentRect.width;
+        let translateZValue = (width / 2);
+
+        entry.target.style.transform = `rotateY(calc(90deg * var(--s))) translateZ(${translateZValue}px)`;
+    });
+});
+elements.forEach(element => {
+    observer.observe(element);
+});
+
 createReevaluationElements();
-const statisticsDashboard = new StatisticsDashboard();
-const homeDashboard = new HomeDashboard(menu);
-
-const transactionsTable = new DataTable('#transactions-table', {
-    info: false,
-    dom: '<"pb-1" t<"d-flex justify-content-between mt-3"<"pt-1"l>p>>',
-    columns: [
-        { data: 'title' }, { data: 'dateTime' }, { data: 'amount' }, { data: 'category' }, {
-            data: null,
-            defaultContent:
-                `<svg  width='20' height='20' fill='rgba(255, 255, 255, 1)' class='me-1' viewBox='0 0 16 16'>
-                    <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z'/>
-                    <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z'>
-                </svg >
-                <svg width="20" height="20" fill="rgba(255, 255, 255, 1)" viewBox="0 0 16 16">
-                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                  <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                </svg>`,
-            targets: -1,
-            sortable: false
-        },
-    ],
-    columnDefs: [{
-        targets: 2,
-        render: function (data, type, row) {
-            if (type === 'display') {
-                return window.userNumberFormat.format(data);
-            } else {
-                return data;
-            }
-        }
-    }, {
-        targets: 1,
-        render: function (data, type, row) {
-            if (type === 'display') {
-                return new Date(data).toLocaleString(window.userLocale);
-            } else {
-                return data;
-            }
-        }
-    }],
-    scrollX: true,
-    scrollCollapse: true
-});
-const statisticsYearPicker = $("#statistics-yearSelector").datepicker({
-    format: 'yyyy',
-    minViewMode: 'years',
-    autoclose: true
-}).on('changeDate', async function () {
-    statisticsDashboard.refresh(fiscalPlanId.value, $(this).datepicker('getDate').getFullYear());
-});
-
-statisticsYearPicker.datepicker('setDate', new Date());
 
 $('.yearPicker .calendar-button').on('click', function () {
     let input = $(this).siblings('.yearSelector');
@@ -129,17 +62,6 @@ $('.yearPicker .calendar-button').on('click', function () {
         input.datepicker('show');
     }
 });
-
-const homeMonthPicker = $("#home-monthSelector").datepicker({
-    format: 'MM yyyy',
-    startView: 'months',
-    minViewMode: 'months',
-    autoclose: true
-}).on('changeDate', async function () {
-    homeDashboard.refresh(fiscalPlanId.value, $(this).datepicker('getUTCDate').toISOString());
-});;
-
-homeMonthPicker.datepicker('setDate', new Date());
 
 $('.monthPicker .calendar-button').on('click', function () {
     let input = $(this).siblings('.monthSelector');
@@ -154,14 +76,6 @@ document.getElementById("sidebar-caret").addEventListener("click", () => {
 });
 */
 
-transactionsTable.on('click', 'svg', function () {
-    var row = transactionsTable.row($(this).parents('tr'));
-    var data = row.data();
-});
-
-const collapseElementList = document.querySelectorAll('.collapse')
-const collapseList = [...collapseElementList].map(collapseElement => new Collapse(collapseElement, { toggle: false }))
-
 $(".accordion-head").on("click", function (event) {
     if (event.target.closest("svg.add-icon")) {
         var type = $(this).closest('.accordion')[0].dataset.type;
@@ -175,7 +89,6 @@ $(".accordion-head").on("click", function (event) {
         caret.classList.toggle("rotate");
     }
 });
-
 $('#add-category-form').on("submit", async function (event) {
     event.preventDefault();
     if ($(this).valid()) {
@@ -183,7 +96,6 @@ $('#add-category-form').on("submit", async function (event) {
         await addCategory(new FormData(this));
     }
 });
-
 $('#add-transaction-form').on("submit", async function (event) {
     event.preventDefault();
     if ($(this).valid()) {
@@ -191,7 +103,6 @@ $('#add-transaction-form').on("submit", async function (event) {
         await addTransaction(new FormData(this));
     }
 });
-
 $('#update-category-form').on("submit", async function (event) {
     event.preventDefault();
     if ($(this).valid()) {
@@ -199,11 +110,10 @@ $('#update-category-form').on("submit", async function (event) {
         await updateCategory(new FormData(this));
     } S
 });
-
 $('#search-form').on("submit", async function (event) {
     event.preventDefault();
     if ($(this).valid()) {
-        await populateTable(new FormData(this));
+        await getTableData(new FormData(this));
     }
 });
 
@@ -214,12 +124,10 @@ document.getElementById('close-menu').onclick = function () {
     borderBox.classList.remove('border-rotate');
     menu.dataset.categoryid = 0;
 };
-
 document.getElementById('add-menu').onclick = function () {
     addTransactionModalCategoryId.value = menu.dataset.categoryid;
     addTransactionModal.show();
 };
-
 document.getElementById('edit-menu').onclick = function () {
     var category = document.getElementById(`category_${menu.dataset.categoryid}`);
 
@@ -231,7 +139,6 @@ document.getElementById('edit-menu').onclick = function () {
 
     updateCategoryModal.show();
 };
-
 document.getElementById('delete-menu').onclick = function () {
     var token = menu.querySelector('input').value;
     var id = menu.dataset.categoryid;
@@ -241,12 +148,10 @@ document.getElementById('delete-menu').onclick = function () {
         menu.dataset.categoryid = 0;
     }
 };
-
 document.getElementById('details-menu').onclick = function () {
     var id = menu.dataset.categoryid;
     window.location.href = "Category/" + id;
 };
-
 $('#action-sidebar').on("click", '.sidebar-button-container', async function (event) {
     if (currentSideIndex === this.dataset.index) {
         return;
@@ -450,7 +355,7 @@ async function deleteCategory(id, type, token) {
     }
 }
 
-async function populateTable(data) {
+async function getTableData(data) {
     try {
         let params = new URLSearchParams();
 
@@ -468,11 +373,12 @@ async function populateTable(data) {
 
         if (response.ok) {
             var data = await response.json();
-            transactionsTable.clear();
-            transactionsTable.rows.add(data);
-            transactionsTable.draw();
+            let table = await transactionsTable;
+            table.clear();
+            table.rows.add(data);
+            table.draw();
         } else {
-            transactionsTable.clear();
+            table.clear();
             console.error(`HTTP GET Error: ${response.status}`);
         }
 
@@ -480,6 +386,7 @@ async function populateTable(data) {
         console.error(error);
     }
 }
+
 function createEvaluationElement(category) {
     var accordion = document.createElement("div");
     accordion.classList.add("accordion");
@@ -744,5 +651,95 @@ function toggleReevaluationInfo() {
     } else {
         reevaluatioInfo.style.display = 'none';
     }
+}
+
+async function getTransactionsTable() {
+    const { default: DataTable } = await import(/* webpackChunkName: "datatables" */'datatables.net-bs5');
+    let dataTable = new DataTable('#transactions-table', {
+        info: false,
+        dom: '<"pb-1" t<"d-flex justify-content-between mt-3"<"pt-1"l>p>>',
+        columns: [
+            { data: 'title' }, { data: 'dateTime' }, { data: 'amount' }, { data: 'category' }, {
+                data: null,
+                defaultContent:
+                `<svg  width='20' height='20' fill='rgba(255, 255, 255, 1)' class='me-2 table-icon' viewBox='0 0 16 16'>
+                    <defs>
+                    <linearGradient id="icon_gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#CCFBE5;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#A2D6CB;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#7EB1B1;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                    <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z'/>
+                    <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z'>
+                </svg >
+                <svg width="20" height="20" fill="rgba(255, 255, 255, 1)" viewBox="0 0 16 16" class="table-icon">
+                <defs>
+                    <linearGradient id="icon_gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#CCFBE5;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#A2D6CB;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#7EB1B1;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                  <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                </svg>`,
+                targets: -1,
+                sortable: false
+            },
+        ],
+        columnDefs: [{
+            targets: 2,
+            render: function (data, type, row) {
+                if (type === 'display') {
+                    return window.userNumberFormat.format(data);
+                } else {
+                    return data;
+                }
+            }
+        }, {
+            targets: 1,
+            render: function (data, type, row) {
+                if (type === 'display') {
+                    return new Date(data).toLocaleString(window.userLocale);
+                } else {
+                    return data;
+                }
+            }
+        }],
+        scrollX: true,
+        scrollCollapse: true
+    });
+    dataTable.on('click', 'svg', function () {
+        var row = transactionsTable.row($(this).parents('tr'));
+        var data = row.data();
+        console.log(data);
+    });
+    return dataTable;
+
+}
+
+async function getStatisticsDashboard(id, date) {
+    await chartDefaultsTask;
+    const { default: StatisticsDashboard } = await import(/* webpackChunkName: "statisticsDashboard" */'./statisticsDashboard');
+  
+    return new StatisticsDashboard(id, date);
+
+}
+
+async function getHomeDashboard(menu, id, date) {
+    await chartDefaultsTask;
+    const { default: HomeDashboard } = await import(/* webpackChunkName: "homeDashboard" */'./homeDashboard');
+
+    return new HomeDashboard(menu, id, date);
+
+} 
+
+async function initializeCountrySelect() {
+    let countrySelect = await getCountrySelect("#country");
+    countrySelect.on('change', () => {
+        let data = countrySelect.countrySelect("getSelectedCountryData");
+        console.log(window.userNumberFormat, window.userLocale, data);
+    });
 }
 

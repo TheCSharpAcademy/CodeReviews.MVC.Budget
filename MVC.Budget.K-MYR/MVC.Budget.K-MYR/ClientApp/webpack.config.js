@@ -36,35 +36,60 @@ module.exports = {
             }
         ]
     },
-    optimization: {  
+    optimization: {
         minimize: false,
-        minimizer: ['...' , new CssMinimizerPlugin()],
-        splitChunks: {            
-            cacheGroups: {    
+        minimizer: ['...', new CssMinimizerPlugin()],
+        splitChunks: {
+            cacheGroups: {
                 styles: {
                     type: "css/mini-extract",
                     chunks: 'all',
                     enforce: true,
+                    reuseExistingChunk: true,
                     name(module, chunks, cacheGroupKey) {
                         const allChunksNames = chunks.map((item) => item.name).join('~');
                         return `${cacheGroupKey}-${allChunksNames}`;
-                    },  
+                    },
                 },
                 defaultVendors: {
                     test: /[\\/]node_modules[\\/]/,
-                    chunks: 'all',
+                    chunks: 'initial',
                     priority: -10,
                     reuseExistingChunk: true,
-                    name(module, chunks, cacheGroupKey) {                        
-                        const allChunksNames = chunks.map((item) => item.name).join('~');
-                        return `vendors-${allChunksNames}`;
-                    },                   
+                    name(module, chunks, cacheGroupKey) {
+                        let allChunksNames = chunks.map((item) => item.name).join('~');
+                        return `vendors${allChunksNames.length > 0 ? `-${allChunksNames}` : ""}`;
+                    },
+                    filename: (pathData) => {
+                        return `${pathData.chunk.name}.js`;
+                    },
                 },
                 default: {
-                    chunks: 'all',
+                    chunks: 'initial',
                     minChunks: 2,
                     priority: -20,
                     reuseExistingChunk: true,
+                    name(module, chunks, cacheGroupKey) {
+                        let allChunksNames = chunks.map((item) => item.name).join('~');
+                        return `vendors${allChunksNames.length > 0 ? `-${allChunksNames}` : ""}`;
+                    },
+                    filename: (pathData) => {
+                        return `${pathData.chunk.name}.js`;
+                    },
+                },                
+                async: {
+                    chunks: 'async',
+                    enforce: true,
+                    priority: -30,
+                    reuseExistingChunk: true,
+                    name(module, chunks, cacheGroupKey) {
+                        let allChunksNames = chunks.map((item) => item.name).join('~');
+                        return `async-${allChunksNames}`;
+                    },
+
+                    filename: (pathData) => {
+                        return `[name].js`;
+                    },
                 },
             }
         }

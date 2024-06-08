@@ -9,6 +9,6 @@
         public decimal Total { get; set; }
         public decimal HappyTotal { get; set; }
         public decimal NecessaryTotal { get; set; }
-        public CategoryBudget? BudgetLimit { get; internal set; }
+        public BudgetLimit? BudgetLimit { get; internal set; }
     }
 }
