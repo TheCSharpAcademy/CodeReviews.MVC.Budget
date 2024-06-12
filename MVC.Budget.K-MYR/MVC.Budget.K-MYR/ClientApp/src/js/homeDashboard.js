@@ -6,7 +6,7 @@ export default class HomeDashboard {
     #data;
     #isLoading;
     #initPromise;
-    #monthPicker
+    #monthPicker;
     #sentimentChartMonthly;
     #necessityChartMonthly;
     #overspendingHeading;
@@ -25,8 +25,8 @@ export default class HomeDashboard {
 
     async #init(id, date) {
         try {
-            let self = this;
             this.#isLoading = true;
+            let self = this;
 
             this.#sentimentChartMonthly = new Chart(document.getElementById('sentimentChart'), {
                 type: 'doughnut',
@@ -115,7 +115,7 @@ export default class HomeDashboard {
             this.#incomeAccordionBody = document.getElementById('incomeAccordionBody');
 
             this.#expenseBalanceHeader = document.getElementById('expensesBalanceHeader');
-            this.#expenseAccordionBody = document.getElementById('expensesAccordionBody');
+            this.#expenseAccordionBody = document.getElementById('expensesAccordionBody');           
 
             this.#monthPicker = await getDatePicker("#home-monthSelector", "month");
             this.#monthPicker.datepicker('setDate', date.toISOString());
@@ -131,9 +131,7 @@ export default class HomeDashboard {
 
             if (data) {
                 let hasUpdated = this.#updateCharts(data);
-                let hasCreated = this.#createCategoryElements(data);
-                hasUpdated;
-                hasCreated;
+                let hasCreated = this.#createCategoryElements(data);        
             }
         } finally {
             this.#isLoading = false;
@@ -143,7 +141,6 @@ export default class HomeDashboard {
     async refresh(id, date) {        
         try {
             if (this.#isLoading) {
-                console.log("Dashboard is loading...")
                 return false;
             }
 

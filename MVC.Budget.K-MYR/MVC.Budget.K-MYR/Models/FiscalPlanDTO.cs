@@ -11,7 +11,7 @@ namespace MVC.Budget.K_MYR.Models
         public decimal ExpensesHappyTotal { get; set; }
         public decimal ExpensesBudget { get; set; }
         public decimal ExpensesTotal { get; set; }
-        public IEnumerable<CategoryDTO> IncomeCategories { get; set; }
-        public IEnumerable<CategoryDTO> ExpenseCategories { get; set; }
+        public IEnumerable<CategoryDTO> IncomeCategories { get; set; } = [];
+        public IEnumerable<CategoryDTO> ExpenseCategories { get; set; } = [];
     }
 }

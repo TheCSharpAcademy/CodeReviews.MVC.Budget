@@ -4,8 +4,6 @@ import 'jquery-validation';
 
 const currentDate = new Date();
 const chartDefaultsTask = importChartDefaults();
-const modals = importBootstrapModals();
-const collapses = importBootstrapCollapses();
 
 const incomeCategoriesAPI = "https://localhost:7246/api/IncomeCategories";
 const expenseCategoriesAPI = "https://localhost:7246/api/ExpenseCategories";
@@ -13,30 +11,122 @@ const transactionsAPI = "https://localhost:7246/api/Transactions";
 const fiscalPlanId = document.getElementById("fiscalPlan_Id");
 const menu = document.getElementById('menu-container');
 
-const statisticsDashboard = getStatisticsDashboard(fiscalPlanId.value, currentDate);
-const homeDashboard = getHomeDashboard(menu, fiscalPlanId.value, currentDate);
-const transactionsTable = getTransactionsTable();
-const countrySelect = initializeCountrySelect();
-
-const sidebar = document.getElementById("sidebar");
-
-const addCategoryModal = document.getElementById("add-category-modal")
+const addCategoryModal = document.getElementById("addCategory-modal")
 const addCategoryModalType = addCategoryModal.querySelector("#addCategory_type");
-
 const updateCategoryModal = document.getElementById("updateCategory-modal")
 const updateCategoryModalLabel = updateCategoryModal.querySelector("#updateCategory-label");
 const updateCategoryModalId = updateCategoryModal.querySelector("#updateCategory_id");
 const updateCategoryModalName = updateCategoryModal.querySelector("#updateCategory_name");
 const updateCategoryModalBudget = updateCategoryModal.querySelector("#updateCategory_budget");
 const updateCategoryModalType = updateCategoryModal.querySelector("#updateCategory_type");
-
 const addTransactionModal = document.getElementById("addTransaction-modal")
 const addTransactionModalCategoryId = addTransactionModal.querySelector("#addTransaction_categoryId");
-
 const flipContainer = document.getElementById("flip-container-inner");
-
 const reevaluationContainer = document.getElementById("reevalCategories-container");
 const reevaluatioInfo = document.getElementById("reevalInfo");
+
+const statisticsDashboard = getStatisticsDashboard(fiscalPlanId.value, currentDate).then((statisticsDashboard) => {
+    $('.monthPicker .calendar-button').on('click', function () {
+        let input = $(this).siblings('.monthSelector');
+        if (!input.data('datepicker').picker.is(':visible')) {
+            input.datepicker('show');
+        }
+    });
+    return statisticsDashboard;
+} );
+const homeDashboard = getHomeDashboard(menu, fiscalPlanId.value, currentDate).then((homeDashboard) => {
+    $('.yearPicker .calendar-button').on('click', function () {
+        let input = $(this).siblings('.yearSelector');
+        if (!input.data('datepicker').picker.is(':visible')) {
+            input.datepicker('show');
+        }
+    });
+    return homeDashboard;
+});;
+const transactionsTable = getTransactionsTable();
+const countrySelect = initializeCountrySelect();
+const modals = importBootstrapModals().then((modalsArray) => {
+    let addCategoryModal = modalsArray.find(m => m._element.id == "addCategory-modal")
+    let addTransactionModal = modalsArray.find(m => m._element.id == "addTransaction-modal")
+    let updateCategoryModal = modalsArray.find(m => m._element.id == "updateCategory-modal")
+
+    $('#add-category-form').on("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            addCategoryModal.hide();
+            await addCategory(new FormData(this));
+        }
+    });
+    $('#add-transaction-form').on("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            addTransactionModal.hide();
+            await addTransaction(new FormData(this));
+        }
+    });
+    $('#update-category-form').on("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            updateCategoryModal.hide();
+            await updateCategory(new FormData(this));
+        }
+    });
+
+    document.getElementById('close-menu').onclick = function () {
+        menu.classList.remove('active');
+        var id = menu.dataset.categoryid;
+        var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
+        borderBox.classList.remove('border-rotate');
+        menu.dataset.categoryid = 0;
+    };
+    document.getElementById('add-menu').onclick = async function () {
+        addTransactionModalCategoryId.value = menu.dataset.categoryid;
+        addTransactionModal.show();
+    };
+    document.getElementById('edit-menu').onclick = function () {
+        var category = document.getElementById(`category_${menu.dataset.categoryid}`);
+
+        updateCategoryModalLabel.textContent = category.dataset.name;
+        updateCategoryModalId.value = category.dataset.id;
+        updateCategoryModalName.value = category.dataset.name;
+        updateCategoryModalBudget.value = category.dataset.budget;
+        updateCategoryModalType.value = category.dataset.type;
+
+        updateCategoryModal.show();
+    };
+    document.getElementById('delete-menu').onclick = function () {
+        var token = menu.querySelector('input').value;
+        var id = menu.dataset.categoryid;
+        var type = menu.dataset.type;
+        if (deleteCategory(id, type, token)) {
+            menu.classList.remove('active');
+            menu.dataset.categoryid = 0;
+        }
+    };
+    document.getElementById('details-menu').onclick = function () {
+        var id = menu.dataset.categoryid;
+        window.location.href = "Category/" + id;
+    };
+    return modalsArray
+});
+const collapses = importBootstrapCollapses().then(async function (collapses) {
+    let modalsArray = await modals;    
+    let modal = modalsArray.find(m => m._element.id == "addCategory-modal")
+    $(".accordion-head").on("click", function (event) {
+        if (event.target.closest("svg.add-icon")) {
+            let type = $(this).closest('.accordion')[0].dataset.type;
+            addCategoryModalType.value = type;
+            modal.show();
+        }
+
+        else {            
+            collapses.find(c => c._element.id == this.nextElementSibling.id).toggle();
+            let caret = $('.accordion-caret', this)[0];
+            caret.classList.toggle("rotate");
+        }
+    });
+    return collapses;
+});
 
 var currentSideIndex = 0;
 var currentDeg = 0;
@@ -56,60 +146,6 @@ elements.forEach(element => {
 
 createReevaluationElements();
 
-$('.yearPicker .calendar-button').on('click', function () {
-    let input = $(this).siblings('.yearSelector');
-    if (!input.data('datepicker').picker.is(':visible')) {
-        input.datepicker('show');
-    }
-});
-
-$('.monthPicker .calendar-button').on('click', function () {
-    let input = $(this).siblings('.monthSelector');
-    if (!input.data('datepicker').picker.is(':visible')) {
-        input.datepicker('show');
-    }
-});
-
-/*
-document.getElementById("sidebar-caret").addEventListener("click", () => {
-    sidebar.classList.toggle('collapsed');
-});
-*/
-
-$(".accordion-head").on("click", function (event) {
-    if (event.target.closest("svg.add-icon")) {
-        var type = $(this).closest('.accordion')[0].dataset.type;
-        addCategoryModalType.value = type;
-        addCategoryModal.show();
-    }
-
-    else {
-        Collapse.getInstance($(this).next()).toggle();
-        var caret = $('.accordion-caret', this)[0];
-        caret.classList.toggle("rotate");
-    }
-});
-$('#add-category-form').on("submit", async function (event) {
-    event.preventDefault();
-    if ($(this).valid()) {
-        addCategoryModal.hide();
-        await addCategory(new FormData(this));
-    }
-});
-$('#add-transaction-form').on("submit", async function (event) {
-    event.preventDefault();
-    if ($(this).valid()) {
-        addTransactionModal.hide();
-        await addTransaction(new FormData(this));
-    }
-});
-$('#update-category-form').on("submit", async function (event) {
-    event.preventDefault();
-    if ($(this).valid()) {
-        updateCategoryModal.hide();
-        await updateCategory(new FormData(this));
-    } S
-});
 $('#search-form').on("submit", async function (event) {
     event.preventDefault();
     if ($(this).valid()) {
@@ -117,41 +153,6 @@ $('#search-form').on("submit", async function (event) {
     }
 });
 
-document.getElementById('close-menu').onclick = function () {
-    menu.classList.remove('active');
-    var id = menu.dataset.categoryid;
-    var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
-    borderBox.classList.remove('border-rotate');
-    menu.dataset.categoryid = 0;
-};
-document.getElementById('add-menu').onclick = function () {
-    addTransactionModalCategoryId.value = menu.dataset.categoryid;
-    addTransactionModal.show();
-};
-document.getElementById('edit-menu').onclick = function () {
-    var category = document.getElementById(`category_${menu.dataset.categoryid}`);
-
-    updateCategoryModalLabel.textContent = category.dataset.name;
-    updateCategoryModalId.value = category.dataset.id;
-    updateCategoryModalName.value = category.dataset.name;
-    updateCategoryModalBudget.value = category.dataset.budget;
-    updateCategoryModalType.value = category.dataset.type;
-
-    updateCategoryModal.show();
-};
-document.getElementById('delete-menu').onclick = function () {
-    var token = menu.querySelector('input').value;
-    var id = menu.dataset.categoryid;
-    var type = menu.dataset.type;
-    if (deleteCategory(id, type, token)) {
-        menu.classList.remove('active');
-        menu.dataset.categoryid = 0;
-    }
-};
-document.getElementById('details-menu').onclick = function () {
-    var id = menu.dataset.categoryid;
-    window.location.href = "Category/" + id;
-};
 $('#action-sidebar').on("click", '.sidebar-button-container', async function (event) {
     if (currentSideIndex === this.dataset.index) {
         return;
@@ -654,7 +655,7 @@ function toggleReevaluationInfo() {
 }
 
 async function getTransactionsTable() {
-    const { default: DataTable } = await import(/* webpackChunkName: "datatables" */'datatables.net-bs5');
+    const { default: DataTable, row, data } = await import(/* webpackChunkName: "datatables" */'datatables.net-bs5');
     let dataTable = new DataTable('#transactions-table', {
         info: false,
         dom: '<"pb-1" t<"d-flex justify-content-between mt-3"<"pt-1"l>p>>',
@@ -711,12 +712,11 @@ async function getTransactionsTable() {
         scrollCollapse: true
     });
     dataTable.on('click', 'svg', function () {
-        var row = transactionsTable.row($(this).parents('tr'));
+        var row = dataTable.row($(this).parents('tr'));
         var data = row.data();
         console.log(data);
     });
     return dataTable;
-
 }
 
 async function getStatisticsDashboard(id, date) {
@@ -742,4 +742,3 @@ async function initializeCountrySelect() {
         console.log(window.userNumberFormat, window.userLocale, data);
     });
 }
-

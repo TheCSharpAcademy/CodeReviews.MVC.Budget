@@ -36,8 +36,8 @@ public class FiscalPlansService : IFiscalPlansService
         return new FiscalPlanDTO
         {
             Id = id,
-            IncomeCategories = categorieData?.IncomeCategories ?? [],
-            ExpenseCategories = categorieData?.ExpenseCategories ?? [],
+            IncomeCategories = categorieData?.IncomeCategories?.OrderBy(c => c.Name)?.ToList() ?? [],
+            ExpenseCategories = categorieData?.ExpenseCategories?.OrderBy(c => c.Name)?.ToList() ?? [],
             ExpensesTotal = categorieData?.ExpenseCategories.Sum(c => c.Total) ?? 0,
             ExpensesBudget = categorieData?.ExpenseCategories.Sum(c => c.BudgetLimit?.Budget ?? c.Budget) ?? 0,
             ExpensesHappyTotal = categorieData?.ExpenseCategories.Sum(c => c.HappyTotal) ?? 0,

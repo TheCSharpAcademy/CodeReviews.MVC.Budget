@@ -413,12 +413,10 @@ export default class StatisticsDashboard {
                         emptypiechart: false,
                     }
                 }
-            });
-
-            
+            });            
 
             let data = await this.#getData(id, year);
-            await this.#updateCharts(data);
+            this.#updateCharts(data);
 
         } finally {
             this.#isLoading = false;

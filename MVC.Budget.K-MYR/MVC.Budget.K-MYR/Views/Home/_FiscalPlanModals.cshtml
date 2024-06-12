@@ -1,7 +1,7 @@
 ﻿@model MVC.Budget.K_MYR.Models.FiscalPlan;
 
 <section id="fiscalPlan-modals">
-    <div class="modal fade" id="add-fiscalPlan-modal" tabindex="-1" aria-labelledby="add-fiscalPlan-label" aria-hidden="true">
+    <div class="modal fade" id="addFiscalPlan-modal" tabindex="-1" aria-labelledby="add-fiscalPlan-label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -9,7 +9,7 @@
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="add-fiscalPlan-form" method="POST">
+                    <form id="addFiscalPlan-form" method="POST">
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
                             <input asp-for="Name" class="form-control" />
@@ -32,7 +32,7 @@
                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="update-fiscalPlan-form">
+                    <form id="updateFiscalPlan-form">
                         <input type="hidden" asp-for="Id" value="" id="updateFiscalPlan_id" />
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
