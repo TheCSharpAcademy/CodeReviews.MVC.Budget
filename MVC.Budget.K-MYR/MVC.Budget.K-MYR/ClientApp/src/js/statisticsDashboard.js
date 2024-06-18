@@ -411,12 +411,27 @@ export default class StatisticsDashboard {
                     },
                     plugins: {
                         emptypiechart: false,
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
+
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += window.userNumberFormat.format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
                     }
                 }
             });            
 
             let data = await this.#getData(id, year);
-            this.#updateCharts(data);
+            this.#renderData(data);
 
         } finally {
             this.#isLoading = false;
@@ -432,7 +447,7 @@ export default class StatisticsDashboard {
 
             this.#isLoading = true;
             let data = await this.#getData(id, year);
-            this.#updateCharts(data);
+            this.#renderData(data);
         } finally {
             this.#isLoading = false;
         }
@@ -456,7 +471,20 @@ export default class StatisticsDashboard {
         }
     }
 
-    #updateCharts(data) {
+    rerenderDashboard() {
+        try {
+            if (this.#isLoading) {
+                console.log("Dashboard is loading...")
+                return false;
+            }
+
+            this.#renderData();
+        } finally {
+            this.#isLoading = false;
+        }
+    }
+
+    #renderData(data) {
         let dataObj = data ?? this.#data;
 
         if (dataObj == null) {

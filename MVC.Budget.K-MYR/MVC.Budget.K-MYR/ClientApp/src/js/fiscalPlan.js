@@ -1,4 +1,4 @@
-﻿import { shortestAngle, resetStyle } from './utilities';
+﻿import { shortestAngle, resetStyle, getLocaleAndNumberFormat } from './utilities';
 import { getCountrySelect, importChartDefaults, importBootstrapModals, importBootstrapCollapses } from './asyncComponents';
 import 'jquery-validation';
 
@@ -43,7 +43,6 @@ const homeDashboard = getHomeDashboard(menu, fiscalPlanId.value, currentDate).th
     });
     return homeDashboard;
 });;
-const transactionsTable = getTransactionsTable();
 const countrySelect = initializeCountrySelect();
 const modals = importBootstrapModals().then((modalsArray) => {
     let addCategoryModal = modalsArray.find(m => m._element.id == "addCategory-modal")
@@ -127,6 +126,7 @@ const collapses = importBootstrapCollapses().then(async function (collapses) {
     });
     return collapses;
 });
+const transactionsTable = getTransactionsTable();
 
 var currentSideIndex = 0;
 var currentDeg = 0;
@@ -258,7 +258,10 @@ async function reevaluateTransaction(data, transactionElement, accordionBody, ac
 
 async function getFilteredCategories() {
     try {
-        var response = await fetch(`${incomeCategoriesAPI}/filteredByEvaluation`, {
+        let queryParams = new URLSearchParams({
+           FiscalPlanId: fiscalPlanId.value
+        });
+        var response = await fetch(`${incomeCategoriesAPI}/filteredByEvaluation?${queryParams}`, {
             method: "GET"
         });
 
@@ -304,8 +307,11 @@ async function addCategory(data) {
 
 async function updateCategory(data) {
     try {
-        var id = parseInt(data.get("Id"));
-        var response = await fetch(`${data.get("type") == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}/${id}?Month=${homeMonthPicker.datepicker('getUTCDate').toISOString()}`, {
+        var id = parseInt(data.get("Id"));     
+        let queryParams = new URLSearchParams({
+            Month: homeMonthPicker.datepicker('getUTCDate').toISOString()
+        });
+        var response = await fetch(`${data.get("type") == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}/${id}?${queryParams}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -738,7 +744,7 @@ async function getHomeDashboard(menu, id, date) {
 async function initializeCountrySelect() {
     let countrySelect = await getCountrySelect("#country");
     countrySelect.on('change', () => {
-        let data = countrySelect.countrySelect("getSelectedCountryData");
-        console.log(window.userNumberFormat, window.userLocale, data);
+        let iso2Code = countrySelect.countrySelect("getSelectedCountryData").iso2;
+       
     });
 }

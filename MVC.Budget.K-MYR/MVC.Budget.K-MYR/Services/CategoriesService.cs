@@ -1,5 +1,4 @@
-﻿using MVC.Budget.K_MYR.API;
-using MVC.Budget.K_MYR.Data;
+﻿using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
 using System.Linq.Expressions;
 
@@ -31,12 +30,12 @@ public class CategoriesService : ICategoriesService
         return _unitOfWork.CategoriesRepository.GetByID(id);
     }
 
-    public Task<List<Category>> GetCategoriesWithUnevaluatedTransactions()
+    public Task<List<Category>> GetCategoriesWithUnevaluatedTransactions(int fiscalPlanId)
     {
         var cutoffDate = DateTime.UtcNow.AddDays(-14);
 
         return _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
-                c => c.FiscalPlanId == 2,
+                c => c.FiscalPlanId == fiscalPlanId,
                 q => q.OrderBy(c => c.Name),
                 c => c.Transactions.Where(t => t.Evaluated == false && t.DateTime < cutoffDate)
                     .OrderByDescending(d => d.DateTime));

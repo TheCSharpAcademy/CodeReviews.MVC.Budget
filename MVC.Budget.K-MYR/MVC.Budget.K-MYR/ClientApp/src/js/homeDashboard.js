@@ -130,7 +130,7 @@ export default class HomeDashboard {
             this.#expenseBalanceHeader.textContent = `${window.userNumberFormat.format(data.expensesTotal)} / ${window.userNumberFormat.format(data.expensesBudget)}`;
 
             if (data) {
-                let hasUpdated = this.#updateCharts(data);
+                let hasUpdated = this.#renderData(data);
                 let hasCreated = this.#createCategoryElements(data);        
             }
         } finally {
@@ -141,18 +141,19 @@ export default class HomeDashboard {
     async refresh(id, date) {        
         try {
             if (this.#isLoading) {
+                console.log("Dashboard is loading...")
                 return false;
             }
 
             this.#isLoading = true;
             let data = await this.#getData(id, date);
-            this.#updateCharts(data);
+            this.#renderData(data);
             this.#updateCategories(data.incomeCategories)
             this.#updateCategories(data.expenseCategories)
         } finally {
             this.#isLoading = false;
         }
-    }
+    }   
 
     async #getData(id, date) {
         try {
@@ -172,7 +173,20 @@ export default class HomeDashboard {
         }
     }
 
-    #updateCharts(data) {
+    rerenderDashboard() {
+        try {
+            if (this.#isLoading) {
+                console.log("Dashboard is loading...")
+                return false;
+            }
+
+            this.#renderData();
+        } finally {
+            this.#isLoading = false;
+        }
+    }
+
+    #renderData(data) {
         let dataObj = data ?? this.#data;       
 
         if (dataObj == null) {
@@ -205,21 +219,12 @@ export default class HomeDashboard {
     }
 
     #updateCategory(category) {
-        let categoryElement;
-
         if (!category) {
             return false;
         }
 
-        switch (category.categoryType) {
-            case 1:
-                categoryElement = this.#incomeAccordionBody.querySelector(`#category_${category.id}`);
-
-                break;
-            case 2:
-                categoryElement = this.#expenseAccordionBody.querySelector(`#category_${category.id}`);
-                break;
-        }
+        let accordion = category.categoryType == 1 ? this.#incomeAccordionBody : this.#expenseAccordionBody;
+        let categoryElement = accordion.querySelector(`#category_${category.id}`);
 
         if (!categoryElement) {
             return false;
@@ -347,22 +352,17 @@ export default class HomeDashboard {
         progressBarDiv.ariaValuemin = '0';
         progressBarDiv.ariaValuemax = '100';
 
-        // Append progress-bar div to progress div
         progressDiv.appendChild(progressBarDiv);
 
-        // Append category-body div and progress div to content div
         contentDiv.appendChild(categoryBodyDiv);
         contentDiv.appendChild(progressDiv);
 
-        // Create border-animation div
         let borderAnimationDiv = document.createElement('div');
         borderAnimationDiv.className = 'border-animation';
 
-        // Append content div and border-animation div to border-container div
         borderContainerDiv.appendChild(contentDiv);
         borderContainerDiv.appendChild(borderAnimationDiv);
 
-        // Append border-container div to main div
         mainDiv.appendChild(borderContainerDiv);
 
         return mainDiv;

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Models;
 using MVC.Budget.K_MYR.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace MVC.Budget.K_MYR.API;
 
@@ -33,9 +34,9 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
     }
 
     [HttpGet("filteredByEvaluation")]
-    public async Task<ActionResult<List<Category>>> GetCategoriesWithUnevaluatedTransactions()
+    public async Task<ActionResult<List<Category>>> GetCategoriesWithUnevaluatedTransactions([FromQuery][Required]int fiscalPlanId)
     {
-        return Ok(await _categoriesService.GetCategoriesWithUnevaluatedTransactions());
+        return Ok(await _categoriesService.GetCategoriesWithUnevaluatedTransactions(fiscalPlanId));
     }
 
     [HttpPost]
