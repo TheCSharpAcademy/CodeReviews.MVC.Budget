@@ -6,6 +6,7 @@ import { getDatePicker } from './asyncComponents'
 export default class StatisticsDashboard {
     #data;
     #initPromise;
+    #apiUrl;
     #isLoading;
     #yearPicker
     #sentimentChartYearly;
@@ -16,8 +17,9 @@ export default class StatisticsDashboard {
     #totalSpentChart;
     #overspendingHeading; 
 
-    constructor(id, year) {
+    constructor(id, year, apiUrl) {
         this.#data = null;
+        this.#apiUrl = apiUrl;
         this.#initPromise = this.#init(id, year);
     }
 
@@ -433,6 +435,15 @@ export default class StatisticsDashboard {
             let data = await this.#getData(id, year);
             this.#renderData(data);
 
+            $('.yearPicker .calendar-button').on('click', function () {
+                let input = $(this).siblings('.yearSelector');
+                if (!input.data('datepicker').picker.is(':visible')) {
+                    input.datepicker('show');
+                } else {
+                    input.datepicker('hide');
+                }
+            });
+
         } finally {
             this.#isLoading = false;
         }
@@ -455,7 +466,7 @@ export default class StatisticsDashboard {
 
     async #getData(id, year) {
         try {
-            let response = await fetch(`https://localhost:7246/api/FiscalPlan/${id}/${year.getFullYear()}`, {
+            let response = await fetch(`${this.#apiUrl}/${id}/${year.getFullYear()}`, {
                 method: "GET"
             });
 

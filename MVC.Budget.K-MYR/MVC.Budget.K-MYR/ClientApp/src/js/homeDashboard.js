@@ -3,6 +3,7 @@ Chart.register(DoughnutController, ArcElement);
 import { getDatePicker } from './asyncComponents'
 
 export default class HomeDashboard {
+    #apiURL
     #data;
     #isLoading;
     #initPromise;
@@ -17,9 +18,10 @@ export default class HomeDashboard {
     #menu;
 
 
-    constructor(menu, id, date) {
+    constructor(menu, id, date, apiUrl) {
         this.#data = null;
-        this.#menu = menu;       
+        this.#menu = menu;      
+        this.#apiURL = apiUrl;
         this.#initPromise = this.#init(id, date);
     }
 
@@ -124,15 +126,22 @@ export default class HomeDashboard {
             });
 
             let data = await this.#getData(id, date);
-            this.#data = data;
+            this.#data = data;            
 
-            this.#incomeBalanceHeader.textContent = `${window.userNumberFormat.format(data.incomeTotal)} / ${window.userNumberFormat.format(data.incomeBudget)}`;
-            this.#expenseBalanceHeader.textContent = `${window.userNumberFormat.format(data.expensesTotal)} / ${window.userNumberFormat.format(data.expensesBudget)}`;
-
-            if (data) {
+            if (data) {                
                 let hasUpdated = this.#renderData(data);
                 let hasCreated = this.#createCategoryElements(data);        
             }
+
+            $('.monthPicker .calendar-button').on('click', function () {
+                let input = $(this).siblings('.monthSelector');
+                if (!input.data('datepicker').picker.is(':visible')) {
+                    input.datepicker('show');
+                } else {
+                    input.datepicker('hide');
+                }
+            });
+
         } finally {
             this.#isLoading = false;
         }        
@@ -157,7 +166,7 @@ export default class HomeDashboard {
 
     async #getData(id, date) {
         try {
-            let response = await fetch(`https://localhost:7246/api/FiscalPlan/${id}/Month?Month=${date.toISOString() ?? new Date().toISOString()}`, {
+            let response = await fetch(`${this.#apiURL}/${id}/Month?Month=${date.toISOString() ?? new Date().toISOString()}`, {
                 method: "GET",
             });
 
@@ -179,8 +188,7 @@ export default class HomeDashboard {
                 console.log("Dashboard is loading...")
                 return false;
             }
-
-            this.#renderData();
+            
         } finally {
             this.#isLoading = false;
         }
@@ -204,7 +212,6 @@ export default class HomeDashboard {
         this.#incomeBalanceHeader.textContent = `${window.userNumberFormat.format(data.incomeTotal)} / ${window.userNumberFormat.format(data.incomeBudget)}`;
         this.#expenseBalanceHeader.textContent = `${window.userNumberFormat.format(data.expensesTotal)} / ${window.userNumberFormat.format(data.expensesBudget)}`;
 
-
         return true;
     }
 
@@ -227,6 +234,7 @@ export default class HomeDashboard {
         let categoryElement = accordion.querySelector(`#category_${category.id}`);
 
         if (!categoryElement) {
+            console.log(`Category element with id ${category.id} not found`);
             return false;
         }
 
@@ -288,16 +296,16 @@ export default class HomeDashboard {
         mainDiv.dataset.fiscalplanid = `${category.fiscalPlanId}`;  
 
         let menu = this.#menu;
-        mainDiv.addEventListener("click", function (event) {
-            
+        mainDiv.addEventListener("click", function (event) {            
             if (menu.dataset.categoryid != 0) {
                 var borderBox = document.getElementById(`category_${menu.dataset.categoryid}`).querySelector('.border-animation');
                 borderBox.classList.remove('border-rotate');
             }
+            let y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
             menu.dataset.categoryid = `${category.id}`;
             menu.dataset.type = `${ category.categoryType }`;
             menu.style.left = `${mainDiv.style.left + event.pageX - 100}px`;
-            menu.style.top = `${event.pageY - 100}px`;
+            menu.style.top = `${y}px`;
             menu.classList.add('active');
 
             this.querySelector('.border-animation').classList.add('border-rotate');

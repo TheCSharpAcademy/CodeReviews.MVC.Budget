@@ -113,7 +113,7 @@ body {
 }
 
 .iconRadioButton:checked + label {
-    box-shadow: white 0 0 0px 2px;
+    border: 2px solid white;
 }
 
 .add-icon {
