@@ -1,17 +1,14 @@
 ﻿import 'jquery-validation';
+import { getCategoriesWithUnevaluatedTransactions, patchTransactionEvaluation } from './api';
 export default class ReevaluationDashboard {
     #data;
-    #categoriesAPI;
-    #transactionsAPI;
     #isLoading;
     #initPromise;
     #container;
     #infoDiv;
 
-    constructor(id, categoriesAPI, transactionsAPI) {
-        this.#data = null;
-        this.#categoriesAPI = categoriesAPI;
-        this.#transactionsAPI = transactionsAPI;
+    constructor(id) {
+        this.#data = null;   
         this.#initPromise = this.#init(id);
     }
 
@@ -34,25 +31,8 @@ export default class ReevaluationDashboard {
     }
 
     async #getData(id) {
-        try {
-            let queryParams = new URLSearchParams({
-                FiscalPlanId: id
-            });
-            var response = await fetch(`${this.#categoriesAPI}/filteredByEvaluation?${queryParams}`, {
-                method: "GET"
-            });
-
-            if (response.ok) {
-                return await response.json();
-            } else {
-                console.error(`HTTP GET Error: ${response.status}`);
-                return null;
-            }
-
-        } catch (error) {
-            console.error(error);
-            return null;
-        };
+        var categories = await getCategoriesWithUnevaluatedTransactions(id);
+        return categories;
     }
 
     #createReevaluationElement(category) {
@@ -416,59 +396,19 @@ export default class ReevaluationDashboard {
         }
     }
 
-    async #reevaluateTransaction(data, transactionElement, accordionBody, accordion) {
-        try {
-            var id = parseInt(data.get("Id"));
-            var transaction = document.getElementById(`reeval_transaction_${id}`);
+    async #reevaluateTransaction(formData, transactionElement, accordionBody, accordion) {
+        var previousIsHappy = transactionElement.dataset.ishappy === 'true';
+        var previousIsNecessary = transactionElement.dataset.isnecessary === 'true';
+        var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary);
 
-            var patchDoc =
-                [{
-                    op: "replace",
-                    path: "/IsHappy",
-                    value: data.get("IsHappy") === "true" ? true : false
-                },
-                {
-                    op: "replace",
-                    path: "/IsNecessary",
-                    value: data.get("IsNecessary") === "true" ? true : false
-                }, {
-                    op: "replace",
-                    path: "/PreviousIsHappy",
-                    value: transaction.dataset.ishappy === "true" ? true : false
-                },
-                {
-                    op: "replace",
-                    path: "/PreviousIsNecessary",
-                    value: transaction.dataset.isnecessary === "true" ? true : false
-                },
-                {
-                    op: "replace",
-                    path: "/Evaluated",
-                    value: true
-                    }];
+        if (IsPatched) {
+            transactionElement.remove();
 
-            var response = await fetch(`${this.#transactionsAPI}/${id}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json-patch+json"
-                },
-                body: JSON.stringify(patchDoc)
-            });
-
-            if (response.ok) {
-                transactionElement.remove();
-
-                if (accordionBody.childElementCount == 0) {
-                    accordion.remove();
-                }
-                toggleReevaluationInfo();
-            } else {
-                console.error(`HTTP Patch Error: ${response.status}`);
+            if (accordionBody.childElementCount == 0) {
+                accordion.remove();
             }
-
-        } catch (error) {
-            console.error(error);
-        };
+            this.#toggleReevaluationInfo();
+        } 
     }
 
     #toggleReevaluationInfo() {

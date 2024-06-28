@@ -28,7 +28,7 @@ export async function importChartDefaults() {
 }
 
 export async function importBootstrapCollapses() {
-    const { Collapse } = await import(/* webpackChunkName: "bootstrap-collapse" */'bootstrap');
+    const { Collapse } = await import(/* webpackChunkName: "bootstrap-collapses" */'bootstrap');
     let collapseElements = document.querySelectorAll('.collapse')
     let collapses = [...collapseElements].map(collapseElement => new Collapse(collapseElement, { toggle: false }))
 

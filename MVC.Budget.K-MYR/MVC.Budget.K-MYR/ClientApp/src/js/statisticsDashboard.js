@@ -1,12 +1,12 @@
 ﻿import { Chart, BarController, BarElement, CategoryScale, LinearScale, LineController, LineElement, PointElement, DoughnutController, ArcElement} from 'chart.js';
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, LineController, LineElement, PointElement, DoughnutController, ArcElement);
 import { getRandomColor } from './utilities';
-import { getDatePicker } from './asyncComponents'
+import { getDatePicker } from './asyncComponents';
+import { getFiscalPlanDataByYear } from './api';
 
 export default class StatisticsDashboard {
     #data;
     #initPromise;
-    #apiUrl;
     #isLoading;
     #yearPicker
     #sentimentChartYearly;
@@ -17,9 +17,8 @@ export default class StatisticsDashboard {
     #totalSpentChart;
     #overspendingHeading; 
 
-    constructor(id, year, apiUrl) {
+    constructor(id, year) {
         this.#data = null;
-        this.#apiUrl = apiUrl;
         this.#initPromise = this.#init(id, year);
     }
 
@@ -465,21 +464,8 @@ export default class StatisticsDashboard {
     }
 
     async #getData(id, year) {
-        try {
-            let response = await fetch(`${this.#apiUrl}/${id}/${year.getFullYear()}`, {
-                method: "GET"
-            });
-
-            if (response.ok) {
-                return await response.json();
-            } else {
-                console.error(`HTTP GET Error: ${response.status}`);
-                return null;
-            }
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
+        var data = await getFiscalPlanDataByYear(id, year);
+        return data;
     }
 
     rerenderDashboard() {

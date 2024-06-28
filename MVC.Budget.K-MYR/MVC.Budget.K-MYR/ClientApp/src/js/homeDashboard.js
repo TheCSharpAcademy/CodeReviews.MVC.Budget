@@ -1,9 +1,10 @@
 ﻿import { ArcElement, Chart, DoughnutController } from 'chart.js';
 Chart.register(DoughnutController, ArcElement);
 import { getDatePicker } from './asyncComponents'
+import { getFiscalPlanDataByMonth } from './api';
+
 
 export default class HomeDashboard {
-    #apiURL
     #data;
     #isLoading;
     #initPromise;
@@ -21,15 +22,13 @@ export default class HomeDashboard {
     constructor(menu, id, date, apiUrl) {
         this.#data = null;
         this.#menu = menu;      
-        this.#apiURL = apiUrl;
         this.#initPromise = this.#init(id, date);
     }
 
     async #init(id, date) {
         try {
             this.#isLoading = true;
-            let self = this;
-
+            this.#initializeDatePicker(id, date);
             this.#sentimentChartMonthly = new Chart(document.getElementById('sentimentChart'), {
                 type: 'doughnut',
                 data: {
@@ -117,13 +116,7 @@ export default class HomeDashboard {
             this.#incomeAccordionBody = document.getElementById('incomeAccordionBody');
 
             this.#expenseBalanceHeader = document.getElementById('expensesBalanceHeader');
-            this.#expenseAccordionBody = document.getElementById('expensesAccordionBody');           
-
-            this.#monthPicker = await getDatePicker("#home-monthSelector", "month");
-            this.#monthPicker.datepicker('setDate', date.toISOString());
-            this.#monthPicker.on('changeDate', async function () {
-                self.refresh(id, self.#monthPicker.datepicker('getUTCDate'))
-            });
+            this.#expenseAccordionBody = document.getElementById('expensesAccordionBody');      
 
             let data = await this.#getData(id, date);
             this.#data = data;            
@@ -147,6 +140,15 @@ export default class HomeDashboard {
         }        
     }
 
+    async #initializeDatePicker(id, date) {
+        let self = this;
+        this.#monthPicker = await getDatePicker("#home-monthSelector", "month")
+        this.#monthPicker.datepicker('setDate', date.toISOString());
+        this.#monthPicker.on('changeDate', async function () {
+            self.refresh(id, self.#monthPicker.datepicker('getUTCDate'))
+        });
+    }
+
     async refresh(id, date) {        
         try {
             if (this.#isLoading) {
@@ -165,21 +167,8 @@ export default class HomeDashboard {
     }   
 
     async #getData(id, date) {
-        try {
-            let response = await fetch(`${this.#apiURL}/${id}/Month?Month=${date.toISOString() ?? new Date().toISOString()}`, {
-                method: "GET",
-            });
-
-            if (response.ok) {
-                return await response.json();
-            } else {
-                console.error(`HTTP GET Error: ${response.status}`);
-                return null;
-            }
-        } catch (error) {
-            console.error(error);
-            return null;
-        }
+        var categories = await getFiscalPlanDataByMonth(id, date);
+        return categories;
     }
 
     rerenderDashboard() {
@@ -375,4 +364,6 @@ export default class HomeDashboard {
 
         return mainDiv;
     }
+
+    addCategory() { }
 }

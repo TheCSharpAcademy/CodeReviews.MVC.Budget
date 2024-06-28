@@ -1,32 +1,27 @@
 ﻿import { shortestAngle, resetStyle} from './utilities';
 import { getCountrySelect, importChartDefaults, importBootstrapModals, importBootstrapCollapses } from './asyncComponents';
+import { postTransaction, getTransactions, postCategory, putCategory, deleteCategory } from './api';
 import 'jquery-validation';
 
 const currentDate = new Date();
 const chartDefaultsTask = importChartDefaults();
 
-const incomeCategoriesAPI = "https://localhost:7246/api/IncomeCategories";
-const expenseCategoriesAPI = "https://localhost:7246/api/ExpenseCategories";
-const transactionsAPI = "https://localhost:7246/api/Transactions";
-const fiscalPlanAPI = "https://localhost:7246/api/FiscalPlan";
 const fiscalPlanId = document.getElementById("fiscalPlan_Id");
 const menu = document.getElementById('menu-container');
 
-const addCategoryModal = document.getElementById("addCategory-modal")
-const addCategoryModalType = addCategoryModal.querySelector("#addCategory_type");
-const updateCategoryModal = document.getElementById("updateCategory-modal")
-const updateCategoryModalLabel = updateCategoryModal.querySelector("#updateCategory-label");
-const updateCategoryModalId = updateCategoryModal.querySelector("#updateCategory_id");
-const updateCategoryModalName = updateCategoryModal.querySelector("#updateCategory_name");
-const updateCategoryModalBudget = updateCategoryModal.querySelector("#updateCategory_budget");
-const updateCategoryModalType = updateCategoryModal.querySelector("#updateCategory_type");
-const addTransactionModal = document.getElementById("addTransaction-modal")
-const addTransactionModalCategoryId = addTransactionModal.querySelector("#addTransaction_categoryId");
+const addCategoryModalType = document.getElementById("addCategory_type");
+const addCategoryFiscalPlanId = document.getElementById("addCategory_fiscalPlanId");
+const updateCategoryModalLabel = document.getElementById("updateCategory-label");
+const updateCategoryModalId = document.getElementById("updateCategory_id");
+const updateCategoryModalName = document.getElementById("updateCategory_name");
+const updateCategoryModalBudget = document.getElementById("updateCategory_budget");
+const updateCategoryModalType = document.getElementById("updateCategory_type");
+const addTransactionModalCategoryId = document.getElementById("addTransaction_categoryId");
 const flipContainer = document.getElementById("flip-container-inner");
 
-const statisticsDashboard = getStatisticsDashboard(fiscalPlanId.value, currentDate, fiscalPlanAPI);
-const homeDashboard = getHomeDashboard(menu, fiscalPlanId.value, currentDate, fiscalPlanAPI);
-const reevaluationDashboard = getReevaluationDashboard(fiscalPlanId.value, expenseCategoriesAPI, transactionsAPI);
+const homeDashboard = getHomeDashboard(menu, fiscalPlanId.value, currentDate);
+const statisticsDashboard = getStatisticsDashboard(fiscalPlanId.value, currentDate);
+const reevaluationDashboard = getReevaluationDashboard(fiscalPlanId.value);
 const countrySelect = initializeCountrySelect();
 const modals = importBootstrapModals().then((modalsArray) => {
     let addCategoryModal = modalsArray.find(m => m._element.id == "addCategory-modal")
@@ -37,21 +32,21 @@ const modals = importBootstrapModals().then((modalsArray) => {
         event.preventDefault();
         if ($(this).valid()) {
             addCategoryModal.hide();
-            await addCategory(new FormData(this));
+            await postCategory(new FormData(this));
         }
     });
     $('#add-transaction-form').on("submit", async function (event) {
         event.preventDefault();
         if ($(this).valid()) {
             addTransactionModal.hide();
-            await addTransaction(new FormData(this));
+            await postTransaction(new FormData(this));
         }
     });
     $('#update-category-form').on("submit", async function (event) {
         event.preventDefault();
         if ($(this).valid()) {
             updateCategoryModal.hide();
-            await updateCategory(new FormData(this));
+            await putCategory(new FormData(this));
         }
     });
 
@@ -99,6 +94,7 @@ const collapses = importBootstrapCollapses().then(async function (collapses) {
         if (event.target.closest("svg.add-icon")) {
             let type = $(this).closest('.accordion')[0].dataset.type;
             addCategoryModalType.value = type;
+            addCategoryFiscalPlanId.value = fiscalPlanId.value;
             modal.show();
         }
 
@@ -131,7 +127,11 @@ elements.forEach(element => {
 $('#search-form').on("submit", async function (event) {
     event.preventDefault();
     if ($(this).valid()) {
-        await getTableData(new FormData(this));
+        let table = await transactionsTable;
+        let transactions = await getTransactions(new FormData(this));
+        table.clear();
+        table.rows.add(transactions);
+        table.draw();
     }
 });
 
@@ -154,151 +154,6 @@ flipContainer.addEventListener("transitionend", () => {
     currentDeg = currentDeg % 360;
     resetStyle(flipContainer, `transform: rotateY(${currentDeg}deg)`);
 });
-
-async function addTransaction(data) {
-    try {
-        var response = await fetch(`${transactionsAPI}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": data.get('__RequestVerificationToken')
-            },
-            body: JSON.stringify({
-                Title: data.get("Title"),
-                Amount: parseFloat(data.get("Amount")),
-                DateTime: data.get("DateTime"),
-                IsHappy: data.get("IsHappy") === "true" ? true : false,
-                IsNecessary: data.get("IsNecessary") === "true" ? true : false,
-                CategoryId: parseInt(data.get("CategoryId"))
-            })
-        });
-
-        if (response.ok) {
-        } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-        }
-
-    } catch (error) {
-        console.error(error);
-    };
-}
-
-async function addCategory(data) {
-    try {
-        var response = await fetch(`${data.get("type") == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": data.get('__RequestVerificationToken')
-            },
-            body: JSON.stringify({
-                Name: data.get("Name"),
-                Budget: parseFloat(data.get("Budget")),
-                FiscalPlanId: parseInt(fiscalPlanId.value)
-            })
-        });
-
-        if (response.ok) {
-            return true;
-        } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-            return false;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-}
-
-async function updateCategory(data) {
-    try {
-        var id = parseInt(data.get("Id"));     
-        let queryParams = new URLSearchParams({
-            Month: homeMonthPicker.datepicker('getUTCDate').toISOString()
-        });
-        var response = await fetch(`${data.get("type") == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}/${id}?${queryParams}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": data.get('__RequestVerificationToken')
-            },
-            body: JSON.stringify({
-                Name: data.get("Name"),
-                Budget: parseFloat(data.get("Budget")),
-                GroupId: parseInt(data.get("GroupId")),
-                Id: id,
-                FiscalPlanId: parseInt(fiscalPlanId.value)
-            })
-        });
-
-        if (response.ok) {
-            return true;
-        } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-            return false;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-}
-
-async function deleteCategory(id, type, token) {
-    try {
-        var response = await fetch(`${type == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}/${id}`, {
-            method: "DELETE",
-            headers: {
-                "RequestVerificationToken": token
-            }
-        });
-
-        if (response.ok) {
-            document.getElementById(`category_${id}`).remove();
-            return true;
-        } else {
-            console.error(`HTTP Delete Error: ${response.status}`);
-            return false;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-}
-
-async function getTableData(data) {
-    try {
-        let params = new URLSearchParams();
-
-        for (let [key, value] of data.entries()) {
-            if (value !== undefined && value !== '') {
-                params.append(key, value);
-            }
-        }
-
-        let query_string = params.toString();
-
-        var response = await fetch(`${transactionsAPI}?${query_string}`, {
-            method: "GET",
-        });
-
-        if (response.ok) {
-            var data = await response.json();
-            let table = await transactionsTable;
-            table.clear();
-            table.rows.add(data);
-            table.draw();
-        } else {
-            table.clear();
-            console.error(`HTTP GET Error: ${response.status}`);
-        }
-
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 async function getTransactionsTable() {
     const { default: DataTable, row, data } = await import(/* webpackChunkName: "datatables" */'datatables.net-bs5');
@@ -365,24 +220,24 @@ async function getTransactionsTable() {
     return dataTable;
 }
 
-async function getStatisticsDashboard(id, date, apiUrl) {
+async function getStatisticsDashboard(id, date) {
     await chartDefaultsTask;
     const { default: StatisticsDashboard } = await import(/* webpackChunkName: "statisticsDashboard" */'./statisticsDashboard');
   
-    return new StatisticsDashboard(id, date, apiUrl);
+    return new StatisticsDashboard(id, date);
 }
 
-async function getHomeDashboard(menu, id, date, apiUrl) {
+async function getHomeDashboard(menu, id, date) {
     await chartDefaultsTask;
     const { default: HomeDashboard } = await import(/* webpackChunkName: "homeDashboard" */'./homeDashboard');
 
-    return new HomeDashboard(menu, id, date, apiUrl);
+    return new HomeDashboard(menu, id, date);
 } 
 
-async function getReevaluationDashboard(id, categoriesAPI, transactionsAPI) {
+async function getReevaluationDashboard(id) {
     const { default: ReevaluationDashboard } = await import(/* webpackChunkName: "reevaluationDashboard" */'./reevaluationDashboard');
 
-    return new ReevaluationDashboard(id, categoriesAPI, transactionsAPI);
+    return new ReevaluationDashboard(id);
 } 
 
 async function initializeCountrySelect() {
