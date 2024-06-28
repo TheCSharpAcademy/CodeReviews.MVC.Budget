@@ -365,5 +365,63 @@ export default class HomeDashboard {
         return mainDiv;
     }
 
-    addCategory() { }
+    addCategory(category) {        
+        var categoryDTO =
+        {
+            id: category.id,
+            name: category.name,
+            budget: category.budget,            
+            categoryType: category.categoryType,
+            happyTotal: 0,
+            necessaryTotal: 0,           
+            total: 0
+        }
+
+        var array;
+        var accordion;
+
+        switch (categoryDTO.categoryType) {
+            case 1:
+                array = this.#data.incomeCategories;
+                accordion = this.#incomeAccordionBody
+                break;
+            case 2:
+                array = this.#data.expenseCategories;
+                accordion = this.#expenseAccordionBody;
+                break;            
+        }
+
+        var insertIndex = array.findIndex((object) => object.name.localeCompare(categoryDTO.name) > 0);
+
+        if (insertIndex === -1) {
+            insertIndex = 0;
+        }
+
+        array.splice(insertIndex, 0, categoryDTO);      
+        
+        var categoryElement = this.#createCategoryELement(categoryDTO);
+        accordion.insertBefore(categoryElement, accordion.children[Math.max(0, insertIndex - 1)])
+    }
+
+    removeCategory(id, type) {        
+        var categoryElement = document.getElementById(`category_${id}`);
+        categoryElement.remove();
+
+        var array;        
+
+        switch (type) {
+            case 1:
+                array = this.#data.incomeCategories;
+                break;
+            case 2:
+                array = this.#data.expenseCategories;
+                break;
+        }
+
+        var index = array.findIndex(item => item.id === id);
+
+        if (index !== -1) {
+            array.splice(index, 1)
+        }
+    }
 }

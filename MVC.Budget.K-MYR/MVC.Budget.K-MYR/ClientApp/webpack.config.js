@@ -37,6 +37,7 @@ module.exports = {
         ]
     },
     optimization: {
+        runtimeChunk: 'single',
         minimize: false,
         minimizer: ['...', new CssMinimizerPlugin()],
         splitChunks: {

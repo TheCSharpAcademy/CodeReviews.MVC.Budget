@@ -142,7 +142,6 @@ export async function deleteCategory(id, type, token) {
         });
 
         if (response.ok) {
-            document.getElementById(`category_${id}`).remove();
             return true;
         } else {
             console.error(`HTTP Delete Error: ${response.status}`);

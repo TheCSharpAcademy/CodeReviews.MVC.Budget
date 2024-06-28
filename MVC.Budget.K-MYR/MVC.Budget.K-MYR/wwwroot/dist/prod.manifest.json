@@ -1,10 +1,12 @@
 {
   "index": [
+    "runtime.js",
     "styles-index~fiscalPlan.css",
     "vendors-index~fiscalPlan.js",
     "index.js"
   ],
   "fiscalPlan": [
+    "runtime.js",
     "styles-index~fiscalPlan.css",
     "styles-fiscalPlan.css",
     "vendors-index~fiscalPlan.js",
