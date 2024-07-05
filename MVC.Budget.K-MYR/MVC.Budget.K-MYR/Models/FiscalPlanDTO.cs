@@ -3,6 +3,8 @@ namespace MVC.Budget.K_MYR.Models
 {
     public class FiscalPlanDTO
     {
+        public DateTime Month { get; set; }
+        public string Name { get; set; }
         public int Id { get; set; }
         public decimal Overspending { get; set; }
         public decimal IncomeBudget { get; set; }

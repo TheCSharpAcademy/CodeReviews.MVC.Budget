@@ -33,7 +33,7 @@ public class FiscalPlanController : ControllerBase
         return fiscalPlan is null ? NotFound() : Ok(fiscalPlan);
     }
 
-    [HttpGet("{id:int}/Month")]
+    [HttpGet("{id:int}/MonthlyData")]
     public async Task<ActionResult<FiscalPlanDTO>> GetDataByMonth(int id, [FromQuery] DateTime? Month)
     {
        var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
@@ -44,7 +44,7 @@ public class FiscalPlanController : ControllerBase
         }
         
         var start = DateTime.UtcNow;
-        FiscalPlanDTO fiscalPlanDTO = await _fiscalPlanService.GetDataByMonth(id, Month ?? DateTime.UtcNow);
+        FiscalPlanDTO fiscalPlanDTO = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
         _logger.LogInformation("GetDataByMonth() Duration: {duration} ms", (DateTime.UtcNow - start).Milliseconds);
 
         return Ok(fiscalPlanDTO);

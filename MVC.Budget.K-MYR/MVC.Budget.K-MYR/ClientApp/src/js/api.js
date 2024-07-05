@@ -2,10 +2,33 @@
 const expenseCategoriesAPI = "https://localhost:7246/api/ExpenseCategories";
 const transactionsAPI = "https://localhost:7246/api/Transactions";
 const fiscalPlanAPI = "https://localhost:7246/api/FiscalPlan";
+const homeController = "https://localhost:7246/Country";
 
+export async function getCountryCookie(countryISOCode, token) {
+    try {
+        var response = await fetch(homeController, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": token
+            },
+            body: JSON.stringify(countryISOCode)
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error(`HTTP Post Error: ${response.status}`);
+            return null;
+        }
+    } catch (error) {
+        console.error(error);
+        return null;
+    }    
+}
 export async function getFiscalPlanDataByMonth(id, date) {
     try {
-        var response = await fetch(`${fiscalPlanAPI}/${id}/Month?Month=${date.toISOString() ?? new Date().toISOString()}`, {
+        var response = await fetch(`${fiscalPlanAPI}/${id}/MonthlyData?Month=${date.toISOString() ?? new Date().toISOString()}`, {
             method: "GET",
         });
 
@@ -68,6 +91,86 @@ export async function postTransaction(formData) {
         console.error(error);
         return null;
     }
+}
+
+export async function getTransactions(formData) {
+    try {
+        var params = new URLSearchParams();
+
+        for (let [key, value] of formData.entries()) {
+            if (value !== undefined && value !== '') {
+                params.append(key, value);
+            }
+        }
+
+        var query_string = params.toString();
+
+        var response = await fetch(`${transactionsAPI}?${query_string}`, {
+            method: "GET",
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error(`HTTP GET Error: ${response.status}`);
+            return null;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+export async function patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary) {
+    try {
+        var id = parseInt(formData.get("Id"));
+
+        var patchDoc =
+            [{
+                op: "replace",
+                path: "/IsHappy",
+                value: formData.get("IsHappy") === "true"
+            },
+            {
+                op: "replace",
+                path: "/IsNecessary",
+                value: formData.get("IsNecessary") === "true"
+            }, {
+                op: "replace",
+                path: "/PreviousIsHappy",
+                value: previousIsHappy
+            },
+            {
+                op: "replace",
+                path: "/PreviousIsNecessary",
+                value: previousIsNecessary
+            },
+            {
+                op: "replace",
+                path: "/Evaluated",
+                value: true
+            }];
+
+        var response = await fetch(`${transactionsAPI}/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json-patch+json"
+            },
+            body: JSON.stringify(patchDoc)
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            console.error(`HTTP Patch Error: ${response.status}`);
+            return false;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return false;
+    };
 }
 
 export async function postCategory(formData) {
@@ -154,35 +257,6 @@ export async function deleteCategory(id, type, token) {
     }
 }
 
-export async function getTransactions(formData) {
-    try {
-        var params = new URLSearchParams();
-
-        for (let [key, value] of formData.entries()) {
-            if (value !== undefined && value !== '') {
-                params.append(key, value);
-            }
-        }
-
-        var query_string = params.toString();
-
-        var response = await fetch(`${transactionsAPI}?${query_string}`, {
-            method: "GET",
-        });
-
-        if (response.ok) {
-            return await response.json();
-        } else {
-            console.error(`HTTP GET Error: ${response.status}`);
-            return null;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
-}
-
 export async function getCategoriesWithUnevaluatedTransactions(id) {
     try {
         var queryParams = new URLSearchParams({
@@ -202,56 +276,5 @@ export async function getCategoriesWithUnevaluatedTransactions(id) {
     } catch (error) {
         console.error(error);
         return null;
-    };
-}
-
-export async function patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary) {
-    try {
-        var id = parseInt(formData.get("Id"));
-
-        var patchDoc =
-            [{
-                op: "replace",
-                path: "/IsHappy",
-                value: formData.get("IsHappy") === "true"
-            },
-            {
-                op: "replace",
-                path: "/IsNecessary",
-                value: formData.get("IsNecessary") === "true"
-            }, {
-                op: "replace",
-                path: "/PreviousIsHappy",
-                value: previousIsHappy
-            },
-            {
-                op: "replace",
-                path: "/PreviousIsNecessary",
-                value: previousIsNecessary
-            },
-            {
-                op: "replace",
-                path: "/Evaluated",
-                value: true
-            }];
-
-        var response = await fetch(`${transactionsAPI}/${id}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json-patch+json"
-            },
-            body: JSON.stringify(patchDoc)
-        });
-
-        if (response.ok) {
-            return true;
-        } else {
-            console.error(`HTTP Patch Error: ${response.status}`);
-            return false;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return false;
     };
 }

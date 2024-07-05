@@ -38,7 +38,16 @@ module.exports = {
     optimization: {
         runtimeChunk: 'single',
         minimize: true,
-        minimizer: ['...', new CssMinimizerPlugin()],
+        minimizer: ['...', new CssMinimizerPlugin({
+            parallel: true,
+            minimizerOptions: {
+                preset: [
+                    "default", {
+                        discardComments: { removeAll: true }
+                    }
+                ]
+            }
+        })],
         splitChunks: {
             cacheGroups: {
                 styles: {

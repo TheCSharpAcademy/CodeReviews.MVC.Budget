@@ -3,7 +3,7 @@
 
 
 @{
-    ViewData["Title"] = "Category";
+    ViewData["Title"] = "Category";    
     var monthlyTransactions = Model.PageModel.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month);
     var happyExpenses = monthlyTransactions.Where(t => t.IsHappy).Sum(t => t.Amount);
     var necessaryExpenses = monthlyTransactions.Where(t => t.IsNecessary).Sum(t => t.Amount);

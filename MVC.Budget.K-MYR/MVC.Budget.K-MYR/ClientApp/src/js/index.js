@@ -17,12 +17,6 @@ const modals = importBootstrapModals().then((modalsArray) => {
         }
     })
  });
-const countrySelect = getCountrySelect("#country");
-
-
-document.getElementById("country-form").addEventListener('submit', function (event) {
-    event.preventDefault();
-});
 
 $('.fiscalPlan-card').on('click', function (event) {
     window.location.href = `https://localhost:7246/FiscalPlan/${this.dataset.id}`;

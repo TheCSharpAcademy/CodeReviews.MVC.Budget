@@ -29,13 +29,15 @@ public class FiscalPlansService : IFiscalPlansService
         return _unitOfWork.FiscalPlansRepository.GetByID(id);
     }
 
-    public async Task<FiscalPlanDTO> GetDataByMonth(int id, DateTime Month)
+    public async Task<FiscalPlanDTO> GetDataByMonth(FiscalPlan fiscalPlan, DateTime Month)
     {
-        var categorieData = await _unitOfWork.CategoriesRepository.GetDataByMonth(id, Month);       
+        var categorieData = await _unitOfWork.CategoriesRepository.GetDataByMonth(fiscalPlan.Id, Month);       
 
         return new FiscalPlanDTO
         {
-            Id = id,
+            Month = Month,
+            Name = fiscalPlan.Name,
+            Id = fiscalPlan.Id,
             IncomeCategories = categorieData?.IncomeCategories?.OrderBy(c => c.Name)?.ToList() ?? [],
             ExpenseCategories = categorieData?.ExpenseCategories?.OrderBy(c => c.Name)?.ToList() ?? [],
             ExpensesTotal = categorieData?.ExpenseCategories.Sum(c => c.Total) ?? 0,

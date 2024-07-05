@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
 using MVC.Budget.K_MYR.Models.ViewModels;
 using MVC.Budget.K_MYR.Services;
@@ -20,24 +19,78 @@ public class HomeController : Controller
         _fiscalPlanService = fiscalPlanService;
         _categorieService = categorieService;
     }
+
+    [HttpPost("Country")]
+    [ValidateAntiForgeryToken]
+    public IActionResult SetCountry([FromBody] string countryISOCode)
+    {
+        RegionInfo regionInfo;
+
+        try
+        {
+            regionInfo = new RegionInfo("en-" + countryISOCode);
+        }
+        catch (ArgumentException)
+        {
+            return BadRequest();
+        }
+
+        var options = new CookieOptions
+        {
+            Expires = DateTime.UtcNow.AddYears(1),
+            Secure = true,
+            HttpOnly = true,
+            IsEssential = true,
+        };
+
+        var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
+
+        var preferences = new UserPreferences
+        {
+            Locale = $"en-{regionInfo.Name}",
+            Currency = currency
+        };
+
+        Response.Cookies.Append("Locale", $"en-{regionInfo.Name}", options);
+
+        return Ok(preferences);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Index()
     {
-        return View(new LayoutModel<HomeModel>(new HomeModel
+        var regionInfo = GetRegionInfo();        
+        var culture = new CultureInfo("en-" + regionInfo.Name);
+        culture.NumberFormat.CurrencyPositivePattern = 2;
+        var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
+
+        var homeModel = new HomeModel
         {
             FiscalPlans = await _fiscalPlanService.GetFiscalPlans(),
             FiscalPlan = new()
-        }, new CultureInfo("en-US"))); ;
+        };
+
+        LayoutModel<HomeModel> viewModel = new(homeModel, culture, currency);
+
+        return View(viewModel);
     }
 
     [HttpGet("FiscalPlan/{id:int}")]
     public async Task<IActionResult> FiscalPlan([FromRoute]int id, DateTime? Month)
     {
-        var fiscalPlanData = await _fiscalPlanService.GetDataByMonth(id, Month ?? DateTime.UtcNow);
+        var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
-        if (fiscalPlanData is null) 
+        if (fiscalPlan is null)
         {
             return NotFound();
         }
+
+        var fiscalPlanData = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
+
+        var regionInfo = GetRegionInfo();
+        var culture = new CultureInfo("en-" + regionInfo.Name);
+        culture.NumberFormat.CurrencyPositivePattern = 2;
+        var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
 
         FiscalPlanModel fiscalPlanModel = new()
         {
@@ -46,7 +99,10 @@ public class HomeController : Controller
             Transaction = new(),
             Search = new(),
         };
-        return View(new LayoutModel<FiscalPlanModel>(fiscalPlanModel, new CultureInfo("en-US")));
+
+        LayoutModel<FiscalPlanModel> viewModel = new(fiscalPlanModel, culture, currency);
+
+        return View(viewModel);
     }    
 
     [HttpGet("Category/{id}")]
@@ -57,7 +113,12 @@ public class HomeController : Controller
         if (category is null)
             return NotFound();
 
-        return View(new LayoutModel<Category>(category, new CultureInfo("en-US")));
+        var regionInfo = GetRegionInfo();
+        var culture = new CultureInfo("en-" + regionInfo.Name);
+        culture.NumberFormat.CurrencyPositivePattern = 2;
+        var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
+
+        return View(new LayoutModel<Category>(category, culture, currency));
     }
 
     public IActionResult Privacy()
@@ -69,5 +130,32 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    private RegionInfo GetRegionInfo()
+    {
+        RegionInfo regionInfo = new("en-US");
+
+        if (Request.Cookies.TryGetValue("Locale", out var locale))
+        {
+            try
+            {
+                regionInfo = new RegionInfo(locale);                
+            }
+            catch (Exception)
+            {
+                var options = new CookieOptions
+                {
+                    Expires = DateTime.UtcNow.AddDays(-2),
+                    Secure = true,
+                    HttpOnly = true,
+                    IsEssential = true,
+                };
+
+                Response.Cookies.Append("Locale", "", options);
+            }
+        }
+        
+        return regionInfo;
     }
 }

@@ -2,4 +2,5 @@
 import 'country-select-js/build/css/countrySelect.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../scss/site.scss';
+import './site';
 import './index';

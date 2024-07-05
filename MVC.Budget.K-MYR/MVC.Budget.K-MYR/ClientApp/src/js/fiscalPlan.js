@@ -1,36 +1,32 @@
 ﻿import { shortestAngle, resetStyle} from './utilities';
-import { getCountrySelect, importChartDefaults, importBootstrapModals, importBootstrapCollapses } from './asyncComponents';
+import { importChartDefaults, importBootstrapModals, importBootstrapCollapses } from './asyncComponents';
 import { postTransaction, getTransactions, postCategory, putCategory, deleteCategory } from './api';
-import 'jquery-validation';
 
 const currentDate = new Date();
+
 const chartDefaultsTask = importChartDefaults();
 
 const fiscalPlanId = document.getElementById("fiscalPlan_Id");
 const menu = document.getElementById('menu-container');
 
-const addCategoryModalType = document.getElementById("addCategory_type");
-const addCategoryFiscalPlanId = document.getElementById("addCategory_fiscalPlanId");
-const updateCategoryModalLabel = document.getElementById("updateCategory-label");
-const updateCategoryModalId = document.getElementById("updateCategory_id");
-const updateCategoryModalName = document.getElementById("updateCategory_name");
-const updateCategoryModalBudget = document.getElementById("updateCategory_budget");
-const updateCategoryModalType = document.getElementById("updateCategory_type");
-const addTransactionModalCategoryId = document.getElementById("addTransaction_categoryId");
-const flipContainer = document.getElementById("flip-container-inner");
-
-const homeDashboardPromise = getHomeDashboard(menu, fiscalPlanId.value, currentDate);
+const homeDashboardPromise = getHomeDashboard(menu, fiscalPlanId.value, currentDate, JSON.parse(fiscalPlanId.dataset.object));
 const statisticsDashboardPromise = getStatisticsDashboard(fiscalPlanId.value, currentDate);
 const reevaluationDashboardPromise = getReevaluationDashboard(fiscalPlanId.value);
-const countrySelectPromise = initializeCountrySelect();
 const modalsPromise = importBootstrapModals();
-const collapsesPromise = importBootstrapCollapses();
+const collapsesPromise = importBootstrapCollapses().then((collapses) => {
+    $(".accordion-head").on("click", function (event) {     
+        if (!event.target.classList.contains("add-category-icon")) {
+            collapses.find(c => c._element.id == this.nextElementSibling.id).toggle();
+            let caret = $('.accordion-caret', this)[0];
+            caret.classList.toggle("rotate");
+        }
+    });
+});
 const transactionsTablePromise = getTransactionsTable()
-    .then(() => {
+    .then((table) => {
         $('#search-form').on("submit", async function (event) {
             event.preventDefault();
             if ($(this).valid()) {
-                let table = await transactionsTable;
                 let transactions = await getTransactions(new FormData(this));
                 table.clear();
                 table.rows.add(transactions);
@@ -38,133 +34,130 @@ const transactionsTablePromise = getTransactionsTable()
             }
         });
     });
-Promise.all([collapsesPromise, modalsPromise])
-    .then(([collapses, modals]) => {
-        let addCategoryModal = modals.find(m => m._element.id == "addCategory-modal");
-        $(".accordion-head").on("click", function (event) {
-            if (event.target.closest("svg.add-icon")) {
-                let type = $(this).closest('.accordion')[0].dataset.type;
-                addCategoryModalType.value = type;
-                addCategoryFiscalPlanId.value = fiscalPlanId.value;
-                addCategoryModal.show();
-            }
 
-            else {
-                collapses.find(c => c._element.id == this.nextElementSibling.id).toggle();
-                let caret = $('.accordion-caret', this)[0];
-                caret.classList.toggle("rotate");
+setupModalHandlers();
+setupFlipContainer();
+
+async function setupModalHandlers() {
+    const modals = await modalsPromise;
+    const homeDashboard = await homeDashboardPromise;
+    const addCategoryModal = modals.find(m => m._element.id == "addCategory-modal");
+    const addCategoryModalType = document.getElementById("addCategory_type");
+    const addCategoryFiscalPlanId = document.getElementById("addCategory_fiscalPlanId");
+
+    const updateCategoryModal = modals.find(m => m._element.id == "updateCategory-modal");
+    const updateCategoryModalLabel = document.getElementById("updateCategory-label");
+    const updateCategoryModalId = document.getElementById("updateCategory_id");
+    const updateCategoryModalName = document.getElementById("updateCategory_name");
+    const updateCategoryModalBudget = document.getElementById("updateCategory_budget");
+    const updateCategoryModalType = document.getElementById("updateCategory_type");
+
+    const addTransactionModal = modals.find(m => m._element.id == "addTransaction-modal");
+    const addTransactionModalCategoryId = document.getElementById("addTransaction_categoryId");
+
+    document.getElementById('add-category-form').addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            addCategoryModal.hide();
+            let category = await postCategory(new FormData(this));
+
+            if (category) {
+                homeDashboard.addCategory(category);
             }
-        });
+        }
+    });
+    document.getElementById('add-transaction-form').addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            addTransactionModal.hide();
+            let transaction = await postTransaction(new FormData(this));
+
+            if (transaction) {
+                homeDashboard.addTransaction(transaction);
+            }
+        }
+    });
+    document.getElementById('update-category-form').addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            updateCategoryModal.hide();
+            let isUpdated = await putCategory(new FormData(this));
+        }
     });
 
-Promise.all([modalsPromise, homeDashboardPromise])
-    .then(([modals, homeDashboard]) => {
-        let addCategoryModal = modals.find(m => m._element.id == "addCategory-modal");
-        let addTransactionModal = modals.find(m => m._element.id == "addTransaction-modal");
-        let updateCategoryModal = modals.find(m => m._element.id == "updateCategory-modal");
+    $(".add-category-icon").on("click", function (event) {
+        let type = $(this).closest('.accordion')[0].dataset.type;
+        addCategoryModalType.value = type;
+        addCategoryFiscalPlanId.value = fiscalPlanId.value;
+        addCategoryModal.show();
+    });
 
-        $('#add-category-form').on("submit", async function (event) {
-            event.preventDefault();
-            if ($(this).valid()) {
-                addCategoryModal.hide();
-                let category = await postCategory(new FormData(this));
+    document.getElementById('close-menu').onclick = function () {
+        menu.classList.remove('active');
+        var id = menu.dataset.categoryid;
+        var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
+        borderBox.classList.remove('border-rotate');
+        menu.dataset.categoryid = 0;
+    }
+    document.getElementById('add-menu').onclick = async function () {
+        addTransactionModalCategoryId.value = menu.dataset.categoryid;
+        addTransactionModal.show();
+    }
+    document.getElementById('edit-menu').onclick = function () {
+        var category = document.getElementById(`category_${menu.dataset.categoryid}`);
 
-                if (category) {
-                    homeDashboard.addCategory(category);
-                }
-            }
-        });
-        $('#add-transaction-form').on("submit", async function (event) {
-            event.preventDefault();
-            if ($(this).valid()) {
-                addTransactionModal.hide();
-                let transaction = await postTransaction(new FormData(this));
-            }
-        });
-        $('#update-category-form').on("submit", async function (event) {
-            event.preventDefault();
-            if ($(this).valid()) {
-                updateCategoryModal.hide();
-                let isUpdated = await putCategory(new FormData(this));
-            }
-        });
+        updateCategoryModalLabel.textContent = category.dataset.name;
+        updateCategoryModalId.value = category.dataset.id;
+        updateCategoryModalName.value = category.dataset.name;
+        updateCategoryModalBudget.value = category.dataset.budget;
+        updateCategoryModalType.value = category.dataset.type;
 
-        document.getElementById('close-menu').onclick = function () {
+        updateCategoryModal.show();
+    }
+    document.getElementById('delete-menu').onclick = function () {
+        var token = menu.querySelector('input').value;
+        var id = parseInt(menu.dataset.categoryid);
+        var type = parseInt(menu.dataset.type);
+        var isDeleted = deleteCategory(id, type, token)
+        if (isDeleted) {
+            homeDashboard.removeCategory(id, type);
             menu.classList.remove('active');
-            var id = menu.dataset.categoryid;
-            var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
-            borderBox.classList.remove('border-rotate');
             menu.dataset.categoryid = 0;
         }
-        document.getElementById('add-menu').onclick = async function () {
-            addTransactionModalCategoryId.value = menu.dataset.categoryid;
-            addTransactionModal.show();
-        }
-        document.getElementById('edit-menu').onclick = function () {
-            var category = document.getElementById(`category_${menu.dataset.categoryid}`);
-
-            updateCategoryModalLabel.textContent = category.dataset.name;
-            updateCategoryModalId.value = category.dataset.id;
-            updateCategoryModalName.value = category.dataset.name;
-            updateCategoryModalBudget.value = category.dataset.budget;
-            updateCategoryModalType.value = category.dataset.type;
-
-            updateCategoryModal.show();
-        }
-        document.getElementById('delete-menu').onclick = function () {
-            var token = menu.querySelector('input').value;
-            var id = menu.dataset.categoryid;
-            var type = parseInt(menu.dataset.type);
-            var isDeleted = deleteCategory(id, type, token)
-            if (isDeleted) {
-                homeDashboard.removeCategory(id, type);
-                menu.classList.remove('active');
-                menu.dataset.categoryid = 0;
-            }
-        }
-        document.getElementById('details-menu').onclick = function () {
-            var id = menu.dataset.categoryid;
-            window.location.href = "Category/" + id;
-        }
-    });
-
-var currentSideIndex = 0;
-var currentDeg = 0;
-
-let elements = document.querySelectorAll('.flip-content');
-let observer = new ResizeObserver(entries => {
-    entries.forEach(entry => {
-        let width = entry.contentRect.width;
-        let translateZValue = (width / 2);
-
-        entry.target.style.transform = `rotateY(calc(90deg * var(--s))) translateZ(${translateZValue}px)`;
-    });
-});
-elements.forEach(element => {
-    observer.observe(element);
-});
-
-
-
-$('#action-sidebar').on("click", '.sidebar-button-container', async function (event) {
-    if (currentSideIndex === this.dataset.index) {
-        return;
+    }
+    document.getElementById('details-menu').onclick = function () {
+        var id = menu.dataset.categoryid;
+        window.location.href = "Category/" + id;
     }
 
-    var degreeDiff = shortestAngle(currentSideIndex, this.dataset.index);
+    homeDashboard.setupMenuHandlers();
+}
 
-    currentDeg += degreeDiff;
+function setupFlipContainer() {
+    var flipContainer = document.getElementById("flip-container-inner");
+    var currentSideIndex = 0;
+    var currentDeg = 0;
 
-    flipContainer.style = `transform: rotateY(${currentDeg}deg)`;
+    $('#action-sidebar').on("click", '.sidebar-button-container', async function (event) {
+        if (currentSideIndex === this.dataset.index) {
+            return;
+        }
 
-    currentSideIndex = this.dataset.index;
-});
+        var degreeDiff = shortestAngle(currentSideIndex, this.dataset.index);
 
-flipContainer.addEventListener("transitionend", () => {
+        currentDeg += degreeDiff;
 
-    currentDeg = currentDeg % 360;
-    resetStyle(flipContainer, `transform: rotateY(${currentDeg}deg)`);
-});
+        flipContainer.style = `transform: rotateY(${currentDeg}deg)`;
+
+        currentSideIndex = this.dataset.index;
+    });
+
+    flipContainer.addEventListener("transitionend", () => {
+
+        currentDeg = currentDeg % 360;
+        resetStyle(flipContainer, `transform: rotateY(${currentDeg}deg)`);
+    });
+}
 
 async function getTransactionsTable() {
     try {
@@ -248,12 +241,12 @@ async function getStatisticsDashboard(id, date) {
     }    
 }
 
-async function getHomeDashboard(menu, id, date) {
+async function getHomeDashboard(menu, id, date, data) {
     try {
         await chartDefaultsTask;
-        const { default: HomeDashboard } = await import(/* webpackChunkName: "homeDashboard" */'./homeDashboard');
+        const { default: HomeDashboard } = await import(/* webpackChunkName: "homeDashboard"*/ './homeDashboard');
 
-        return new HomeDashboard(menu, id, date);
+        return new HomeDashboard(menu, id, date, data);
 
     } catch (error) {
         console.error('Error loading home dashboard:', error);
@@ -272,10 +265,3 @@ async function getReevaluationDashboard(id) {
     }
     
 } 
-
-async function initializeCountrySelect() {
-    let countrySelect = await getCountrySelect("#country");
-    countrySelect.on('change', () => {
-        let iso2Code = countrySelect.countrySelect("getSelectedCountryData").iso2;       
-    });
-}

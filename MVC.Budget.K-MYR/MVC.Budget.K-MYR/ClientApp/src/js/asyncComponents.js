@@ -1,9 +1,10 @@
 ﻿export async function getCountrySelect(id) {
     try {
-        const { default: _ } = await import(/* webpackChunkName: "countrySelect" */ 'country-select-js');
+        const { default: _ } = await import(/* webpackChunkName: "countrySelect" */ 'country-select-js');        
         return $(id).countrySelect({
             defaultCountry: window.userLocale.region.toLowerCase(),
             preferredCountries: ["at", "us"],
+            excludeCountries: [],
             responsiveDropdown: true
         });
     } catch (error) {
