@@ -1,12 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Budget.Models;
-using Budget.CategoriesModule.Models;
 using Budget.Data;
-using Budget.TransactionsModule.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Budget.ViewModels;
 
 namespace Budget.Controllers;
 
@@ -21,14 +17,15 @@ public class HomeController : Controller
         _db = budgetDb;
     }
 
-    private async Task<TransactionsViewModel> GetTransactionsViewModel(TransactionsViewModelActiveTab? activeTab = null)
+    private async Task<HomeViewModel> GetTransactionsViewModel(TransactionsViewModelActiveTab? activeTab = null)
     {
         var transactions = await _db.Transactions.ToListAsync();
         var categories = await _db.Categories.ToListAsync();
 
-        var model = new TransactionsViewModel
+        var transactionsList = new TransactionsListViewModel { Transactions = transactions };
+        var model = new HomeViewModel
         {
-            Transactions = transactions,
+            TransactionList = transactionsList,
             Categories = categories,
             ActiveTab = activeTab ?? TransactionsViewModelActiveTab.Transactions
         };

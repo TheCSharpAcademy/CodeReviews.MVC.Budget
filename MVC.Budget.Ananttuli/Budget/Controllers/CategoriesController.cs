@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Budget.Models;
 using Budget.CategoriesModule.Models;
 using Budget.Data;
 using Budget.TransactionsModule.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Budget.ViewModels;
 
 namespace Budget.Controllers;
 
@@ -33,7 +33,8 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<NoContent> CreateCategory([Bind("Category", "Category.Name", "Category.Duration", "Category.Budget")] UpsertCategoryViewModel model)
     {
-        _db.Categories.Add(new Category {
+        _db.Categories.Add(new Category
+        {
             Name = model.Category.Name,
             Duration = model.Category.Duration,
             Budget = model.Category.Budget

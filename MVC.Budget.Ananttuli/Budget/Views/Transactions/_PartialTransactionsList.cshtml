@@ -1,0 +1,37 @@
+﻿@model TransactionsListViewModel
+
+<table id="transactions" class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(m => Model.Transactions[0].Date)</th>
+            <th scope="col">
+                @Html.DisplayNameFor(m => Model.Transactions[0].Description)
+            </th>
+            <th scope="col">@Html.DisplayNameFor(m => Model.Transactions[0].Amount)</th>
+
+            <th scope="col">@Html.DisplayNameFor(m => Model.Transactions[0].Category)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in Model.Transactions)
+        {
+            <tr>
+                <th scope="row">@Html.DisplayFor(m => transaction.Date)</th>
+                <td>@Html.DisplayFor(m => transaction.Description)</td>
+                <td>@Html.DisplayFor(m => transaction.Amount)</td>
+                <td>@Html.DisplayFor(m => transaction.Category.Name)</td>
+                <th>
+                    <button onclick="showEditTransactionModal(@transaction.Id)" type="button" class="btn btn-warning" data-bs-toggle="modal"
+                            data-bs-target="#modal">
+                        Edit
+                    </button>
+                    <button onclick="showEditTransactionModal(@transaction.Id)" type="button" class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#modal">
+                        Delete
+                    </button>
+                </th>
+            </tr>
+        }
+    </tbody>
+</table>

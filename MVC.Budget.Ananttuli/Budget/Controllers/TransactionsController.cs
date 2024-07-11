@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Budget.Models;
-using Budget.CategoriesModule.Models;
 using Budget.Data;
 using Budget.TransactionsModule.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Budget.ViewModels;
 
 namespace Budget.Controllers;
 

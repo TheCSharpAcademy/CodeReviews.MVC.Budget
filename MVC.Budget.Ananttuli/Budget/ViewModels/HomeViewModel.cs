@@ -1,10 +1,10 @@
 using Budget.CategoriesModule.Models;
 
-namespace Budget.TransactionsModule.Models;
+namespace Budget.ViewModels;
 
-public class TransactionsViewModel
+public class HomeViewModel
 {
-    public List<Transaction> Transactions { get; set; } = new();
+    public TransactionsListViewModel TransactionList { get; set; } = new();
     public List<Category> Categories { get; set; } = new();
 
     public TransactionsViewModelActiveTab ActiveTab { get; set; } = TransactionsViewModelActiveTab.Transactions;

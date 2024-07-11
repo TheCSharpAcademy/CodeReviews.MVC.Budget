@@ -1,4 +1,4 @@
-﻿@model TransactionsViewModel
+﻿@model HomeViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -14,8 +14,6 @@
 }
 
 <div class="text-center m-4">
-    <h1 class="display-4">InBudget</h1>
-
     <div class="d-flex align-items-center justify-content-end gap-2 mt-3 mb-3">
         <button onclick="showCreateCategoryModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
                 data-bs-target="#modal">
@@ -44,41 +42,8 @@
     <div class="tab-content" id="myTabContent">
         <div class="@ViewData["TransactionsTabClasses"]" id="transactions" role="tabpanel"
             aria-labelledby="transactions-tab">
-            <table id="transactions" class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Transactions[0].Date)</th>
-                        <th scope="col">
-                            @Html.DisplayNameFor(m => m.Transactions[0].Description)
-                        </th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Transactions[0].Amount)</th>
-                        
-                        <th scope="col">@Html.DisplayNameFor(m => m.Transactions[0].Category)</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var transaction in Model.Transactions)
-                    {
-                        <tr>
-                            <th scope="row">@Html.DisplayFor(m => transaction.Date)</th>
-                            <td>@Html.DisplayFor(m => transaction.Description)</td>
-                            <td>@Html.DisplayFor(m => transaction.Amount)</td>
-                            <td>@Html.DisplayFor(m => transaction.Category.Name)</td>
-                            <th>
-                                <button onclick="showEditTransactionModal(@transaction.Id)" type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#modal">
-                                    Edit
-                                </button>
-                                <button onclick="showEditTransactionModal(@transaction.Id)" type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#modal">
-                                    Delete
-                                </button>
-                            </th>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            
+            <partial name="/Views/Transactions/_PartialTransactionsList.cshtml" for="TransactionList" />
 
 
         </div>

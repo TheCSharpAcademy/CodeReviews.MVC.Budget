@@ -1,7 +1,7 @@
 using Budget.TransactionsModule.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Budget.CategoriesModule.Models;
+namespace Budget.ViewModels;
 
 public class UpsertTransactionViewModel
 {

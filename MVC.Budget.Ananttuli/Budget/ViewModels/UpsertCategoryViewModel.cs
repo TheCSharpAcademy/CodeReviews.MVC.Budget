@@ -1,10 +1,11 @@
+using Budget.CategoriesModule.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Budget.CategoriesModule.Models;
+namespace Budget.ViewModels;
 
 public class UpsertCategoryViewModel
 {
-    public Category Category { get; set; }
+    public Category? Category { get; set; }
 
     public SelectList BudgetDurations { get; set; } = new SelectList
         (
