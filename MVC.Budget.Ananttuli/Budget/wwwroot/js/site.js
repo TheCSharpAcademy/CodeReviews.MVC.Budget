@@ -14,7 +14,7 @@ const updateTransactionFormId = "update-transaction-form";
 //======================== CATEGORY ========================\\
 
 async function showCreateCategoryModal() {
-    await getModalPartialView(`${categoriesUri}/CreateCategoryModal`, "modal");
+    await showPartialViewFormInModal(`${categoriesUri}/CreateCategoryModal`, "Create Category");
 }
 
 async function createCategory(e) {
@@ -29,7 +29,7 @@ async function createCategory(e) {
 }
 
 async function showEditCategoryModal(id) {
-    await getModalPartialView(`${categoriesUri}/EditCategoryModal?id=${id}`, "modal");
+    await showPartialViewFormInModal(`${categoriesUri}/EditCategoryModal?id=${id}`, "Edit Category");
 }
 
 async function updateCategory(e) {
@@ -46,7 +46,7 @@ async function updateCategory(e) {
 //======================== TRANSACTIONS ========================\\
 
 async function showCreateTransactionModal() {
-    await getModalPartialView(`${transactionsUri}/CreateTransactionModal`, "modal");
+    await showPartialViewFormInModal(`${transactionsUri}/CreateTransactionModal`, "Create Transaction");
 }
 
 async function createTransaction(e) {
@@ -61,7 +61,7 @@ async function createTransaction(e) {
 }
 
 async function showEditTransactionModal(id) {
-    await getModalPartialView(`${transactionsUri}/EditTransactionModal?id=${id}`, "modal");
+    await showPartialViewFormInModal(`${transactionsUri}/EditTransactionModal?id=${id}`, "Edit Transaction");
 }
 
 async function updateTransaction(e) {
@@ -108,17 +108,37 @@ async function upsertEntity({ uri, formElementId, redirectUri, method }) {
     }
 }
 
-async function getModalPartialView(uri, modalHtmlId) {
+async function showPartialViewFormInModal(uri, modalTitle) {
     const modalViewResult = await fetch(uri);
-    const modalMarkup = await modalViewResult.text();
+    const modalContent = await modalViewResult.text();
 
-    const modalEl = document.getElementById(modalHtmlId);
-    const modalContentEl = modalEl?.querySelector(".modal-body")
-    if (!modalEl || !modalContentEl) {
-        throw new Error("Could not find modal");
+    const { modalContentEl } = setModalContent(modalTitle, modalContent);
+
+    if (!modalContentEl) return;
+
+    const forms = modalContentEl?.getElementsByTagName("form");
+    var newForm = forms?.[forms.length - 1];
+    if (newForm) {
+        $.validator.unobtrusive.parse(newForm);
     }
-    modalContentEl.innerHTML = modalMarkup;
-    const forms = modalContentEl.getElementsByTagName("form");
-    var newForm = forms[forms.length - 1];
-    $.validator.unobtrusive.parse(newForm);
+}
+
+function resetModalContent() {
+    setModalContent("", "");
+}
+
+function setModalContent(title = "", content = "") {
+    const modalEl = document.getElementById("modal");
+    const modalTitleEl = modalEl?.querySelector(".modal-title");
+    const modalContentEl = modalEl?.querySelector(".modal-body");
+
+    if (!modalEl || !modalContentEl || !modalTitleEl) {
+        console.log("could not set modal content");
+        return {};
+    }
+
+    modalTitleEl.innerHTML = title;
+    modalContentEl.innerHTML = content;
+
+    return { modalTitleEl, modalContentEl };
 }

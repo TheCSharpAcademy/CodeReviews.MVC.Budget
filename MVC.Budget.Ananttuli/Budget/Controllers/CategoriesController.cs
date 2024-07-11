@@ -85,4 +85,22 @@ public class CategoriesController : Controller
 
         return TypedResults.Ok(foundCategory);
     }
+
+    [HttpDelete]
+    [ValidateAntiForgeryToken]
+    public async Task<Results<NotFound, NoContent>> Delete(int id)
+    {
+        var foundCategory = await _db.Categories.FindAsync(id);
+
+        if (foundCategory is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        _db.Categories.Remove(foundCategory);
+
+        await _db.SaveChangesAsync();
+
+        return TypedResults.NoContent();
+    }
 }

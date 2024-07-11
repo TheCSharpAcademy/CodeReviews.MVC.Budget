@@ -32,7 +32,8 @@ public class TransactionsController : Controller
 
         var categoriesSelectList = await GetCategoriesSelectList();
 
-        var model = new UpsertTransactionViewModel { 
+        var model = new UpsertTransactionViewModel
+        {
             Transaction = new Transaction { Date = DateTime.Today },
             AllCategories = categoriesSelectList
         };
@@ -100,5 +101,24 @@ public class TransactionsController : Controller
         await _db.SaveChangesAsync();
 
         return TypedResults.Ok(foundTransaction);
+    }
+
+
+    [HttpDelete]
+    [ValidateAntiForgeryToken]
+    public async Task<Results<NotFound, NoContent>> Delete(int id)
+    {
+        var existingTransaction = await _db.Transactions.FindAsync(id);
+
+        if (existingTransaction is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        _db.Transactions.Remove(existingTransaction);
+
+        await _db.SaveChangesAsync();
+
+        return TypedResults.NoContent();
     }
 }

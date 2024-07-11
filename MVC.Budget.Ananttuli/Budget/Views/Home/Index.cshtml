@@ -13,20 +13,21 @@
     ViewData["CategoriesTabClasses"] = "tab-pane fade " + (isCategoriesTab ? "show active" : "");
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+<div class="text-center m-4">
+    <h1 class="display-4">InBudget</h1>
 
-    <button onclick="showCreateTransactionModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
-            data-bs-target="#modal">
-        + Create Transaction
-    </button>
+    <div class="d-flex align-items-center justify-content-end gap-2 mt-3 mb-3">
+        <button onclick="showCreateCategoryModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#modal">
+            + Create category
+        </button>
+        <button onclick="showCreateTransactionModal()" type="button" class="btn btn-success" data-bs-toggle="modal"
+                data-bs-target="#modal">
+            + Create Transaction
+        </button>
+    </div>
 
-    <button onclick="showCreateCategoryModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
-        data-bs-target="#modal">
-        + Create category
-    </button>
-
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="@ViewData["TransactionsLinkClasses"]" id="transactions-tab" data-bs-toggle="tab"
                 data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions"
@@ -68,6 +69,10 @@
                                 <button onclick="showEditTransactionModal(@transaction.Id)" type="button" class="btn btn-primary" data-bs-toggle="modal"
                                         data-bs-target="#modal">
                                     Edit
+                                </button>
+                                <button onclick="showEditTransactionModal(@transaction.Id)" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#modal">
+                                    Delete
                                 </button>
                             </th>
                         </tr>
@@ -116,7 +121,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="modalLabel"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
