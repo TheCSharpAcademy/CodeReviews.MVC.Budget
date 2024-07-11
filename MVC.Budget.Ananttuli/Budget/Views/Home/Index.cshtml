@@ -1,0 +1,128 @@
+﻿@model TransactionsViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+
+    var isTransactionsTab = Model.ActiveTab == TransactionsViewModelActiveTab.Transactions;
+    var isCategoriesTab = Model.ActiveTab == TransactionsViewModelActiveTab.Categories;
+
+    ViewData["TransactionsLinkClasses"] = "nav-link " + (isTransactionsTab ? "active" : "");
+    ViewData["CategoriesLinkClasses"] = "nav-link " + (isCategoriesTab ? "active" : "");
+
+    ViewData["TransactionsTabClasses"] = "tab-pane fade " + (isTransactionsTab ? "show active" : "");
+    ViewData["CategoriesTabClasses"] = "tab-pane fade " + (isCategoriesTab ? "show active" : "");
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+
+    <button onclick="showCreateTransactionModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#modal">
+        + Create Transaction
+    </button>
+
+    <button onclick="showCreateCategoryModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
+        data-bs-target="#modal">
+        + Create category
+    </button>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="@ViewData["TransactionsLinkClasses"]" id="transactions-tab" data-bs-toggle="tab"
+                data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions"
+                aria-selected="@isTransactionsTab.ToString()">Transactions</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="@ViewData["CategoriesLinkClasses"]" id="categories-tab" data-bs-toggle="tab"
+                data-bs-target="#categories" type="button" role="tab" aria-controls="categories"
+                aria-selected="@isCategoriesTab.ToString()">Categories</button>
+        </li>
+
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+        <div class="@ViewData["TransactionsTabClasses"]" id="transactions" role="tabpanel"
+            aria-labelledby="transactions-tab">
+            <table id="transactions" class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Transactions[0].Date)</th>
+                        <th scope="col">
+                            @Html.DisplayNameFor(m => m.Transactions[0].Description)
+                        </th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Transactions[0].Amount)</th>
+                        
+                        <th scope="col">@Html.DisplayNameFor(m => m.Transactions[0].Category)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var transaction in Model.Transactions)
+                    {
+                        <tr>
+                            <th scope="row">@Html.DisplayFor(m => transaction.Date)</th>
+                            <td>@Html.DisplayFor(m => transaction.Description)</td>
+                            <td>@Html.DisplayFor(m => transaction.Amount)</td>
+                            <td>@Html.DisplayFor(m => transaction.Category.Name)</td>
+                            <th>
+                                <button onclick="showEditTransactionModal(@transaction.Id)" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#modal">
+                                    Edit
+                                </button>
+                            </th>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+        </div>
+        <div class="@ViewData["CategoriesTabClasses"]" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+
+            <table id="categories" class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            @Html.DisplayNameFor(m => m.Categories[0].Name)
+                        </th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Categories[0].Duration)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Categories[0].Budget)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <tr>
+                            <th scope="row">@Html.DisplayFor(m => category.Name)</th>
+                            <td>@Html.DisplayFor(m => category.Duration)</td>
+                            <td>@Html.DisplayFor(m => category.Budget)</td>
+                            <th>
+                                <button onclick="showEditCategoryModal(@category.Id)" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#modal">
+                                    Edit
+                                </button>
+                            </th>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

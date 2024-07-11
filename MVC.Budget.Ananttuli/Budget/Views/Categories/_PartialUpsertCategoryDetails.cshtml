@@ -1,0 +1,21 @@
+@model UpsertCategoryViewModel
+
+<div class="form-floating mb-3">
+    <input asp-for="Category!.Name" type="text" class="form-control" />
+    <label asp-for="Category!.Name"></label>
+    <span asp-validation-for="Category!.Name" class="text-danger" />
+</div>
+
+<div class="form-floating  mb-3">
+    <select class="form-select" asp-for="Category!.Duration" asp-items="Model.BudgetDurations">
+    </select>
+    <label>Budget duration</label>
+</div>
+
+<div class="form-floating mb-3">
+    <input asp-for="Category!.Budget" type="number" class="form-control" />
+    <label asp-for="Category!.Budget"></label>
+    <span asp-validation-for="Category!.Budget" class="text-danger" />
+</div>
+
+<span class="error-message text-danger" />
