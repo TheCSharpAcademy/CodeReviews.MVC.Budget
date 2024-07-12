@@ -31,13 +31,11 @@ public class CategoriesController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<NoContent> CreateCategory([Bind("Category", "Category.Name", "Category.Duration", "Category.Budget")] UpsertCategoryViewModel model)
+    public async Task<NoContent> CreateCategory([Bind("Category", "Category.Name")] UpsertCategoryViewModel model)
     {
         _db.Categories.Add(new Category
         {
-            Name = model.Category.Name,
-            Duration = model.Category.Duration,
-            Budget = model.Category.Budget
+            Name = model.Category!.Name
         });
 
         await _db.SaveChangesAsync();
@@ -52,11 +50,6 @@ public class CategoriesController : Controller
         var model = new UpsertCategoryViewModel
         {
             Category = category,
-            BudgetDurations = new SelectList
-                (
-                    Enum.GetValues(typeof(BudgetDuration)).Cast<BudgetDuration>(),
-                    category?.Duration ?? BudgetDuration.Monthly
-                )
         };
 
         return PartialView("_PartialEditCategoryModalView", model);
@@ -65,7 +58,7 @@ public class CategoriesController : Controller
     [HttpPut]
     [ValidateAntiForgeryToken]
     public async Task<Results<NotFound, Ok<Category>>> UpdateCategory(
-        [Bind("Category", "Category.Id", "Category.Name", "Category.Duration", "Category.Budget")]
+        [Bind("Category", "Category.Id", "Category.Name")]
             UpsertCategoryViewModel model
         )
     {
@@ -77,8 +70,6 @@ public class CategoriesController : Controller
         }
 
         foundCategory.Name = model.Category.Name;
-        foundCategory.Duration = model.Category.Duration;
-        foundCategory.Budget = model.Category.Budget;
 
         _db.Categories.Update(foundCategory);
 

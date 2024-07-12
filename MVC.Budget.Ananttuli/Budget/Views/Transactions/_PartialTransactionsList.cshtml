@@ -1,5 +1,14 @@
 ﻿@model TransactionsListViewModel
 
+<form id="search-form" class="d-flex justify-content-center mt-4 mb-2 gap-2">
+    <input id="search-form-description" type="text" asp-for="SearchText" name="SearchText" aria-label="Filter by description" placeholder="Filter by description" />
+    <select id="search-form-category"  class="form-select" asp-for="SearchCategoryId" asp-items="Model.CategoriesList" name="SearchCategoryId" onchange="this.form.submit()">
+        <option selected>Filter by category</option>
+    </select>
+    <input type="submit" value="Search" class="btn btn-primary" />
+    <input type="submit" value="Clear" onclick="clearSearchForm()" class="btn btn-secondary" />
+</form>
+
 <table id="transactions" class="table">
     <thead>
         <tr>

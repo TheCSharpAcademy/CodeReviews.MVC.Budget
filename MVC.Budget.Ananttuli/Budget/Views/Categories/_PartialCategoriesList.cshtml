@@ -7,8 +7,6 @@
             <th scope="col">
                 @Html.DisplayNameFor(m => m[0].Name)
             </th>
-            <th scope="col">@Html.DisplayNameFor(m => m[0].Duration)</th>
-            <th scope="col">@Html.DisplayNameFor(m => m[0].Budget)</th>
             <th></th>
         </tr>
     </thead>
@@ -17,8 +15,6 @@
         {
             <tr>
                 <th scope="row">@Html.DisplayFor(m => category.Name)</th>
-                <td>@Html.DisplayFor(m => category.Duration)</td>
-                <td>@Html.DisplayFor(m => category.Budget)</td>
                 <th>
                     <button onclick="showEditCategoryModal(@category.Id)" type="button" class="btn btn-warning" data-bs-toggle="modal"
                             data-bs-target="#modal">

@@ -20,11 +20,6 @@ public class TransactionsController : Controller
         _db = budgetDb;
     }
 
-    private async Task<SelectList> GetCategoriesSelectList()
-    {
-        var categories = await _db.Categories.ToListAsync();
-        return new SelectList(categories, "Id", "Name");
-    }
 
     public async Task<PartialViewResult> CreateTransactionModal()
     {
@@ -39,6 +34,12 @@ public class TransactionsController : Controller
 
 
         return PartialView("_PartialCreateTransactionModalView", model);
+    }
+
+    private async Task<SelectList> GetCategoriesSelectList()
+    {
+        var categories = await _db.Categories.ToListAsync();
+        return new SelectList(categories, "Id", "Name");
     }
 
     [HttpPost]

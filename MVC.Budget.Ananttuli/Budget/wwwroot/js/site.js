@@ -10,7 +10,8 @@ const updateCategoryFormId = "update-category-form";
 const transactionsUri = "/Transactions";
 const createTransactionFormId = "create-transaction-form";
 const updateTransactionFormId = "update-transaction-form";
-
+const searchFormDescriptionElementId = "search-form-description";
+const searchFormCategoryElementId = "search-form-category";
 //======================== CATEGORY ========================\\
 
 async function showCreateCategoryModal() {
@@ -81,6 +82,20 @@ async function updateTransaction(e) {
 
 async function deleteTransaction(id) {
     await deleteEntity("Transaction", `${transactionsUri}/Delete/${id}`, homePageTransactionsTab);
+}
+
+function clearSearchForm() {
+
+    const descriptionSearchEl = document.getElementById(searchFormDescriptionElementId);
+    const categorySearchEl = document.getElementById(searchFormCategoryElementId);
+
+    if (descriptionSearchEl) {
+        descriptionSearchEl.value = null;
+    }
+
+    if (categorySearchEl) {
+        categorySearchEl.value = null;
+    }
 }
 
 //======================== COMMON ========================\\
@@ -215,7 +230,6 @@ function showConfirmationModal({ title, body, action, onConfirm, isDestructive, 
     confirmButton.addEventListener('click', async function () {
         try {
             await onConfirm();
-
             confirmModal?.hide();
         } catch {
             confirmModal?.hide();

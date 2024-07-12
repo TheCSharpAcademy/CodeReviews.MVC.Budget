@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Budget.Data;
 using Microsoft.EntityFrameworkCore;
 using Budget.ViewModels;
+using Budget.TransactionsModule.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Budget.Controllers;
 
@@ -17,12 +19,44 @@ public class HomeController : Controller
         _db = budgetDb;
     }
 
-    private async Task<HomeViewModel> GetTransactionsViewModel(TransactionsViewModelActiveTab? activeTab = null)
+    private async Task<List<Transaction>> FindTransactions(string? name = null, int? categoryId = null)
     {
-        var transactions = await _db.Transactions.ToListAsync();
+        IQueryable<Transaction> transactionQuery = _db.Transactions;
+
+        if (name is not null)
+        {
+            transactionQuery = transactionQuery.Where(
+                t => t.Description.ToLower().Contains(name.ToLower())
+            );
+        }
+
+        if (categoryId is not null)
+        {
+            transactionQuery = transactionQuery.Where(
+                t => t.CategoryId == categoryId
+            );
+        }
+
+        return await transactionQuery.ToListAsync();
+    }
+
+    private async Task<HomeViewModel> GetTransactionsViewModel(
+        TransactionsViewModelActiveTab? activeTab = null,
+        string? searchText = null,
+        int? searchCategoryId = null
+    )
+    {
+        var transactions = await FindTransactions(searchText, searchCategoryId);
         var categories = await _db.Categories.ToListAsync();
 
-        var transactionsList = new TransactionsListViewModel { Transactions = transactions };
+        var transactionsList = new TransactionsListViewModel
+        {
+            Transactions = transactions,
+            SearchCategoryId = searchCategoryId,
+            SearchText = searchText,
+            CategoriesList = new SelectList(categories, "Id", "Name", searchCategoryId)
+        };
+
         var model = new HomeViewModel
         {
             TransactionList = transactionsList,
@@ -33,13 +67,18 @@ public class HomeController : Controller
         return model;
     }
 
-    public async Task<IActionResult> Index(TransactionsViewModelActiveTab? activeTab)
+    public async Task<IActionResult> Index(
+        TransactionsViewModelActiveTab? activeTab,
+        string? searchText = null,
+        int? searchCategoryId = null
+    )
     {
-        return View(await GetTransactionsViewModel(activeTab));
+        return View(await GetTransactionsViewModel(activeTab, searchText, searchCategoryId));
     }
 
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
 }
