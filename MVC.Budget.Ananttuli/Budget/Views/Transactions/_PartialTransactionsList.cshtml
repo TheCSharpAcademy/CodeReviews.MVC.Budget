@@ -1,12 +1,40 @@
 ﻿@model TransactionsListViewModel
 
-<form id="search-form" class="d-flex justify-content-center mt-4 mb-2 gap-2">
-    <input id="search-form-description" type="text" asp-for="SearchText" name="SearchText" aria-label="Filter by description" placeholder="Filter by description" />
-    <select id="search-form-category"  class="form-select" asp-for="SearchCategoryId" asp-items="Model.CategoriesList" name="SearchCategoryId" onchange="this.form.submit()">
-        <option selected>Filter by category</option>
-    </select>
-    <input type="submit" value="Search" class="btn btn-primary" />
-    <input type="submit" value="Clear" onclick="clearSearchForm()" class="btn btn-secondary" />
+@{
+    var hasPreviousPage = Model.PageNumber > 1;
+    var hasNextPage = Model.PageNumber < Model.TotalPages;
+
+    var previousPageDisabledAttribute = !hasPreviousPage ? "disabled=\"disabled\"" : "";
+    var nextPageDisabledAttribute = !hasNextPage ? "disabled=\"disabled\"" : "";
+}
+
+<form id="search-form" class="d-flex flex-column">
+    <div class="d-flex justify-content-center mt-4 mb-2 gap-2">
+        <input id="search-form-description" type="text" asp-for="SearchText" name="SearchText" aria-label="Filter by description" placeholder="Filter by description" />
+        <select id="search-form-category"  class="form-select" asp-for="SearchCategoryId" asp-items="Model.CategoriesList" name="SearchCategoryId" onchange="this.form.submit()">
+            <option selected>Filter by category</option>
+        </select>
+
+        <input type="submit" value="Search" class="btn btn-primary" />
+        <input type="submit" value="Clear" onclick="clearSearchForm()" class="btn btn-secondary" />
+    </div>
+
+    <div class="mt-4 d-flex align-self-end gap-3 align-items-center">
+        <div class="d-flex gap-1 btn-group-sm flex-shrink-0">
+            <input type="submit" class="btn btn-secondary" value="&lt;&lt; Previous" @previousPageDisabledAttribute onclick="previousPage()" />
+            <input type="submit" class="btn btn-secondary" value="Next &gt;&gt;" @nextPageDisabledAttribute onclick="nextPage()" />
+        </div>
+        <select
+            id="search-form-page-number"
+            class="form-select-sm"
+            aria-label="page-number"
+            asp-for="PageNumber"
+            asp-items="Model.PageNumbersList"
+            name="PageNumber"
+            onchange="this.form.submit()" 
+        ></select>
+       
+    </div>
 </form>
 
 <table id="transactions" class="table">

@@ -13,11 +13,13 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    scope.ServiceProvider.GetRequiredService<BudgetDb>().Database.EnsureCreated();
+    var budgetDb = scope.ServiceProvider.GetRequiredService<BudgetDb>();
+    budgetDb.Database.EnsureCreated();
+
+    SeedService.Seed(budgetDb);
 }
 
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

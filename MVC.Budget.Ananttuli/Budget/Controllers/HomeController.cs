@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Budget.ViewModels;
 using Budget.TransactionsModule.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Linq;
 
 namespace Budget.Controllers;
 
@@ -19,8 +20,70 @@ public class HomeController : Controller
         _db = budgetDb;
     }
 
-    private async Task<List<Transaction>> FindTransactions(string? name = null, int? categoryId = null)
+
+    public async Task<IActionResult> Index(
+        int? pageNumber,
+        int? pageSize,
+        TransactionsViewModelActiveTab? activeTab,
+        string? searchText = null,
+        int? searchCategoryId = null
+    )
     {
+        return View(await GetTransactionsViewModel(activeTab, searchText, searchCategoryId, pageNumber, pageSize));
+    }
+
+
+    private async Task<HomeViewModel> GetTransactionsViewModel(
+        TransactionsViewModelActiveTab? activeTab = null,
+        string? searchText = null,
+        int? searchCategoryId = null,
+        int? pageNumber = null,
+        int? pageSize = null
+    )
+    {
+        var validPageNumber = (!pageNumber.HasValue || pageNumber < 1) ? 1 : pageNumber.Value;
+        var validPageSize = (!pageSize.HasValue || pageSize < 1) ? 20 : pageSize.Value;
+
+        var (transactions, total) = await FindTransactions(validPageNumber, validPageSize, searchText, searchCategoryId);
+        var categories = await _db.Categories.ToListAsync();
+
+        var remainder = total % validPageSize;
+        var totalPages = (total / validPageSize) + (remainder > 0 ? 1 : 0);
+
+        var transactionsListViewModel = new TransactionsListViewModel
+        {
+            Transactions = transactions,
+            Total = total,
+            SearchCategoryId = searchCategoryId,
+            SearchText = searchText,
+            CategoriesList = new SelectList(categories, "Id", "Name", searchCategoryId),
+            PageSize = validPageSize,
+            PageNumber = validPageNumber,
+            TotalPages = totalPages,
+            PageNumbersList = new SelectList(Enumerable.Range(1, totalPages).ToList(), validPageNumber)
+        };
+
+        var model = new HomeViewModel
+        {
+            TransactionList = transactionsListViewModel,
+            Categories = categories,
+            ActiveTab = activeTab ?? TransactionsViewModelActiveTab.Transactions
+        };
+
+        return model;
+    }
+    private async Task<(List<Transaction>, int)> FindTransactions(
+        int pageNumber,
+        int pageSize,
+        string? name = null,
+        int? categoryId = null
+    )
+    {
+        if (pageSize < 1)
+        {
+            return ([], 0);
+        }
+
         IQueryable<Transaction> transactionQuery = _db.Transactions;
 
         if (name is not null)
@@ -37,43 +100,15 @@ public class HomeController : Controller
             );
         }
 
-        return await transactionQuery.ToListAsync();
-    }
+        var total = await transactionQuery.CountAsync();
 
-    private async Task<HomeViewModel> GetTransactionsViewModel(
-        TransactionsViewModelActiveTab? activeTab = null,
-        string? searchText = null,
-        int? searchCategoryId = null
-    )
-    {
-        var transactions = await FindTransactions(searchText, searchCategoryId);
-        var categories = await _db.Categories.ToListAsync();
+        var transactions = await transactionQuery
+            .OrderByDescending(t => t.Date)
+            .ThenBy(t => t.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize).ToListAsync();
 
-        var transactionsList = new TransactionsListViewModel
-        {
-            Transactions = transactions,
-            SearchCategoryId = searchCategoryId,
-            SearchText = searchText,
-            CategoriesList = new SelectList(categories, "Id", "Name", searchCategoryId)
-        };
-
-        var model = new HomeViewModel
-        {
-            TransactionList = transactionsList,
-            Categories = categories,
-            ActiveTab = activeTab ?? TransactionsViewModelActiveTab.Transactions
-        };
-
-        return model;
-    }
-
-    public async Task<IActionResult> Index(
-        TransactionsViewModelActiveTab? activeTab,
-        string? searchText = null,
-        int? searchCategoryId = null
-    )
-    {
-        return View(await GetTransactionsViewModel(activeTab, searchText, searchCategoryId));
+        return (transactions, total);
     }
 
     public IActionResult Error()
