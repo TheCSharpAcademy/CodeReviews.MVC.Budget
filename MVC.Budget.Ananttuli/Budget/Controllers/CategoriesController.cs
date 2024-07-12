@@ -88,7 +88,6 @@ public class CategoriesController : Controller
     }
 
     [HttpDelete]
-    [ValidateAntiForgeryToken]
     public async Task<Results<NotFound, NoContent>> Delete(int id)
     {
         var foundCategory = await _db.Categories.FindAsync(id);

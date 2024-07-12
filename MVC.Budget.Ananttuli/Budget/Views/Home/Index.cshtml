@@ -48,35 +48,7 @@
 
         </div>
         <div class="@ViewData["CategoriesTabClasses"]" id="categories" role="tabpanel" aria-labelledby="categories-tab">
-
-            <table id="categories" class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">
-                            @Html.DisplayNameFor(m => m.Categories[0].Name)
-                        </th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Categories[0].Duration)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Categories[0].Budget)</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var category in Model.Categories)
-                    {
-                        <tr>
-                            <th scope="row">@Html.DisplayFor(m => category.Name)</th>
-                            <td>@Html.DisplayFor(m => category.Duration)</td>
-                            <td>@Html.DisplayFor(m => category.Budget)</td>
-                            <th>
-                                <button onclick="showEditCategoryModal(@category.Id)" type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#modal">
-                                    Edit
-                                </button>
-                            </th>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <partial name="/Views/Categories/_PartialCategoriesList.cshtml" for="Categories" />
         </div>
     </div>
 

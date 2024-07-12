@@ -104,7 +104,6 @@ public class TransactionsController : Controller
 
 
     [HttpDelete]
-    [ValidateAntiForgeryToken]
     public async Task<Results<NotFound, NoContent>> Delete(int id)
     {
         var existingTransaction = await _db.Transactions.FindAsync(id);
