@@ -1,18 +1,17 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using Budget.Data;
 using Budget.TransactionsModule.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Budget.ViewModels;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Controllers;
 
 public class TransactionsController : Controller
 {
-    private readonly ILogger<TransactionsController> _logger;
     private readonly BudgetDb _db;
+    private readonly ILogger<TransactionsController> _logger;
 
     public TransactionsController(ILogger<TransactionsController> logger, BudgetDb budgetDb)
     {
@@ -23,7 +22,6 @@ public class TransactionsController : Controller
 
     public async Task<PartialViewResult> CreateTransactionModal()
     {
-
         var categoriesSelectList = await GetCategoriesSelectList();
 
         var model = new UpsertTransactionViewModel
@@ -45,7 +43,8 @@ public class TransactionsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<NoContent> CreateTransaction(
-        [Bind("Transaction", "Transaction.Description", "Transaction.Date", "Transaction.Amount", "Transaction.CategoryId")]
+        [Bind("Transaction", "Transaction.Description", "Transaction.Date", "Transaction.Amount",
+            "Transaction.CategoryId")]
         UpsertTransactionViewModel model
     )
     {
@@ -80,16 +79,14 @@ public class TransactionsController : Controller
     [HttpPut]
     [ValidateAntiForgeryToken]
     public async Task<Results<NotFound, Ok<Transaction>>> UpdateTransaction(
-       [Bind("Transaction", "Transaction.Id", "Transaction.Description", "Transaction.Date", "Transaction.Amount", "Transaction.CategoryId")]
-            UpsertTransactionViewModel model
-        )
+        [Bind("Transaction", "Transaction.Id", "Transaction.Description", "Transaction.Date", "Transaction.Amount",
+            "Transaction.CategoryId")]
+        UpsertTransactionViewModel model
+    )
     {
         var foundTransaction = await _db.Transactions.FindAsync(model.Transaction.Id);
 
-        if (foundTransaction is null)
-        {
-            return TypedResults.NotFound();
-        }
+        if (foundTransaction is null) return TypedResults.NotFound();
 
         foundTransaction.Description = model.Transaction.Description;
         foundTransaction.Date = model.Transaction.Date;
@@ -109,10 +106,7 @@ public class TransactionsController : Controller
     {
         var existingTransaction = await _db.Transactions.FindAsync(id);
 
-        if (existingTransaction is null)
-        {
-            return TypedResults.NotFound();
-        }
+        if (existingTransaction is null) return TypedResults.NotFound();
 
         _db.Transactions.Remove(existingTransaction);
 

@@ -6,9 +6,10 @@ namespace Budget.Data;
 
 public class BudgetDb : DbContext
 {
+    public BudgetDb(DbContextOptions options) : base(options)
+    {
+    }
+
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Category> Categories { get; set; }
-
-    public BudgetDb(DbContextOptions options) : base(options)
-    { }
 }

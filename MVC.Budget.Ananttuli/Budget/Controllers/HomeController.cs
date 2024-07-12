@@ -1,18 +1,17 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using Budget.Data;
-using Microsoft.EntityFrameworkCore;
-using Budget.ViewModels;
 using Budget.TransactionsModule.Models;
+using Budget.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Budget.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
     private readonly BudgetDb _db;
+    private readonly ILogger<HomeController> _logger;
 
     public HomeController(ILogger<HomeController> logger, BudgetDb budgetDb)
     {
@@ -31,7 +30,8 @@ public class HomeController : Controller
         DateOnly? endDateRange = null
     )
     {
-        return View(await GetTransactionsViewModel(activeTab, searchText, searchCategoryId, pageNumber, pageSize, startDateRange, endDateRange));
+        return View(await GetTransactionsViewModel(activeTab, searchText, searchCategoryId, pageNumber, pageSize,
+            startDateRange, endDateRange));
     }
 
 
@@ -45,8 +45,8 @@ public class HomeController : Controller
         DateOnly? endDateRange = null
     )
     {
-        var validPageNumber = (!pageNumber.HasValue || pageNumber < 1) ? 1 : pageNumber.Value;
-        var validPageSize = (!pageSize.HasValue || pageSize < 1) ? 20 : pageSize.Value;
+        var validPageNumber = !pageNumber.HasValue || pageNumber < 1 ? 1 : pageNumber.Value;
+        var validPageSize = !pageSize.HasValue || pageSize < 1 ? 20 : pageSize.Value;
 
         var (transactions, total) = await FindTransactions(
             validPageNumber, validPageSize, searchText,
@@ -56,7 +56,7 @@ public class HomeController : Controller
         var categories = await _db.Categories.ToListAsync();
 
         var remainder = total % validPageSize;
-        var totalPages = (total / validPageSize) + (remainder > 0 ? 1 : 0);
+        var totalPages = total / validPageSize + (remainder > 0 ? 1 : 0);
 
         var transactionsListViewModel = new TransactionsListViewModel
         {
@@ -82,6 +82,7 @@ public class HomeController : Controller
 
         return model;
     }
+
     private async Task<(List<Transaction>, int)> FindTransactions(
         int pageNumber,
         int pageSize,
@@ -91,40 +92,29 @@ public class HomeController : Controller
         DateOnly? endDateRange = null
     )
     {
-        if (pageSize < 1)
-        {
-            return ([], 0);
-        }
+        if (pageSize < 1) return ([], 0);
 
         IQueryable<Transaction> transactionQuery = _db.Transactions;
 
         if (name is not null)
-        {
             transactionQuery = transactionQuery.Where(
                 t => t.Description.ToLower().Contains(name.ToLower())
             );
-        }
 
         if (categoryId is not null)
-        {
             transactionQuery = transactionQuery.Where(
                 t => t.CategoryId == categoryId
             );
-        }
 
-        if(startDateRange.HasValue)
-        {
+        if (startDateRange.HasValue)
             transactionQuery = transactionQuery.Where(
-                t => DateOnly.FromDateTime(t.Date) >= startDateRange.Value 
+                t => DateOnly.FromDateTime(t.Date) >= startDateRange.Value
             );
-        }
 
         if (endDateRange.HasValue)
-        {
             transactionQuery = transactionQuery.Where(
                 t => DateOnly.FromDateTime(t.Date) <= endDateRange.Value
             );
-        }
 
         var total = await transactionQuery.CountAsync();
 
@@ -141,5 +131,4 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
-
 }

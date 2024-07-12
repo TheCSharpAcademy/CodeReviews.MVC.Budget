@@ -1,15 +1,16 @@
 @model UpsertTransactionViewModel
 
 
-@if(Model.Transaction is null)
+@if (Model.Transaction is null)
 {
     <h3>Not Found</h3>
-} else
+}
+else
 {
     <form id="create-transaction-form" action="/Home/CreateTransaction" method="post" onsubmit="createTransaction(event)">
         @Html.AntiForgeryToken()
         <div class="row">
-            <partial name="_PartialUpsertTransactionDetails" for="@Model" />
+            <partial name="_PartialUpsertTransactionDetails" for="@Model"/>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

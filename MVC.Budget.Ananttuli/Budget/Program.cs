@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("BudgetDb");
 
-builder.Services.AddDbContext<BudgetDb>((builder) => builder.UseSqlServer(connectionString));
+builder.Services.AddDbContext<BudgetDb>(builder => builder.UseSqlServer(connectionString));
 
 builder.Services.AddControllersWithViews();
 
@@ -34,7 +34,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    "default",
+    "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

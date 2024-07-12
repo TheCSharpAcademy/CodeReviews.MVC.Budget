@@ -28,30 +28,33 @@
     <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="@ViewData["TransactionsLinkClasses"]" id="transactions-tab" data-bs-toggle="tab"
-                data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions"
-                aria-selected="@isTransactionsTab.ToString()">Transactions</button>
+                    data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions"
+                    aria-selected="@isTransactionsTab.ToString()">
+                Transactions
+            </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="@ViewData["CategoriesLinkClasses"]" id="categories-tab" data-bs-toggle="tab"
-                data-bs-target="#categories" type="button" role="tab" aria-controls="categories"
-                aria-selected="@isCategoriesTab.ToString()">Categories</button>
+                    data-bs-target="#categories" type="button" role="tab" aria-controls="categories"
+                    aria-selected="@isCategoriesTab.ToString()">
+                Categories
+            </button>
         </li>
 
     </ul>
 
     <div class="tab-content" id="myTabContent">
         <div class="@ViewData["TransactionsTabClasses"]" id="transactions" role="tabpanel"
-            aria-labelledby="transactions-tab">
-            
-            <partial name="/Views/Transactions/_PartialTransactionsList.cshtml" for="TransactionList" />
+             aria-labelledby="transactions-tab">
+
+            <partial name="/Views/Transactions/_PartialTransactionsList.cshtml" for="TransactionList"/>
 
 
         </div>
         <div class="@ViewData["CategoriesTabClasses"]" id="categories" role="tabpanel" aria-labelledby="categories-tab">
-            <partial name="/Views/Categories/_PartialCategoriesList.cshtml" for="Categories" />
+            <partial name="/Views/Categories/_PartialCategoriesList.cshtml" for="Categories"/>
         </div>
     </div>
-
 
 
     <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">

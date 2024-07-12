@@ -1,19 +1,15 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using Budget.CategoriesModule.Models;
 using Budget.Data;
-using Budget.TransactionsModule.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Budget.ViewModels;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Budget.Controllers;
 
 public class CategoriesController : Controller
 {
-    private readonly ILogger<CategoriesController> _logger;
     private readonly BudgetDb _db;
+    private readonly ILogger<CategoriesController> _logger;
 
     public CategoriesController(ILogger<CategoriesController> logger, BudgetDb budgetDb)
     {
@@ -49,7 +45,7 @@ public class CategoriesController : Controller
 
         var model = new UpsertCategoryViewModel
         {
-            Category = category,
+            Category = category
         };
 
         return PartialView("_PartialEditCategoryModalView", model);
@@ -59,15 +55,12 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<Results<NotFound, Ok<Category>>> UpdateCategory(
         [Bind("Category", "Category.Id", "Category.Name")]
-            UpsertCategoryViewModel model
-        )
+        UpsertCategoryViewModel model
+    )
     {
         var foundCategory = await _db.Categories.FindAsync(model.Category.Id);
 
-        if (foundCategory is null)
-        {
-            return TypedResults.NotFound();
-        }
+        if (foundCategory is null) return TypedResults.NotFound();
 
         foundCategory.Name = model.Category.Name;
 
@@ -83,10 +76,7 @@ public class CategoriesController : Controller
     {
         var foundCategory = await _db.Categories.FindAsync(id);
 
-        if (foundCategory is null)
-        {
-            return TypedResults.NotFound();
-        }
+        if (foundCategory is null) return TypedResults.NotFound();
 
         _db.Categories.Remove(foundCategory);
 

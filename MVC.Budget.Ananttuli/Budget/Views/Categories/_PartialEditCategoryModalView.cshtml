@@ -1,16 +1,17 @@
 @model UpsertCategoryViewModel
 
 
-@if(Model.Category is null)
+@if (Model.Category is null)
 {
     <h3>Not Found</h3>
-} else
+}
+else
 {
     <form id="update-category-form" action="/Home/UpdateCategory" method="post" onsubmit="updateCategory(event)">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="Category!.Id" />
+        <input type="hidden" asp-for="Category!.Id"/>
         <div class="row">
-            <partial name="_PartialUpsertCategoryDetails" for="@Model" />
+            <partial name="_PartialUpsertCategoryDetails" for="@Model"/>
 
 
             <div class="modal-footer">
