@@ -14,8 +14,8 @@ const transactionsUri = "/Transactions";
 const createTransactionFormId = "create-transaction-form";
 const updateTransactionFormId = "update-transaction-form";
 
-const searchFormDescriptionElementId = "search-form-description";
-const searchFormCategoryElementId = "search-form-category";
+const searchFormElementId = "search-form";
+const searchFormInputsClass = "search-form-input";
 const searchFormPageNumberElementId = "search-form-page-number";
 
 //======================== CATEGORY ========================\\
@@ -45,7 +45,7 @@ export async function updateCategory(e) {
     await upsertEntity({
         uri: `${categoriesUri}/UpdateCategory`,
         formElementId: updateCategoryFormId,
-        redirectUri: homePageCategoriesTab,
+        redirectUri: `${homePageCategoriesTab}${window.location.search || ''}`,
         method: "PUT"
     });
 }
@@ -81,7 +81,7 @@ export async function updateTransaction(e) {
     await upsertEntity({
         uri: `${transactionsUri}/UpdateTransaction`,
         formElementId: updateTransactionFormId,
-        redirectUri: homePageTransactionsTab,
+        redirectUri: `${homePageTransactionsTab}${window.location.search || ''}`,
         method: "PUT"
     });
 }
@@ -91,17 +91,15 @@ export async function deleteTransaction(id) {
 }
 
 export function clearSearchForm() {
-
-    const descriptionSearchEl = document.getElementById(searchFormDescriptionElementId);
-    const categorySearchEl = document.getElementById(searchFormCategoryElementId);
+    const searchFormEl = document.getElementById(searchFormElementId);
     const pageNumberEl = document.getElementById(searchFormPageNumberElementId);
 
-    if (descriptionSearchEl) {
-        descriptionSearchEl.value = null;
+    if (!searchFormEl) {
+        return;
     }
 
-    if (categorySearchEl) {
-        categorySearchEl.value = null;
+    for (const input of searchFormEl.querySelectorAll(`.${searchFormInputsClass}`) || []) {
+        input.value = null;
     }
 
     if (pageNumberEl) {

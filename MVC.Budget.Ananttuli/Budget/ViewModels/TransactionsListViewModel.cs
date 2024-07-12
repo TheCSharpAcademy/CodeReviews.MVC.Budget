@@ -1,5 +1,6 @@
 ﻿using Budget.TransactionsModule.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Budget.ViewModels
@@ -12,15 +13,23 @@ namespace Budget.ViewModels
         public SelectList CategoriesList { get; set; }
 
         [Range(1, int.MaxValue)]
-        public int? PageNumber { get; set; } = 1;
-
-        [Range(1, 100)]
-        public int? PageSize { get; set; } = 25;
+        public int? PageNumber { get; set; }
 
         public int Total { get; set; }
-        
+
         public int TotalPages { get; set; }
-        
+
         public SelectList PageNumbersList { get; set; }
+
+        [Range(1, 100)]
+        public int? PageSize { get; set; }
+
+        [DataType(DataType.Date)]
+        [DisplayName("Date From")]
+        public DateOnly? StartDateRange { get; set; }
+
+        [DataType(DataType.Date)]
+        [DisplayName("Date To")]
+        public DateOnly? EndDateRange { get; set; }
     }
 }

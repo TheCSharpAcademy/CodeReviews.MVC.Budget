@@ -9,14 +9,27 @@
 }
 
 <form id="search-form" class="d-flex flex-column">
-    <div class="d-flex justify-content-center mt-4 mb-2 gap-2">
-        <input id="search-form-description" type="text" asp-for="SearchText" name="SearchText" aria-label="Filter by description" placeholder="Filter by description" />
-        <select id="search-form-category"  class="form-select" asp-for="SearchCategoryId" asp-items="Model.CategoriesList" name="SearchCategoryId" onchange="this.form.submit()">
-            <option selected>Filter by category</option>
-        </select>
+    <div class="d-flex flex-wrap justify-content-center mt-4 mb-2 gap-2">
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <div class="d-flex gap-2 input-group-sm">
+                <input class="search-form-input" type="text" asp-for="SearchText" name="SearchText" aria-label="Filter by description" placeholder="Filter by description" />
+                <select class="search-form-input" class="form-select" asp-for="SearchCategoryId" asp-items="Model.CategoriesList" name="SearchCategoryId" onchange="this.form.submit()">
+                    <option selected>Filter by category</option>
+                </select>
+            </div>
+            <div class="d-flex gap-2 input-group-sm flex-shrink-0">
+                <label asp-for="StartDateRange"></label>
+                <input class="search-form-input" type="date" asp-for="StartDateRange" name="StartDateRange" onchange="this.form.submit()" />
 
-        <input type="submit" value="Search" class="btn btn-primary" />
-        <input type="submit" value="Clear" onclick="clearSearchForm()" class="btn btn-secondary" />
+                <label asp-for="EndDateRange"></label>
+                <input class="search-form-input" type="date" asp-for="EndDateRange" name="EndDateRange" onchange="this.form.submit()" />
+            </div>
+        </div>
+
+        <div class="d-flex align-self-end gap-2">
+            <input type="submit" value="Search" class="btn btn-primary" />
+            <input type="submit" value="Clear" onclick="clearSearchForm()" class="btn btn-secondary" />
+        </div>
     </div>
 
     <div class="mt-4 d-flex align-self-end gap-3 align-items-center">
@@ -26,7 +39,7 @@
         </div>
         <select
             id="search-form-page-number"
-            class="form-select-sm"
+            class="form-select-sm search-form-input"
             aria-label="page-number"
             asp-for="PageNumber"
             asp-items="Model.PageNumbersList"

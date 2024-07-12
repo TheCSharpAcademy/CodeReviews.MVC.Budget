@@ -26,10 +26,12 @@ public class HomeController : Controller
         int? pageSize,
         TransactionsViewModelActiveTab? activeTab,
         string? searchText = null,
-        int? searchCategoryId = null
+        int? searchCategoryId = null,
+        DateOnly? startDateRange = null,
+        DateOnly? endDateRange = null
     )
     {
-        return View(await GetTransactionsViewModel(activeTab, searchText, searchCategoryId, pageNumber, pageSize));
+        return View(await GetTransactionsViewModel(activeTab, searchText, searchCategoryId, pageNumber, pageSize, startDateRange, endDateRange));
     }
 
 
@@ -38,13 +40,19 @@ public class HomeController : Controller
         string? searchText = null,
         int? searchCategoryId = null,
         int? pageNumber = null,
-        int? pageSize = null
+        int? pageSize = null,
+        DateOnly? startDateRange = null,
+        DateOnly? endDateRange = null
     )
     {
         var validPageNumber = (!pageNumber.HasValue || pageNumber < 1) ? 1 : pageNumber.Value;
         var validPageSize = (!pageSize.HasValue || pageSize < 1) ? 20 : pageSize.Value;
 
-        var (transactions, total) = await FindTransactions(validPageNumber, validPageSize, searchText, searchCategoryId);
+        var (transactions, total) = await FindTransactions(
+            validPageNumber, validPageSize, searchText,
+            searchCategoryId, startDateRange, endDateRange
+        );
+
         var categories = await _db.Categories.ToListAsync();
 
         var remainder = total % validPageSize;
@@ -60,7 +68,9 @@ public class HomeController : Controller
             PageSize = validPageSize,
             PageNumber = validPageNumber,
             TotalPages = totalPages,
-            PageNumbersList = new SelectList(Enumerable.Range(1, totalPages).ToList(), validPageNumber)
+            PageNumbersList = new SelectList(Enumerable.Range(1, totalPages).ToList(), validPageNumber),
+            StartDateRange = startDateRange,
+            EndDateRange = endDateRange
         };
 
         var model = new HomeViewModel
@@ -76,7 +86,9 @@ public class HomeController : Controller
         int pageNumber,
         int pageSize,
         string? name = null,
-        int? categoryId = null
+        int? categoryId = null,
+        DateOnly? startDateRange = null,
+        DateOnly? endDateRange = null
     )
     {
         if (pageSize < 1)
@@ -97,6 +109,20 @@ public class HomeController : Controller
         {
             transactionQuery = transactionQuery.Where(
                 t => t.CategoryId == categoryId
+            );
+        }
+
+        if(startDateRange.HasValue)
+        {
+            transactionQuery = transactionQuery.Where(
+                t => DateOnly.FromDateTime(t.Date) >= startDateRange.Value 
+            );
+        }
+
+        if (endDateRange.HasValue)
+        {
+            transactionQuery = transactionQuery.Where(
+                t => DateOnly.FromDateTime(t.Date) <= endDateRange.Value
             );
         }
 
