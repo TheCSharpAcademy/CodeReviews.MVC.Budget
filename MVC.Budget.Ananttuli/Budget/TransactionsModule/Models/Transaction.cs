@@ -18,6 +18,8 @@ public class Transaction
     [DataType(DataType.Currency)]
     public decimal Amount { get; set; }
 
+    [Required(ErrorMessage = "Transaction must have a linked category")]
     public int CategoryId { get; set; }
+
     public Category Category { get; set; }
 }
