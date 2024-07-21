@@ -1,0 +1,30 @@
+﻿@model List<Category>
+
+
+<table id="categories" class="table">
+    <thead>
+    <tr>
+        <th scope="col">
+            @Html.DisplayNameFor(m => m[0].Name)
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var category in Model)
+    {
+        <tr>
+            <th scope="row">@Html.DisplayFor(m => category.Name)</th>
+            <th>
+                <button onclick="showEditCategoryModal(@category.Id)" type="button" class="btn btn-warning" data-bs-toggle="modal"
+                        data-bs-target="#modal">
+                    Edit
+                </button>
+                <button onclick="deleteCategory(@category.Id)" type="button" class="btn btn-danger">
+                    Delete
+                </button>
+            </th>
+        </tr>
+    }
+    </tbody>
+</table>

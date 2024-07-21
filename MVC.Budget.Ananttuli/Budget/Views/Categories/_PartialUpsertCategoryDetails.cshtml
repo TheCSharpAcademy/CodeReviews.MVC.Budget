@@ -1,0 +1,9 @@
+@model UpsertCategoryViewModel
+
+<div class="form-floating mb-3">
+    <input asp-for="Category!.Name" type="text" class="form-control"/>
+    <label asp-for="Category!.Name"></label>
+    <span asp-validation-for="Category!.Name" class="text-danger"/>
+</div>
+
+<span class="error-message text-danger"/>

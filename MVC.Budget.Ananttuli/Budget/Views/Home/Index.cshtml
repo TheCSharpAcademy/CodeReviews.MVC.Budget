@@ -1,0 +1,73 @@
+﻿@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+
+    var isTransactionsTab = Model.ActiveTab == TransactionsViewModelActiveTab.Transactions;
+    var isCategoriesTab = Model.ActiveTab == TransactionsViewModelActiveTab.Categories;
+
+    ViewData["TransactionsLinkClasses"] = "nav-link " + (isTransactionsTab ? "active" : "");
+    ViewData["CategoriesLinkClasses"] = "nav-link " + (isCategoriesTab ? "active" : "");
+
+    ViewData["TransactionsTabClasses"] = "tab-pane fade " + (isTransactionsTab ? "show active" : "");
+    ViewData["CategoriesTabClasses"] = "tab-pane fade " + (isCategoriesTab ? "show active" : "");
+}
+
+<div class="text-center m-4">
+    <div class="d-flex align-items-center justify-content-end gap-2 mt-3 mb-3">
+        <button onclick="showCreateCategoryModal()" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#modal">
+            + Create category
+        </button>
+        <button onclick="showCreateTransactionModal()" type="button" class="btn btn-success" data-bs-toggle="modal"
+                data-bs-target="#modal">
+            + Create Transaction
+        </button>
+    </div>
+
+    <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="@ViewData["TransactionsLinkClasses"]" id="transactions-tab" data-bs-toggle="tab"
+                    data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions"
+                    aria-selected="@isTransactionsTab.ToString()">
+                Transactions
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="@ViewData["CategoriesLinkClasses"]" id="categories-tab" data-bs-toggle="tab"
+                    data-bs-target="#categories" type="button" role="tab" aria-controls="categories"
+                    aria-selected="@isCategoriesTab.ToString()">
+                Categories
+            </button>
+        </li>
+
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+        <div class="@ViewData["TransactionsTabClasses"]" id="transactions" role="tabpanel"
+             aria-labelledby="transactions-tab">
+
+            <partial name="/Views/Transactions/_PartialTransactionsList.cshtml" for="TransactionList"/>
+
+
+        </div>
+        <div class="@ViewData["CategoriesTabClasses"]" id="categories" role="tabpanel" aria-labelledby="categories-tab">
+            <partial name="/Views/Categories/_PartialCategoriesList.cshtml" for="Categories"/>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

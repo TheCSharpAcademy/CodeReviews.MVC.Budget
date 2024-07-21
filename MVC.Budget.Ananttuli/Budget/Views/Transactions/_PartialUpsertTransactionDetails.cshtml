@@ -1,0 +1,31 @@
+@model UpsertTransactionViewModel
+
+<div class="form-floating mb-3">
+    <input asp-for="Transaction!.Amount" type="number" class="form-control"/>
+    <label asp-for="Transaction!.Amount"></label>
+    <span asp-validation-for="Transaction!.Amount" class="text-danger"/>
+</div>
+<div class="form-floating mb-3">
+    <input asp-for="Transaction!.Description" type="text" class="form-control"/>
+    <label asp-for="Transaction!.Description"></label>
+    <span asp-validation-for="Transaction!.Description" class="text-danger"/>
+</div>
+<div class="form-floating mb-3">
+    <input asp-for="Transaction!.Date" type="date" class="form-control"/>
+    <label asp-for="Transaction!.Date"></label>
+    <span asp-validation-for="Transaction!.Date" class="text-danger"/>
+</div>
+
+<div class="form-floating mb-3">
+    <select class="form-select" asp-for="Transaction!.CategoryId" asp-items="Model.AllCategories">
+    </select>
+    <label>Category</label>
+    <span asp-validation-for="Transaction!.CategoryId" class="text-danger"/>
+</div>
+
+@if (Model.AllCategories.Count() == 0)
+{
+    <span class="text-danger">No categories available. Please create a category first so it can be linked to this transaction.</span>
+}
+
+<span class="error-message text-danger"></span>

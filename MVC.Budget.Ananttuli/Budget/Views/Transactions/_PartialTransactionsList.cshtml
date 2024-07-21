@@ -1,0 +1,86 @@
+﻿@model TransactionsListViewModel
+
+@{
+    var hasPreviousPage = Model.PageNumber > 1;
+    var hasNextPage = Model.PageNumber < Model.TotalPages;
+
+    var previousPageDisabledAttribute = !hasPreviousPage ? "disabled=\"disabled\"" : "";
+    var nextPageDisabledAttribute = !hasNextPage ? "disabled=\"disabled\"" : "";
+}
+
+<form id="search-form" class="d-flex flex-column">
+    <div class="d-flex flex-wrap justify-content-center mt-4 mb-2 gap-2">
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <div class="d-flex gap-2 input-group-sm">
+                <input class="search-form-input" type="text" asp-for="SearchText" name="SearchText" aria-label="Filter by description" placeholder="Filter by description"/>
+                <select class="search-form-input" class="form-select" asp-for="SearchCategoryId" asp-items="Model.CategoriesList" name="SearchCategoryId" onchange="this.form.submit()">
+                    <option selected>Filter by category</option>
+                </select>
+            </div>
+            <div class="d-flex gap-2 input-group-sm flex-shrink-0">
+                <label asp-for="StartDateRange"></label>
+                <input class="search-form-input" type="date" asp-for="StartDateRange" name="StartDateRange" onchange="this.form.submit()"/>
+
+                <label asp-for="EndDateRange"></label>
+                <input class="search-form-input" type="date" asp-for="EndDateRange" name="EndDateRange" onchange="this.form.submit()"/>
+            </div>
+        </div>
+
+        <div class="d-flex align-self-end gap-2">
+            <input type="submit" value="Search" class="btn btn-primary"/>
+            <input type="submit" value="Clear" onclick="clearSearchForm()" class="btn btn-secondary"/>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex align-self-end gap-3 align-items-center">
+        <div class="d-flex gap-1 btn-group-sm flex-shrink-0">
+            <input type="submit" class="btn btn-secondary" value="&lt;&lt; Previous" @previousPageDisabledAttribute onclick="previousPage()"/>
+            <input type="submit" class="btn btn-secondary" value="Next &gt;&gt;" @nextPageDisabledAttribute onclick="nextPage()"/>
+        </div>
+        <select
+            id="search-form-page-number"
+            class="form-select-sm search-form-input"
+            aria-label="page-number"
+            asp-for="PageNumber"
+            asp-items="Model.PageNumbersList"
+            name="PageNumber"
+            onchange="this.form.submit()">
+        </select>
+
+    </div>
+</form>
+
+<table id="transactions" class="table">
+    <thead>
+    <tr>
+        <th scope="col">@Html.DisplayNameFor(m => Model.Transactions[0].Date)</th>
+        <th scope="col">
+            @Html.DisplayNameFor(m => Model.Transactions[0].Description)
+        </th>
+        <th scope="col">@Html.DisplayNameFor(m => Model.Transactions[0].Amount)</th>
+
+        <th scope="col">@Html.DisplayNameFor(m => Model.Transactions[0].Category)</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var transaction in Model.Transactions)
+    {
+        <tr>
+            <th scope="row">@Html.DisplayFor(m => transaction.Date)</th>
+            <td>@Html.DisplayFor(m => transaction.Description)</td>
+            <td>@Html.DisplayFor(m => transaction.Amount)</td>
+            <td>@Html.DisplayFor(m => transaction.Category.Name)</td>
+            <th>
+                <button onclick="showEditTransactionModal(@transaction.Id)" type="button" class="btn btn-warning" data-bs-toggle="modal"
+                        data-bs-target="#modal">
+                    Edit
+                </button>
+                <button onclick="deleteTransaction(@transaction.Id)" type="button" class="btn btn-danger">
+                    Delete
+                </button>
+            </th>
+        </tr>
+    }
+    </tbody>
+</table>

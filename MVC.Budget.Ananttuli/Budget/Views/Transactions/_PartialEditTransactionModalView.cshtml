@@ -1,0 +1,22 @@
+@model UpsertTransactionViewModel
+
+
+@if (Model.Transaction is null)
+{
+    <h3>Not Found</h3>
+}
+else
+{
+    <form id="update-transaction-form" action="/Home/UpdateTransaction" method="post" onsubmit="updateTransaction(event)">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Transaction!.Id"/>
+        <div class="row">
+            <partial name="_PartialUpsertTransactionDetails" for="@Model"/>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="update-transaction-button" type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </form>
+}
