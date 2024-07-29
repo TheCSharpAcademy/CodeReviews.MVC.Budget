@@ -59,10 +59,7 @@ public class HomeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var regionInfo = GetRegionInfo();        
-        var culture = new CultureInfo("en-" + regionInfo.Name);
-        culture.NumberFormat.CurrencyPositivePattern = 2;
-        var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
+        var (culture, currency) = GetUserPreferences();
 
         var homeModel = new HomeModel
         {
@@ -87,10 +84,7 @@ public class HomeController : Controller
 
         var fiscalPlanData = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
 
-        var regionInfo = GetRegionInfo();
-        var culture = new CultureInfo("en-" + regionInfo.Name);
-        culture.NumberFormat.CurrencyPositivePattern = 2;
-        var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
+        var (culture, currency) = GetUserPreferences();
 
         FiscalPlanModel fiscalPlanModel = new()
         {
@@ -113,10 +107,7 @@ public class HomeController : Controller
         if (category is null)
             return NotFound();
 
-        var regionInfo = GetRegionInfo();
-        var culture = new CultureInfo("en-" + regionInfo.Name);
-        culture.NumberFormat.CurrencyPositivePattern = 2;
-        var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
+        var (culture, currency) = GetUserPreferences();
 
         return View(new LayoutModel<Category>(category, culture, currency));
     }
@@ -132,7 +123,7 @@ public class HomeController : Controller
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-    private RegionInfo GetRegionInfo()
+    private (CultureInfo culture, string currency) GetUserPreferences()
     {
         RegionInfo regionInfo = new("en-US");
 
@@ -155,7 +146,11 @@ public class HomeController : Controller
                 Response.Cookies.Append("Locale", "", options);
             }
         }
-        
-        return regionInfo;
+
+        var culture = new CultureInfo("en-" + regionInfo.Name);
+        culture.NumberFormat.CurrencyPositivePattern = 2;
+        var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
+
+        return (culture, currency);
     }
 }

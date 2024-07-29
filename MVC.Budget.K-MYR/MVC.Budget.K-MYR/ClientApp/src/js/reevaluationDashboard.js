@@ -402,6 +402,10 @@ export default class ReevaluationDashboard {
         var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary);
 
         if (IsPatched) {
+            document.getElementById(`reevaluate-transaction-form_${formData.get("Id")}`)
+                    .removeEventListener();
+            document.getElementById(`accordion-head_${formData.get("CategoryId")}`)
+                    .removeEventListener();            
             transactionElement.remove();
 
             if (accordionBody.childElementCount == 0) {

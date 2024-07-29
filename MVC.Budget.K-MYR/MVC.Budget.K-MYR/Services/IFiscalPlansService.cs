@@ -10,6 +10,6 @@ public interface IFiscalPlansService
     Task<FiscalPlan> AddFiscalPlan(FiscalPlanPost fiscalPlanPost);
     Task UpdateFiscalPlan(FiscalPlan fiscalPlan, FiscalPlanPut fiscalPlanPut);
     Task DeleteFiscalPlan(FiscalPlan fiscalPlan);
-    Task<FiscalPlanDTO> GetDataByMonth(FiscalPlan fiscalPlan, DateTime Month);
-    Task<YearlyStatisticsDto> GetDataByYear(int fiscalPlanId, int year);
+    Task<FiscalPlanMonthDTO> GetDataByMonth(FiscalPlan fiscalPlan, DateTime Month);
+    Task<FiscalPlanYearDTO> GetDataByYear(int fiscalPlanId, int year);
 }

@@ -160,7 +160,7 @@
                                     <div id="incomeAccordionBody" class="accordion-body">                                        
                                         @foreach (var category in fiscalPlanDTO.IncomeCategories)
                                         {                                            
-                                            var progressbarWidth = Math.Min(100, category.Total / category.Budget * 100);
+                                            var progressbarWidth = (int)Math.Min(100, category.Total / category.Budget * 100);
                                             var budget = category.BudgetLimit?.Budget ?? category.Budget;
 
                                             <div id="category_@category.Id" class="category"
@@ -187,7 +187,9 @@
                                                             </div>
                                                         </div>
                                                         <div class="progress">
-                                                            <div id="category_@(category.Id)_progressbar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                                            <div id="category_@(category.Id)_progressbar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                                                                role="progressbar" style="width: @(progressbarWidth)%" aria-valuenow=" @progressbarWidth" aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="border-animation"></div>
@@ -227,7 +229,7 @@
                                     <div id="expensesAccordionBody" class="accordion-body">                                        
                                         @foreach (var category in fiscalPlanDTO.ExpenseCategories)
                                         {
-                                            var progressbarWidth = Math.Min(100, category.Total / category.Budget * 100);
+                                            var progressbarWidth = (int)Math.Min(100, category.Total / category.Budget * 100);
                                             var cutOffDate = DateTime.UtcNow.AddDays(-14);                                          
                                             var color = progressbarWidth < 50 ? "bg-success" : progressbarWidth < 85 ? "bg-warning" : "bg-danger";
                                             var budget = category.BudgetLimit?.Budget ?? category.Budget;
@@ -257,7 +259,8 @@
                                                             </div>
                                                         </div>
                                                         <div class="progress">
-                                                            <div id="category_@(category.Id)_progressbar" class="progress-bar progress-bar-striped progress-bar-animated @color" role="progressbar" style="width: @((int)progressbarWidth)%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                                            <div id="category_@(category.Id)_progressbar" class="progress-bar progress-bar-striped progress-bar-animated @color"
+                                                                 role="progressbar" style="width: @(progressbarWidth)%" aria-valuenow="@(progressbarWidth)" aria-valuemin="0" aria-valuemax="100"></div>
                                                         </div>
                                                     </div>
                                                     <div class="border-animation"></div>

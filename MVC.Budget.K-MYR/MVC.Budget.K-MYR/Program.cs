@@ -3,9 +3,10 @@ using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Repositories;
 using MVC.Budget.K_MYR.Services;
 using Newtonsoft.Json;
+using System.Globalization;
 
-//CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-//CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 

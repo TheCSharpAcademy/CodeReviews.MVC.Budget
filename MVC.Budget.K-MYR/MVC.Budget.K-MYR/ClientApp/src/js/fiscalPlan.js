@@ -51,6 +51,7 @@ async function setupModalHandlers() {
     const updateCategoryModalName = document.getElementById("updateCategory_name");
     const updateCategoryModalBudget = document.getElementById("updateCategory_budget");
     const updateCategoryModalType = document.getElementById("updateCategory_type");
+    const updateCategoryFiscalPlanId = document.getElementById("updateCategory_fiscalPlanId");
 
     const addTransactionModal = modals.find(m => m._element.id == "addTransaction-modal");
     const addTransactionModalCategoryId = document.getElementById("addTransaction_categoryId");
@@ -59,7 +60,7 @@ async function setupModalHandlers() {
         event.preventDefault();
         if ($(this).valid()) {
             addCategoryModal.hide();
-            let category = await postCategory(new FormData(this));
+            var category = await postCategory(new FormData(this));
 
             if (category) {
                 homeDashboard.addCategory(category);
@@ -70,7 +71,7 @@ async function setupModalHandlers() {
         event.preventDefault();
         if ($(this).valid()) {
             addTransactionModal.hide();
-            let transaction = await postTransaction(new FormData(this));
+            var transaction = await postTransaction(new FormData(this));
 
             if (transaction) {
                 homeDashboard.addTransaction(transaction);
@@ -81,12 +82,13 @@ async function setupModalHandlers() {
         event.preventDefault();
         if ($(this).valid()) {
             updateCategoryModal.hide();
-            let isUpdated = await putCategory(new FormData(this));
+            var month = homeDashboard.getCurrentMonth().toISOString()
+            var isUpdated = await putCategory(new FormData(this), month);
         }
     });
 
     $(".add-category-icon").on("click", function (event) {
-        let type = $(this).closest('.accordion')[0].dataset.type;
+        var type = $(this).closest('.accordion')[0].dataset.type;
         addCategoryModalType.value = type;
         addCategoryFiscalPlanId.value = fiscalPlanId.value;
         addCategoryModal.show();
@@ -110,8 +112,8 @@ async function setupModalHandlers() {
         updateCategoryModalId.value = category.dataset.id;
         updateCategoryModalName.value = category.dataset.name;
         updateCategoryModalBudget.value = category.dataset.budget;
-        updateCategoryModalType.value = category.dataset.type;
-
+        updateCategoryModalType.value = category.dataset.type;    
+        updateCategoryFiscalPlanId.value = fiscalPlanId.value;
         updateCategoryModal.show();
     }
     document.getElementById('delete-menu').onclick = function () {

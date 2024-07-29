@@ -1,6 +1,6 @@
 ﻿namespace MVC.Budget.K_MYR.Models;
 
-public class YearlyStatisticsDto
+public class FiscalPlanYearDTO
 {
 
     public decimal HappyEvaluatedTotal { get; set; }

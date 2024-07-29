@@ -47,14 +47,14 @@ public class CategoriesService : ICategoriesService
         {
             Name = categoryPost.Name,
             Budget = categoryPost.Budget,
-            FiscalPlanId = categoryPost.FiscalPlanId,
+            FiscalPlanId = categoryPost.FiscalPlanId
         };
 
         var categoryStatistics = new CategoryBudget()
         {
             CategoryId = category.Id,
             Budget = category.Budget,
-            Month = DateTime.UtcNow
+            Month = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1)
         };
 
         category.PreviousBudgets.Add(categoryStatistics);

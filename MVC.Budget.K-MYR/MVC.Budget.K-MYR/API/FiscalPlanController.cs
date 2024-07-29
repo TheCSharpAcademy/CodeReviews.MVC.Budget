@@ -34,7 +34,7 @@ public class FiscalPlanController : ControllerBase
     }
 
     [HttpGet("{id:int}/MonthlyData")]
-    public async Task<ActionResult<FiscalPlanDTO>> GetDataByMonth(int id, [FromQuery] DateTime? Month)
+    public async Task<ActionResult<FiscalPlanMonthDTO>> GetDataByMonth(int id, [FromQuery] DateTime? Month)
     {
        var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
@@ -44,14 +44,14 @@ public class FiscalPlanController : ControllerBase
         }
         
         var start = DateTime.UtcNow;
-        FiscalPlanDTO fiscalPlanDTO = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
+        FiscalPlanMonthDTO fiscalPlanDTO = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
         _logger.LogInformation("GetDataByMonth() Duration: {duration} ms", (DateTime.UtcNow - start).Milliseconds);
 
         return Ok(fiscalPlanDTO);
     }
 
     [HttpGet("{id:int}/{year:int}")]
-    public async Task<ActionResult<YearlyStatisticsDto>> GetDataByYear([FromRoute] int id, [FromRoute] int year)
+    public async Task<ActionResult<FiscalPlanYearDTO>> GetDataByYear([FromRoute] int id, [FromRoute] int year)
     {
         var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
@@ -61,7 +61,7 @@ public class FiscalPlanController : ControllerBase
         }
 
         var start = DateTime.UtcNow;
-        YearlyStatisticsDto fiscalPlanDTO = await _fiscalPlanService.GetDataByYear(id, year);
+        FiscalPlanYearDTO fiscalPlanDTO = await _fiscalPlanService.GetDataByYear(id, year);
         _logger.LogInformation("GetDataByYear() Duration: {duration} ms", (DateTime.UtcNow-start).Milliseconds);
 
         return Ok(fiscalPlanDTO);

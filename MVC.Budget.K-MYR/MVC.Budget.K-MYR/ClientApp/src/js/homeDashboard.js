@@ -56,7 +56,7 @@ export default class HomeDashboard {
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    let label = context.dataset.label || '';
+                                    var label = context.dataset.label || '';
 
                                     if (label) {
                                         label += ': ';
@@ -97,7 +97,7 @@ export default class HomeDashboard {
                         tooltip: {
                             callbacks: {
                                 label: function (context) {
-                                    let label = context.dataset.label || '';
+                                    var label = context.dataset.label || '';
 
                                     if (label) {
                                         label += ': ';
@@ -131,7 +131,7 @@ export default class HomeDashboard {
     }
 
     setupMenuHandlers() {
-        let categoryElements = this.#dashboardContainer.querySelectorAll('.category');
+        var categoryElements = this.#dashboardContainer.querySelectorAll('.category');
 
         for (let i = 0; i < categoryElements.length; i++) {
             let category = categoryElements[i];
@@ -143,7 +143,7 @@ export default class HomeDashboard {
                     var borderBox = document.getElementById(`category_${menu.dataset.categoryid}`).querySelector('.border-animation');
                     borderBox.classList.remove('border-rotate');
                 }
-                let y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
+                var y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
                 menu.dataset.categoryid = id;
                 menu.dataset.type = type;
                 menu.style.left = `${category.style.left + event.pageX - 100}px`;
@@ -157,16 +157,16 @@ export default class HomeDashboard {
 
     formatInitialCategories()
     {
-        let overspending = parseInt(this.#overspendingHeading.dataset.overspending);
+        var overspending = parseInt(this.#overspendingHeading.dataset.overspending);
         this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(overspending)}`;
-        let incomeTotal = parseInt(this.#incomeBalanceHeader.dataset.total);
-        let incomeBudget = parseInt(this.#incomeBalanceHeader.dataset.budget);
-        let expenseTotal = parseInt(this.#expenseBalanceHeader.dataset.total);
-        let expenseBudget = parseInt(this.#expenseBalanceHeader.dataset.budget);
+        var incomeTotal = parseInt(this.#incomeBalanceHeader.dataset.total);
+        var incomeBudget = parseInt(this.#incomeBalanceHeader.dataset.budget);
+        var expenseTotal = parseInt(this.#expenseBalanceHeader.dataset.total);
+        var expenseBudget = parseInt(this.#expenseBalanceHeader.dataset.budget);
         this.#incomeBalanceHeader.textContent = `${window.userNumberFormat.format(incomeTotal)} / ${window.userNumberFormat.format(incomeBudget)}`;
         this.#expenseBalanceHeader.textContent = `${window.userNumberFormat.format(expenseTotal)} / ${window.userNumberFormat.format(expenseBudget)}`;
 
-        let categoryElements = this.#dashboardContainer.querySelectorAll('.category');
+        var categoryElements = this.#dashboardContainer.querySelectorAll('.category');
 
         for (let i = 0; i < categoryElements.length; i++) {
             let category = categoryElements[i];
@@ -190,7 +190,7 @@ export default class HomeDashboard {
     }
 
     async #initializeDatePicker(id, date) {
-        let self = this;
+        var self = this;
         this.#monthPicker = await getDatePicker("#home-monthSelector", "month")
         this.#monthPicker.datepicker('setDate', date.toISOString());
         this.#monthPicker.on('changeDate', async function () {
@@ -199,7 +199,7 @@ export default class HomeDashboard {
         });
 
         $('.monthPicker .calendar-button').on('click', function () {
-            let input = $(this).siblings('.monthSelector');
+            var input = $(this).siblings('.monthSelector');
             if (!input.data('datepicker').picker.is(':visible')) {
                 input.datepicker('show');
             } else {
@@ -217,7 +217,7 @@ export default class HomeDashboard {
 
             this.#isLoading = true;
 
-            let data = await this.#getData(id, date);
+            var data = await this.#getData(id, date);
 
             this.#renderData(data);            
 
@@ -245,7 +245,7 @@ export default class HomeDashboard {
     }
 
     #renderData(data) {
-        let dataObj = data ?? this.#data;       
+        var dataObj = data ?? this.#data;       
 
         if (dataObj == null) {
             return false;
@@ -283,23 +283,23 @@ export default class HomeDashboard {
             return false;
         }
 
-        let accordion = category.categoryType == 1 ? this.#incomeAccordionBody : this.#expenseAccordionBody;
-        let categoryElement = accordion.querySelector(`#category_${category.id}`);
+        var accordion = category.categoryType == 1 ? this.#incomeAccordionBody : this.#expenseAccordionBody;
+        var categoryElement = accordion.querySelector(`#category_${category.id}`);
 
         if (!categoryElement) {
             this.addCategory(category);
             return true;
         }
 
-        let categoryNameElement = categoryElement.querySelector(`#category_${category.id}_name`);
+        var categoryNameElement = categoryElement.querySelector(`#category_${category.id}_name`);
         categoryNameElement.textContent = decodeURIComponent(category.name);        
 
-        let progressBarElement = categoryElement.querySelector(`#category_${category.id}_progressbar`)
-        let balanceElement = categoryElement.querySelector(`#category_${category.id}_balance`)
+        var progressBarElement = categoryElement.querySelector(`#category_${category.id}_progressbar`)
+        var balanceElement = categoryElement.querySelector(`#category_${category.id}_balance`)
         balanceElement.textContent = `${window.userNumberFormat.format(category.total)} / 
             ${window.userNumberFormat.format(category.budgetLimit?.budget ?? category.budget)}`;
 
-        let deviationDiv = categoryElement.querySelector(`#category_${category.id}_deviation`)
+        var deviationDiv = categoryElement.querySelector(`#category_${category.id}_deviation`)
 
         if (category.total > category.budget) {
             let deviationSpan;
@@ -328,22 +328,22 @@ export default class HomeDashboard {
             deviationDiv.remove();
         }
 
-        let progressBarELementPercentage = Math.floor(category.total * 100 / category.budget);
-        let color = "bg-success";
+        var progressBarPercentage = Math.min(100, Math.floor(category.total * 100 / category.budget));
+        var color = "bg-success";
         if (category.categoryType == 2) {
-            color = progressBarELementPercentage < 50 ? "bg-success" : progressBarELementPercentage < 85 ? "bg-warning" : "bg-danger";
+            color = progressBarPercentage < 50 ? "bg-success" : progressBarPercentage < 85 ? "bg-warning" : "bg-danger";
         }
 
         progressBarElement.className = `progress-bar progress-bar-striped progress-bar-animated ${color}`;
-        progressBarElement.style.width = `${progressBarELementPercentage}%`;
-        progressBarElement.ariaValuenow = `${progressBarELementPercentage}`;
+        progressBarElement.style.width = `${progressBarPercentage}%`;
+        progressBarElement.ariaValuenow = `${progressBarPercentage}`;
 
         return true;
     }
 
     #createCategoryElements(data) {
-        let fragment = document.createDocumentFragment();
-        let orderedCategories = data.incomeCategories.sort(function (a, b) {
+        var fragment = document.createDocumentFragment();
+        var orderedCategories = data.incomeCategories.sort(function (a, b) {
             return a.name.localeCompare(b.name);
         });
 
@@ -369,7 +369,7 @@ export default class HomeDashboard {
     }   
 
     #createCategoryElement(category) {
-        let mainDiv = document.createElement('div');
+        var mainDiv = document.createElement('div');
         mainDiv.id = `category_${category.id}`;
         mainDiv.className = 'category';
         mainDiv.dataset.id = `${category.id}`;
@@ -378,13 +378,13 @@ export default class HomeDashboard {
         mainDiv.dataset.budget = `${category.budget}`;
         mainDiv.dataset.fiscalplanid = `${category.fiscalPlanId}`;  
 
-        let menu = this.#menu;
+        var menu = this.#menu;
         mainDiv.addEventListener("click", function (event) {            
             if (menu.dataset.categoryid != 0) {
                 var borderBox = document.getElementById(`category_${menu.dataset.categoryid}`).querySelector('.border-animation');
                 borderBox.classList.remove('border-rotate');
             }
-            let y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
+            var y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
             menu.dataset.categoryid = `${category.id}`;
             menu.dataset.type = `${ category.categoryType }`;
             menu.style.left = `${mainDiv.style.left + event.pageX - 100}px`;
@@ -394,25 +394,25 @@ export default class HomeDashboard {
             this.querySelector('.border-animation').classList.add('border-rotate');
         });
 
-        let borderContainerDiv = document.createElement('div');
+        var borderContainerDiv = document.createElement('div');
         borderContainerDiv.className = 'border-container';
 
-        let contentDiv = document.createElement('div');
+        var contentDiv = document.createElement('div');
         contentDiv.className = 'content';
 
-        let categoryBodyDiv = document.createElement('div');
+        var categoryBodyDiv = document.createElement('div');
         categoryBodyDiv.className = 'category-body';
 
-        let categoryNameDiv = document.createElement('div');
+        var categoryNameDiv = document.createElement('div');
         categoryNameDiv.id = `category_${category.id}_name`;
         categoryNameDiv.className = "me-auto"
         categoryNameDiv.textContent = decodeURIComponent(category.name);
 
-        let budget = category.budgetLimit?.budget ?? category.budget;
+        var budget = category.budgetLimit?.budget ?? category.budget;
 
-        let categoryBalanceDiv = document.createElement('div');
+        var categoryBalanceDiv = document.createElement('div');
 
-        let categoryBalanceSpan = document.createElement('span');
+        var categoryBalanceSpan = document.createElement('span');
         categoryBalanceSpan.id = `category_${category.id}_balance`;
         categoryBalanceSpan.className = 'balance-text';
         categoryBalanceSpan.textContent = `${window.userNumberFormat.format(category.total)} / 
@@ -440,16 +440,16 @@ export default class HomeDashboard {
 
         categoryBodyDiv.appendChild(categoryBalanceDiv);
 
-        let progressDiv = document.createElement('div');
+        var progressDiv = document.createElement('div');
         progressDiv.className = 'progress';
 
-        let progressBarDivPercentage = Math.floor(category.total * 100 / budget);
-        let color = "bg-success";
+        var progressBarDivPercentage = Math.floor(category.total * 100 / budget);
+        var color = "bg-success";
         if (category.categoryType == 2) {
             color = progressBarDivPercentage < 50 ? "bg-success" : progressBarDivPercentage < 85 ? "bg-warning" : "bg-danger";
         }
 
-        let progressBarDiv = document.createElement('div');
+        var progressBarDiv = document.createElement('div');
         progressBarDiv.id = `category_${category.id}_progressbar`;
         progressBarDiv.className = `progress-bar progress-bar-striped progress-bar-animated ${color}`;
         progressBarDiv.role = 'progressbar';
@@ -463,7 +463,7 @@ export default class HomeDashboard {
         contentDiv.appendChild(categoryBodyDiv);
         contentDiv.appendChild(progressDiv);
 
-        let borderAnimationDiv = document.createElement('div');
+        var borderAnimationDiv = document.createElement('div');
         borderAnimationDiv.className = 'border-animation';
 
         borderContainerDiv.appendChild(contentDiv);
@@ -503,6 +503,7 @@ export default class HomeDashboard {
 
     removeCategory(id, type) {        
         var categoryElement = document.getElementById(`category_${id}`);
+        categoryElement.removeEventListener();
         categoryElement.remove();
 
         if (!this.#data) {
@@ -536,10 +537,12 @@ export default class HomeDashboard {
         var currentMonth = currentDate.getMonth();
 
         if (transactionYear === currentYear && transactionMonth == currentMonth) {
-            var array = this.#data.incomeCategories.concat(this.#data.expenseCategories);
+            let array = this.#data.incomeCategories.concat(this.#data.expenseCategories);
             let category = array.find((element) => element.id === transaction.categoryId);
             category.total += transaction.amount;
             this.#updateCategory(category);
         }        
     }
+
+    getCurrentMonth = () => this.#monthPicker.datepicker('getUTCDate');
 }

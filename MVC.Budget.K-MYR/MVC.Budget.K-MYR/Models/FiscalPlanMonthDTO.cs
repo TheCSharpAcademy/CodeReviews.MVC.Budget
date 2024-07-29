@@ -1,7 +1,7 @@
 ﻿
 namespace MVC.Budget.K_MYR.Models
 {
-    public class FiscalPlanDTO
+    public class FiscalPlanMonthDTO
     {
         public DateTime Month { get; set; }
         public string Name { get; set; }

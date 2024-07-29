@@ -201,12 +201,13 @@ export async function postCategory(formData) {
     }
 }
 
-export async function putCategory(formData) {
+export async function putCategory(formData, month) {
     try {
         var id = parseInt(formData.get("Id"));
         let queryParams = new URLSearchParams({
-            Month: homeMonthPicker.datepicker('getUTCDate').toISOString()
-        });
+            Month: month
+        });        
+
         var response = await fetch(`${formData.get("type") == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}/${id}?${queryParams}`, {
             method: "PUT",
             headers: {
@@ -218,7 +219,7 @@ export async function putCategory(formData) {
                 Budget: parseFloat(formData.get("Budget")),
                 GroupId: parseInt(formData.get("GroupId")),
                 Id: id,
-                FiscalPlanId: parseInt(fiscalPlanId.value)
+                FiscalPlanId: parseInt(formData.get("FiscalPlanId"))
             })
         });
 
