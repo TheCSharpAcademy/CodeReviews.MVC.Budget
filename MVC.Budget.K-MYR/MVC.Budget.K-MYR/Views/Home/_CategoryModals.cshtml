@@ -1,7 +1,7 @@
 ﻿@model MVC.Budget.K_MYR.Models.Category;
 
 <section id="category-modals">
-    <div class="modal fade" id="addCategory-modal" tabindex="-1" aria-labelledby="add-category-label" aria-hidden="true">
+    <div class="modal fade" id="addCategory-modal" tabindex="-1" aria-labelledby="add-category-label" aria-hidden="true" aria-modal="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -14,7 +14,7 @@
                         <input type="hidden" asp-for="CategoryType" value="" id="addCategory_type" name="type" />
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
-                            <input asp-for="Name" class="form-control" />
+                            <input asp-for="Name" class="form-control" autocomplete="off" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
@@ -22,8 +22,8 @@
                             <input asp-for="Budget" class="form-control" />
                             <span asp-validation-for="Budget" class="text-danger"></span>
                         </div>
-                        <div class="form-group mt-2 d-flex align-items-center justify-content-center">
-                            <input type="submit" value="Add" class="px-4" /> 
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Add" class="px-4 submit-btn" />
                         </div>
                     </form>
                 </div>
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateCategory-modal" tabindex="-1" aria-labelledby="updateCategory-label" aria-hidden="true">
+    <div class="modal fade" id="updateCategory-modal" tabindex="-1" aria-labelledby="updateCategory-label" aria-hidden="true" aria-modal="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -46,7 +46,7 @@
                         <input type="hidden" value ="" id="updateCategory_month"/>
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
-                            <input asp-for="Name" class="form-control" id="updateCategory_name"/>
+                            <input asp-for="Name" class="form-control" id="updateCategory_name" autocomplete="off" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <div class="form-group">
@@ -54,8 +54,8 @@
                             <input asp-for="Budget" class="form-control" id="updateCategory_budget" />
                             <span asp-validation-for="Budget" class="text-danger"></span>
                         </div>
-                        <div class="form-group mt-2 d-flex align-items-center justify-content-center">
-                            <input type="submit" value="Edit" class="px-4" /> 
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Edit" class="px-4 submit-btn" />
                         </div>
                     </form>
                 </div>
@@ -63,5 +63,3 @@
         </div>
     </div>
 </section>
-
-

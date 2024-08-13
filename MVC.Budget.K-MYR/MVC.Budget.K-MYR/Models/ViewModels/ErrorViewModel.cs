@@ -1,4 +1,4 @@
-namespace MVC.Budget.K_MYR.Models;
+namespace MVC.Budget.K_MYR.Models.ViewModels;
 
 public class ErrorViewModel
 {

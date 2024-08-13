@@ -1,7 +1,7 @@
 ﻿@model MVC.Budget.K_MYR.Models.Transaction;
 
 <section id="transaction-modals">
-    <div class="modal fade" id="addTransaction-modal" tabindex="-1" aria-labelledby="addTransaction-label" aria-hidden="true">
+    <div class="modal fade" id="addTransaction-modal" tabindex="-1" aria-labelledby="addTransaction-label" aria-hidden="true" aria-modal="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -173,8 +173,8 @@
                         </div>
                         <span asp-validation-for="IsHappy" class="text-danger"></span>
                         <span asp-validation-for="IsNecessary" class="text-danger"></span>
-                        <div class="form-group mt-2 d-flex align-items-center justify-content-center">
-                            <input type="submit" value="Add" class="px-4" />
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Add" class="px-4 submit-btn" />
                         </div>
                     </form>
                 </div>
@@ -358,8 +358,8 @@
                         </div>
                         <span asp-validation-for="IsHappy" class="text-danger"></span>
                         <span asp-validation-for="IsNecessary" class="text-danger"></span>
-                        <div class="form-group mt-2 d-flex align-items-center justify-content-center">
-                            <input type="submit" value="Edit" class="px-4" />
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Edit" class="px-4 submit-btn" />
                         </div>
                     </form>
                 </div>

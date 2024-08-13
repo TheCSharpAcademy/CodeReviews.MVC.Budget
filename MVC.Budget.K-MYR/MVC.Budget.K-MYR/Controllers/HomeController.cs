@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MVC.Budget.K_MYR.Models;
 using MVC.Budget.K_MYR.Models.ViewModels;
 using MVC.Budget.K_MYR.Services;
@@ -7,18 +8,11 @@ using System.Globalization;
 
 namespace MVC.Budget.K_MYR.Controllers;
 
-public class HomeController : Controller
+public class HomeController(ILogger<HomeController> logger, IFiscalPlansService fiscalPlanService, ICategoriesService categorieService) : Controller
 {
-    private readonly IFiscalPlansService _fiscalPlanService;
-    private readonly ICategoriesService _categorieService;
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger, IFiscalPlansService fiscalPlanService, ICategoriesService categorieService)
-    {
-        _logger = logger;
-        _fiscalPlanService = fiscalPlanService;
-        _categorieService = categorieService;
-    }
+    private readonly IFiscalPlansService _fiscalPlanService = fiscalPlanService;
+    private readonly ICategoriesService _categorieService = categorieService;
+    private readonly ILogger<HomeController> _logger = logger;
 
     [HttpPost("Country")]
     [ValidateAntiForgeryToken]
@@ -41,6 +35,7 @@ public class HomeController : Controller
             Secure = true,
             HttpOnly = true,
             IsEssential = true,
+            SameSite = SameSiteMode.Strict
         };
 
         var currency = regionInfo.ISOCurrencySymbol == "XXX" ? "USD" : regionInfo.ISOCurrencySymbol;
@@ -82,16 +77,23 @@ public class HomeController : Controller
             return NotFound();
         }
 
-        var fiscalPlanData = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
+        var fiscalPlanDTO = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
 
         var (culture, currency) = GetUserPreferences();
+        var selectList = new SelectList(fiscalPlanDTO.ExpenseCategories.Concat(fiscalPlanDTO.IncomeCategories)
+                                                                       .OrderBy(c => c.Name)
+                                                                       .ToList(), "Id", "Name");
+
 
         FiscalPlanModel fiscalPlanModel = new()
         {
-            FiscalPlan = fiscalPlanData,        
+            FiscalPlan = fiscalPlanDTO,        
             Category = new (),
             Transaction = new(),
-            Search = new(),
+            Search = new()
+            {
+                Categories = selectList
+            },
         };
 
         LayoutModel<FiscalPlanModel> viewModel = new(fiscalPlanModel, culture, currency);
@@ -111,11 +113,7 @@ public class HomeController : Controller
 
         return View(new LayoutModel<Category>(category, culture, currency));
     }
-
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+   
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

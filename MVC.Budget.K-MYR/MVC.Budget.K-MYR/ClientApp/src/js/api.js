@@ -26,6 +26,7 @@ export async function getCountryCookie(countryISOCode, token) {
         return null;
     }    
 }
+
 export async function getFiscalPlanDataByMonth(id, date) {
     try {
         var response = await fetch(`${fiscalPlanAPI}/${id}/MonthlyData?Month=${date.toISOString() ?? new Date().toISOString()}`, {
@@ -95,24 +96,27 @@ export async function postTransaction(formData) {
 
 export async function getTransactions(formData) {
     try {
-        var params = new URLSearchParams();
-
-        for (let [key, value] of formData.entries()) {
-            if (value !== undefined && value !== '') {
-                params.append(key, value);
-            }
-        }
-
-        var query_string = params.toString();
-
-        var response = await fetch(`${transactionsAPI}?${query_string}`, {
-            method: "GET",
+        var response = await fetch(`${transactionsAPI}/search`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": formData.get('__RequestVerificationToken')
+            },
+            body: JSON.stringify({
+                FiscalPlanId: parseInt(formData.get("FiscalPlanId")),
+                SearchString: formData.get("SearchString"),
+                CategoryId: parseInt(formData.get("CategoryId")),
+                MinDate: formData.get("MinDate"),
+                MaxDate: formData.get("MaxDate"),
+                MinAmount: parseFloat(formData.get("MinAmount")),
+                MaxAmount: parseFloat(formData.get("MaxAmount"))
+            })
         });
 
         if (response.ok) {
             return await response.json();
         } else {
-            console.error(`HTTP GET Error: ${response.status}`);
+            console.error(`HTTP POST Error: ${response.status}`);
             return null;
         }
 

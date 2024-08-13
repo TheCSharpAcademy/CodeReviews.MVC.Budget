@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace MVC.Budget.K_MYR.Models;
+namespace MVC.Budget.K_MYR.Models.ViewModels;
 
-public class SearchModel
+public class SearchViewModel
 {
     public SelectList? Categories { get; set; }
     public string? SearchString { get; set; }

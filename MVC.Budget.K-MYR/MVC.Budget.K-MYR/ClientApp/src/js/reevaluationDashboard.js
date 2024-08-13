@@ -22,7 +22,7 @@ export default class ReevaluationDashboard {
             this.#data = data;
 
             if (data) {
-                let hasCreated = this.#createReevaluationElements(data);
+                this.#createReevaluationElements(data);
                 this.#toggleReevaluationInfo();
             }
         } finally {
@@ -34,6 +34,31 @@ export default class ReevaluationDashboard {
         var categories = await getCategoriesWithUnevaluatedTransactions(id);
         return categories;
     }
+
+    formatDashboard() {
+        try {
+            if (this.#isLoading) {
+                console.log("Dashboard is loading...")
+                return false;
+            }
+            this.#isLoading = true;
+
+            for (let i = 0; i < this.#data.length; i++) {
+                let category = this.#data[i];                
+                for (let i = 0; i < category.transactions.length; i++) {
+                    let transaction = category.transactions[i];
+                    let element = document.getElementById(`transaction_date_${transaction.id}`);
+                    element.textContent = new Date(transaction.dateTime).toLocaleDateString(window.userLocale);
+                    element = document.getElementById(`transaction_amount_${transaction.id}`);
+                    element.textContent = window.userNumberFormat.format(transaction.amount);
+                }
+            }
+
+        } finally {
+            this.#isLoading = false;
+        }
+    }
+    
 
     #createReevaluationElement(category) {
         let self = this;
@@ -218,16 +243,19 @@ export default class ReevaluationDashboard {
             transactionBody.setAttribute('data-id', transaction.id);
             transactionBody.setAttribute('data-ishappy', transaction.isHappy);
             transactionBody.setAttribute('data-isnecessary', transaction.isNecessary);
+            transactionBody.setAttribute('data-amount', transaction.amount);
 
             let titleDiv = document.createElement('div');
             titleDiv.textContent = decodeURIComponent(transaction.title);
 
             let dateDiv = document.createElement('div');
-            dateDiv.className = 'ms-2';
+            dateDiv.className = 'ms-2 ';
+            dateDiv.id = `transaction_date_${transaction.id}`;
             dateDiv.textContent = new Date(transaction.dateTime).toLocaleDateString(window.userLocale);
 
             let amountDiv = document.createElement('div');
-            amountDiv.className = 'ms-2 me-auto';
+            amountDiv.id = `transaction_amount_${transaction.id}`;
+            amountDiv.className = 'transaction-amount ms-2 me-auto';
             amountDiv.textContent = window.userNumberFormat.format(transaction.amount);
 
             let transactionForm = document.createElement('form');
@@ -238,7 +266,7 @@ export default class ReevaluationDashboard {
                 event.preventDefault();
                 if ($(transactionForm).valid()) {
                     let element = transactionBody;
-                    await self.#reevaluateTransaction(new FormData(this), element, accordionBody, accordion);
+                    await self.#reevaluateTransaction(new FormData(this), element, accordion, category.id);
                 }
             });
 
@@ -383,9 +411,9 @@ export default class ReevaluationDashboard {
 
     #createReevaluationElements(data) {
         if (data) {
-            var frag = document.createDocumentFragment();
+            let frag = document.createDocumentFragment();
 
-            for (var i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
                 if (data[i].transactions.length > 0) {
                     frag.appendChild(this.#createReevaluationElement(data[i]));
                 }
@@ -396,19 +424,26 @@ export default class ReevaluationDashboard {
         }
     }
 
-    async #reevaluateTransaction(formData, transactionElement, accordionBody, accordion) {
+    async #reevaluateTransaction(formData, transactionElement, accordion, categoryId) {
         var previousIsHappy = transactionElement.dataset.ishappy === 'true';
         var previousIsNecessary = transactionElement.dataset.isnecessary === 'true';
         var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary);
 
-        if (IsPatched) {
-            document.getElementById(`reevaluate-transaction-form_${formData.get("Id")}`)
-                    .removeEventListener();
-            document.getElementById(`accordion-head_${formData.get("CategoryId")}`)
-                    .removeEventListener();            
+        if (IsPatched) {   
+            let categoryIndex = this.#data.findIndex(t => t.id === categoryId);
+
+            if (categoryIndex > -1) {
+                let category = this.#data[categoryIndex];
+                let index = category.transactions.findIndex(t => t.id == formData.get('Id'));
+
+                if (index > -1) {
+                    category.transactions.splice(index, 1);
+                }
+            }
+
             transactionElement.remove();
 
-            if (accordionBody.childElementCount == 0) {
+            if (category.transactions.length === 0) {
                 accordion.remove();
             }
             this.#toggleReevaluationInfo();

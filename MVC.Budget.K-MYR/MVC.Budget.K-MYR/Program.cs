@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Repositories;
@@ -10,6 +11,11 @@ CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+});
+
 builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddTransient<ITransactionsRepository, TransactionsRepository>();
 builder.Services.AddTransient<ICategoryBudgetsRepository, CategoryBudgetsRepository>();
@@ -21,7 +27,7 @@ builder.Services.AddTransient<IFiscalPlansService, FiscalPlansService>();
 
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MSQL")));
 builder.Services.AddControllersWithViews()
      .AddNewtonsoftJson(options =>
      {
@@ -29,6 +35,8 @@ builder.Services.AddControllersWithViews()
      });
 
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -43,10 +51,10 @@ using (var scope = app.Services.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
+app.UseHsts();
 app.UseStaticFiles();
 
 app.UseRouting();

@@ -26,7 +26,7 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Category>> GetCategory(int id)
+    public async Task<ActionResult<Category>> GetCategory([FromRoute] int id)
     {
         var category = await _categoriesService.GetByIDAsync(id);
 
@@ -53,7 +53,7 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutCategory(int id, [Bind("Name,Budget,Id")] T categoryPut, [FromQuery] DateTime? month)
+    public async Task<ActionResult> PutCategory([FromRoute] int id, [Bind("Name,Budget,Id")] T categoryPut, [FromQuery] DateTime? month)
     {
         if (id != categoryPut.Id)
             return BadRequest();
@@ -62,15 +62,16 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
             return BadRequest();
 
         var date = month ?? DateTime.UtcNow;
+        var cutOffDate = new DateTime(date.Year, date.Month, 1);
 
-        var category = await _categoriesService.GetCategoryWithFilteredStatistics(categoryPut.Id, c => c.PreviousBudgets.Where(s => s.Month.Month == date.Month && s.Month.Year == date.Year));
+        var category = await _categoriesService.GetCategoryWithBudgetLimit(categoryPut.Id, c => c.PreviousBudgets.Where(s => cutOffDate <= s.Month));
 
         if (category is null)
             return NotFound();
 
         try
         {
-            await _categoriesService.UpdateCategory(category, categoryPut, date);
+            await _categoriesService.UpdateCategory(category, categoryPut, cutOffDate);
             return NoContent();
         }
         catch (DbUpdateConcurrencyException) when (!CategoryExists(category.Id))
@@ -81,7 +82,7 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
 
     [HttpDelete("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> DeleteCategory(int id)
+    public async Task<ActionResult> DeleteCategory([FromRoute] int id)
     {
         var category = await _categoriesService.GetByIDAsync(id);
 

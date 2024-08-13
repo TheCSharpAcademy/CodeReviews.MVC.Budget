@@ -2,37 +2,32 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Models;
+using MVC.Budget.K_MYR.Models.ViewModels;
 using MVC.Budget.K_MYR.Services;
 
 namespace MVC.Budget.K_MYR.API;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TransactionsController : ControllerBase
+public class TransactionsController(ILogger<TransactionsController> logger, ITransactionsService transactionsService) : ControllerBase
 {
-    private readonly ILogger<TransactionsController> _logger;
-    private readonly ITransactionsService _transactionsService;
-
-
-    public TransactionsController(ILogger<TransactionsController> logger, ITransactionsService transactionsService)
-    {
-        _logger = logger;
-        _transactionsService = transactionsService;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<List<Transaction>>> GetTransactions([FromQuery] SearchModel? searchModel)
-    {
-        return Ok(await _transactionsService.GetTransactions(searchModel?.CategoryId, searchModel?.SearchString, searchModel?.MinDate, searchModel?.MaxDate,  searchModel?.MinAmount, searchModel?.MaxAmount));
-
-    }
+    private readonly ILogger<TransactionsController> _logger = logger;
+    private readonly ITransactionsService _transactionsService = transactionsService;
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Transaction>> GetTransaction(int id)
+    public async Task<ActionResult<Transaction>> GetTransaction([FromRoute] int id)
     {
         var transaction = await _transactionsService.GetByIDAsync(id);
 
         return transaction is null ? NotFound() : Ok(transaction);
+    }
+
+    [HttpPost("search")]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult<List<Transaction>>> GetTransactions([FromBody] TransactionsSearchModel? searchModel)
+    {
+        return Ok(await _transactionsService.GetTransactions(searchModel?.FiscalPlanId, searchModel?.CategoryId, searchModel?.SearchString, searchModel?.MinDate, searchModel?.MaxDate, searchModel?.MinAmount, searchModel?.MaxAmount));
+
     }
 
     [HttpPost]
@@ -49,12 +44,9 @@ public class TransactionsController : ControllerBase
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutTransaction(int id, [FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, Evaluated, EvaluatedIsHappy, EvaluatedIsNecessary, Id")] TransactionPut transactionPut)
+    public async Task<ActionResult> PutTransaction([FromRoute] int id, [FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, Evaluated, EvaluatedIsHappy, EvaluatedIsNecessary, Id")] TransactionPut transactionPut)
     {
-        if (id != transactionPut.Id)
-            return BadRequest();
-
-        if (!ModelState.IsValid)
+        if (id != transactionPut.Id || !ModelState.IsValid)
             return BadRequest();
 
         var transaction = await _transactionsService.GetByIDAsync(id);
@@ -102,14 +94,8 @@ public class TransactionsController : ControllerBase
 
         patchDoc.ApplyTo(transactionToPatch, ModelState);
 
-        if (transactionToPatch.Id != transaction.Id)
+        if (transactionToPatch.Id != transaction.Id || !ModelState.IsValid)
             return BadRequest();
-
-        if (!ModelState.IsValid)
-            return BadRequest();
-
-        if (!await _transactionsService.CategoryExists(transactionToPatch.CategoryId))
-            return NotFound();
 
         try
         {
@@ -124,7 +110,7 @@ public class TransactionsController : ControllerBase
 
     [HttpDelete("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> DeleteTransaction(int id)
+    public async Task<ActionResult> DeleteTransaction([FromRoute] int id)
     {
         var transaction = await _transactionsService.GetByIDAsync(id);
 

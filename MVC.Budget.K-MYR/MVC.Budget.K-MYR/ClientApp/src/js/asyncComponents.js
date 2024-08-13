@@ -32,6 +32,7 @@ export async function importChartDefaults() {
         Chart.defaults.scales.linear.min = 0;
         Chart.defaults.plugins.legend.labels.filter = (item) => item.text !== undefined;
         Chart.defaults.plugins.tooltip.filter = (item) => item.label !== ""; 
+        Chart.defaults.layout.padding = 2;
     } catch (error) {
         console.error('Error loading Chart.js defaults:', error);
         throw error; 

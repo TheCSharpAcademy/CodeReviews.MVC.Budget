@@ -17,8 +17,6 @@ export default class HomeDashboard {
     #expenseBalanceHeader;
     #expenseAccordionBody;
     #menu;
-    #dashboardContainer;
-
 
     constructor(menu, id, date, data) {
         this.#data = data;
@@ -41,7 +39,7 @@ export default class HomeDashboard {
                     ],
                     datasets: [{
                         label: 'Total Amount',
-                        data: [sentimentChart.dataset.happy, sentimentChart.dataset.unhappy],
+                        data: [this.#data.expensesHappyTotal, this.#data.expensesTotal - this.#data.expensesHappyTotal],
                         backgroundColor: [
                             'rgb(25,135,84)',
                             'rgb(220,53,69)'
@@ -51,6 +49,9 @@ export default class HomeDashboard {
                 },
                 options: {
                     responsive: true,
+                    layout: {
+                        padding: 2
+                    },
                     maintainAspectRatio: false,
                     plugins: {
                         tooltip: {
@@ -82,7 +83,7 @@ export default class HomeDashboard {
                     ],
                     datasets: [{
                         label: 'Total Amount',
-                        data: [necessityChart.dataset.necessary, necessityChart.dataset.unnecessary],
+                        data: [this.#data.expensesNecessaryTotal, this.#data.expensesTotal - this.#data.expensesNecessaryTotal],
                         backgroundColor: [
                             'rgb(25,135,84)',
                             'rgb(220,53,69)'
@@ -113,6 +114,7 @@ export default class HomeDashboard {
                 }
             });
 
+
             this.#overspendingHeading = document.getElementById('home-overspending');
 
             this.#incomeBalanceHeader = document.getElementById('incomeBalanceHeader');
@@ -120,10 +122,9 @@ export default class HomeDashboard {
 
             this.#expenseBalanceHeader = document.getElementById('expensesBalanceHeader');
             this.#expenseAccordionBody = document.getElementById('expensesAccordionBody');  
-
-            this.#dashboardContainer = document.getElementById('home-container');
             
-            this.formatInitialCategories();   
+            this.#formatHeaders();   
+            this.#formatCategories();
 
         } finally {
             this.#isLoading = false;
@@ -131,61 +132,28 @@ export default class HomeDashboard {
     }
 
     setupMenuHandlers() {
-        var categoryElements = this.#dashboardContainer.querySelectorAll('.category');
+        var menu = this.#menu;
+        var categories = this.#data.incomeCategories.concat(this.#data.expenseCategories);
 
-        for (let i = 0; i < categoryElements.length; i++) {
-            let category = categoryElements[i];
-            let menu = this.#menu;
-            let id = category.dataset.id
-            let type = category.dataset.type;
-            category.addEventListener("click", function (event) {
-                if (menu.dataset.categoryid != 0) {
-                    var borderBox = document.getElementById(`category_${menu.dataset.categoryid}`).querySelector('.border-animation');
-                    borderBox.classList.remove('border-rotate');
-                }
-                var y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
-                menu.dataset.categoryid = id;
-                menu.dataset.type = type;
-                menu.style.left = `${category.style.left + event.pageX - 100}px`;
-                menu.style.top = `${y}px`;
-                menu.classList.add('active');
+        for (let i = 0; i < categories.length; i++) {
+            let category = categories[i];
+            let element = document.getElementById(`category_${category.id}`);
 
-                this.querySelector('.border-animation').classList.add('border-rotate');
-            });
-        }
-    }
+            if (element) {
+                element.addEventListener("click", function (event) {
+                    if (menu.dataset.categoryid != 0) {
+                        let borderBox = document.getElementById(`category_${menu.dataset.categoryid}`).querySelector('.border-animation');
+                        borderBox.classList.remove('border-rotate');
+                    }
+                    let y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
+                    menu.dataset.categoryid = category.id;                   
+                    menu.style.left = `${element.style.left + event.pageX - 100}px`;
+                    menu.style.top = `${y}px`;
+                    menu.classList.add('active');
 
-    formatInitialCategories()
-    {
-        var overspending = parseInt(this.#overspendingHeading.dataset.overspending);
-        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(overspending)}`;
-        var incomeTotal = parseInt(this.#incomeBalanceHeader.dataset.total);
-        var incomeBudget = parseInt(this.#incomeBalanceHeader.dataset.budget);
-        var expenseTotal = parseInt(this.#expenseBalanceHeader.dataset.total);
-        var expenseBudget = parseInt(this.#expenseBalanceHeader.dataset.budget);
-        this.#incomeBalanceHeader.textContent = `${window.userNumberFormat.format(incomeTotal)} / ${window.userNumberFormat.format(incomeBudget)}`;
-        this.#expenseBalanceHeader.textContent = `${window.userNumberFormat.format(expenseTotal)} / ${window.userNumberFormat.format(expenseBudget)}`;
-
-        var categoryElements = this.#dashboardContainer.querySelectorAll('.category');
-
-        for (let i = 0; i < categoryElements.length; i++) {
-            let category = categoryElements[i];
-            let id = parseInt(category.dataset.id);
-            let total = parseInt(category.dataset.total);
-            let budget = parseInt(category.dataset.budget);
-            let type = parseInt(category.dataset.type);
-
-            let balanceElement = category.querySelector(`#category_${id}_balance`)
-            balanceElement.textContent = `${window.userNumberFormat.format(total)} / 
-            ${window.userNumberFormat.format(budget)}`;
-
-            if (total > budget) {
-                let deviationAmount = total - budget;
-                let deviationSpan = category.querySelector(`#category_${id}_deviationText`);
-                deviationSpan.textContent = type === 1
-                    ? `Windfall: ${window.userNumberFormat.format(deviationAmount)}`
-                    : `Overspending: ${window.userNumberFormat.format(deviationAmount)}`;
-            }
+                    element.querySelector('.border-animation').classList.add('border-rotate');
+                });
+            }     
         }
     }
 
@@ -232,16 +200,83 @@ export default class HomeDashboard {
         return data;
     }
 
-    rerenderDashboard() {
+    formatDashboard(data) {
         try {
             if (this.#isLoading) {
                 console.log("Dashboard is loading...")
                 return false;
             }
+            this.#isLoading = true;
+
+            this.#formatHeaders(data);
+            this.#formatCategories(data); 
+            this.#formatCharts(data);
             
         } finally {
             this.#isLoading = false;
         }
+    }
+
+    #formatCategories(data) {
+        var dataObj = data ?? this.#data;
+
+        if (dataObj == null) {
+            return false;
+        }
+
+        var categoryElements = this.#data.incomeCategories.concat(this.#data.expenseCategories);
+
+        for (let i = 0; i < categoryElements.length; i++) {
+            this.#formatCategory(categoryElements[i]);
+        }  
+        return true;
+    }
+
+    #formatCharts(data) {
+        var dataObj = data ?? this.#data;
+
+        if (dataObj == null) {
+            return false;
+        }
+        this.#sentimentChartMonthly.data.datasets[0].data = [dataObj.expensesHappyTotal, dataObj.expensesTotal - dataObj.expensesHappyTotal, Number.MIN_VALUE];
+        this.#sentimentChartMonthly.update();
+
+        this.#necessityChartMonthly.data.datasets[0].data = [dataObj.expensesNecessaryTotal, dataObj.expensesTotal - dataObj.expensesNecessaryTotal, Number.MIN_VALUE];
+        this.#necessityChartMonthly.update();
+
+        return true;
+    }
+
+    #formatHeaders(data) {
+        var dataObj = data ?? this.#data;
+
+        if (dataObj == null) {
+            return false;
+        }
+       
+        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(dataObj.overspending)}`;
+        this.#incomeBalanceHeader.textContent = `${window.userNumberFormat.format(dataObj.incomeTotal)} / ${window.userNumberFormat.format(dataObj.incomeBudget)}`;
+        this.#expenseBalanceHeader.textContent = `${window.userNumberFormat.format(dataObj.expensesTotal)} / ${window.userNumberFormat.format(dataObj.expensesBudget)}`;
+
+        return true;
+    }
+
+    #formatCategory(category) {
+        if (!category) {
+            return false;
+        }
+        var balanceElement = document.getElementById(`category_${category.id}_balance`);
+        balanceElement.textContent = `${window.userNumberFormat.format(category.total)} / 
+            ${window.userNumberFormat.format(category.budget)}`;
+
+        if (category.total > category.budget) {
+            let deviationAmount = category.total - category.budget;
+            let deviationSpan = document.getElementById(`category_${category.id}_deviationText`);
+            deviationSpan.textContent = category.type === 1
+                ? `Windfall: ${window.userNumberFormat.format(deviationAmount)}`
+                : `Overspending: ${window.userNumberFormat.format(deviationAmount)}`;
+        }
+        return true;
     }
 
     #renderData(data) {
@@ -249,21 +284,13 @@ export default class HomeDashboard {
 
         if (dataObj == null) {
             return false;
-        }
+        }      
 
-        this.#sentimentChartMonthly.data.datasets[0].data = [dataObj.expensesHappyTotal, dataObj.expensesTotal - dataObj.expensesHappyTotal, Number.MIN_VALUE];
-        this.#sentimentChartMonthly.update();
+        this.#formatCharts(dataObj);
+        this.#formatHeaders(dataObj);
 
-        this.#necessityChartMonthly.data.datasets[0].data = [dataObj.expensesNecessaryTotal, dataObj.expensesTotal - dataObj.expensesNecessaryTotal, Number.MIN_VALUE]
-        this.#necessityChartMonthly.update();
-
-        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(dataObj.overspending)}`
-
-        this.#incomeBalanceHeader.textContent = `${window.userNumberFormat.format(data.incomeTotal)} / ${window.userNumberFormat.format(data.incomeBudget)}`;
-        this.#expenseBalanceHeader.textContent = `${window.userNumberFormat.format(data.expensesTotal)} / ${window.userNumberFormat.format(data.expensesBudget)}`;
-
-        this.#updateCategories(data.incomeCategories)
-        this.#updateCategories(data.expenseCategories)
+        this.#updateCategories(dataObj.incomeCategories);
+        this.#updateCategories(dataObj.expenseCategories);
 
         return true;
     }
@@ -276,38 +303,38 @@ export default class HomeDashboard {
         for (let i = 0; i < categories.length; i++) {
             this.#updateCategory(categories[i]);
         }
+        return true;
     }
 
     #updateCategory(category) {
         if (!category) {
             return false;
         }
-
-        var accordion = category.categoryType == 1 ? this.#incomeAccordionBody : this.#expenseAccordionBody;
-        var categoryElement = accordion.querySelector(`#category_${category.id}`);
+        var categoryElement = document.getElementById(`category_${category.id}`);
 
         if (!categoryElement) {
             this.addCategory(category);
             return true;
         }
 
-        var categoryNameElement = categoryElement.querySelector(`#category_${category.id}_name`);
+        var categoryNameElement = document.getElementById(`category_${category.id}_name`);
         categoryNameElement.textContent = decodeURIComponent(category.name);        
 
-        var progressBarElement = categoryElement.querySelector(`#category_${category.id}_progressbar`)
-        var balanceElement = categoryElement.querySelector(`#category_${category.id}_balance`)
+        var budget = category.budgetLimit?.budget ?? category.budget;
+        var progressBarElement = document.getElementById(`category_${category.id}_progressbar`)
+        var balanceElement = document.getElementById(`category_${category.id}_balance`)
         balanceElement.textContent = `${window.userNumberFormat.format(category.total)} / 
-            ${window.userNumberFormat.format(category.budgetLimit?.budget ?? category.budget)}`;
+            ${window.userNumberFormat.format(budget)}`;
 
-        var deviationDiv = categoryElement.querySelector(`#category_${category.id}_deviation`)
+        var deviationDiv = document.getElementById(`category_${category.id}_deviation`)
 
-        if (category.total > category.budget) {
+        if (category.total > budget) {
             let deviationSpan;
-            let deviationAmount = category.total - category.budget;
+            let deviationAmount = category.total - budget;
             if (!deviationDiv) {
                 let categoryBodyDiv = categoryElement.querySelector('.category-body');
                 deviationDiv = document.createElement('div');
-                deviationDiv.className = 'me-2';
+                deviationDiv.className = 'category-body-content deviation';
                 deviationDiv.id = `category_${category.id}_deviation`;
 
                 deviationSpan = document.createElement('span');
@@ -316,7 +343,6 @@ export default class HomeDashboard {
 
                 deviationDiv.appendChild(deviationSpan);
                 categoryBodyDiv.insertBefore(deviationDiv, balanceElement.parentElement);
-                balanceElement.parentElement.className = "";
             } else {
                 deviationSpan = deviationDiv.querySelector(`#category_${category.id}_deviationText`);
             }
@@ -334,39 +360,12 @@ export default class HomeDashboard {
             color = progressBarPercentage < 50 ? "bg-success" : progressBarPercentage < 85 ? "bg-warning" : "bg-danger";
         }
 
-        progressBarElement.className = `progress-bar progress-bar-striped progress-bar-animated ${color}`;
+        progressBarElement.className = `progress-bar progress-bar-striped ${color}`;
         progressBarElement.style.width = `${progressBarPercentage}%`;
         progressBarElement.ariaValuenow = `${progressBarPercentage}`;
 
         return true;
-    }
-
-    #createCategoryElements(data) {
-        var fragment = document.createDocumentFragment();
-        var orderedCategories = data.incomeCategories.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-
-        for (var i = 0; i < orderedCategories.length; i++) {
-            fragment.appendChild(this.#createCategoryElement(orderedCategories[i], data.id))
-        }
-
-        this.#incomeAccordionBody.textContent = "";
-        this.#incomeAccordionBody.appendChild(fragment);
-
-        fragment = document.createDocumentFragment();
-        orderedCategories = data.expenseCategories.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-
-        for (var i = 0; i < orderedCategories.length; i++) {
-            fragment.appendChild(this.#createCategoryElement(orderedCategories[i], data.id))
-        }
-
-        this.#expenseAccordionBody.textContent = "";
-        this.#expenseAccordionBody.appendChild(fragment);
-        return true;
-    }   
+    }    
 
     #createCategoryElement(category) {
         var mainDiv = document.createElement('div');
@@ -405,12 +404,13 @@ export default class HomeDashboard {
 
         var categoryNameDiv = document.createElement('div');
         categoryNameDiv.id = `category_${category.id}_name`;
-        categoryNameDiv.className = "me-auto"
+        categoryNameDiv.className = "category-body-content";
         categoryNameDiv.textContent = decodeURIComponent(category.name);
 
         var budget = category.budgetLimit?.budget ?? category.budget;
 
         var categoryBalanceDiv = document.createElement('div');
+        categoryBalanceDiv.className = "category-body-content balance";
 
         var categoryBalanceSpan = document.createElement('span');
         categoryBalanceSpan.id = `category_${category.id}_balance`;
@@ -424,7 +424,7 @@ export default class HomeDashboard {
         if (category.total > category.budget) {
             let deviationAmount = category.total - category.budget;
             let deviationDiv = document.createElement('div');
-            deviationDiv.className = 'me-2';
+            deviationDiv.className = 'category-body-content deviation';
             deviationDiv.id = `category_${category.id}_deviation`;
 
             let deviationSpan = document.createElement('span');
@@ -451,12 +451,13 @@ export default class HomeDashboard {
 
         var progressBarDiv = document.createElement('div');
         progressBarDiv.id = `category_${category.id}_progressbar`;
-        progressBarDiv.className = `progress-bar progress-bar-striped progress-bar-animated ${color}`;
+        progressBarDiv.className = `progress-bar progress-bar-striped ${color}`;
         progressBarDiv.role = 'progressbar';
         progressBarDiv.style.width = `${progressBarDivPercentage}%`;
         progressBarDiv.ariaValuenow = `${progressBarDivPercentage}`;
         progressBarDiv.ariaValuemin = '0';
         progressBarDiv.ariaValuemax = '100';
+        progressBarDiv.setAttribute('aria-labelledby', `category_${category.id}_balance`); 
 
         progressDiv.appendChild(progressBarDiv);
 
@@ -501,16 +502,12 @@ export default class HomeDashboard {
         }
     }
 
-    removeCategory(id, type) {        
-        var categoryElement = document.getElementById(`category_${id}`);
-        categoryElement.removeEventListener();
-        categoryElement.remove();
-
-        if (!this.#data) {
-            return;
-        }
-
-        var array;        
+    editCategory(formData, month) {        
+        var type = parseInt(formData.get('type'));
+        var id = parseInt(formData.get('Id'));
+        var name = formData.get("Name");
+        var budget = parseFloat(formData.get("Budget"));
+        var array;
 
         switch (type) {
             case 1:
@@ -519,6 +516,65 @@ export default class HomeDashboard {
             case 2:
                 array = this.#data.expenseCategories;
                 break;
+            default:
+                return false;
+        }
+
+        var category = array.find(c => c.id === id);
+
+        if (!category) {
+            return false;
+        }
+
+        var oldBudget = category.budgetLimit?.budget ?? category.budget;
+
+        if (category.name == name && oldBudget == budget) {
+            return;
+        }
+
+        if (oldBudget != budget) {
+            let overspending = Math.max(0, category.total - oldBudget);
+            let newOverspending = Math.max(0, category.total - budget);
+            let diff = newOverspending - overspending;
+            this.#data.overspending += diff;
+            debugger;
+            switch (type) {
+                case 1:
+                    this.#data.incomeBudget += budget - oldBudget;
+                    break;
+                case 2:
+                    this.#data.expensesBudget += budget - oldBudget;
+                    break;
+                default:
+                    return false;
+            }
+
+            this.#formatHeaders();
+            category.budgetLimit = { budget, month }
+        }
+
+        category.name = name;
+
+        this.#updateCategory(category);
+    }
+
+    removeCategory(id, type) {        
+        var categoryElement = document.getElementById(`category_${id}`);
+        categoryElement.remove();
+
+        if (!this.#data) {
+            return false;
+        }
+
+        switch (type) {
+            case 1:
+                array = this.#data.incomeCategories;
+                break;
+            case 2:
+                array = this.#data.expenseCategories;
+                break;
+            default:
+                return false;
         }
 
         var index = array.findIndex(item => item.id === id);
@@ -532,17 +588,43 @@ export default class HomeDashboard {
         var transactionDate = new Date(transaction.dateTime)
         var transactionYear = transactionDate.getYear();
         var transactionMonth = transactionDate.getMonth();
-        var currentDate = new Date(this.#data.month);
+        var currentDate = this.getCurrentMonth();
         var currentYear = currentDate.getYear();
         var currentMonth = currentDate.getMonth();
 
         if (transactionYear === currentYear && transactionMonth == currentMonth) {
             let array = this.#data.incomeCategories.concat(this.#data.expenseCategories);
-            let category = array.find((element) => element.id === transaction.categoryId);
+            let category = array.find((element) => element.id === transaction.categoryId);  
+            let overspending = Math.max(0, category.total - category.budget);   
+            
             category.total += transaction.amount;
+            this.#data.overspending += Math.max(0, category.total - category.budget - overspending);
+            if (category.categoryType == 2) {
+                this.#data.expensesTotal += transaction.amount;
+
+                if (transaction.isHappy) {
+                    this.#data.expensesHappyTotal += transaction.amount;
+
+                }
+                if (transaction.isNecessary) {
+                    this.#data.expensesNecessaryTotal += transaction.amount;
+                }
+            }
+            else if (category.categoryType == 1) {
+                this.#data.incomeTotal += transaction.amount;
+            }
+            
+            this.#formatHeaders();
+            this.#formatCharts();
             this.#updateCategory(category);
         }        
     }
 
     getCurrentMonth = () => this.#monthPicker.datepicker('getUTCDate');
+
+    getCategory(id) {
+        var categories = this.#data.incomeCategories.concat(this.#data.expenseCategories);
+        var category = categories.find(c => c.id == id);
+        return category;
+    }
 }

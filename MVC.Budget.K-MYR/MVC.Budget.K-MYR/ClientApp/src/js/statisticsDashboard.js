@@ -1,6 +1,6 @@
 ﻿import { Chart, BarController, BarElement, CategoryScale, LinearScale, LineController, LineElement, PointElement, DoughnutController, ArcElement} from 'chart.js';
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, LineController, LineElement, PointElement, DoughnutController, ArcElement);
-import { getRandomColor } from './utilities';
+import { getColor } from './utilities';
 import { getDatePicker } from './asyncComponents';
 import { getFiscalPlanDataByYear } from './api';
 
@@ -468,14 +468,20 @@ export default class StatisticsDashboard {
         return data;
     }
 
-    rerenderDashboard() {
+    formatDashboard() {
         try {
             if (this.#isLoading) {
                 console.log("Dashboard is loading...")
                 return false;
             }
+            this.#isLoading = true;
 
-            this.#renderData();
+            this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(this.#data.overspendingTotal)}`;
+            this.#sentimentBarChart.update('none');
+            this.#necessityBarChart.update('none');
+            this.#overspendingChart.update('none');
+            this.#totalSpentChart.update('none');
+            
         } finally {
             this.#isLoading = false;
         }
@@ -517,7 +523,7 @@ export default class StatisticsDashboard {
                 data: categoryData.overspendingPerMonth,
                 borderWidth: 2,
                 borderColor: '#d3d3d3',
-                backgroundColor: getRandomColor()
+                backgroundColor: getColor(i)
             });
         }
 

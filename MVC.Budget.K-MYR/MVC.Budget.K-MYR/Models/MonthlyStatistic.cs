@@ -1,6 +1,6 @@
 ﻿namespace MVC.Budget.K_MYR.Models;
 
-public class MonthlyStatistics
+public class MonthlyStatistic
 {
     public int Month { get; set; }
     public decimal TotalSpent { get; set; }

@@ -34,7 +34,7 @@ public class FiscalPlanController : ControllerBase
     }
 
     [HttpGet("{id:int}/MonthlyData")]
-    public async Task<ActionResult<FiscalPlanMonthDTO>> GetDataByMonth(int id, [FromQuery] DateTime? Month)
+    public async Task<ActionResult<FiscalPlanMonthDTO>> GetDataByMonth([FromRoute] int id, [FromQuery] DateTime? Month)
     {
        var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
@@ -45,7 +45,7 @@ public class FiscalPlanController : ControllerBase
         
         var start = DateTime.UtcNow;
         FiscalPlanMonthDTO fiscalPlanDTO = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
-        _logger.LogInformation("GetDataByMonth() Duration: {duration} ms", (DateTime.UtcNow - start).Milliseconds);
+        _logger.LogInformation("{method} Duration: {duration} ms", nameof(GetDataByMonth),(DateTime.UtcNow - start).Milliseconds);
 
         return Ok(fiscalPlanDTO);
     }
@@ -62,7 +62,8 @@ public class FiscalPlanController : ControllerBase
 
         var start = DateTime.UtcNow;
         FiscalPlanYearDTO fiscalPlanDTO = await _fiscalPlanService.GetDataByYear(id, year);
-        _logger.LogInformation("GetDataByYear() Duration: {duration} ms", (DateTime.UtcNow-start).Milliseconds);
+        _logger.LogInformation("{method} Duration: {duration} ms", nameof(GetDataByYear), (DateTime.UtcNow - start).Milliseconds);
+
 
         return Ok(fiscalPlanDTO);
     }
@@ -81,7 +82,7 @@ public class FiscalPlanController : ControllerBase
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutFiscalPlan(int id, [Bind("Name,Id")] FiscalPlanPut fiscalPlanPut)
+    public async Task<ActionResult> PutFiscalPlan([FromRoute] int id, [Bind("Name,Id")] FiscalPlanPut fiscalPlanPut)
     {
         if (id != fiscalPlanPut.Id)
             return BadRequest();
@@ -108,7 +109,7 @@ public class FiscalPlanController : ControllerBase
 
     [HttpDelete("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> DeleteFiscalPlan(int id)
+    public async Task<ActionResult> DeleteFiscalPlan([FromRoute] int id)
     {
         var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 

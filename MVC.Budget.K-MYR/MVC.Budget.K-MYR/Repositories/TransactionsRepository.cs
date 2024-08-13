@@ -10,9 +10,12 @@ public sealed class TransactionsRepository : GenericRepository<Transaction>, ITr
     public TransactionsRepository(DatabaseContext context) : base(context)
     { }
 
-    public async Task<List<TransactionDTO>> GetFilteredTransactionsAsync(int? categoryId = null, string? searchString = null, DateTime? minDate = null, DateTime? maxDate = null, decimal? minAmount = null, decimal? maxAmount = null)
+    public async Task<List<TransactionDTO>> GetFilteredTransactionsAsync(int? fiscalPlanId, int? categoryId = null, string? searchString = null, DateTime? minDate = null, DateTime? maxDate = null, decimal? minAmount = null, decimal? maxAmount = null)
     {
         IQueryable<Transaction> query = _dbSet;
+
+        if (fiscalPlanId is not null)
+            query = query.Where(t => t.Category.FiscalPlanId == fiscalPlanId);
 
         if (categoryId is not null)
             query = query.Where(t => t.CategoryId == categoryId);
@@ -24,24 +27,23 @@ public sealed class TransactionsRepository : GenericRepository<Transaction>, ITr
             query = query.Where(t => t.DateTime <= maxDate);
 
         if (minAmount is not null)
-            query = query.Where(t => t.Amount>= minAmount);
+            query = query.Where(t => t.Amount >= minAmount);
 
         if (maxAmount is not null)
             query = query.Where(t => t.Amount <= maxAmount);
 
         if (!searchString.IsNullOrEmpty())
-            query = query.Where(t => t.Title.Contains(searchString.Trim()));
+            query = query.Where(t => t.Title.Contains(searchString!.Trim()));
 
-        return await query.Include(t => t.Category)
-             .Select(t => new TransactionDTO
-             {
-                 Id = t.Id,
-                 Title = t.Title,
-                 Amount = t.Amount,
-                 Description = t.Description,
-                 DateTime = t.DateTime,
-                 Category = t.Category.Name
-             })
-             .ToListAsync();
+        return await query.Select(t => new TransactionDTO
+                           {
+                               Id = t.Id,
+                               Title = t.Title,
+                               Amount = t.Amount,
+                               Description = t.Description,
+                               DateTime = t.DateTime,
+                               Category = t.Category.Name
+                           })
+                           .ToListAsync();
     }
 }

@@ -32,12 +32,13 @@ public class CategoriesService : ICategoriesService
 
     public Task<List<Category>> GetCategoriesWithUnevaluatedTransactions(int fiscalPlanId)
     {
-        var cutoffDate = DateTime.UtcNow.AddDays(-14);
+        var date = DateTime.UtcNow.AddDays(-14);
+        var cutOffDate = new DateTime(date.Year, date.Month, date.Day);
 
         return _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
                 c => c.FiscalPlanId == fiscalPlanId,
                 q => q.OrderBy(c => c.Name),
-                c => c.Transactions.Where(t => t.Evaluated == false && t.DateTime < cutoffDate)
+                c => c.Transactions.Where(t => t.Evaluated == false && t.DateTime < cutOffDate)
                     .OrderByDescending(d => d.DateTime));
     }
 
@@ -47,14 +48,14 @@ public class CategoriesService : ICategoriesService
         {
             Name = categoryPost.Name,
             Budget = categoryPost.Budget,
-            FiscalPlanId = categoryPost.FiscalPlanId
+            FiscalPlanId = categoryPost.FiscalPlanId,
         };
 
         var categoryStatistics = new CategoryBudget()
         {
             CategoryId = category.Id,
             Budget = category.Budget,
-            Month = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1)
+            Month = DateTime.UtcNow
         };
 
         category.PreviousBudgets.Add(categoryStatistics);
@@ -85,15 +86,15 @@ public class CategoriesService : ICategoriesService
             {
                 currentBudget.Budget = categoryPut.Budget;
             }
-        }
 
-        if(month.Year == DateTime.UtcNow.Year && month.Month == DateTime.UtcNow.Month) 
-        {
-            category.Budget = categoryPut.Budget;
+            if ((DateTime.UtcNow.Month == month.Month && DateTime.UtcNow.Year == month.Year) || 
+                !category.PreviousBudgets.Any(b => b.Month.Month != month.Month || b.Month.Year != month.Year))
+            {
+                category.Budget = categoryPut.Budget;
+            }
         }
 
         category.Name = categoryPut.Name;
-        category.FiscalPlanId = categoryPut.FiscalPlanId;    
 
         await _unitOfWork.Save();
     }
@@ -104,8 +105,8 @@ public class CategoriesService : ICategoriesService
         await _unitOfWork.Save();
     }
 
-    public Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter)
+    public Task<Category?> GetCategoryWithBudgetLimit(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter)
     {
-        return _unitOfWork.CategoriesRepository.GetCategoryWithFilteredStatistics(id, filter);
+        return _unitOfWork.CategoriesRepository.GetCategoryWithBudgetLimits(id, filter);
     }
 }

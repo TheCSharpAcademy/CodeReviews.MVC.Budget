@@ -1,7 +1,7 @@
 ﻿@model MVC.Budget.K_MYR.Models.FiscalPlan;
 
 <section id="fiscalPlan-modals">
-    <div class="modal fade" id="addFiscalPlan-modal" tabindex="-1" aria-labelledby="add-fiscalPlan-label" aria-hidden="true">
+    <div class="modal fade" id="addFiscalPlan-modal" tabindex="-1" aria-labelledby="add-fiscalPlan-label" aria-hidden="true" aria-modal="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -15,8 +15,8 @@
                             <input asp-for="Name" class="form-control" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>                        
-                        <div class="form-group mt-2 d-flex align-items-center justify-content-center">
-                            <input type="submit" value="Add" class="px-4" />
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Add" class="px-4 submit-btn" />
                         </div>
                     </form>
                 </div>
@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateFiscalPlan-modal" tabindex="-1" aria-labelledby="updateFiscalPlan-label" aria-hidden="true">
+    <div class="modal fade" id="updateFiscalPlan-modal" tabindex="-1" aria-labelledby="updateFiscalPlan-label" aria-hidden="true" aria-modal="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -39,8 +39,8 @@
                             <input asp-for="Name" class="form-control" id="updateCategory_name" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>                       
-                        <div class="form-group mt-2 d-flex align-items-center justify-content-center">
-                            <input type="submit" value="Edit" class="px-4" />
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Edit" class="px-4 submit-btn" />
                         </div>
                     </form>
                 </div>

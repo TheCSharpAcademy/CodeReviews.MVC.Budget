@@ -15,9 +15,9 @@ public class TransactionsService : ITransactionsService
         _logger = logger;
     }
 
-    public Task<List<TransactionDTO>> GetTransactions(int? categoryId = null, string? searchString = null, DateTime? minDate = null, DateTime? maxDate = null, decimal? minAmount = null, decimal? maxAmount = null)
+    public Task<List<TransactionDTO>> GetTransactions(int? fiscalPlanId, int? categoryId = null, string? searchString = null, DateTime? minDate = null, DateTime? maxDate = null, decimal? minAmount = null, decimal? maxAmount = null)
     {
-        return _unitOfWork.TransactionsRepository.GetFilteredTransactionsAsync(categoryId, searchString, minDate, maxDate, minAmount, maxAmount);
+        return _unitOfWork.TransactionsRepository.GetFilteredTransactionsAsync(fiscalPlanId, categoryId, searchString, minDate, maxDate, minAmount, maxAmount);
     }
 
     public ValueTask<Transaction?> GetByIDAsync(int id)
@@ -68,10 +68,7 @@ public class TransactionsService : ITransactionsService
     {
         _unitOfWork.TransactionsRepository.Delete(transaction);
         await _unitOfWork.Save();
-    }
-
-    public async Task<bool> CategoryExists(int id) => await _unitOfWork.CategoriesRepository.GetByIDAsync(id) is not null;
-    
+    }    
 }
 
 

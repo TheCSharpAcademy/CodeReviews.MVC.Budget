@@ -5,5 +5,5 @@ public class FiscalPlanModel
     public FiscalPlanMonthDTO FiscalPlan{ get; set; }
     public IncomeCategory Category { get; set; }
     public Transaction Transaction { get; set; }
-    public SearchModel Search { get; set; }
+    public SearchViewModel Search { get; set; }
 }

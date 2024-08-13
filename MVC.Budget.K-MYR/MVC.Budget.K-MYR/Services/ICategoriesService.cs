@@ -12,6 +12,6 @@ namespace MVC.Budget.K_MYR.Services
         Task<T> AddCategory<T>(T categoryPost) where T : Category, new();
         Task UpdateCategory<T>(T category, T categoryPut, DateTime month) where T : Category;
         Task DeleteCategory<T>(T category) where T : Category;
-        Task<Category?> GetCategoryWithFilteredStatistics(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter);
+        Task<Category?> GetCategoryWithBudgetLimit(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter);
     }
 }
