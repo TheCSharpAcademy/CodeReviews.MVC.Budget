@@ -4,6 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -112,5 +113,10 @@ module.exports = {
                     return entries;
                 }
             }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: 'src/img', to: 'img' },
+            ],
+        }),
     ]
 };

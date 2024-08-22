@@ -8,20 +8,40 @@ const fiscalPlanId = document.getElementById("fiscalPlan_Id");
 const menu = document.getElementById('menu-container');
 
 const chartDefaultsTask = importChartDefaults();
-const homeDashboardPromise = getHomeDashboard(menu, fiscalPlanId.value, currentDate, JSON.parse(fiscalPlanId.dataset.object));
-const statisticsDashboardPromise = getStatisticsDashboard(fiscalPlanId.value, currentDate);
-const reevaluationDashboardPromise = getReevaluationDashboard(fiscalPlanId.value);
-const modalsPromise = importBootstrapModals();
-const collapsesPromise = importBootstrapCollapses().then((collapses) => {
-    $(".accordion-head").on("click", function (event) {     
-        if (!event.target.classList.contains("add-category-icon")) {
-            collapses.find(c => c._element.id == this.nextElementSibling.id).toggle();
-            let caret = $('.accordion-caret', this)[0];
-            caret.classList.toggle("rotate");
-        }
-    });
-});
-const transactionsTablePromise = getTransactionsTable()
+const homeDashboardPromise = scheduler.postTask(() =>
+    getHomeDashboard(menu, fiscalPlanId.value, currentDate, JSON.parse(fiscalPlanId.dataset.object)),
+    { priority: 'user-blocking' }
+);
+
+const statisticsDashboardPromise = scheduler.postTask(() =>
+    getStatisticsDashboard(fiscalPlanId.value, currentDate),
+    { priority: 'background' }
+);
+
+const reevaluationDashboardPromise = scheduler.postTask(() =>
+    getReevaluationDashboard(fiscalPlanId.value),
+    { priority: 'background' }
+);
+
+const modalsPromise = scheduler.postTask(
+    importBootstrapModals,
+    { priority: 'background' }
+);
+
+const collapsesPromise = scheduler.postTask(() =>
+    importBootstrapCollapses().then((collapses) => {
+        $(".accordion-head").on("click", function (event) {
+            if (!event.target.classList.contains("add-category-icon")) {
+                collapses.find(c => c._element.id == this.nextElementSibling.id).toggle();
+                let caret = $('.accordion-caret', this)[0];
+                caret.classList.toggle("rotate");
+            }
+        })
+    }),
+    { priority: 'background' }
+);
+
+const transactionsTablePromise = scheduler.postTask(() => getTransactionsTable()
     .then((table) => {
         document.getElementById('search_fiscalPlanId').value = fiscalPlanId.value;
         $('#search-form').on("submit", async function (event) {
@@ -36,7 +56,9 @@ const transactionsTablePromise = getTransactionsTable()
             }
         });
         return table;
-    });
+    }),
+    { priority: 'background' }
+);
 
 setupFlipContainer();
 setupModalHandlers();
@@ -47,6 +69,7 @@ async function setupRerenderHandlers() {
         [homeDashboardPromise, statisticsDashboardPromise, reevaluationDashboardPromise, transactionsTablePromise]
     );
     window.addEventListener('countryChanged', () => {
+        debugger;
         homeDB.formatDashboard();
         reevaluationDB.formatDashboard();
         statisticsDB.formatDashboard();
@@ -262,6 +285,7 @@ async function getTransactionsTable() {
             var data = row.data();
             console.log(data, this);
         });
+        var table = document.getElementById("transactions-table");
         return dataTable;
     } catch (error) {
         console.error('Error loading Datatable:', error);

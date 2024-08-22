@@ -8,18 +8,19 @@ public class FiscalPlanYearDTO
     public decimal NecessaryEvaluatedTotal { get; set; }
     public decimal UnnecessaryEvaluatedTotal { get; set; }
     public decimal TotalSpent { get; set; }
+    public decimal TotalIncome { get; set; }
     public decimal OverspendingTotal { get; set; }
-    public IEnumerable<decimal> TotalPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> HappyPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> HappyEvaluatedPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> UnhappyPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> UnhappyEvaluatedPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> NecessaryPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> NecessaryEvaluatedPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> UnnecessaryPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> UnnecessaryEvaluatedPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> UnevaluatedPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<MonthlyOverspendingPerCategory> MonthlyOverspendingPerCategory { get; set; } = Enumerable.Empty<MonthlyOverspendingPerCategory>();
-    public IEnumerable<decimal> SavingsPerMonth { get; set; } = Enumerable.Empty<decimal>();
-    public IEnumerable<decimal> IncomePerMonth { get; set; } = Enumerable.Empty<decimal>();
+    public List<decimal> TotalPerMonth { get; set; } = [];
+    public List<decimal> HappyPerMonth { get; set; } = [];
+    public List<decimal> HappyEvaluatedPerMonth { get; set; } = [];
+    public List<decimal> UnhappyPerMonth { get; set; } = [];
+    public List<decimal> UnhappyEvaluatedPerMonth { get; set; } = [];
+    public List<decimal> NecessaryPerMonth { get; set; } = [];
+    public List<decimal> NecessaryEvaluatedPerMonth { get; set; } = [];
+    public List<decimal> UnnecessaryPerMonth { get; set; } = [];
+    public List<decimal> UnnecessaryEvaluatedPerMonth { get; set; } = [];
+    public List<decimal> UnevaluatedPerMonth { get; set; } = [];
+    public List<MonthlyOverspendingPerCategory> MonthlyOverspendingPerCategory { get; set; } = [];
+    public List<decimal> SavingsPerMonth { get; set; } = [];
+    public List<decimal> IncomePerMonth { get; set; } = [];
 }

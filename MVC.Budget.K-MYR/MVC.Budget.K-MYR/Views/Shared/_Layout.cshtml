@@ -29,7 +29,7 @@
                         </li>
                     </ul>          
                     <form id="country-form" method="post" onsubmit="return false;">
-                        <input type="text" id="country" aria-label="Country Selection" autocomplete="off" />
+                        <input type="text" id="country" aria-label="Country Selection" autocomplete="off"/>
                     </form>
                 </div>
             </div>
@@ -98,5 +98,9 @@
     </div>
 
     @await RenderSectionAsync("Scripts", false)
+    @if (Environment.GetEnvironmentVariable("__ASPNETCORE_BROWSER_TOOLS") is not null)
+    {
+        <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+    }
 </body>
 </html>

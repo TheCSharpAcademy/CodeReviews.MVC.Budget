@@ -1,11 +1,10 @@
 ﻿export async function getCountrySelect(id) {
     try {
-        const { default: _ } = await import(/* webpackChunkName: "countrySelect" */ 'country-select-js');        
+        const { default: _ } = await import(/* webpackChunkName: "countrySelect" */ 'country-select-js');          
         return $(id).countrySelect({
             defaultCountry: window.userLocale.region.toLowerCase(),
             preferredCountries: ["at", "us"],
-            excludeCountries: [],
-            responsiveDropdown: true
+            excludeCountries: []
         });
     } catch (error) {
         console.error('Error loading Country Select:', error);
@@ -28,6 +27,7 @@ export async function importChartDefaults() {
             }
         );
 
+        Chart.defaults.normalized = true;
         Chart.defaults.color = '#ffffff';
         Chart.defaults.scales.linear.min = 0;
         Chart.defaults.plugins.legend.labels.filter = (item) => item.text !== undefined;
@@ -76,7 +76,7 @@ export async function getDatePicker(id, mode) {
                     startView: 'months',
                     minViewMode: 'months',
                     autoclose: true
-                })
+                });
             default:
                 return $(id).datepicker({
                     format: 'yyyy',

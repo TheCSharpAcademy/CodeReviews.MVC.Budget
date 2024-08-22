@@ -58,7 +58,7 @@
                                     </div>
                                     <div class="dashboardStatistics mt-4">
                                         <h5 id="home-overspending" class="text-center">
-                                            Overspending: @fiscalPlanDTO.Overspending.ToString("C2", Model.Culture) 
+                                            Overspending: @fiscalPlanDTO.Overspending.ToString("C2", Model.Culture)
                                         </h5>
                                     </div>
                                 </div>
@@ -94,13 +94,13 @@
                                     <div class="accordion-caret rotate"></div>
                                 </div>
                                 <div id="collapseIncome" class="accordion-collapse collapse show" aria-labelledby="accordionIncomeHeader">
-                                    <div id="incomeAccordionBody" class="accordion-body">                                        
+                                    <div id="incomeAccordionBody" class="accordion-body">
                                         @foreach (var category in fiscalPlanDTO.IncomeCategories)
-                                        {                                            
+                                        {
                                             var progressbarWidth = (int)Math.Min(100, category.Total / category.Budget * 100);
                                             var budget = category.BudgetLimit?.Budget ?? category.Budget;
 
-                                            <div id="category_@category.Id" class="category">                                                
+                                            <div id="category_@category.Id" class="category">
                                                 <div class="border-container">
                                                     <div class="content">
                                                         <div class="category-body">
@@ -110,7 +110,7 @@
                                                             {
                                                                 <div id="category_@(category.Id)_deviation" class="category-body-content deviation">
                                                                     <span id="category_@(category.Id)_deviationText" class="deviation-text">Windfall: @((category.Total - category.Budget).ToString("C2", Model.Culture))</span>
-                                                                </div>                                                                
+                                                                </div>
                                                             }
 
                                                             <div class="category-body-content balance">
@@ -118,7 +118,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="progress">
-                                                            <div id="category_@(category.Id)_progressbar" class="progress-bar progress-bar-striped bg-success"
+                                                            <div id="category_@(category.Id)_progressbar" class="progress-bar bg-success"
                                                                  role="progressbar" style="width: @(progressbarWidth)%" aria-valuenow="@progressbarWidth" aria-valuemin="0" aria-valuemax="100" aria-labelledby="category_@(category.Id)_balance">
                                                             </div>
                                                         </div>
@@ -126,7 +126,7 @@
                                                     <div class="border-animation"></div>
                                                 </div>
                                             </div>
-                                        }                                        
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -156,7 +156,7 @@
                                     <div class="accordion-caret rotate"></div>
                                 </div>
                                 <div id="collapseExpenses" class="accordion-collapse collapse show" aria-labelledby="accordionExpensesHeader">
-                                    <div id="expensesAccordionBody" class="accordion-body">                                        
+                                    <div id="expensesAccordionBody" class="accordion-body">
                                         @foreach (var category in fiscalPlanDTO.ExpenseCategories)
                                         {
                                             var progressbarWidth = (int)Math.Min(100, category.Total / category.Budget * 100);
@@ -167,8 +167,8 @@
                                                 <div class="border-container">
                                                     <div class="content">
                                                         <div class="category-body">
-                                                            <div id="category_@(category.Id)_name" class="category-body-content">@Html.Encode(category.Name)</div>
-                                                          
+                                                            <div id="category_@(category.Id)_name" class="category-body-content">@category.Name</div>
+
                                                             @if (category.Total > category.Budget)
                                                             {
                                                                 <div id="category_@(category.Id)_deviation" class="category-body-content deviation">
@@ -180,7 +180,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="progress">
-                                                            <div id="category_@(category.Id)_progressbar" class="progress-bar progress-bar-striped @color"
+                                                            <div id="category_@(category.Id)_progressbar" class="progress-bar @color"
                                                                  role="progressbar" style="width: @(progressbarWidth)%" aria-valuenow="@(progressbarWidth)" aria-valuemin="0" aria-valuemax="100" aria-labelledby="category_@(category.Id)_balance">
                                                             </div>
                                                         </div>
@@ -188,7 +188,7 @@
                                                     <div class="border-animation"></div>
                                                 </div>
                                             </div>
-                                        }                                        
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -203,7 +203,82 @@
                     <h2 id="reevalInfoText">You have reevaluated all of your previous expenses. Good job!</h2>
                 </div>
                 <div id="reevalCategories-scrollcontainer" class="content-scrollcontainer">
-                    <div id="reevalCategories-container" class="content-container">                      
+                    <div id="reevalCategories-container" class="content-container">                       
+                        @for (int i = 0; i < Model.PageModel.Categories.Count; i++)
+                        {
+                            var category = Model.PageModel.Categories[i];
+
+                            if(category.Transactions.Count != 0)
+                            {
+                                <div class="accordion reevaluation-accordion" id="accordion_@category.Id" data-categoryId="@category.Id">
+                                    <div class="accordion-item">
+                                        <div id="accordion-head_@category.Id" class="accordion-head d-flex">
+                                            <h5 id="accordionHeader_@category.Id" class="accordion-header me-auto">@category.Name</h5>
+                                            <div class="accordion-caret rotate"></div>
+                                        </div>
+                                        <div class="accordion-collapse collapse show" id="collapse_@category.Id" aria-labelledby="accordionHeader_@category.Id">
+                                            <div class="accordion-body">
+                                                @foreach (var transaction in category.Transactions)
+                                                {
+                                                    <div id="reeval_transaction_@transaction.Id" class="transaction-body"
+                                                         data-id="@transaction.Id"
+                                                         data-ishappy="@transaction.IsHappy"
+                                                         data-isnecessary="@transaction.IsNecessary"
+                                                         data-amount="@transaction.Amount"
+                                                         data-date="@transaction.DateTime.ToUniversalTime()">
+                                                        <div>@transaction.Title</div>
+                                                        <div class="ms-2" id="transaction_date_@transaction.Id">@transaction.DateTime.ToString(Model.Culture)</div>
+                                                        <div id="transaction_amount_@transaction.Id" class="transaction-amount ms-2 me-auto">@transaction.Amount.ToString("C2", Model.Culture)</div>
+                                                        <form id="reevaluate-transaction-form_@transaction.Id" class="reevaluate-transaction-form" novalidate="novalidate">                                                            
+                                                            <input type="hidden" value="@transaction.Id" id="reeval_transaction_@transaction.Id" name="Id"><div class="d-flex justify-content-around">                                                                
+                                                                <div class="me-3 d-flex align-items-center">
+                                                                    <input type="radio" value="true" id="isHappyTrue_@transaction.Id" class="iconRadioButton" name="IsHappy">
+                                                                    <label class="reevalIconLabel" for="isHappyTrue_@transaction.Id">
+                                                                        <div class="reevalIconContainer">
+                                                                            <img src="~/dist/img/happy-emote.svg" height="30" width="30" class="reevalIcon">
+                                                                        </div>
+                                                                    </label>
+                                                                    <input type="radio" value="false" id="isHappyFalse_@transaction.Id" class="iconRadioButton" name="IsHappy" checked>
+                                                                    <label class="reevalIconLabel" for="isHappyFalse_@transaction.Id">
+                                                                        <div class="reevalIconContainer">
+                                                                            <div class="reevalIconContainer">
+                                                                                <img src="~/dist/img/sad-emote.svg" height="30" width="30" class="reevalIcon">
+                                                                            </div>
+                                                                        </div>
+                                                                    </label>
+                                                                </div>                                                    
+                                                                <div class="me-3 d-flex align-items-center">
+                                                                    <input type="radio" value="true" id="isNecessaryTrue_@transaction.Id" class="iconRadioButton" name="IsNecessary">
+                                                                    <label class="reevalIconLabel" for="isNecessaryTrue_@transaction.Id">
+                                                                        <div class="reevalIconContainer">
+                                                                            <img src="~/dist/img/chart-growth.svg" height="30" width="30" class="reevalIconNecessity">
+                                                                        </div>
+                                                                    </label>
+                                                                    <input type="radio" value="false" id="isNecessaryFalse_@transaction.Id" class="iconRadioButton" name="IsNecessary" checked>
+                                                                    <label class="reevalIconLabel" for="isNecessaryFalse_@transaction.Id">
+                                                                        <div class="reevalIconContainer">
+                                                                            <img src="~/dist/img/chart-decrease.svg" height="30" width="30" class="reevalIconNecessity"/>
+                                                                        </div>
+                                                                    </label>
+                                                                </div>
+                                                                <div>
+                                                                    <button class="reeval-submit-button" type="submit">
+                                                                        <svg class="reeval-submit-svg" viewBox="0 0 24 24" height="40" width="40">
+                                                                            <circle cx="12" cy="12" r="11.5" stroke-width="1"></circle>
+                                                                            <path d="M8.5 12.5L10.5 14.5L15.5 9.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                    </form>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
             </div>
@@ -225,7 +300,8 @@
                                         <span class="input-group-text me-auto calendar-button"><i class="bi bi-calendar"></i></span>
                                     </div>
                                     <div class="dashboardStatistics mt-4">
-                                        <h5 id="statistics-overspending" class="text-center">Overspending: @fiscalPlanDTO.Overspending.ToString("C2", Model.Culture) </h5>
+                                        <h5 id="statistics-totalSpent" class="text-center"></h5>
+                                        <h5 id="statistics-overspending" class="text-center"></h5>
                                     </div>
                                 </div>
                                 <div class="chart-container">
@@ -277,15 +353,15 @@
                                         </th>
                                         <th>
                                             Amount
-                                        </th>         
+                                        </th>
                                         <th>
                                             Category
                                         </th>
-                                        <th> 
+                                        <th>
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>                                    
+                                <tbody>
                                 </tbody>
                             </table>
                         </div>
@@ -298,7 +374,7 @@
 
 @await Html.PartialAsync("_CategoryModals", Model.PageModel.Category)
 @await Html.PartialAsync("_TransactionModals", Model.PageModel.Transaction)
-<input id="fiscalPlan_Id" type="hidden" value="@fiscalPlanDTO.Id" data-object='@Json.Serialize(Model.PageModel.FiscalPlan)' />
+<input id="fiscalPlan_Id" type="hidden" value="@fiscalPlanDTO.Id" data-object='@Json.Serialize(Model.PageModel.FiscalPlan)'>
 
 @section Scripts {
     @{

@@ -360,7 +360,7 @@ export default class HomeDashboard {
             color = progressBarPercentage < 50 ? "bg-success" : progressBarPercentage < 85 ? "bg-warning" : "bg-danger";
         }
 
-        progressBarElement.className = `progress-bar progress-bar-striped ${color}`;
+        progressBarElement.className = `progress-bar ${color}`;
         progressBarElement.style.width = `${progressBarPercentage}%`;
         progressBarElement.ariaValuenow = `${progressBarPercentage}`;
 
@@ -451,7 +451,7 @@ export default class HomeDashboard {
 
         var progressBarDiv = document.createElement('div');
         progressBarDiv.id = `category_${category.id}_progressbar`;
-        progressBarDiv.className = `progress-bar progress-bar-striped ${color}`;
+        progressBarDiv.className = `progress-bar ${color}`;
         progressBarDiv.role = 'progressbar';
         progressBarDiv.style.width = `${progressBarDivPercentage}%`;
         progressBarDiv.ariaValuenow = `${progressBarDivPercentage}`;

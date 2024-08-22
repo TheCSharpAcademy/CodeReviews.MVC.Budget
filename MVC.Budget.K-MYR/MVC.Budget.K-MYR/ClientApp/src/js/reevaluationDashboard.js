@@ -17,22 +17,53 @@ export default class ReevaluationDashboard {
             this.#isLoading = true;
             this.#container = document.getElementById("reevalCategories-container");
             this.#infoDiv = document.getElementById("reevalInfo");
-
-            let data = await this.#getData(id);
-            this.#data = data;
-
-            if (data) {
-                this.#createReevaluationElements(data);
-                this.#toggleReevaluationInfo();
-            }
+            this.attachEventHandlers();  
+            this.#toggleReevaluationInfo();
+           
         } finally {
             this.#isLoading = false;
+            this.formatDashboard();
         }
     }
 
     async #getData(id) {
         var categories = await getCategoriesWithUnevaluatedTransactions(id);
         return categories;
+    }
+
+    async #reevaluateTransaction(form) {
+        var formData = new FormData(form);
+        var id = formData.get('Id');
+        var element = document.getElementById(`reeval_transaction_${id}`);
+        var previousIsHappy = element.dataset.ishappy === 'true';
+        var previousIsNecessary = element.dataset.isnecessary === 'true';
+        var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary);
+
+        if (IsPatched) {
+            let accordionBody = form.closest(".accordion-body");
+            let accordion = accordionBody.closest(".accordion");
+            let category = this.#data.find(c => c.id == accordion.dataset.categoryid);
+            let index = Array.prototype.indexOf.call(element.parentNode.children, element);
+            if (index != -1) {
+                category.transactions.splice(index, 1);
+            }
+            element.removeEventListener("submit", this.onReevaluate);
+            element.remove();
+
+            if (accordionBody.childElementCount === 0) {
+                accordionBody.remove();
+            }
+            this.#toggleReevaluationInfo();
+        }
+    }
+
+    attachEventHandlers() {
+        $(".reevaluate-transaction-form").on("submit", this.onReevaluate.bind(this));
+    }
+
+    onReevaluate(event) {
+        event.preventDefault();
+        this.#reevaluateTransaction(event.target);
     }
 
     formatDashboard() {
@@ -43,23 +74,42 @@ export default class ReevaluationDashboard {
             }
             this.#isLoading = true;
 
-            for (let i = 0; i < this.#data.length; i++) {
-                let category = this.#data[i];                
-                for (let i = 0; i < category.transactions.length; i++) {
-                    let transaction = category.transactions[i];
-                    let element = document.getElementById(`transaction_date_${transaction.id}`);
-                    element.textContent = new Date(transaction.dateTime).toLocaleDateString(window.userLocale);
-                    element = document.getElementById(`transaction_amount_${transaction.id}`);
-                    element.textContent = window.userNumberFormat.format(transaction.amount);
+            if (this.#data) {
+                for (let i = 0; i < this.#data.length; i++) {
+                    let category = this.#data[i];
+                    for (let i = 0; i < category.transactions.length; i++) {
+                        let transaction = category.transactions[i];
+                        let element = document.getElementById(`transaction_date_${transaction.id}`);
+                        element.textContent = new Date(transaction.dateTime).toLocaleDateString(window.userLocale);
+                        element = document.getElementById(`transaction_amount_${transaction.id}`);
+                        element.textContent = window.userNumberFormat.format(transaction.amount);
+                    }
                 }
             }
+            else {
+                let transactions = $(".transaction-body", this.#container);
+
+                for (let i = 0; i < transactions.length; i++) {
+                    let transaction = transactions[i];
+                    let id = parseInt(transaction.dataset.id);
+                    let date = new Date(transaction.dataset.date);
+                    let amount = parseFloat(transaction.dataset.amount);
+                    
+                    let element = document.getElementById(`transaction_date_${id}`);
+                    element.textContent = date.toLocaleDateString(window.userLocale);
+                    element = document.getElementById(`transaction_amount_${id}`);
+                    element.textContent = window.userNumberFormat.format(amount);                    
+                }
+            }
+
+
+            
 
         } finally {
             this.#isLoading = false;
         }
     }
     
-
     #createReevaluationElement(category) {
         let self = this;
         var accordion = document.createElement("div");
@@ -77,11 +127,7 @@ export default class ReevaluationDashboard {
 
         var accordionHead = document.createElement("div");
         accordionHead.id = `accordion-head_${category.id}`;
-        accordionHead.classList.add("accordion-head", "d-flex");
-        accordionHead.addEventListener("click", () => {
-            $(accordionHead).next().collapse('toggle');
-            accordionCaret.classList.toggle("rotate");
-        });
+        accordionHead.classList.add("accordion-head", "d-flex");       
 
         var accordionCollapse = document.createElement("div");
         accordionCollapse.classList.add("accordion-collapse", "collapse", "show");
@@ -409,45 +455,20 @@ export default class ReevaluationDashboard {
         return accordion;
     }
 
-    #createReevaluationElements(data) {
+    #createReevaluationElements(data) { 
+        return;
         if (data) {
             let frag = document.createDocumentFragment();
 
             for (let i = 0; i < data.length; i++) {
                 if (data[i].transactions.length > 0) {
-                    frag.appendChild(this.#createReevaluationElement(data[i]));
+                    frag.appendChild(this.#createReevaluationElement(data[i]));            
                 }
             }
 
             this.#container.innerHTML = "";
             this.#container.appendChild(frag);
         }
-    }
-
-    async #reevaluateTransaction(formData, transactionElement, accordion, categoryId) {
-        var previousIsHappy = transactionElement.dataset.ishappy === 'true';
-        var previousIsNecessary = transactionElement.dataset.isnecessary === 'true';
-        var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary);
-
-        if (IsPatched) {   
-            let categoryIndex = this.#data.findIndex(t => t.id === categoryId);
-
-            if (categoryIndex > -1) {
-                let category = this.#data[categoryIndex];
-                let index = category.transactions.findIndex(t => t.id == formData.get('Id'));
-
-                if (index > -1) {
-                    category.transactions.splice(index, 1);
-                }
-            }
-
-            transactionElement.remove();
-
-            if (category.transactions.length === 0) {
-                accordion.remove();
-            }
-            this.#toggleReevaluationInfo();
-        } 
     }
 
     #toggleReevaluationInfo() {

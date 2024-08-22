@@ -16,6 +16,7 @@ export default class StatisticsDashboard {
     #overspendingChart;
     #totalSpentChart;
     #overspendingHeading; 
+    #totalSpentHeading;
 
     constructor(id, year) {
         this.#data = null;
@@ -365,6 +366,8 @@ export default class StatisticsDashboard {
 
             this.#overspendingHeading = document.getElementById('statistics-overspending');
             this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(0)}`;
+            this.#totalSpentHeading = document.getElementById('statistics-totalSpent');
+            this.#totalSpentHeading.textContent = `Total Spent: ${window.userNumberFormat.format(0)}`;
 
             this.#totalSpentChart = new Chart(document.getElementById('totalSpentChart'), {
                 type: 'line',
@@ -477,6 +480,7 @@ export default class StatisticsDashboard {
             this.#isLoading = true;
 
             this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(this.#data.overspendingTotal)}`;
+            this.#totalSpentHeading.textContent = `Total Spent: ${window.userNumberFormat.format(this.#data.totalSpent)}`;
             this.#sentimentBarChart.update('none');
             this.#necessityBarChart.update('none');
             this.#overspendingChart.update('none');
@@ -493,6 +497,9 @@ export default class StatisticsDashboard {
         if (dataObj == null) {
             return false;
         }
+
+        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(data.overspendingTotal)}`;
+        this.#totalSpentHeading.textContent = `Total Spent: ${window.userNumberFormat.format(0)}`;
 
         this.#sentimentChartYearly.data.datasets[0].data = [data.happyEvaluatedTotal, data.unhappyEvaluatedTotal, Number.MIN_VALUE];
         this.#sentimentChartYearly.update();
@@ -529,8 +536,6 @@ export default class StatisticsDashboard {
 
         this.#overspendingChart.data.datasets = datasets;
         this.#overspendingChart.update();
-
-        this.#overspendingHeading.textContent = `Overspending: ${window.userNumberFormat.format(data.overspendingTotal)}`;
 
         this.#totalSpentChart.data.datasets[0].data = data.totalPerMonth;
         this.#totalSpentChart.update();

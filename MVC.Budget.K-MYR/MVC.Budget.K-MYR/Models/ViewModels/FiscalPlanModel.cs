@@ -1,4 +1,5 @@
-﻿namespace MVC.Budget.K_MYR.Models.ViewModels;
+﻿
+namespace MVC.Budget.K_MYR.Models.ViewModels;
 
 public class FiscalPlanModel
 {
@@ -6,4 +7,5 @@ public class FiscalPlanModel
     public IncomeCategory Category { get; set; }
     public Transaction Transaction { get; set; }
     public SearchViewModel Search { get; set; }
+    public List<Category> Categories { get; internal set; }
 }

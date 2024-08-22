@@ -93,7 +93,7 @@ public class FiscalPlansService : IFiscalPlansService
             OverspendingPerMonth = months.Select(month =>
                 Math.Max(0, (c.Statistics.FirstOrDefault(s => s.Month == month)?.TotalSpent ?? 0)
                     - (c.BudgetLimits.LastOrDefault(bl => bl.Month.Month <= month)?.Budget ?? c.Budget)))
-        });
+        }).ToList();
 
         Dictionary<int, MonthlyStatistic> statistics = [];
 
@@ -143,16 +143,16 @@ public class FiscalPlansService : IFiscalPlansService
             UnhappyEvaluatedTotal = unhappyEvaluatedTotal,
             NecessaryEvaluatedTotal = necessaryEvaluatedTotal,
             UnnecessaryEvaluatedTotal = unnecessaryEvaluatedTotal,
-            TotalPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.TotalSpent : 0),
-            HappyPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.HappyTransactions : 0),
-            HappyEvaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.HappyEvaluatedTransactions : 0),
-            UnhappyPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnhappyTransactions : 0),
-            UnhappyEvaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnhappyEvaluatedTransactions : 0),
-            NecessaryPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.NecessaryTransactions : 0),
-            NecessaryEvaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.NecessaryEvaluatedTransactions : 0),
-            UnnecessaryPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnnecessaryTransactions : 0),
-            UnnecessaryEvaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnnecessaryEvaluatedTransactions : 0),
-            UnevaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnevaluatedTransactions : 0),
+            TotalPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.TotalSpent : 0).ToList(),
+            HappyPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.HappyTransactions : 0).ToList(),
+            HappyEvaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.HappyEvaluatedTransactions : 0).ToList(),
+            UnhappyPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnhappyTransactions : 0).ToList(),
+            UnhappyEvaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnhappyEvaluatedTransactions : 0).ToList(),
+            NecessaryPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.NecessaryTransactions : 0).ToList(),
+            NecessaryEvaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.NecessaryEvaluatedTransactions : 0).ToList(),
+            UnnecessaryPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnnecessaryTransactions : 0).ToList(),
+            UnnecessaryEvaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnnecessaryEvaluatedTransactions : 0).ToList(),
+            UnevaluatedPerMonth = months.Select(month => statistics.TryGetValue(month, out var statistic) ? statistic.UnevaluatedTransactions : 0).ToList(),
             MonthlyOverspendingPerCategory = monthlyOverspendingPerCategory
         };    
         

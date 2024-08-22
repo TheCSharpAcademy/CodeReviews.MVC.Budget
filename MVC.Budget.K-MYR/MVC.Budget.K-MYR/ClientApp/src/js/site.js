@@ -2,7 +2,7 @@
 import { getCountryCookie } from "./api";
 
 const countryChangedEvent = new CustomEvent('countryChanged');
-const countrySelectPromise = initializeCountrySelect();
+const countrySelectPromise = scheduler.postTask(initializeCountrySelect, { priority: 'background' });
 document.getElementById("country-form").onsubmit = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -10,7 +10,7 @@ document.getElementById("country-form").onsubmit = (event) => {
 
 
 async function initializeCountrySelect() {
-    let countrySelect = await getCountrySelect("#country");    
+    let countrySelect = await getCountrySelect("#country");  
     countrySelect.countrySelect("selectCountry", window.userLocale.region.toLowerCase());
     countrySelect.on('change', async function () {
         let iso2Code = countrySelect.countrySelect("getSelectedCountryData").iso2;
