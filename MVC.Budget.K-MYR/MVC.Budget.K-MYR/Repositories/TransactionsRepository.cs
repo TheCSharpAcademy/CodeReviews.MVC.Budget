@@ -10,7 +10,7 @@ public sealed class TransactionsRepository : GenericRepository<Transaction>, ITr
     public TransactionsRepository(DatabaseContext context) : base(context)
     { }
 
-    public async Task<List<TransactionDTO>> GetFilteredTransactionsAsync(int? fiscalPlanId, int? categoryId = null, string? searchString = null, DateTime? minDate = null, DateTime? maxDate = null, decimal? minAmount = null, decimal? maxAmount = null)
+    public Task<List<TransactionDTO>> GetFilteredTransactionsAsync(int? fiscalPlanId, int? categoryId = null, string? searchString = null, DateTime? minDate = null, DateTime? maxDate = null, decimal? minAmount = null, decimal? maxAmount = null)
     {
         IQueryable<Transaction> query = _dbSet;
 
@@ -35,15 +35,32 @@ public sealed class TransactionsRepository : GenericRepository<Transaction>, ITr
         if (!searchString.IsNullOrEmpty())
             query = query.Where(t => t.Title.Contains(searchString!.Trim()));
 
-        return await query.Select(t => new TransactionDTO
-                           {
-                               Id = t.Id,
-                               Title = t.Title,
-                               Amount = t.Amount,
-                               Description = t.Description,
-                               DateTime = t.DateTime,
-                               Category = t.Category.Name
-                           })
-                           .ToListAsync();
+        return query.Select(t => new TransactionDTO
+                    {
+                        Id = t.Id,
+                        Title = t.Title,
+                        Amount = t.Amount,
+                        Description = t.Description,
+                        DateTime = t.DateTime,
+                        Category = t.Category.Name
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+    }
+
+    public Task<List<Transaction>> GetUnevaluatedTransactions(int categoryid, int? lastId = null, DateTime? lastDate = null, int pageSize = 10)
+    {
+        var query = _dbSet.Where(t => t.CategoryId == categoryid);
+
+        if(lastId is not null && lastDate is not null)
+        {
+            query = query.Where(t => t.DateTime > lastDate || (t.DateTime == lastDate && t.Id > lastId));
+        }
+
+        return query.OrderBy(t => t.DateTime)
+                     .ThenBy(t => t.Id)
+                     .Take(pageSize)
+                     .AsNoTracking()
+                     .ToListAsync();
     }
 }

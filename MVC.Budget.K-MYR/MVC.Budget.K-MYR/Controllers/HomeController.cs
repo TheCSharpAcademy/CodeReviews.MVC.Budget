@@ -78,7 +78,7 @@ public class HomeController(ILogger<HomeController> logger, IFiscalPlansService 
         }
 
         var fiscalPlanDTO = await _fiscalPlanService.GetDataByMonth(fiscalPlan, Month ?? DateTime.UtcNow);
-        var categories = await _categorieService.GetCategoriesWithUnevaluatedTransactions(id);
+        var categories = await _categorieService.GetCategoriesWithUnevaluatedTransactions(id, 10);
         var (culture, currency) = GetUserPreferences();
         var selectList = new SelectList(fiscalPlanDTO.ExpenseCategories.Concat(fiscalPlanDTO.IncomeCategories)
                                                                        .OrderBy(c => c.Name)

@@ -210,14 +210,14 @@
 
                             if(category.Transactions.Count != 0)
                             {
-                                <div class="accordion reevaluation-accordion" id="accordion_@category.Id" data-categoryId="@category.Id">
+                                <div class="accordion" id="accordion_@category.Id" data-categoryId="@category.Id">
                                     <div class="accordion-item">
                                         <div id="accordion-head_@category.Id" class="accordion-head d-flex">
                                             <h5 id="accordionHeader_@category.Id" class="accordion-header me-auto">@category.Name</h5>
                                             <div class="accordion-caret rotate"></div>
                                         </div>
-                                        <div class="accordion-collapse collapse show" id="collapse_@category.Id" aria-labelledby="accordionHeader_@category.Id">
-                                            <div class="accordion-body">
+                                        <div class="accordion-collapse reeval-col collapse show" id="collapse_@category.Id" aria-labelledby="accordionHeader_@category.Id">
+                                            <div class="accordion-body reevaluation-accordion">
                                                 @foreach (var transaction in category.Transactions)
                                                 {
                                                     <div id="reeval_transaction_@transaction.Id" class="transaction-body"
@@ -227,7 +227,7 @@
                                                          data-amount="@transaction.Amount"
                                                          data-date="@transaction.DateTime.ToUniversalTime()">
                                                         <div>@transaction.Title</div>
-                                                        <div class="ms-2" id="transaction_date_@transaction.Id">@transaction.DateTime.ToString(Model.Culture)</div>
+                                                        <div class="ms-2" id="transaction_date_@transaction.Id">@transaction.DateTime.ToString(CultureInfo.InvariantCulture)</div>
                                                         <div id="transaction_amount_@transaction.Id" class="transaction-amount ms-2 me-auto">@transaction.Amount.ToString("C2", Model.Culture)</div>
                                                         <form id="reevaluate-transaction-form_@transaction.Id" class="reevaluate-transaction-form" novalidate="novalidate">                                                            
                                                             <input type="hidden" value="@transaction.Id" id="reeval_transaction_@transaction.Id" name="Id"><div class="d-flex justify-content-around">                                                                
@@ -273,6 +273,20 @@
                                                     </form>
                                                     </div>
                                                 }
+                                                @if(category.Transactions.Count >= 5)
+                                                {
+                                                    <div class="spinner-container" id="spinner_@category.Id">
+                                                        <div class="spinner-grow" role="status" style="--i: 0">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                        <div class="spinner-grow" role="status" style="--i: 1">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                        <div class="spinner-grow" role="status" style="--i: 2">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                }                                                
                                             </div>
                                         </div>
                                     </div>
@@ -311,13 +325,13 @@
                             </div>
                         </div>
                         <div class="Charts-container">
-                            <div class="lineChart-container">
-                                <canvas id="sentimentLineChartYear"></canvas>
+                            <div class="barChart-container">
+                                <canvas id="sentimentBarChartYear"></canvas>
                             </div>
                         </div>
                         <div class="Charts-container">
-                            <div class="lineChart-container">
-                                <canvas id="necessityLineChartYear"></canvas>
+                            <div class="barChart-container">
+                                <canvas id="necessityBarChartYear"></canvas>
                             </div>
                         </div>
                         <div class="Charts-container">
@@ -326,7 +340,7 @@
                             </div>
                         </div>
                         <div class="Charts-container">
-                            <div class="lineChart-container">
+                            <div class="barChart-container">
                                 <canvas id="totalSpentChart"></canvas>
                             </div>
                         </div>

@@ -182,7 +182,7 @@ public static class SeedData
             {
                 Name = "Leisure",
                 Budget = 300,
-                Transactions = GenerateTransactions(20, 40, 10, ["Pub", "Cinema", "Barbecue", "Shopping"]),
+                Transactions = GenerateTransactions(5, 30, 10, ["Pub", "Cinema", "Barbecue", "Shopping"]),
                 PreviousBudgets =
                 [
                     new()
@@ -235,7 +235,7 @@ public static class SeedData
                 {
                     Title = title,
                     Amount = Random.Next(minValue, maxValue),
-                    DateTime = Now.AddMonths(-i),
+                    DateTime = Now.AddMonths(-i).AddDays(-j),
                     IsHappy = Random.Next(0, 2) == 1,
                     IsNecessary = Random.Next(0, 2) == 1,
                     Evaluated = isEvaluated,

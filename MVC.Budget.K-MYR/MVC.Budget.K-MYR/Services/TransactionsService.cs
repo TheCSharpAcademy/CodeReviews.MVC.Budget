@@ -20,6 +20,10 @@ public class TransactionsService : ITransactionsService
         return _unitOfWork.TransactionsRepository.GetFilteredTransactionsAsync(fiscalPlanId, categoryId, searchString, minDate, maxDate, minAmount, maxAmount);
     }
 
+    public Task<List<Transaction>> GetUnevaluatedTransactions(int categoryid, int? lastId = null, DateTime? lastDate = null, int pageSize = 10)
+    {
+        return _unitOfWork.TransactionsRepository.GetUnevaluatedTransactions(categoryid, lastId, lastDate, pageSize);
+    }
     public ValueTask<Transaction?> GetByIDAsync(int id)
     {
         return _unitOfWork.TransactionsRepository.GetByIDAsync(id);
@@ -68,7 +72,7 @@ public class TransactionsService : ITransactionsService
     {
         _unitOfWork.TransactionsRepository.Delete(transaction);
         await _unitOfWork.Save();
-    }    
+    }
 }
 
 

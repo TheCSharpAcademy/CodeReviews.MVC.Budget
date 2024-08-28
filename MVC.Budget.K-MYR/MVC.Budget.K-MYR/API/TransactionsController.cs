@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Models;
-using MVC.Budget.K_MYR.Models.ViewModels;
 using MVC.Budget.K_MYR.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace MVC.Budget.K_MYR.API;
 
@@ -20,6 +20,14 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
         var transaction = await _transactionsService.GetByIDAsync(id);
 
         return transaction is null ? NotFound() : Ok(transaction);
+    }
+
+    [HttpGet("Unevaluated")]
+    public async Task<ActionResult<Transaction>> GetUnevaluatedTransactions([FromQuery][Required] int categoryid, [FromQuery] int? lastId = null, [FromQuery] DateTime? lastDate = null,[FromQuery] int pageSize = 10)
+    {
+        var transactions = await _transactionsService.GetUnevaluatedTransactions(categoryid, lastId, lastDate, pageSize);
+
+        return Ok(transactions);
     }
 
     [HttpPost("search")]

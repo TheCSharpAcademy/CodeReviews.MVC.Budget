@@ -8,7 +8,7 @@ namespace MVC.Budget.K_MYR.Services
         Task<List<Category>> GetCategories();
         Category? GetByID(int id);
         ValueTask<Category?> GetByIDAsync(int id);
-        Task<List<Category>> GetCategoriesWithUnevaluatedTransactions(int fiscalPlanId);
+        Task<List<Category>> GetCategoriesWithUnevaluatedTransactions(int fiscalPlanId, int pageSize = 10);
         Task<T> AddCategory<T>(T categoryPost) where T : Category, new();
         Task UpdateCategory<T>(T category, T categoryPut, DateTime month) where T : Category;
         Task DeleteCategory<T>(T category) where T : Category;

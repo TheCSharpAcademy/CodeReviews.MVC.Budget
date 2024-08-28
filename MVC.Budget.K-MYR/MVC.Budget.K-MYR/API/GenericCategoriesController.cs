@@ -34,9 +34,9 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
     }
 
     [HttpGet("filteredByEvaluation")]
-    public async Task<ActionResult<List<Category>>> GetCategoriesWithUnevaluatedTransactions([FromQuery][Required]int fiscalPlanId)
-    {
-        return Ok(await _categoriesService.GetCategoriesWithUnevaluatedTransactions(fiscalPlanId));
+    public async Task<ActionResult<List<Category>>> GetCategoriesWithUnevaluatedTransactions([FromQuery][Required]int fiscalPlanId, [FromQuery] int pageSize = 10)
+    {        
+        return Ok(await _categoriesService.GetCategoriesWithUnevaluatedTransactions(fiscalPlanId, pageSize));
     }
 
     [HttpPost]

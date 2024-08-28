@@ -28,92 +28,7 @@ export default class HomeDashboard {
         try {
             this.#isLoading = true;
             this.#initializeDatePicker(id, date);
-
-            var sentimentChart= document.getElementById('sentimentChart');
-            this.#sentimentChartMonthly = new Chart(sentimentChart, {
-                type: 'doughnut',
-                data: {
-                    labels: [
-                        'Happy',
-                        'Unhappy'
-                    ],
-                    datasets: [{
-                        label: 'Total Amount',
-                        data: [this.#data.expensesHappyTotal, this.#data.expensesTotal - this.#data.expensesHappyTotal],
-                        backgroundColor: [
-                            'rgb(25,135,84)',
-                            'rgb(220,53,69)'
-                        ],
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    layout: {
-                        padding: 2
-                    },
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    var label = context.dataset.label || '';
-
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += window.userNumberFormat.format(context.parsed);
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            var necessityChart = document.getElementById('necessityChart');
-            this.#necessityChartMonthly = new Chart(document.getElementById('necessityChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: [
-                        'Necessary',
-                        'Unnecessary'
-                    ],
-                    datasets: [{
-                        label: 'Total Amount',
-                        data: [this.#data.expensesNecessaryTotal, this.#data.expensesTotal - this.#data.expensesNecessaryTotal],
-                        backgroundColor: [
-                            'rgb(25,135,84)',
-                            'rgb(220,53,69)'
-                        ],
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    var label = context.dataset.label || '';
-
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += window.userNumberFormat.format(context.parsed);
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
+            this.#initializeCharts();            
 
             this.#overspendingHeading = document.getElementById('home-overspending');
 
@@ -158,12 +73,10 @@ export default class HomeDashboard {
     }
 
     async #initializeDatePicker(id, date) {
-        var self = this;
         this.#monthPicker = await getDatePicker("#home-monthSelector", "month")
         this.#monthPicker.datepicker('setDate', date.toISOString());
-        this.#monthPicker.on('changeDate', async function () {
-            var date = self.#monthPicker.datepicker('getUTCDate')
-            self.refresh(id, date);
+        this.#monthPicker.on('changeDate', async () => {
+            this.refresh(id, this.#monthPicker.datepicker('getUTCDate'));
         });
 
         $('.monthPicker .calendar-button').on('click', function () {
@@ -173,6 +86,74 @@ export default class HomeDashboard {
             } else {
                 input.datepicker('hide');
             }
+        });
+    }
+
+    #initializeCharts() {
+        var options = {
+            responsive: true,
+            layout: {
+                padding: 2
+            },
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            var label = context.dataset.label || '';
+
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += window.userNumberFormat.format(context.parsed);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        };
+        var sentimentChart = document.getElementById('sentimentChart');
+        this.#sentimentChartMonthly = new Chart(sentimentChart, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Happy',
+                    'Unhappy'
+                ],
+                datasets: [{
+                    label: 'Total Amount',
+                    data: [this.#data.expensesHappyTotal, this.#data.expensesTotal - this.#data.expensesHappyTotal],
+                    backgroundColor: [
+                        'rgb(25,135,84)',
+                        'rgb(220,53,69)'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: options
+        });
+
+        var necessityChart = document.getElementById('necessityChart');
+        this.#necessityChartMonthly = new Chart(necessityChart, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Necessary',
+                    'Unnecessary'
+                ],
+                datasets: [{
+                    label: 'Total Amount',
+                    data: [this.#data.expensesNecessaryTotal, this.#data.expensesTotal - this.#data.expensesNecessaryTotal],
+                    backgroundColor: [
+                        'rgb(25,135,84)',
+                        'rgb(220,53,69)'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: options
         });
     }
 

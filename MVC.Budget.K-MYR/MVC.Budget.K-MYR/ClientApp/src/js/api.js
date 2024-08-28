@@ -262,6 +262,38 @@ export async function deleteCategory(id, type, token) {
     }
 }
 
+export async function getUnevaluatedTransactions(categoryId, lastDate, lastId, pageSize) {
+    try {
+        var queryParams = new URLSearchParams({
+            categoryId: categoryId,
+            pageSize: pageSize
+        });
+
+        if (lastDate) {
+            queryParams.append("lastDate", lastDate)
+        }
+
+        if (lastId) {
+            queryParams.append("lastId", lastId)
+        }
+
+        var response = await fetch(`${transactionsAPI}/Unevaluated?${queryParams}`, {
+            method: "GET"
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error(`HTTP GET Error: ${response.status}`);
+            return null;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return null;
+    };
+}
+
 export async function getCategoriesWithUnevaluatedTransactions(id) {
     try {
         var queryParams = new URLSearchParams({

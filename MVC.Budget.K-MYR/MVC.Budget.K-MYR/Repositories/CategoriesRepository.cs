@@ -103,7 +103,7 @@ public Task<Category?> GetCategoryWithBudgetLimits(int id, Expression<Func<Categ
 
 public Task<List<Category>> GetCategoriesWithFilteredTransactionsAsync(Expression<Func<Category, bool>>? filter = null, 
     Func<IQueryable<Category>,IOrderedQueryable<Category>>? orderBy = null,
-    Expression<Func<Category, IOrderedEnumerable<Transaction>>>? filterTransactions = null)
+    Expression<Func<Category, IEnumerable<Transaction>>>? filterTransactions = null)
 {
     IQueryable<Category> query = _dbSet;
 

@@ -30,7 +30,7 @@ public class CategoriesService : ICategoriesService
         return _unitOfWork.CategoriesRepository.GetByID(id);
     }
 
-    public Task<List<Category>> GetCategoriesWithUnevaluatedTransactions(int fiscalPlanId)
+    public Task<List<Category>> GetCategoriesWithUnevaluatedTransactions(int fiscalPlanId, int pageSize = 10)
     {
         var date = DateTime.UtcNow.AddDays(-14);
         var cutOffDate = new DateTime(date.Year, date.Month, date.Day);
@@ -39,7 +39,8 @@ public class CategoriesService : ICategoriesService
                 c => c.FiscalPlanId == fiscalPlanId,
                 q => q.OrderBy(c => c.Name),
                 c => c.Transactions.Where(t => t.Evaluated == false && t.DateTime < cutOffDate)
-                    .OrderByDescending(d => d.DateTime));
+                                   .OrderBy(d => d.DateTime)
+                                   .Take(pageSize));
     }
 
     public async Task<T> AddCategory<T>(T categoryPost) where T : Category, new()
