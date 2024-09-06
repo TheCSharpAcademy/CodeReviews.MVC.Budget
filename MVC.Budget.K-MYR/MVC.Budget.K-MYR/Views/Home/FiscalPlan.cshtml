@@ -355,7 +355,7 @@
                         <div class="filter-container">
                             @await Html.PartialAsync("_SearchForm", Model.PageModel.Search)
                         </div>
-                        <div class="filter-container mt-3">
+                        <div class="filter-container mt-3" id="table-container" style="display: none">
                             <table class="table table-hover table-borderless w-100 px-2" id="transactions-table">
                                 <thead>
                                     <tr>

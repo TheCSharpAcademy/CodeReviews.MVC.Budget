@@ -53,5 +53,8 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
         modelBuilder.Entity<Transaction>()
             .Property(m => m.Amount)
             .HasPrecision(19, 4);
+
+        modelBuilder.Entity<Transaction>()
+            .HasIndex(t => t.DateTime);
     }
 }

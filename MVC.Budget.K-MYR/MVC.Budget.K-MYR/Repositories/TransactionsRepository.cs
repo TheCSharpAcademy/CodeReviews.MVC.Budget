@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Models;
 
@@ -10,40 +9,49 @@ public sealed class TransactionsRepository : GenericRepository<Transaction>, ITr
     public TransactionsRepository(DatabaseContext context) : base(context)
     { }
 
-    public Task<List<TransactionDTO>> GetFilteredTransactionsAsync(int? fiscalPlanId, int? categoryId = null, string? searchString = null, DateTime? minDate = null, DateTime? maxDate = null, decimal? minAmount = null, decimal? maxAmount = null)
+    public Task<List<TransactionDTO>> GetAsync(TransactionsSearch searchModel, Func<IQueryable<Transaction>,
+                                                 IOrderedQueryable<Transaction>>? orderBy = null, Func<IQueryable<Transaction>,
+                                                 IQueryable<Transaction>>? filter = null)
     {
         IQueryable<Transaction> query = _dbSet;
 
-        if (fiscalPlanId is not null)
-            query = query.Where(t => t.Category.FiscalPlanId == fiscalPlanId);
+        if (filter is not null)
+            query = filter(query);
 
-        if (categoryId is not null)
-            query = query.Where(t => t.CategoryId == categoryId);
+        if (searchModel.FiscalPlanId is not null)
+            query = query.Where(t => t.Category.FiscalPlanId == searchModel.FiscalPlanId);
 
-        if (minDate is not null)
-            query = query.Where(t => t.DateTime >= minDate);
+        if (searchModel.CategoryId is not null)
+            query = query.Where(t => t.CategoryId == searchModel.CategoryId);
 
-        if (maxDate is not null)
-            query = query.Where(t => t.DateTime <= maxDate);
+        if (searchModel.MinDate is not null)
+            query = query.Where(t => t.DateTime >= searchModel.MinDate);
 
-        if (minAmount is not null)
-            query = query.Where(t => t.Amount >= minAmount);
+        if (searchModel.MaxDate is not null)
+            query = query.Where(t => t.DateTime <= searchModel.MaxDate);
 
-        if (maxAmount is not null)
-            query = query.Where(t => t.Amount <= maxAmount);
+        if (searchModel.MinAmount is not null)
+            query = query.Where(t => t.Amount >= searchModel.MinAmount);
 
-        if (!searchString.IsNullOrEmpty())
-            query = query.Where(t => t.Title.Contains(searchString!.Trim()));
+        if (searchModel.MaxAmount is not null)
+            query = query.Where(t => t.Amount <= searchModel.MaxAmount);
+
+        if (!String.IsNullOrEmpty(searchModel.SearchString))
+            query = query.Where(t => t.Title.Contains(searchModel.SearchString.Trim()));
+
+        if (orderBy is not null)
+            query = orderBy(query);
 
         return query.Select(t => new TransactionDTO
-                    {
-                        Id = t.Id,
-                        Title = t.Title,
-                        Amount = t.Amount,
-                        Description = t.Description,
-                        DateTime = t.DateTime,
-                        Category = t.Category.Name
-                    })
+        {
+            Id = t.Id,
+            Title = t.Title,
+            Amount = t.Amount,
+            Description = t.Description,
+            DateTime = t.DateTime,
+            Category = t.Category.Name
+        })
+                    .Take(searchModel.PageSize)
                     .AsNoTracking()
                     .ToListAsync();
     }
@@ -52,7 +60,7 @@ public sealed class TransactionsRepository : GenericRepository<Transaction>, ITr
     {
         var query = _dbSet.Where(t => t.CategoryId == categoryid);
 
-        if(lastId is not null && lastDate is not null)
+        if (lastId is not null && lastDate is not null)
         {
             query = query.Where(t => t.DateTime > lastDate || (t.DateTime == lastDate && t.Id > lastId));
         }

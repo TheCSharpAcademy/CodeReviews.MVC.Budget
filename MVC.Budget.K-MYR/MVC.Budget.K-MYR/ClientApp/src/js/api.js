@@ -277,7 +277,7 @@ export async function getUnevaluatedTransactions(categoryId, lastDate, lastId, p
             queryParams.append("lastId", lastId)
         }
 
-        var response = await fetch(`${transactionsAPI}/Unevaluated?${queryParams}`, {
+        var response = await fetch(`${transactionsAPI}/unevaluated?${queryParams}`, {
             method: "GET"
         });
 

@@ -57,7 +57,9 @@ export default class ReevaluationDashboard {
                 if (transactions && transactions.length > 0) {
                     this.#createTransactionElements(transactions, accordionBody, spinner);
                 } else {
-                     spinner.remove();
+                    if (spinner) {
+                        spinner.remove();
+                    }
                 }
             }
 

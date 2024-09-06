@@ -61,8 +61,9 @@ export default class HomeDashboard {
                         borderBox.classList.remove('border-rotate');
                     }
                     let y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
-                    menu.dataset.categoryid = category.id;                   
-                    menu.style.left = `${element.style.left + event.pageX - 100}px`;
+                    let x = Math.max(Math.min(event.pageX - 100, window.innerWidth - 220), 20);
+                    menu.dataset.categoryid = category.id;   
+                    menu.style.left = `${x}px`;
                     menu.style.top = `${y}px`;
                     menu.classList.add('active');
 

@@ -29,15 +29,11 @@ const transactionsTablePromise = getTransactionsTable()
         document.getElementById('search_fiscalPlanId').value = fiscalPlanId.value;
         $('#search-form').on("submit", async function (event) {
             event.preventDefault();
-            console.log(table.page.info());
             if ($(this).valid()) {
-                let transactions = await getTransactions(new FormData(this));
-                if (transactions) {
-                    table.clear();
-                    table.rows.add(transactions).draw();
-                }
+                table.ajax.reload(null, false);
             }
         });
+        
         return table;
     });
 
@@ -50,12 +46,11 @@ async function setupRerenderHandlers() {
         [homeDashboardPromise, statisticsDashboardPromise, reevaluationDashboardPromise, transactionsTablePromise]
     );
     window.addEventListener('countryChanged', () => {
-        homeDB.formatDashboard();
-        reevaluationDB.formatDashboard();
-        statisticsDB.formatDashboard();
-        transactionsTable.rows().invalidate().draw();
+        setTimeout(() => homeDB.formatDashboard(), 0);
+        setTimeout(() => reevaluationDB.formatDashboard(), 0);
+        setTimeout(() => statisticsDB.formatDashboard(), 0);
+        setTimeout(() => transactionsTable.rows().invalidate().draw(), 0);
     })
-
 }
 
 async function setupModalHandlers() {
@@ -192,8 +187,99 @@ function setupFlipContainer() {
 
 async function getTransactionsTable() {
     try {
-        const { default: DataTable} = await import(/* webpackChunkName: "datatables" */'datatables.net-bs5');
-        let dataTable = new DataTable('#transactions-table', {
+        const { default: DataTable } = await import(/* webpackChunkName: "datatables" */'datatables.net-bs5');
+        var lastAjaxData = {
+            start: 0,     
+            lastId: null,
+            lastValue: null
+        };
+        var dataTable = new DataTable('#transactions-table', {
+            processing: true,
+            serverSide: true,
+            deferLoading: 0,
+            ajax: function (data, callback, settings) {
+                var formData = new FormData(document.getElementById("search-form"));
+                var table = new $.fn.dataTable.Api(settings);
+
+                var searchString = formData.get("SearchString");
+                var minDate = formData.get("MinDate");
+                var maxDate = formData.get("MaxDate");
+                var fiscalPlanId = formData.get("FiscalPlanId");
+                var categoryId = formData.get("CategoryId");
+                var minAmount = formData.get("MinAmount");
+                var maxAmount = formData.get("MaxAmount");
+
+                var isPrevious = lastAjaxData.start > data.start;
+                var lastId = lastAjaxData.lastId;
+                var lastValue = lastAjaxData.lastValue;
+                var orderBy = null;
+                var orderDirection = null;
+
+                if (data.order[0]) {
+                    orderBy = data.order[0].name;
+                    orderDirection = data.order[0].dir;
+                }
+
+                if (data.start !== 0) {
+                    var rowData = null;
+
+                    if (lastAjaxData.start > data.start) {
+                        rowData = table.row(':first').data();
+                    }
+                    else if (lastAjaxData.start < data.start) {
+                        rowData = table.row(':last').data();
+                    }                    
+                    lastId = rowData.id;
+
+                    if (orderBy) {
+                        lastValue = rowData[orderBy];
+                    }
+                } 
+                                
+                var requestData = {
+                    draw: data.draw,
+                    start: data.start,
+                    pageSize: data.length,
+                    orderBy: orderBy,
+                    orderDirection: orderDirection === 'asc' ? 0 : 1,
+                    lastId: lastId,
+                    lastValue: lastValue,
+                    isPrevious: isPrevious,
+                    FiscalPlanId: fiscalPlanId.length > 0 ? parseInt(fiscalPlanId) : null,
+                    SearchString: searchString.length > 0 ? searchString : null,
+                    CategoryId: categoryId.length > 0 ? parseInt(categoryId) : null,
+                    MinDate: minDate.length > 0 ? minDate: null,
+                    MaxDate: maxDate.length > 0 ? maxDate : null,
+                    MinAmount: minAmount.length > 0 ? parseFloat(minAmount) : null,
+                    MaxAmount: maxAmount.length > 0 ? parseFloat(maxAmount) : null
+                };
+                console.log(requestData);
+                $.ajax({
+                    url: 'https://localhost:7246/api/Transactions/search',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                        "RequestVerificationToken": formData.get('__RequestVerificationToken')
+                    },
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        callback({
+                            draw: response.draw,
+                            recordsFiltered: data.start + response.transactions.length + (response.hasNext === true ? 1 : 0),
+                            data: response.transactions
+                        });
+                        lastAjaxData = {
+                            start: requestData.start,
+                            lastId: requestData.lastId,
+                            lastValue: requestData.lastValue
+                        };                      
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(`Couldn't fetch transactions'`, error);
+                    }
+                });
+              
+            },
             info: false,
             layout: {
                 topStart: null,
@@ -201,16 +287,16 @@ async function getTransactionsTable() {
                 bottomStart: 'pageLength',
                 bottomEnd: {
                     paging: {
-                        type: "full",
+                        type: 'simple',
                         numbers: false 
                     }
                 }
             },
             columns: [
-                { data: 'title', render: DataTable.render.text() },
-                { data: 'dateTime' },
-                { data: 'amount' },
-                { data: 'category', render: DataTable.render.text() },
+                { data: 'title', render: DataTable.render.text(), name: 'title' },
+                { data: 'dateTime', name: 'dateTime' },
+                { data: 'amount', name: 'amount' },
+                { data: 'category', render: DataTable.render.text(), name: 'category' },
                 {
                     data: null,
                     defaultContent:
@@ -269,7 +355,9 @@ async function getTransactionsTable() {
             var data = row.data();
             console.log(data, this);
         });
-        var table = document.getElementById("transactions-table");
+        var table = document.getElementById("table-container");
+        table.style = "";
+        dataTable.columns.adjust();
         return dataTable;
     } catch (error) {
         console.error('Error loading Datatable:', error);

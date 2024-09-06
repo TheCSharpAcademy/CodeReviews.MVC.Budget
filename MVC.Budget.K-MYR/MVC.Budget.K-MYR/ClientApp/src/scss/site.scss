@@ -192,26 +192,6 @@ body {
     padding: 10px 0;
 }
 
-.spinner-grow{
-    display: inline-block;
-    width: var(--#{$prefix}spinner-width);
-    height: var(--#{$prefix}spinner-height);
-    vertical-align: var(--#{$prefix}spinner-vertical-align);
-    border-radius: 50%;
-    animation: var(--#{$prefix}spinner-animation-speed) linear calc(var(--i) * 0.25s) infinite var(--#{$prefix}spinner-animation-name);
-}
-
-@keyframes spinner-grow {
-    0% {
-        transform: scale(0);
-    }
-
-    50% {
-        opacity: 1;
-        transform: none;
-    }
-}
-
 .spinner-grow {
     --#{$prefix}spinner-width: #{$spinner-width};
     --#{$prefix}spinner-height: #{$spinner-height};
@@ -220,12 +200,12 @@ body {
     --#{$prefix}spinner-animation-name: spinner-grow;
     background-color: currentcolor;
     opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {        
-    .spinner-grow {
-        --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed * 2};
-    }
+    display: inline-block;
+    width: var(--#{$prefix}spinner-width);
+    height: var(--#{$prefix}spinner-height);
+    vertical-align: var(--#{$prefix}spinner-vertical-align);
+    border-radius: 50%;
+    animation: var(--#{$prefix}spinner-animation-speed) linear calc(var(--i) * 0.25s) infinite var(--#{$prefix}spinner-animation-name);
 }
 
 //Navbar
@@ -314,15 +294,17 @@ $sidebar-gap: 8px;
     opacity: 0;
     transition: opacity 0.2s ease-out 0.4s, visibility 0.2s ease-out 0.4s;
     z-index: 1000;
+    pointer-events: none;
 }
 
 #menu-container.active {
     transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
     visibility: visible;
     opacity: 1;
+    pointer-events: auto;
 }
 
-.menu {
+#menu {
     position: relative;
     height: 200px;
     width: 200px;
@@ -404,10 +386,11 @@ main {
 }
 
 .flip-container-inner {
+    --animation-speed: 1s;
     position: relative;
     height: 100%;
     width: 100%;
-    transition: transform 1s;
+    transition: transform var(--animation-speed);
     transform-style: preserve-3d;
 }
 
@@ -718,7 +701,7 @@ main {
     padding: 10px;
     border-radius: $border-radius;
     background-color: $secondary;
-    box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 2px 1px;
+    box-shadow: $box-shadow;
 }
 
 #filter-accordion {
@@ -867,7 +850,28 @@ main {
     }
 }
 
+@keyframes spinner-grow {
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: none;
+    }
+}
+
 // Media Queries
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner-grow {
+        --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed * 2};
+    }
+
+    .flip-container-inner {
+        --animation-speed: 0;
+    }
+}
 
 
 @media (min-width: $small-screen-query) {

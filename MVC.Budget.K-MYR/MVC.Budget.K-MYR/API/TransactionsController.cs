@@ -22,7 +22,7 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
         return transaction is null ? NotFound() : Ok(transaction);
     }
 
-    [HttpGet("Unevaluated")]
+    [HttpGet("unevaluated")]
     public async Task<ActionResult<Transaction>> GetUnevaluatedTransactions([FromQuery][Required] int categoryid, [FromQuery] int? lastId = null, [FromQuery] DateTime? lastDate = null,[FromQuery] int pageSize = 10)
     {
         var transactions = await _transactionsService.GetUnevaluatedTransactions(categoryid, lastId, lastDate, pageSize);
@@ -32,9 +32,16 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
 
     [HttpPost("search")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult<List<Transaction>>> GetTransactions([FromBody] TransactionsSearchModel? searchModel)
+    public async Task<ActionResult<TransactionsSearchResponse>> GetTransactions([FromBody] TransactionsSearchRequest searchModel)
     {
-        return Ok(await _transactionsService.GetTransactions(searchModel?.FiscalPlanId, searchModel?.CategoryId, searchModel?.SearchString, searchModel?.MinDate, searchModel?.MaxDate, searchModel?.MinAmount, searchModel?.MaxAmount));
+        var response = await _transactionsService.GetTransactions(searchModel);
+
+        if(response is null)
+        {
+            return BadRequest($"Couldn't convert {nameof(searchModel.LastValue)} to its respective type");
+        }
+
+        return Ok(response);
 
     }
 
