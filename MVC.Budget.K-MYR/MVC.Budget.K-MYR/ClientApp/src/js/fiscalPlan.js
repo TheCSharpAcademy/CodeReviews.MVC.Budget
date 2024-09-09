@@ -30,6 +30,7 @@ const transactionsTablePromise = getTransactionsTable()
         $('#search-form').on("submit", async function (event) {
             event.preventDefault();
             if ($(this).valid()) {
+                table.page(0);
                 table.ajax.reload(null, false);
             }
         });
@@ -70,6 +71,7 @@ async function setupModalHandlers() {
 
     const addTransactionModal = modals.find(m => m._element.id == "addTransaction-modal");
     const addTransactionModalCategoryId = document.getElementById("addTransaction_categoryId");
+    const addTransactionModalDateTime = document.getElementById("addTransaction_dateTime");
 
     document.getElementById('add-category-form').addEventListener("submit", async function (event) {
         event.preventDefault();
@@ -97,7 +99,7 @@ async function setupModalHandlers() {
         event.preventDefault();
         if ($(this).valid()) {
             updateCategoryModal.hide();
-            let month = homeDashboard.getCurrentMonth().toISOString();
+            let month = homeDashboard.getCurrentMonthUTC().toISOString();
             let formData = new FormData(this);
             let isUpdated = await putCategory(formData, month);
 
@@ -122,7 +124,10 @@ async function setupModalHandlers() {
         menu.dataset.categoryid = 0;
     }
     document.getElementById('add-menu').onclick = async function () {
+        var month = homeDashboard.getCurrentMonth();
+
         addTransactionModalCategoryId.value = menu.dataset.categoryid;
+        addTransactionModalDateTime.value = month.toISOString().slice(0, 16);
         addTransactionModal.show();
     }
     document.getElementById('edit-menu').onclick = function () {
@@ -209,32 +214,35 @@ async function getTransactionsTable() {
                 var minAmount = formData.get("MinAmount");
                 var maxAmount = formData.get("MaxAmount");
 
-                var isPrevious = lastAjaxData.start > data.start;
-                var lastId = lastAjaxData.lastId;
-                var lastValue = lastAjaxData.lastValue;
+                var isPrevious = false;
+                var lastId = null;
+                var lastValue = null;                
                 var orderBy = null;
                 var orderDirection = null;
 
-                if (data.order[0]) {
+                if (data.order?.[0]) {
                     orderBy = data.order[0].name;
                     orderDirection = data.order[0].dir;
                 }
 
                 if (data.start !== 0) {
-                    var rowData = null;
+                    let rowData = null;
 
-                    if (lastAjaxData.start > data.start) {
-                        rowData = table.row(':first').data();
+                    if (lastAjaxData.start !== data.start) {
+                        isPrevious = lastAjaxData.start > data.start;
+                        rowData = isPrevious ? table.row(':first').data() : table.row(':last').data();
+                    } else {
+                        lastId = lastAjaxData.lastId;
+                        lastValue = lastAjaxData.lastValue;
                     }
-                    else if (lastAjaxData.start < data.start) {
-                        rowData = table.row(':last').data();
-                    }                    
-                    lastId = rowData.id;
 
-                    if (orderBy) {
-                        lastValue = rowData[orderBy];
+                    if (rowData) {
+                        lastId = rowData.id;
+                        if (orderBy) {
+                            lastValue = rowData[orderBy];
+                        }
                     }
-                } 
+                }
                                 
                 var requestData = {
                     draw: data.draw,
@@ -253,7 +261,6 @@ async function getTransactionsTable() {
                     MinAmount: minAmount.length > 0 ? parseFloat(minAmount) : null,
                     MaxAmount: maxAmount.length > 0 ? parseFloat(maxAmount) : null
                 };
-                console.log(requestData);
                 $.ajax({
                     url: 'https://localhost:7246/api/Transactions/search',
                     type: 'POST',

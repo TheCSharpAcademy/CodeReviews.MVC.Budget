@@ -19,43 +19,51 @@ public class TransactionsService : ITransactionsService
         _logger = logger;
     }
 
-    public async Task<TransactionsSearchResponse>? GetTransactions(TransactionsSearchRequest requestModel)
+    public async Task<TransactionsSearchResponse?> GetTransactions(TransactionsSearchRequest requestModel)
     {
-        Func<IQueryable<Transaction>, IOrderedQueryable<Transaction>>? orderBy = q => q.OrderBy("Id ASC");
+        Func<IQueryable<Transaction>, IOrderedQueryable<Transaction>> orderBy = q => q.OrderBy(t => t.Id);
         Func<IQueryable<Transaction>, IQueryable<Transaction>>? filter = null;
 
 
         if (requestModel.OrderBy is not null && OrderingHelpers.IsAllowedProperty(requestModel.OrderBy))
         {
-            string orderDirection = (requestModel.OrderDirection == OrderDirection.Ascending) ^ requestModel.IsPrevious ? "" : " DESC";
-            string orderString = $"{requestModel.OrderBy} {orderDirection}, Id";
+            bool IsReverseOrder = (requestModel.OrderDirection == OrderDirection.Ascending) ^ requestModel.IsPrevious;
+            string orderDirection = IsReverseOrder ? "" : " DESC";
+            string orderString = $"{requestModel.OrderBy}{orderDirection}, Id{orderDirection}";
             orderBy = q => q.OrderBy(orderString);
 
-            if (requestModel.LastId is not null && requestModel.LastValue is not null)
+            if (requestModel.LastId is not null)
             {
-                var type = OrderingHelpers.GetProperty<Transaction>(requestModel.OrderBy)?.PropertyType;
+                string comparerSymbol = IsReverseOrder ? ">" : "<";
 
-                if(type is not null)
+                if (requestModel.LastValue is not null)
                 {
-                    string comparerSymbol = requestModel.IsPrevious ? "<" : ">";
-                    object lastValue = requestModel.LastValue;
+                    var type = OrderingHelpers.GetProperty<Transaction>(requestModel.OrderBy)?.PropertyType;
 
-                    if (requestModel.LastValue.GetType() != type)
+                    if (type is not null)
                     {
-                        try
-                        {
-                            lastValue = Convert.ChangeType(requestModel.LastValue, type);
+                        object lastValue = requestModel.LastValue;
 
-                        }
-                        catch
+                        if (requestModel.LastValue.GetType() != type)
                         {
-                            return null!;
+                            try
+                            {
+                                lastValue = Convert.ChangeType(requestModel.LastValue, type);
+                            }
+                            catch
+                            {
+                                return null;
+                            }
                         }
+
+                        filter = q => q.Where($"{requestModel.OrderBy} {comparerSymbol} @0 || ({requestModel.OrderBy} == @0 && Id {comparerSymbol} @1)",
+                            lastValue, requestModel.LastId);
                     }
-
-                    filter = q => q.Where($"{requestModel.OrderBy} {comparerSymbol} @0 || ({requestModel.OrderBy} == @0 && Id {comparerSymbol} @1)",
-                        lastValue, requestModel.LastId);
                 }
+                else
+                {
+                    filter = q => q.Where($"Id {comparerSymbol} @0", requestModel.LastId);
+                }                
             }
         }
 

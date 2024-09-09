@@ -570,7 +570,7 @@ export default class HomeDashboard {
         var transactionDate = new Date(transaction.dateTime)
         var transactionYear = transactionDate.getYear();
         var transactionMonth = transactionDate.getMonth();
-        var currentDate = this.getCurrentMonth();
+        var currentDate = this.getCurrentMonthUTC();
         var currentYear = currentDate.getYear();
         var currentMonth = currentDate.getMonth();
 
@@ -602,7 +602,8 @@ export default class HomeDashboard {
         }        
     }
 
-    getCurrentMonth = () => this.#monthPicker.datepicker('getUTCDate');
+    getCurrentMonthUTC = () => this.#monthPicker.datepicker('getUTCDate');
+    getCurrentMonth = () => this.#monthPicker.datepicker('getDate');
 
     getCategory(id) {
         var categories = this.#data.incomeCategories.concat(this.#data.expenseCategories);

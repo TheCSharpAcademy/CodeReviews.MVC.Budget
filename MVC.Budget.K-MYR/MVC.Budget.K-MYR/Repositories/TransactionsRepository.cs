@@ -10,7 +10,7 @@ public sealed class TransactionsRepository : GenericRepository<Transaction>, ITr
     { }
 
     public Task<List<TransactionDTO>> GetAsync(TransactionsSearch searchModel, Func<IQueryable<Transaction>,
-                                                 IOrderedQueryable<Transaction>>? orderBy = null, Func<IQueryable<Transaction>,
+                                                 IOrderedQueryable<Transaction>> orderBy, Func<IQueryable<Transaction>,
                                                  IQueryable<Transaction>>? filter = null)
     {
         IQueryable<Transaction> query = _dbSet;
