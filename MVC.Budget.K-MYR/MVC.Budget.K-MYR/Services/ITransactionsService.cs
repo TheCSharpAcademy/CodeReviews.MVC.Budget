@@ -1,10 +1,11 @@
-﻿using MVC.Budget.K_MYR.Models;
+﻿using LanguageExt.Common;
+using MVC.Budget.K_MYR.Models;
 
 namespace MVC.Budget.K_MYR.Services;
 
 public interface ITransactionsService
 {
-    Task<TransactionsSearchResponse?> GetTransactions(TransactionsSearchRequest searchModel);
+    Task<Result<TransactionsSearchResponse>> GetTransactions(TransactionsSearchRequest searchModel);
     Task<List<Transaction>> GetUnevaluatedTransactions(int categoryid, int? lastId = null, DateTime? lastDate = null, int pageSize = 10);
     Transaction? GetByID(int id);
     ValueTask<Transaction?> GetByIDAsync(int id);

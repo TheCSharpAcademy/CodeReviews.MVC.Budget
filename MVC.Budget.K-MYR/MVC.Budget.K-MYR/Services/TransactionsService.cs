@@ -3,6 +3,8 @@ using MVC.Budget.K_MYR.Data;
 using MVC.Budget.K_MYR.Extensions;
 using MVC.Budget.K_MYR.Models;
 using MVC.Budget.K_MYR.Enums;
+using LanguageExt.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace MVC.Budget.K_MYR.Services;
 
@@ -19,45 +21,45 @@ public class TransactionsService : ITransactionsService
         _logger = logger;
     }
 
-    public async Task<TransactionsSearchResponse?> GetTransactions(TransactionsSearchRequest requestModel)
+    public async Task<Result<TransactionsSearchResponse>> GetTransactions(TransactionsSearchRequest requestModel)
     {
         Func<IQueryable<Transaction>, IOrderedQueryable<Transaction>> orderBy = q => q.OrderBy(t => t.Id);
         Func<IQueryable<Transaction>, IQueryable<Transaction>>? filter = null;
 
-
-        if (requestModel.OrderBy is not null && OrderingHelpers.IsAllowedProperty(requestModel.OrderBy))
+        if (requestModel.OrderBy is not null)
         {
-            bool IsReverseOrder = (requestModel.OrderDirection == OrderDirection.Ascending) ^ requestModel.IsPrevious;
-            string orderDirection = IsReverseOrder ? "" : " DESC";
+            if(!OrderingHelpers.IsAllowedProperty(requestModel.OrderBy))
+            {
+                return new Result<TransactionsSearchResponse>(new ValidationException($"'{requestModel.OrderBy}' is not a valid field for ordering."));
+            }
+
+            bool IsAscendingOrder = (requestModel.OrderDirection == OrderDirection.Ascending) ^ requestModel.IsPrevious;
+            string orderDirection = IsAscendingOrder ? "" : " DESC";
             string orderString = $"{requestModel.OrderBy}{orderDirection}, Id{orderDirection}";
             orderBy = q => q.OrderBy(orderString);
 
             if (requestModel.LastId is not null)
             {
-                string comparerSymbol = IsReverseOrder ? ">" : "<";
+                string comparerSymbol = IsAscendingOrder ? ">" : "<";
 
                 if (requestModel.LastValue is not null)
                 {
                     var type = OrderingHelpers.GetProperty<Transaction>(requestModel.OrderBy)?.PropertyType;
 
-                    if (type is not null)
+                    if (type is null)
                     {
-                        object lastValue = requestModel.LastValue;
+                        return new Result<TransactionsSearchResponse>(new ValidationException($"Failed to retrieve the type for the property '{requestModel.OrderBy}'."));
+                    }
 
-                        if (requestModel.LastValue.GetType() != type)
-                        {
-                            try
-                            {
-                                lastValue = Convert.ChangeType(requestModel.LastValue, type);
-                            }
-                            catch
-                            {
-                                return null;
-                            }
-                        }
-
+                    try
+                    {
+                        var lastValue = Convert.ChangeType(requestModel.LastValue, type);
                         filter = q => q.Where($"{requestModel.OrderBy} {comparerSymbol} @0 || ({requestModel.OrderBy} == @0 && Id {comparerSymbol} @1)",
-                            lastValue, requestModel.LastId);
+                       lastValue, requestModel.LastId);
+                    }
+                    catch
+                    {
+                        return new Result<TransactionsSearchResponse>(new ValidationException($"Failed to convert '{requestModel.LastValue}' to the expected type '{type.Name}'."));
                     }
                 }
                 else
@@ -157,5 +159,3 @@ public class TransactionsService : ITransactionsService
         await _unitOfWork.Save();
     }
 }
-
-

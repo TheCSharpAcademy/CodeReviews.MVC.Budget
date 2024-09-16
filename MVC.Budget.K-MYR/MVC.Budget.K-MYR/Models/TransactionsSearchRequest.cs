@@ -8,7 +8,7 @@ public class TransactionsSearchRequest
     public int PageSize { get; set; } = 100;
     public bool IsPrevious { get; set; } = false;
     public int? LastId { get; set; }
-    public string? LastValue { get; set; }
+    public object? LastValue { get; set; }
     public string? OrderBy { get; set; }
     public OrderDirection OrderDirection { get; set; } = OrderDirection.Ascending;
     public string? SearchString { get; set; }

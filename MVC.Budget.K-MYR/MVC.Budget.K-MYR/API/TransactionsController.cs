@@ -34,15 +34,11 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
     [ValidateAntiForgeryToken]
     public async Task<ActionResult<TransactionsSearchResponse>> GetTransactions([FromBody] TransactionsSearchRequest searchModel)
     {
-        var response = await _transactionsService.GetTransactions(searchModel);
+        var result = await _transactionsService.GetTransactions(searchModel);
 
-        if(response is null)
-        {
-            return BadRequest($"Couldn't convert {nameof(searchModel.LastValue)} to its respective type");
-        }
-
-        return Ok(response);
-
+        return result.Match<ActionResult<TransactionsSearchResponse>>(
+            res => Ok(res),
+            err => BadRequest(err.Message));
     }
 
     [HttpPost]

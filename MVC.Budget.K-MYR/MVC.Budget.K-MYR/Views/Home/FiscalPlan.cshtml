@@ -14,6 +14,19 @@
     var fiscalPlanDTO = Model.PageModel.FiscalPlan;
 }
 
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="visibility:hidden; position: absolute;">
+    <defs>
+        <linearGradient id="icon_gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#CCFBE5;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#A2D6CB;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#7EB1B1;stop-opacity:1" />
+        </linearGradient>        
+    </defs>
+    <symbol id="accordion-button-icon" viewBox="0 0 15 15">
+        <path fill="url(#icon_gradient)" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+    </symbol>
+</svg>
+
 <div id="menu-container" data-categoryid="0">
     <div id="menu" class="menu">
         @Html.AntiForgeryToken()
@@ -51,16 +64,14 @@
                                     <canvas id="sentimentChart"></canvas>
                                 </div>
                                 <div class="chart-container">
-                                    <h1 class="text-center">@fiscalPlanDTO.Name</h1>
-                                    <div class="input-group monthPicker">
+                                    <h1 class="text-center mt-1">@fiscalPlanDTO.Name</h1>
+                                    <div class="input-group monthPicker mt-3">
                                         <input id="home-monthSelector" type="text" class="monthSelector form-control ms-auto" value="" aria-label="Month Selection" readonly>
                                         <span class="input-group-text me-auto calendar-button"><i class="bi bi-calendar"></i></span>
-                                    </div>
-                                    <div class="dashboardStatistics mt-4">
-                                        <h5 id="home-overspending" class="text-center">
-                                            Overspending: @fiscalPlanDTO.Overspending.ToString("C2", Model.Culture)
-                                        </h5>
-                                    </div>
+                                    </div>                                    
+                                    <h5 id="home-overspending" class="text-center mt-5">
+                                        Overspending: @fiscalPlanDTO.Overspending.ToString("C2", Model.Culture)
+                                    </h5>                                    
                                 </div>
                                 <div class="chart-container">
                                     @{
@@ -142,15 +153,8 @@
                                         @fiscalPlanDTO.ExpensesTotal.ToString("C2", Model.Culture) / @fiscalPlanDTO.ExpensesBudget.ToString("C2", Model.Culture)
                                     </h5>
                                     <svg class="add-category-icon" fill="none" viewBox="0 0 14 14" height="23" width="23">
-                                        <g>
-                                            <defs>
-                                                <radialGradient id="gradient2" x1="0" x2="1" y1="0" y2="1">
-                                                    <stop offset="0%" stop-color="#CCFBE5" />
-                                                    <stop offset="50%" stop-color="#A2D6CB" />
-                                                    <stop offset="100%" stop-color="#7EB1B1" />
-                                                </radialGradient>
-                                            </defs>
-                                            <path fill="url(#gradient2)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
+                                        <g>                                            
+                                            <path fill="url(#icon_gradient)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
                                         </g>
                                     </svg>
                                     <div class="accordion-caret rotate"></div>
@@ -308,12 +312,12 @@
                                     </canvas>
                                 </div>
                                 <div class="chart-container">
-                                    <h1 class="text-center">My Budget</h1>
-                                    <div class="input-group yearPicker">
+                                    <h1 class="text-center mt-1">My Budget</h1>
+                                    <div class="input-group yearPicker mt-3">
                                         <input id="statistics-yearSelector" type="text" class="yearSelector form-control ms-auto" value="" aria-label="Year Selection" readonly>
                                         <span class="input-group-text me-auto calendar-button"><i class="bi bi-calendar"></i></span>
                                     </div>
-                                    <div class="dashboardStatistics mt-4">
+                                    <div class="dashboardStatistics mt-5">
                                         <h5 id="statistics-totalSpent" class="text-center"></h5>
                                         <h5 id="statistics-overspending" class="text-center"></h5>
                                     </div>
@@ -381,7 +385,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>            
         </div>
     </div>
 </div>

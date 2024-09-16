@@ -26,7 +26,7 @@ builder.Services.AddTransient<IFiscalPlansService, FiscalPlansService>();
 
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MSQL")));
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")));
 builder.Services.AddControllersWithViews()
      .AddNewtonsoftJson(options =>
      {
