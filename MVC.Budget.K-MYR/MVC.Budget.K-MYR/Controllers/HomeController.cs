@@ -58,7 +58,7 @@ public class HomeController(ILogger<HomeController> logger, IFiscalPlansService 
 
         var homeModel = new HomeModel
         {
-            FiscalPlans = await _fiscalPlanService.GetFiscalPlans(),
+            FiscalPlans = await _fiscalPlanService.GetFiscalPlanDTOs(),
             FiscalPlan = new()
         };
 

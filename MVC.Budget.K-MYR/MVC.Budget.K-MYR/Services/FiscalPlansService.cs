@@ -19,6 +19,12 @@ public class FiscalPlansService : IFiscalPlansService
         return _unitOfWork.FiscalPlansRepository.GetAsync();
     }
 
+    public Task<List<FiscalPlanDTO>> GetFiscalPlanDTOs(DateTime? month = null)
+    {        
+        var date = month ?? DateTime.UtcNow;
+        return _unitOfWork.FiscalPlansRepository.GetAllWithMonthlyData(date);
+    }
+
     public ValueTask<FiscalPlan?> GetByIDAsync(int id)
     {
         return _unitOfWork.FiscalPlansRepository.GetByIDAsync(id);

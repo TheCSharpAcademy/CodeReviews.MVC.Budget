@@ -16,21 +16,11 @@
 
   <ItemGroup>
     <None Remove="ClientApp\src\js\fiscalPlan.js" />
-    <None Remove="ClientApp\src\scss\site.css" />
-    <None Remove="ClientApp\src\scss\site.min.css" />
     <None Remove="ClientApp\src\scss\site.scss" />
     <None Remove="ClientApp\src\js\category.js" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="ClientApp\src\scss\site.css">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="ClientApp\src\scss\site.min.css">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="ClientApp\src\scss\site.scss">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

@@ -316,28 +316,28 @@ export default class StatisticsDashboard {
             data: {
                 labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dez",],
                 datasets: [{
-                    label: 'Happy',
+                    label: 'Necessary',
                     stack: 'Unevaluated',
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#20c997',
                 },
                 {
-                    label: 'Unhappy',
+                    label: 'Unnecessary',
                     stack: 'Unevaluated',
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: 'rgb(220,53,69)'
                 },
                 {
-                    label: 'Happy (Eval.)',
+                    label: 'Necessary (Eval.)',
                     stack: 'Evaluated',
                     borderWidth: 2,
                     borderColor: '#d3d3d3',
                     backgroundColor: '#0f7c5c',
                 },
                 {
-                    label: 'Unhappy (Eval.)',
+                    label: 'Unnecessary (Eval.)',
                     stack: 'Evaluated',
                     borderWidth: 2,
                     borderColor: '#d3d3d3',

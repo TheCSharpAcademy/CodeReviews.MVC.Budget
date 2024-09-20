@@ -2,6 +2,6 @@
 
 public class HomeModel
 {
-    public List<FiscalPlan> FiscalPlans { get; set; }
-    public FiscalPlan FiscalPlan { get; set; }  
+    public List<FiscalPlanDTO> FiscalPlans { get; set; } = new List<FiscalPlanDTO>();
+    public FiscalPlan FiscalPlan { get; set; }
 }

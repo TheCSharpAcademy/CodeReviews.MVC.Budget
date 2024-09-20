@@ -1,88 +1,4 @@
-﻿@import "../../node_modules/bootstrap/scss/functions";
-
-//Variables
-$primary: #020403;
-$secondary: #475456;
-$body-color: white;
-$body-bg: $primary;
-$borderWidth: 4px;
-$border-radius: 10px;
-$small-screen-query: 576px;
-$big-screen-query: 1400px;
-$box-shadow: rgba(0, 0, 0, 0.17) 2px 2px 5px 2px;
-
-$accordion-bg: $secondary;
-$accordion-button-active-bg: $secondary;
-$accordion-button-active-color: white;
-$accordion-icon-active-color: white;
-$accordion-body-padding-y: 8px;
-$accordion-body-padding-x: 10px;
-$accordion-border-radius: $border-radius;
-$accordion-button-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 15' fill='white'%3E%3Cdefs%3E%3CradialGradient id='gradient1' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23CCFBE5' /%3E%3Cstop offset='50%25' stop-color='%23A2D6CB' /%3E%3Cstop offset='100%25' stop-color='%237EB1B1' /%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath fill='url(%23gradient1)' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-$accordion-icon-width: 20px;
-$accordion-icon-transition: transform 0.3s ease-in-out;
-
-
-$navbar-light-color: white;
-$navbar-light-brand-color: white;
-
-$table-color: white;
-$table-bg: $secondary;
-$pagination-bg: white;
-$pagination-disabled-color: #BDC3C7;
-
-$modal-content-bg: $secondary;
-
-$spinner-width: calc(15px + var(--i) * 5px);
-$spinner-animation-speed: 1.25s;
-
-// Configuration
-@import "../../node_modules/bootstrap/scss/variables";
-@import "../../node_modules/bootstrap/scss/variables-dark";
-@import "../../node_modules/bootstrap/scss/maps";
-@import "../../node_modules/bootstrap/scss/mixins";
-@import "../../node_modules/bootstrap/scss/utilities";
-
-// Layout & components
-@import "../../node_modules/bootstrap/scss/root";
-@import "../../node_modules/bootstrap/scss/reboot";
-@import "../../node_modules/bootstrap/scss/type";
-//@import "../../node_modules/bootstrap/scss/images";
-@import "../../node_modules/bootstrap/scss/containers";
-@import "../../node_modules/bootstrap/scss/grid";
-@import "../../node_modules/bootstrap/scss/tables";
-@import "../../node_modules/bootstrap/scss/forms";
-//@import "../../node_modules/bootstrap/scss/buttons";
-@import "../../node_modules/bootstrap/scss/transitions";
-@import "../../node_modules/bootstrap/scss/dropdown";
-//@import "../../node_modules/bootstrap/scss/button-group";
-@import "../../node_modules/bootstrap/scss/nav";
-@import "../../node_modules/bootstrap/scss/navbar";
-@import "../../node_modules/bootstrap/scss/card";
-@import "../../node_modules/bootstrap/scss/accordion";
-//@import "../../node_modules/bootstrap/scss/breadcrumb";
-@import "../../node_modules/bootstrap/scss/pagination";
-//@import "../../node_modules/bootstrap/scss/badge";
-//@import "../../node_modules/bootstrap/scss/alert";
-@import "../../node_modules/bootstrap/scss/progress";
-//@import "../../node_modules/bootstrap/scss/list-group";
-@import "../../node_modules/bootstrap/scss/close";
-//@import "../../node_modules/bootstrap/scss/toasts";
-@import "../../node_modules/bootstrap/scss/modal";
-//@import "../../node_modules/bootstrap/scss/tooltip";
-//@import "../../node_modules/bootstrap/scss/popover";
-//@import "../../node_modules/bootstrap/scss/carousel";
-//@import "../../node_modules/bootstrap/scss/spinners";
-//@import "../../node_modules/bootstrap/scss/offcanvas";
-//@import "../../node_modules/bootstrap/scss/placeholders";
-
-// Helpers
-@import "../../node_modules/bootstrap/scss/helpers";
-
-// Utilities
-@import "../../node_modules/bootstrap/scss/utilities/api";
-
-// --- Custom Styles ---
+﻿@import "_variables.scss";
 
 body {
     height: 100vh;
@@ -130,6 +46,14 @@ body {
     box-shadow: #A2D6CB 0 0 2px 3px;
 }
 
+.iconRadioButton {
+    display: none;
+}
+
+.iconRadioButton:checked + label {
+    border: 2px solid white;
+}
+
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -142,14 +66,6 @@ body {
 ::-webkit-scrollbar-thumb {
     background: white;
     border-radius: 5px;
-}
-
-.iconRadioButton {
-    display: none;
-}
-
-.iconRadioButton:checked + label {
-    border: 2px solid white;
 }
 
 .add-category-icon {
@@ -779,16 +695,23 @@ main {
 
 .cards-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-top: 5px;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    margin: 0 auto;
+    max-width: 800px;
 }
 
 .fiscalPlan-card {
     background-color: $secondary;
-    padding: 15px;
-    height: 200px;
+    padding: 25px;
     border-radius: $border-radius;
+}
+
+.progress-container {
+    display: grid;
+    grid-gap: 30px;
+    padding: 20px 10px;
+    margin: 0 10px;
 }
 
 .add-fiscalPlan-card {

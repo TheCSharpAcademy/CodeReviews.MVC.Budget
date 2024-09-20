@@ -12,4 +12,5 @@ public interface IFiscalPlansService
     Task DeleteFiscalPlan(FiscalPlan fiscalPlan);
     Task<FiscalPlanMonthDTO> GetDataByMonth(FiscalPlan fiscalPlan, DateTime Month);
     Task<FiscalPlanYearDTO> GetDataByYear(int fiscalPlanId, int year);
+    Task<List<FiscalPlanDTO>> GetFiscalPlanDTOs(DateTime? month = null);
 }

@@ -17,14 +17,42 @@
             <div class="cards-container">                        
                 @foreach(var fiscalPlan in Model.PageModel.FiscalPlans)
                 {
+                    var progressbarWidthIncome = (int)Math.Min(100, fiscalPlan.TotalIncome / fiscalPlan.BudgetIncome * 100); ;
+                    var progressbarWidthExpenses = (int)Math.Min(100, fiscalPlan.TotalExpenses / fiscalPlan.BudgetExpenses * 100);
+                    var color = progressbarWidthExpenses < 50 ? "bg-success" : progressbarWidthExpenses < 85 ? "bg-warning" : "bg-danger";
+
                     <div class="fiscalPlan-card" data-id="@fiscalPlan.Id">
-                        <h4 class="text-center">@fiscalPlan.Name</h4>
-                        <div>April 2024</div>
-                        <div class="ms-4">
-                            <div>Available: € 650</div>
-                            <div>Spent: € 350</div>
-                            <div>Overspending: € 30</div>
-                        </div>
+                        <h1 class="text-center">@fiscalPlan.Name</h1>
+                        <div class="progress-container">
+                            <div>
+                                <div class="d-flex justify-content-between">
+                                    <div>Income</div>
+                                    <div id="fiscalPlan_@(fiscalPlan.Id)_income" data-total="0" data-budget="0">
+                                        @fiscalPlan.TotalIncome.ToString("C2", Model.Culture) / @fiscalPlan.BudgetIncome.ToString("C2", Model.Culture)
+                                    </div>
+                                </div>
+                                <div class="progress">
+                                    <div id="fiscalPlan_@(fiscalPlan.Id)_progressbar" class="progress-bar bg-success"
+                                         role="progressbar" style="width: @(progressbarWidthIncome)%"
+                                         aria-valuenow="@(progressbarWidthIncome)" aria-valuemin="0" aria-valuemax="100" aria-labelledby="fiscalPlan_@(fiscalPlan.Id)_balance">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between">
+                                    <div>Expenses</div>
+                                    <div id="fiscalPlan_@(fiscalPlan.Id)_expenses" data-total="0" data-budget="0">
+                                        @fiscalPlan.TotalExpenses.ToString("C2", Model.Culture) / @fiscalPlan.BudgetExpenses.ToString("C2", Model.Culture)
+                                    </div>
+                                </div>
+                                <div class="progress">
+                                    <div id="fiscalPlan_@(fiscalPlan.Id)_progressbar" class="progress-bar @(color)"
+                                         role="progressbar" style="width: @(progressbarWidthExpenses)%"
+                                         aria-valuenow="@(progressbarWidthExpenses)" aria-valuemin="0" aria-valuemax="100" aria-labelledby="fiscalPlan_@(fiscalPlan.Id)_balance">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
                     </div>
                 }
                 <div id="addFiscalPlan-card" class="add-fiscalPlan-card">

@@ -1,4 +1,6 @@
-﻿namespace MVC.Budget.K_MYR.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MVC.Budget.K_MYR.Models;
 
 public class FiscalPlan
 {

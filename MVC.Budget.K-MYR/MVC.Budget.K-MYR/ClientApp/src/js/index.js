@@ -1,5 +1,4 @@
 ﻿import { importChartDefaults,  importBootstrapModals} from './asyncComponents';
-import 'jquery-validation';
 
 const fiscalPlanApi = "https://localhost:7246/api/FiscalPlan";
 
