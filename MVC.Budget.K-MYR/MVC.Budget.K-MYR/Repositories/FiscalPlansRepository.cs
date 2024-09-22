@@ -19,7 +19,7 @@ public class FiscalPlansRepository : GenericRepository<FiscalPlan>, IFiscalPlans
             Id = f.Id,
             Name = f.Name,
             TotalIncome = f.IncomeCategories.SelectMany(c => c.Transactions.Where(t => t.DateTime >= lowerLimit && t.DateTime < upperLimit))
-                                                        .Sum(t => t.Amount),
+                                            .Sum(t => t.Amount),
             BudgetIncome = f.IncomeCategories.Sum(c => c.Budget),
             TotalExpenses = f.ExpenseCategories.SelectMany(c => c.Transactions.Where(t => t.DateTime >= lowerLimit && t.DateTime < upperLimit))
                                                         .Sum(t => t.Amount),

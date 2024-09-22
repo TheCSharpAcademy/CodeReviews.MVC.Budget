@@ -27,7 +27,7 @@
                             <div>
                                 <div class="d-flex justify-content-between">
                                     <div>Income</div>
-                                    <div id="fiscalPlan_@(fiscalPlan.Id)_income" data-total="0" data-budget="0">
+                                    <div id="fiscalPlan_@(fiscalPlan.Id)_income" data-total="@fiscalPlan.TotalIncome" data-budget="@fiscalPlan.BudgetIncome">
                                         @fiscalPlan.TotalIncome.ToString("C2", Model.Culture) / @fiscalPlan.BudgetIncome.ToString("C2", Model.Culture)
                                     </div>
                                 </div>
@@ -41,7 +41,7 @@
                             <div>
                                 <div class="d-flex justify-content-between">
                                     <div>Expenses</div>
-                                    <div id="fiscalPlan_@(fiscalPlan.Id)_expenses" data-total="0" data-budget="0">
+                                    <div id="fiscalPlan_@(fiscalPlan.Id)_expenses" data-total="@fiscalPlan.TotalExpenses" data-budget="@fiscalPlan.BudgetExpenses">
                                         @fiscalPlan.TotalExpenses.ToString("C2", Model.Culture) / @fiscalPlan.BudgetExpenses.ToString("C2", Model.Culture)
                                     </div>
                                 </div>

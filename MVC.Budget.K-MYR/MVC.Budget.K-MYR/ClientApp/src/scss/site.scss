@@ -30,7 +30,7 @@ body {
 
 .form-select:focus {
     border: none;
-    box-shadow: #A2D6CB 0 0 2px 3px;
+    box-shadow: #A2D6CB 0 0 5px 2px;
 }
 
 .submit-btn {
@@ -79,6 +79,12 @@ body {
     pointer-events: none;
 }
 
+.yearPicker, .monthPicker {
+    justify-content: center;
+    width: fit-content;
+    margin: 0 auto;
+}
+
 .yearPicker .bi-calendar, .monthPicker .bi-calendar {
     color: #456977;
     cursor: pointer;
@@ -86,14 +92,12 @@ body {
 
 .monthSelector {
     max-width: 140px;
-    margin: 0 0 0 auto;
     cursor: pointer;
     text-align: center;
 }
 
 .yearSelector {
     max-width: 60px;
-    margin: 0 0 0 auto;
     cursor: pointer;
     text-align: center;
 }
@@ -705,6 +709,7 @@ main {
     background-color: $secondary;
     padding: 25px;
     border-radius: $border-radius;
+    cursor: pointer;
 }
 
 .progress-container {

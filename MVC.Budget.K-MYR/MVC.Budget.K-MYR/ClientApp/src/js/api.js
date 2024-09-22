@@ -27,6 +27,32 @@ export async function getCountryCookie(countryISOCode, token) {
     }    
 }
 
+export async function addFiscalPlan(formData) {
+    try {
+        var response = await fetch(`${fiscalPlanApi}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": formData.get('__RequestVerificationToken')
+            },
+            body: JSON.stringify({
+                Name: formData.get("Name"),
+            })
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            console.error(`HTTP Post Error: ${response.status}`);
+            return false;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+}
+
 export async function getFiscalPlanDataByMonth(id, date) {
     try {
         var response = await fetch(`${fiscalPlanAPI}/${id}/MonthlyData?Month=${date.toISOString() ?? new Date().toISOString()}`, {

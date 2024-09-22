@@ -1,8 +1,8 @@
-﻿import { importChartDefaults,  importBootstrapModals} from './asyncComponents';
+﻿import { importBootstrapModals } from './asyncComponents';
+import { addFiscalPlan } from './api'
 
+formatDashboard();
 const fiscalPlanApi = "https://localhost:7246/api/FiscalPlan";
-
-const chartDefaultsTask = importChartDefaults();
 const modals = importBootstrapModals().then((modalsArray) => {
     let modal = modalsArray.find(m => m._element.id == "addFiscalPlan-modal");
     document.getElementById("addFiscalPlan-card").addEventListener('click', function () {
@@ -21,28 +21,17 @@ $('.fiscalPlan-card').on('click', function (event) {
     window.location.href = `https://localhost:7246/FiscalPlan/${this.dataset.id}`;
 });
 
-async function addFiscalPlan(data) {
-    try {
-        var response = await fetch(`${fiscalPlanApi}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": data.get('__RequestVerificationToken')
-            },
-            body: JSON.stringify({
-                Name: data.get("Name"),
-            })
-        });
+window.addEventListener('countryChanged', () => {
+    formatDashboard();
+})
 
-        if (response.ok) {
-            return true;
-        } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-            return false;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return false;
+function formatDashboard() {
+    var cards = $('.fiscalPlan-card');
+    for (let i = 0; i < cards.length; i++) {
+        let id = cards[i].dataset.id;
+        let incomeText = document.getElementById(`fiscalPlan_${id}_income`);
+        incomeText.textContent = `${window.userNumberFormat.format(incomeText.dataset.total)} / ${window.userNumberFormat.format(incomeText.dataset.budget)}`;
+        let expensesText = document.getElementById(`fiscalPlan_${id}_expenses`);
+        expensesText.textContent = `${window.userNumberFormat.format(expensesText.dataset.total)} / ${window.userNumberFormat.format(expensesText.dataset.budget)}`;
     }
 }
