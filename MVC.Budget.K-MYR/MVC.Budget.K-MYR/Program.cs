@@ -10,11 +10,6 @@ CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddResponseCompression(options =>
-{
-    options.EnableForHttps = true;
-});
-
 builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddTransient<ITransactionsRepository, TransactionsRepository>();
 builder.Services.AddTransient<ICategoryBudgetsRepository, CategoryBudgetsRepository>();
@@ -26,16 +21,15 @@ builder.Services.AddTransient<IFiscalPlansService, FiscalPlansService>();
 
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MSQL")));
-builder.Services.AddControllersWithViews()
-     .AddNewtonsoftJson(options =>
-     {
-         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-     });
+builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer")));
+builder.Services
+    .AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    });
 
 var app = builder.Build();
-
-app.UseResponseCompression();
 
 using (var scope = app.Services.CreateScope())
 {

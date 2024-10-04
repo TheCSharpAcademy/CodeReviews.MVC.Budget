@@ -32,7 +32,7 @@ public class TransactionsService : ITransactionsService
             {
                 return new Result<TransactionsSearchResponse>(new ValidationException($"'{requestModel.OrderBy}' is not a valid field for ordering."));
             }
-
+            
             bool IsAscendingOrder = (requestModel.OrderDirection == OrderDirection.Ascending) ^ requestModel.IsPrevious;
             string orderDirection = IsAscendingOrder ? "" : " DESC";
             string orderString = $"{requestModel.OrderBy}{orderDirection}, Id{orderDirection}";
@@ -54,8 +54,7 @@ public class TransactionsService : ITransactionsService
                     try
                     {
                         var lastValue = Convert.ChangeType(requestModel.LastValue, type);
-                        filter = q => q.Where($"{requestModel.OrderBy} {comparerSymbol} @0 || ({requestModel.OrderBy} == @0 && Id {comparerSymbol} @1)",
-                       lastValue, requestModel.LastId);
+                        filter = q => q.Where($"{requestModel.OrderBy} {comparerSymbol} @0 || ({requestModel.OrderBy} == @0 && Id {comparerSymbol} @1)", lastValue, requestModel.LastId);
                     }
                     catch
                     {
@@ -146,7 +145,7 @@ public class TransactionsService : ITransactionsService
         transaction.IsHappy = transactionPut.IsHappy;
         transaction.IsNecessary = transactionPut.IsNecessary;
         transaction.DateTime = transactionPut.DateTime;        
-        transaction.Evaluated = transactionPut.Evaluated;
+        transaction.IsEvaluated = transactionPut.IsEvaluated;
         transaction.PreviousIsNecessary = transactionPut.PreviousIsNecessary;
         transaction.PreviousIsHappy = transactionPut.PreviousIsHappy;
 

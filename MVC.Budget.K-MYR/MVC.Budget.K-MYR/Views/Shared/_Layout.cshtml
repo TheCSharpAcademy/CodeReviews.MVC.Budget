@@ -1,4 +1,4 @@
-﻿@model MVC.Budget.K_MYR.Models.ViewModels.LayoutModel
+﻿@model MVC.Budget.K_MYR.Models.ViewModels.LayoutViewModel
 
 <!DOCTYPE html>
 <html lang="en">
@@ -42,10 +42,6 @@
         </main>
     </div>
 
-    @await RenderSectionAsync("Scripts", false)
-    @if (Environment.GetEnvironmentVariable("__ASPNETCORE_BROWSER_TOOLS") is not null)
-    {
-        <script src="/_framework/aspnetcore-browser-refresh.js"></script>
-    }
+    @await RenderSectionAsync("Scripts", false)   
 </body>
 </html>

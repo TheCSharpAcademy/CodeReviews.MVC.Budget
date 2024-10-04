@@ -18,13 +18,51 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                 .SingleOrDefaultAsync(c => c.Id == id);
     }
 
-    public Task<List<CategoryDTO>> GetDataByMonth(int id, DateTime month)
+    public Task<CategoryMonthDTO?> GetCategoryDataByMonth(int id, DateTime month)
     {
         DateTime thisMonth = new(month.Year, month.Month, 1);
         var nextMonth = thisMonth.AddMonths(1);
         DateTime cutOffDate = new(nextMonth.Year, nextMonth.Month, 1);
         var query = _dbSet
-                      .Where(c => c.FiscalPlanId == id)
+                      .Where(c => c.Id == id)
+                      .Select(c => new CategoryMonthDTO
+                      {
+                          Id = c.Id,
+                          FiscalPlanId = c.FiscalPlanId,
+                          CategoryType = c.CategoryType,
+                          Name = c.Name,
+                          Budget = c.Budget,
+                          BudgetLimit = c.PreviousBudgets.Where(b => b.Month < cutOffDate)
+                                                         .Select(b => new BudgetLimit
+                                                         {
+                                                             Budget = b.Budget,
+                                                             Month = b.Month
+                                                         })
+                                                         .OrderByDescending(b => b.Month)
+                                                         .FirstOrDefault(),
+                          Total = c.Transactions.Where(t => t.DateTime >= thisMonth && t.DateTime < nextMonth)
+                                                .Sum(t => t.Amount),
+                          HappyTotal = c.Transactions.Where(t => t.DateTime >= thisMonth && t.DateTime < nextMonth)
+                                                     .Where(t => t.PreviousIsHappy && t.IsEvaluated || !t.IsEvaluated && t.IsHappy)
+                                                     .Sum(t => t.Amount),
+                          NecessaryTotal = c.Transactions.Where(t => t.DateTime >= thisMonth && t.DateTime < nextMonth)
+                                                         .Where(t => t.PreviousIsNecessary && t.IsEvaluated || !t.IsEvaluated && t.IsNecessary)
+                                                         .Sum(t => t.Amount),
+                      });
+
+        return query.AsNoTracking()
+                    .AsSplitQuery()
+                    .FirstOrDefaultAsync();
+    }
+
+
+    public Task<List<CategoryDTO>> GetCategoriesDataByMonth(int fiscalPlanId, DateTime month)
+    {
+        DateTime thisMonth = new(month.Year, month.Month, 1);
+        var nextMonth = thisMonth.AddMonths(1);
+        DateTime cutOffDate = new(nextMonth.Year, nextMonth.Month, 1);
+        var query = _dbSet
+                      .Where(c => c.FiscalPlanId == fiscalPlanId)
                       .Select(c => new CategoryDTO
                       {
                           Id = c.Id,
@@ -42,10 +80,10 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                           Total = c.Transactions.Where(t => t.DateTime >= thisMonth && t.DateTime < nextMonth)
                                                 .Sum(t => t.Amount),
                           HappyTotal = c.Transactions.Where(t => t.DateTime >= thisMonth && t.DateTime < nextMonth)
-                                                     .Where(t => t.PreviousIsHappy && t.Evaluated || !t.Evaluated && t.IsHappy)
+                                                     .Where(t => t.PreviousIsHappy && t.IsEvaluated || !t.IsEvaluated && t.IsHappy)
                                                      .Sum(t => t.Amount),
                           NecessaryTotal = c.Transactions.Where(t => t.DateTime >= thisMonth && t.DateTime < nextMonth)
-                                                         .Where(t => t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && t.IsNecessary)
+                                                         .Where(t => t.PreviousIsNecessary && t.IsEvaluated || !t.IsEvaluated && t.IsNecessary)
                                                          .Sum(t => t.Amount),
                       });
 
@@ -54,7 +92,7 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                     .ToListAsync();
     }
 
-    public Task<List<CategoryStatisticsDTO>> GetDataByYear(int id, int year)
+    public Task<List<CategoryStatisticsDTO>> GetCategoriesDataByYear(int id, int year)
     {
         DateTime thisYear = new(year, 1, 1);
         DateTime nextYear = new(year + 1, 1, 1);
@@ -71,23 +109,23 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                                                          {
                                                              Month = g.Key,
                                                              TotalSpent = g.Sum(t => t.Amount),
-                                                             HappyTransactions = g.Where(t => t.PreviousIsHappy && t.Evaluated || !t.Evaluated && t.IsHappy)
+                                                             HappyTransactions = g.Where(t => t.PreviousIsHappy && t.IsEvaluated || !t.IsEvaluated && t.IsHappy)
                                                                                   .Sum(t => t.Amount),
-                                                             UnhappyTransactions = g.Where(t => !t.PreviousIsHappy && t.Evaluated || !t.Evaluated && !t.IsHappy)
+                                                             UnhappyTransactions = g.Where(t => !t.PreviousIsHappy && t.IsEvaluated || !t.IsEvaluated && !t.IsHappy)
                                                                                     .Sum(t => t.Amount),
-                                                             HappyEvaluatedTransactions = g.Where(t => t.IsHappy && t.Evaluated)
+                                                             HappyEvaluatedTransactions = g.Where(t => t.IsHappy && t.IsEvaluated)
                                                                                            .Sum(t => t.Amount),
-                                                             UnhappyEvaluatedTransactions = g.Where(t => !t.IsHappy && t.Evaluated)
+                                                             UnhappyEvaluatedTransactions = g.Where(t => !t.IsHappy && t.IsEvaluated)
                                                                                              .Sum(t => t.Amount),
-                                                             NecessaryTransactions = g.Where(t => t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && t.IsNecessary)
+                                                             NecessaryTransactions = g.Where(t => t.PreviousIsNecessary && t.IsEvaluated || !t.IsEvaluated && t.IsNecessary)
                                                                                       .Sum(t => t.Amount),
-                                                             UnnecessaryTransactions = g.Where(t => !t.PreviousIsNecessary && t.Evaluated || !t.Evaluated && !t.IsNecessary)
+                                                             UnnecessaryTransactions = g.Where(t => !t.PreviousIsNecessary && t.IsEvaluated || !t.IsEvaluated && !t.IsNecessary)
                                                                                         .Sum(t => t.Amount),
-                                                             NecessaryEvaluatedTransactions = g.Where(t => t.IsNecessary && t.Evaluated)
+                                                             NecessaryEvaluatedTransactions = g.Where(t => t.IsNecessary && t.IsEvaluated)
                                                                                                .Sum(t => t.Amount),
-                                                             UnnecessaryEvaluatedTransactions = g.Where(t => !t.IsNecessary && t.Evaluated)
+                                                             UnnecessaryEvaluatedTransactions = g.Where(t => !t.IsNecessary && t.IsEvaluated)
                                                                                                  .Sum(t => t.Amount),
-                                                             UnevaluatedTransactions = g.Where(t => !t.Evaluated)
+                                                             UnevaluatedTransactions = g.Where(t => !t.IsEvaluated)
                                                                                         .Sum(t => t.Amount),
                                                          }),
                               BudgetLimits = c.PreviousBudgets.Where(t => t.Month.Year <= year)
@@ -101,13 +139,11 @@ public sealed class CategoriesRepository : GenericRepository<Category>, ICategor
                     .ToListAsync();
     }
 
-
     public Task<Category?> GetCategoryWithBudgetLimits(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter)
     {
         return _dbSet.Include(filter)
                      .SingleOrDefaultAsync(c => c.Id == id);
     }
-
 
     public Task<List<Category>> GetCategoriesWithFilteredTransactionsAsync(Expression<Func<Category, bool>>? filter = null,
         Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderBy = null,

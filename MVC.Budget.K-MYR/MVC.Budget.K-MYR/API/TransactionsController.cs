@@ -22,7 +22,7 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
         return transaction is null ? NotFound() : Ok(transaction);
     }
 
-    [HttpGet("unevaluated")]
+    [HttpGet("Unevaluated")]
     public async Task<ActionResult<Transaction>> GetUnevaluatedTransactions([FromQuery][Required] int categoryid, [FromQuery] int? lastId = null, [FromQuery] DateTime? lastDate = null,[FromQuery] int pageSize = 10)
     {
         var transactions = await _transactionsService.GetUnevaluatedTransactions(categoryid, lastId, lastDate, pageSize);
@@ -30,7 +30,7 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
         return Ok(transactions);
     }
 
-    [HttpPost("search")]
+    [HttpPost("Search")]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult<TransactionsSearchResponse>> GetTransactions([FromBody] TransactionsSearchRequest searchModel)
     {
@@ -55,7 +55,7 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutTransaction([FromRoute] int id, [FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, Evaluated, EvaluatedIsHappy, EvaluatedIsNecessary, Id")] TransactionPut transactionPut)
+    public async Task<ActionResult> PutTransaction([FromRoute] int id, [FromBody][Bind("Id, Title, DateTime, Amount, IsHappy, IsNecessary, Evaluated, EvaluatedIsHappy, EvaluatedIsNecessary, Id")] TransactionPut transactionPut)
     {
         if (id != transactionPut.Id || !ModelState.IsValid)
             return BadRequest();
@@ -91,7 +91,6 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
         TransactionPut transactionToPatch = new()
         {
             Id = transaction.Id,
-            CategoryId = transaction.CategoryId,
             Title = transaction.Title,
             Description = transaction.Description,
             DateTime = transaction.DateTime,
@@ -100,7 +99,7 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
             IsNecessary = transaction.IsNecessary,
             PreviousIsNecessary = transaction.PreviousIsNecessary,
             PreviousIsHappy = transaction.PreviousIsHappy,
-            Evaluated = transaction.Evaluated
+            IsEvaluated = transaction.IsEvaluated
         };
 
         patchDoc.ApplyTo(transactionToPatch, ModelState);

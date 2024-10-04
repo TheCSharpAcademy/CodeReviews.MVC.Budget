@@ -1,10 +1,10 @@
 ﻿@using System.Globalization
-@model LayoutModel<FiscalPlanModel>
+@model LayoutModel<FiscalPlanViewModel>
 
 @section Stylesheets {
     @{
-        <link rel="stylesheet" href="~/dist/styles-index~fiscalPlan.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/dist/styles-fiscalPlan.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/dist/styles-index~fiscalPlan~category.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/dist/styles-fiscalPlan~category.css" asp-append-version="true" />
     }
 }
 
@@ -20,30 +20,44 @@
             <stop offset="0%" style="stop-color:#CCFBE5;stop-opacity:1" />
             <stop offset="50%" style="stop-color:#A2D6CB;stop-opacity:1" />
             <stop offset="100%" style="stop-color:#7EB1B1;stop-opacity:1" />
-        </linearGradient>        
+        </linearGradient>
+        <radialGradient id="icon_gradient_radial" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="#CCFBE5" />
+            <stop offset="50%" stop-color="#A2D6CB" />
+            <stop offset="100%" stop-color="#7EB1B1" />
+        </radialGradient>
     </defs>
-    <symbol id="accordion-button-icon" viewBox="0 0 15 15">
-        <path fill="url(#icon_gradient)" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+    <symbol id="add-category-icon" viewBox="0 0 14 14">        
+        <path fill="url(#icon_gradient_radial)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>        
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="edit-icon" viewBox='0 0 16 16'>
+        <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z' />
+        <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z' />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="trash-icon" viewBox="0 0 16 16">
+        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
     </symbol>
 </svg>
 
 <div id="menu-container" data-categoryid="0">
     <div id="menu" class="menu">
-        @Html.AntiForgeryToken()
-        <span class="toggle" id="close-menu">
-            <svg class="close" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368" /></svg>
+        <span class="close-menu menu-option" id="close-menu">
+            <svg width="65" height="65" class="svg-menu" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368" /></svg>
         </span>
-        <span id="details-menu" class="span-box" style="--i:0">
-            <svg class="details" viewBox="0 0 512 512"><path d="M32 32v432a16 16 0 0016 16h432" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="96" y="224" width="80" height="192" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="240" y="176" width="80" height="240" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="383.64" y="112" width="80" height="304" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
+        <span id="details-menu" class="span-box-menu menu-option" style="--i:0">
+            <svg width="30" height="30" class="svg-menu" viewBox="0 0 512 512"><path d="M32 32v432a16 16 0 0016 16h432" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="96" y="224" width="80" height="192" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="240" y="176" width="80" height="240" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="383.64" y="112" width="80" height="304" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
         </span>
-        <span id="add-menu" class="span-box" style="--i:1">
-            <svg class="plus" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112" /></svg>
+        <span id="add-menu" class="span-box-menu menu-option" style="--i:1">
+            <svg class="svg-menu" width="40" height="40" viewBox="0 0 512 512">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112" />
+            </svg>
         </span>
-        <span id="edit-menu" class="span-box" style="--i:2">
-            <svg class="pen" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M364.13 125.25L87 403l-23 45 44.99-23 277.76-277.13-22.62-22.62zM420.69 68.69l-22.62 22.62 22.62 22.63 22.62-22.63a16 16 0 000-22.62h0a16 16 0 00-22.62 0z" /></svg>
+        <span id="edit-menu" class="span-box-menu menu-option" style="--i:2">
+            <svg width="30" height="30" class="svg-menu" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M364.13 125.25L87 403l-23 45 44.99-23 277.76-277.13-22.62-22.62zM420.69 68.69l-22.62 22.62 22.62 22.63 22.62-22.63a16 16 0 000-22.62h0a16 16 0 00-22.62 0z" /></svg>
         </span>
-        <span id="delete-menu" class="span-box" style="--i:3">
-            <svg class="trash" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" /><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
+        <span id="delete-menu" class="span-box-menu menu-option" style="--i:3">
+            <svg width="30" height="30" class="svg-menu" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" /><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
         </span>
     </div>
 </div>
@@ -143,18 +157,9 @@
                                     </h5>
                                     <h5 id="incomeBalanceHeader" class="accordion-header">
                                         @fiscalPlanDTO.IncomeTotal.ToString("C2", Model.Culture) / @fiscalPlanDTO.IncomeBudget.ToString("C2", Model.Culture)
-                                    </h5>
-                                    <svg class="add-category-icon" fill="none" viewBox="0 0 14 14" height="23" width="23">
-                                        <g>
-                                            <defs>
-                                                <radialGradient id="gradient1" x1="0" x2="1" y1="0" y2="1">
-                                                    <stop offset="0%" stop-color="#CCFBE5" />
-                                                    <stop offset="50%" stop-color="#A2D6CB" />
-                                                    <stop offset="100%" stop-color="#7EB1B1" />
-                                                </radialGradient>
-                                            </defs>
-                                            <path fill="url(#gradient1)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
-                                        </g>
+                                    </h5>                                    
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="add-category-icon" viewBox="0 0 14 14" height="23" width="23">
+                                        <use href="#add-category-icon" xlink:href="#add-category-icon" />
                                     </svg>
                                     <div class="accordion-caret rotate"></div>
                                 </div>
@@ -162,24 +167,24 @@
                                     <div id="incomeAccordionBody" class="accordion-body">
                                         @foreach (var category in fiscalPlanDTO.IncomeCategories)
                                         {
-                                            var progressbarWidth = (int)Math.Min(100, category.Total / category.Budget * 100);
                                             var budget = category.BudgetLimit?.Budget ?? category.Budget;
+                                            var progressbarWidth = budget > 0 ? (int)Math.Min(100, category.Total / budget * 100) : 100;
 
-                                            <div id="category_@category.Id" class="category">
+                                            <div id="category_@category.Id" class="category" data-id="@category.Id">
                                                 <div class="border-container">
                                                     <div class="content">
                                                         <div class="category-body">
                                                             <div class="category-body-content" id="category_@(category.Id)_name">@Html.Encode(category.Name)</div>
 
-                                                            @if (category.Total > category.Budget)
+                                                            @if (category.Total > budget)
                                                             {
                                                                 <div id="category_@(category.Id)_deviation" class="category-body-content deviation">
-                                                                    <span id="category_@(category.Id)_deviationText" class="deviation-text">Windfall: @((category.Total - category.Budget).ToString("C2", Model.Culture))</span>
+                                                                    <span id="category_@(category.Id)_deviationText" class="deviation-text">Surplus: @((category.Total - budget).ToString("C2", Model.Culture))</span>
                                                                 </div>
                                                             }
 
                                                             <div class="category-body-content balance">
-                                                                <span id="category_@(category.Id)_balance" class="balance-text">@(category.Total.ToString("C2", Model.Culture)) / @category.Budget.ToString("C2", Model.Culture)</span>
+                                                                <span id="category_@(category.Id)_balance" class="balance-text">@(category.Total.ToString("C2", Model.Culture)) / @budget.ToString("C2", Model.Culture)</span>
                                                             </div>
                                                         </div>
                                                         <div class="progress">
@@ -206,10 +211,8 @@
                                     <h5 id="expensesBalanceHeader" class="accordion-header">
                                         @fiscalPlanDTO.ExpensesTotal.ToString("C2", Model.Culture) / @fiscalPlanDTO.ExpensesBudget.ToString("C2", Model.Culture)
                                     </h5>
-                                    <svg class="add-category-icon" fill="none" viewBox="0 0 14 14" height="23" width="23">
-                                        <g>                                            
-                                            <path fill="url(#icon_gradient)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
-                                        </g>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="add-category-icon" viewBox="0 0 14 14" height="23" width="23">
+                                        <use href="#add-category-icon" xlink:href="#add-category-icon" />
                                     </svg>
                                     <div class="accordion-caret rotate"></div>
                                 </div>
@@ -217,24 +220,24 @@
                                     <div id="expensesAccordionBody" class="accordion-body">
                                         @foreach (var category in fiscalPlanDTO.ExpenseCategories)
                                         {
-                                            var progressbarWidth = (int)Math.Min(100, category.Total / category.Budget * 100);
-                                            var color = progressbarWidth < 50 ? "bg-success" : progressbarWidth < 85 ? "bg-warning" : "bg-danger";
                                             var budget = category.BudgetLimit?.Budget ?? category.Budget;
+                                            var progressbarWidth = budget > 0 ? (int)Math.Min(100, category.Total / budget * 100) : 100;
+                                            var color = progressbarWidth < 50 ? "bg-success" : progressbarWidth < 85 ? "bg-warning" : "bg-danger";
 
-                                            <div id="category_@category.Id" class="category">
+                                            <div id="category_@category.Id" class="category" data-id="@category.Id">
                                                 <div class="border-container">
                                                     <div class="content">
                                                         <div class="category-body">
                                                             <div id="category_@(category.Id)_name" class="category-body-content">@category.Name</div>
 
-                                                            @if (category.Total > category.Budget)
+                                                            @if (category.Total > budget)
                                                             {
                                                                 <div id="category_@(category.Id)_deviation" class="category-body-content deviation">
-                                                                    <span id="category_@(category.Id)_deviationText" class="overspending-text">Overspending: @((category.Total - category.Budget).ToString("C2", Model.Culture))</span>
+                                                                    <span id="category_@(category.Id)_deviationText" class="overspending-text">Overspending: @((category.Total - budget).ToString("C2", Model.Culture))</span>
                                                                 </div>
                                                             }
                                                             <div class="category-body-content balance">
-                                                                <span id="category_@(category.Id)_balance" class="balance-text">@category.Total.ToString("C2", Model.Culture) / @category.Budget.ToString("C2", Model.Culture)</span>
+                                                                <span id="category_@(category.Id)_balance" class="balance-text">@category.Total.ToString("C2", Model.Culture) / @budget.ToString("C2", Model.Culture)</span>
                                                             </div>
                                                         </div>
                                                         <div class="progress">
@@ -285,11 +288,11 @@
                                                          data-amount="@transaction.Amount"
                                                          data-date="@transaction.DateTime.ToUniversalTime()">
                                                         <div>@transaction.Title</div>
-                                                        <div class="ms-2" id="transaction_date_@transaction.Id">@transaction.DateTime.ToString(CultureInfo.InvariantCulture)</div>
-                                                        <div id="transaction_amount_@transaction.Id" class="transaction-amount ms-2 me-auto">@transaction.Amount.ToString("C2", Model.Culture)</div>
+                                                        <div id="transaction_date_@transaction.Id">@transaction.DateTime.ToString(CultureInfo.InvariantCulture)</div>
+                                                        <div id="transaction_amount_@transaction.Id">@transaction.Amount.ToString("C2", Model.Culture)</div>
                                                         <form id="reevaluate-transaction-form_@transaction.Id" class="reevaluate-transaction-form" novalidate="novalidate">                                                            
-                                                            <input type="hidden" value="@transaction.Id" id="reeval_transaction_@transaction.Id" name="Id"><div class="d-flex justify-content-around">                                                                
-                                                                <div class="me-3 d-flex align-items-center">
+                                                            <input type="hidden" value="@transaction.Id" id="reeval_transaction_@transaction.Id" name="Id"><div class="d-flex justify-content-around">
+                                                                <div class="d-flex align-items-center">
                                                                     <input type="radio" value="true" id="isHappyTrue_@transaction.Id" class="iconRadioButton" name="IsHappy">
                                                                     <label class="reevalIconLabel" for="isHappyTrue_@transaction.Id">
                                                                         <div class="reevalIconContainer">
@@ -305,7 +308,7 @@
                                                                         </div>
                                                                     </label>
                                                                 </div>                                                    
-                                                                <div class="me-3 d-flex align-items-center">
+                                                                <div class="d-flex align-items-center">
                                                                     <input type="radio" value="true" id="isNecessaryTrue_@transaction.Id" class="iconRadioButton" name="IsNecessary">
                                                                     <label class="reevalIconLabel" for="isNecessaryTrue_@transaction.Id">
                                                                         <div class="reevalIconContainer">
@@ -411,7 +414,7 @@
                 <div id="search-scrollcontainer" class="content-scrollcontainer">
                     <div id="search-container" class="content-container">
                         <div class="filter-container">
-                            @await Html.PartialAsync("_SearchForm", Model.PageModel.Search)
+                            @await Html.PartialAsync("_TransactionSearchForm", Model.PageModel.Search)
                         </div>
                         <div class="filter-container mt-3" id="table-container" style="display: none">
                             <table class="table table-hover table-borderless w-100 px-2" id="transactions-table">
@@ -451,7 +454,7 @@
 @section Scripts {
     @{
         <script src="~/dist/runtime.js" asp-append-version="true"></script>
-        <script src="~/dist/vendors-index~fiscalPlan.js" asp-append-version="true"></script>
+        <script src="~/dist/vendors-index~fiscalPlan~category.js" asp-append-version="true"></script>
         <script src="~/dist/fiscalPlan.js" asp-append-version="true"></script>
     }
 }

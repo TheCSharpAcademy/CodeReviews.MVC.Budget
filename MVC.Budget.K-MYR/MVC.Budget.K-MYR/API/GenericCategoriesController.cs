@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Models;
 using MVC.Budget.K_MYR.Services;
-using System.ComponentModel.DataAnnotations;
 
 namespace MVC.Budget.K_MYR.API;
 
@@ -33,10 +32,17 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
         return category is null ? NotFound() : Ok(category);
     }
 
-    [HttpGet("filteredByEvaluation")]
-    public async Task<ActionResult<List<Category>>> GetCategoriesWithUnevaluatedTransactions([FromQuery][Required]int fiscalPlanId, [FromQuery] int pageSize = 10)
-    {        
-        return Ok(await _categoriesService.GetCategoriesWithUnevaluatedTransactions(fiscalPlanId, pageSize));
+    [HttpGet("{id:int}/MonthlyData")]
+    public async Task<ActionResult<FiscalPlanMonthDTO>> GetDataByMonth([FromRoute] int id, [FromQuery] DateTime? Month)
+    {
+        CategoryMonthDTO? categoryDTO = await _categoriesService.GetCategoryDataByMonth(id, Month ?? DateTime.UtcNow);
+
+        if (categoryDTO is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(categoryDTO);
     }
 
     [HttpPost]
@@ -64,7 +70,7 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
         var date = month ?? DateTime.UtcNow;
         var cutOffDate = new DateTime(date.Year, date.Month, 1);
 
-        var category = await _categoriesService.GetCategoryWithBudgetLimit(categoryPut.Id, c => c.PreviousBudgets.Where(s => cutOffDate <= s.Month));
+        var category = await _categoriesService.GetCategoryWithBudgetLimit(categoryPut.Id, cutOffDate);
 
         if (category is null)
             return NotFound();

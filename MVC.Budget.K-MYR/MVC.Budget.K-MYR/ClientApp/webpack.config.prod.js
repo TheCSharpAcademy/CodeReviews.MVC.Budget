@@ -9,8 +9,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     entry: {
         index: './src/js/index-entry.js',
-        fiscalPlan: './src/js/fiscalPlan-entry.js'
-
+        fiscalPlan: './src/js/fiscalPlan-entry.js',
+        category: './src/js/category-entry.js',
     },
     output: {
         filename: '[name].js',

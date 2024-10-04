@@ -3,7 +3,6 @@ Chart.register(DoughnutController, ArcElement);
 import { getDatePicker } from './asyncComponents'
 import { getFiscalPlanDataByMonth } from './api';
 
-
 export default class HomeDashboard {
     #data;
     #isLoading;
@@ -21,13 +20,13 @@ export default class HomeDashboard {
     constructor(menu, id, date, data) {
         this.#data = data;
         this.#menu = menu;      
-        this.#initPromise = this.#init(id, date);
+        this.#init(id, date);
     }
 
     async #init(id, date) {
         try {
             this.#isLoading = true;
-            this.#initializeDatePicker(id, date);
+            var promise = this.#initializeDatePicker(id, date);
             this.#initializeCharts();            
 
             this.#overspendingHeading = document.getElementById('home-overspending');
@@ -40,14 +39,13 @@ export default class HomeDashboard {
             
             this.#formatHeaders();   
             this.#formatCategories();
-
+            await promise;
         } finally {
             this.#isLoading = false;
         }        
     }
 
-    setupMenuHandlers() {
-        var menu = this.#menu;
+    attachMenuHandlers() {
         var categories = this.#data.incomeCategories.concat(this.#data.expenseCategories);
 
         for (let i = 0; i < categories.length; i++) {
@@ -55,29 +53,33 @@ export default class HomeDashboard {
             let element = document.getElementById(`category_${category.id}`);
 
             if (element) {
-                element.addEventListener("click", function (event) {
-                    if (menu.dataset.categoryid != 0) {
-                        let borderBox = document.getElementById(`category_${menu.dataset.categoryid}`).querySelector('.border-animation');
-                        borderBox.classList.remove('border-rotate');
-                    }
-                    let y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
-                    let x = Math.max(Math.min(event.pageX - 100, window.innerWidth - 220), 20);
-                    menu.dataset.categoryid = category.id;   
-                    menu.style.left = `${x}px`;
-                    menu.style.top = `${y}px`;
-                    menu.classList.add('active');
-
-                    element.querySelector('.border-animation').classList.add('border-rotate');
-                });
+                element.addEventListener("click", this.#onCategoryClick.bind(this));
             }     
         }
+    }
+
+    #onCategoryClick(event) {
+        var categoryElement = event.target.closest('.category');
+        var id = categoryElement.dataset.id;
+        if (this.#menu.dataset.categoryid != 0) {
+            let borderBox = document.getElementById(`category_${this.#menu.dataset.categoryid}`).querySelector('.border-animation');
+            borderBox.classList.remove('border-rotate');
+        }
+        var y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
+        var x = Math.max(Math.min(event.pageX - 100, window.innerWidth - 220), 20);
+        this.#menu.dataset.categoryid = id;
+        this.#menu.style.left = `${x}px`;
+        this.#menu.style.top = `${y}px`;
+        this.#menu.classList.add('active');
+
+        categoryElement.querySelector('.border-animation').classList.add('border-rotate');
     }
 
     async #initializeDatePicker(id, date) {
         this.#monthPicker = await getDatePicker("#home-monthSelector", "month")
         this.#monthPicker.datepicker('setDate', date.toISOString());
         this.#monthPicker.on('changeDate', async () => {
-            this.refresh(id, this.#monthPicker.datepicker('getUTCDate'));
+            this.#refresh(id, this.#monthPicker.datepicker('getUTCDate'));
         });
 
         $('.monthPicker .calendar-button').on('click', function () {
@@ -158,20 +160,19 @@ export default class HomeDashboard {
         });
     }
 
-    async refresh(id, date) {        
+    async #refresh(id, date) {        
         try {
             if (this.#isLoading) {
                 console.log("Dashboard is loading...")
-                return false;
             }
 
             this.#isLoading = true;
-
             var data = await this.#getData(id, date);
 
-            this.#renderData(data);            
-
-            this.#data = data;
+            if (data) {
+                this.#renderData(data);
+                this.#data = data;
+            }            
         } finally {
             this.#isLoading = false;
         }
@@ -214,6 +215,23 @@ export default class HomeDashboard {
         return true;
     }
 
+    #formatCategory(category) {
+        if (!category) {
+            return false;
+        }
+        var balanceElement = document.getElementById(`category_${category.id}_balance`);
+        balanceElement.textContent = `${window.userNumberFormat.format(category.total)} / 
+            ${window.userNumberFormat.format(category.budget)}`;
+        if (category.total > category.budget) {
+            let deviationAmount = category.total - category.budget;
+            let deviationSpan = document.getElementById(`category_${category.id}_deviationText`);
+            deviationSpan.textContent = category.categoryType === 1
+                ? `Surplus: ${window.userNumberFormat.format(deviationAmount)}`
+                : `Overspending: ${window.userNumberFormat.format(deviationAmount)}`;
+        }
+        return true;
+    }
+
     #formatCharts(data) {
         var dataObj = data ?? this.#data;
 
@@ -240,24 +258,6 @@ export default class HomeDashboard {
         this.#incomeBalanceHeader.textContent = `${window.userNumberFormat.format(dataObj.incomeTotal)} / ${window.userNumberFormat.format(dataObj.incomeBudget)}`;
         this.#expenseBalanceHeader.textContent = `${window.userNumberFormat.format(dataObj.expensesTotal)} / ${window.userNumberFormat.format(dataObj.expensesBudget)}`;
 
-        return true;
-    }
-
-    #formatCategory(category) {
-        if (!category) {
-            return false;
-        }
-        var balanceElement = document.getElementById(`category_${category.id}_balance`);
-        balanceElement.textContent = `${window.userNumberFormat.format(category.total)} / 
-            ${window.userNumberFormat.format(category.budget)}`;
-
-        if (category.total > category.budget) {
-            let deviationAmount = category.total - category.budget;
-            let deviationSpan = document.getElementById(`category_${category.id}_deviationText`);
-            deviationSpan.textContent = category.type === 1
-                ? `Windfall: ${window.userNumberFormat.format(deviationAmount)}`
-                : `Overspending: ${window.userNumberFormat.format(deviationAmount)}`;
-        }
         return true;
     }
 
@@ -329,7 +329,7 @@ export default class HomeDashboard {
                 deviationSpan = deviationDiv.querySelector(`#category_${category.id}_deviationText`);
             }
             deviationSpan.textContent = category.categoryType === 1
-                ? `Windfall: ${window.userNumberFormat.format(deviationAmount)}`
+                ? `Surplus: ${window.userNumberFormat.format(deviationAmount)}`
                 : `Overspending: ${window.userNumberFormat.format(deviationAmount)}`;
 
         } else if (deviationDiv) {
@@ -354,26 +354,7 @@ export default class HomeDashboard {
         mainDiv.id = `category_${category.id}`;
         mainDiv.className = 'category';
         mainDiv.dataset.id = `${category.id}`;
-        mainDiv.dataset.type = `${category.categoryType}`;
-        mainDiv.dataset.name = `${category.name}`;
-        mainDiv.dataset.budget = `${category.budget}`;
-        mainDiv.dataset.fiscalplanid = `${category.fiscalPlanId}`;  
-
-        var menu = this.#menu;
-        mainDiv.addEventListener("click", function (event) {            
-            if (menu.dataset.categoryid != 0) {
-                var borderBox = document.getElementById(`category_${menu.dataset.categoryid}`).querySelector('.border-animation');
-                borderBox.classList.remove('border-rotate');
-            }
-            var y = Math.max(Math.min(event.pageY - 100, window.innerHeight - 200), 66);
-            menu.dataset.categoryid = `${category.id}`;
-            menu.dataset.type = `${ category.categoryType }`;
-            menu.style.left = `${mainDiv.style.left + event.pageX - 100}px`;
-            menu.style.top = `${y}px`;
-            menu.classList.add('active');
-
-            this.querySelector('.border-animation').classList.add('border-rotate');
-        });
+        mainDiv.addEventListener("click", this.#onCategoryClick.bind(this));
 
         var borderContainerDiv = document.createElement('div');
         borderContainerDiv.className = 'border-container';
@@ -413,7 +394,7 @@ export default class HomeDashboard {
             deviationSpan.id = `category_${category.id}_deviationText`;
             deviationSpan.className = 'deviation-text';
             deviationSpan.textContent = category.categoryType === 1
-                ? `Windfall: ${window.userNumberFormat.format(deviationAmount)}`
+                ? `Surplus: ${window.userNumberFormat.format(deviationAmount)}`
                 : `Overspending: ${window.userNumberFormat.format(deviationAmount)}`;
 
             deviationDiv.appendChild(deviationSpan);
@@ -457,6 +438,12 @@ export default class HomeDashboard {
         return mainDiv;
     }
 
+    getCategory(id) {
+        var categories = this.#data.incomeCategories.concat(this.#data.expenseCategories);
+        var category = categories.find(c => c.id == id);
+        return category;
+    }
+
     addCategory(category) {        
         var categoryDTO =
         {
@@ -485,7 +472,7 @@ export default class HomeDashboard {
     }
 
     editCategory(formData, month) {        
-        var type = parseInt(formData.get('type'));
+        var type = parseInt(formData.get('Type'));
         var id = parseInt(formData.get('Id'));
         var name = formData.get("Name");
         var budget = parseFloat(formData.get("Budget"));
@@ -542,11 +529,15 @@ export default class HomeDashboard {
 
     removeCategory(id, type) {        
         var categoryElement = document.getElementById(`category_${id}`);
-        categoryElement.remove();
 
-        if (!this.#data) {
+        if (!categoryElement) {
             return false;
         }
+
+        categoryElement.removeEventListener("click", this.#onCategoryClick)
+        categoryElement.remove();
+
+        var array;
 
         switch (type) {
             case 1:
@@ -564,6 +555,8 @@ export default class HomeDashboard {
         if (index !== -1) {
             array.splice(index, 1)
         }
+
+        return true;
     }
 
     addTransaction(transaction) {
@@ -603,11 +596,5 @@ export default class HomeDashboard {
     }
 
     getCurrentMonthUTC = () => this.#monthPicker.datepicker('getUTCDate');
-    getCurrentMonth = () => this.#monthPicker.datepicker('getDate');
-
-    getCategory(id) {
-        var categories = this.#data.incomeCategories.concat(this.#data.expenseCategories);
-        var category = categories.find(c => c.id == id);
-        return category;
-    }
+    getCurrentMonth = () => this.#monthPicker.datepicker('getDate');        
 }

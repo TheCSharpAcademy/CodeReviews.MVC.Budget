@@ -30,6 +30,21 @@ public class CategoriesService : ICategoriesService
         return _unitOfWork.CategoriesRepository.GetByID(id);
     }
 
+    public Task<Category?> GetCategoryWithBudgetLimit(int id, DateTime cutOffDate)
+    {       
+        return _unitOfWork.CategoriesRepository.GetCategoryWithBudgetLimits(id, c => c.PreviousBudgets.Where(s => cutOffDate <= s.Month));
+    }
+
+    public async Task<CategoryMonthDTO?> GetCategoryDataByMonth(int id, DateTime month)
+    {
+        var categoryDTO = await _unitOfWork.CategoriesRepository.GetCategoryDataByMonth(id, month);
+        if (categoryDTO != null)
+        {
+            categoryDTO.Month = month;
+        }
+        return categoryDTO;
+    }
+
     public Task<List<Category>> GetCategoriesWithUnevaluatedTransactions(int fiscalPlanId, int pageSize = 10)
     {
         var date = DateTime.UtcNow.AddDays(-14);
@@ -38,7 +53,7 @@ public class CategoriesService : ICategoriesService
         return _unitOfWork.CategoriesRepository.GetCategoriesWithFilteredTransactionsAsync(
                 c => c.FiscalPlanId == fiscalPlanId,
                 q => q.OrderBy(c => c.Name),
-                c => c.Transactions.Where(t => t.Evaluated == false && t.DateTime < cutOffDate)
+                c => c.Transactions.Where(t => t.IsEvaluated == false && t.DateTime < cutOffDate)
                                    .OrderBy(d => d.DateTime)
                                    .Take(pageSize));
     }
@@ -72,7 +87,7 @@ public class CategoriesService : ICategoriesService
     {
         if (categoryPut.Budget != category.Budget) 
         {
-            var currentBudget = category.PreviousBudgets.SingleOrDefault(b => b.Month.Month == month.Month && b.Month.Year == month.Year);
+            var currentBudget = category.PreviousBudgets.SingleOrDefault(b => b.Month.Year == month.Year && b.Month.Month == month.Month);
 
             if (currentBudget is null)
             {
@@ -104,10 +119,5 @@ public class CategoriesService : ICategoriesService
     {
         _unitOfWork.CategoriesRepository.Delete(category);
         await _unitOfWork.Save();
-    }
-
-    public Task<Category?> GetCategoryWithBudgetLimit(int id, Expression<Func<Category, IEnumerable<CategoryBudget>>> filter)
-    {
-        return _unitOfWork.CategoriesRepository.GetCategoryWithBudgetLimits(id, filter);
-    }
+    }    
 }

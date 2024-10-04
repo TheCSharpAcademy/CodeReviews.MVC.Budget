@@ -11,6 +11,10 @@ body {
     overflow: hidden;
 }
 
+svg * {
+    pointer-events: none;
+}
+
 .form-control {
     background-color: white !important;
     color: black !important;
@@ -75,10 +79,6 @@ body {
     width: 23px;
 }
 
-.add-category-icon * {
-    pointer-events: none;
-}
-
 .yearPicker, .monthPicker {
     justify-content: center;
     width: fit-content;
@@ -102,8 +102,16 @@ body {
     text-align: center;
 }
 
-//Spinners
+.datepicker {
+    color: $primary;
+}
 
+.datepicker table tr td span.active.active {
+    background-color: #608C94 !important;
+    border-color: #456977 !important;
+}
+
+//Spinners
 .spinner-container {
     display: flex;
     align-items: center;
@@ -214,14 +222,12 @@ $sidebar-gap: 8px;
     opacity: 0;
     transition: opacity 0.2s ease-out 0.4s, visibility 0.2s ease-out 0.4s;
     z-index: 1000;
-    pointer-events: none;
 }
 
 #menu-container.active {
-    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+    transition: opacity 0.2s ease-out, visibility 0.2s ease-out;
     visibility: visible;
     opacity: 1;
-    pointer-events: auto;
 }
 
 #menu {
@@ -235,57 +241,53 @@ $sidebar-gap: 8px;
     border-radius: 50%;
 }
 
-.toggle {
+.menu-option {
     position: absolute;
-    width: 65px;
-    height: 65px;
+    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
     border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 3px 4px rgba(0,0,0,0.15);
-    font-size: 2em;
-    color: black;
     background-color: rgba(255, 255, 255, 1);
+    transition: transform 0.4s ease;
+    backdrop-filter: blur(2.5px);
 }
 
-#menu-container .span-box {
-    position: absolute;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    left: 0;
+.close-menu {    
+    width: 65px;
+    height: 65px;
+    z-index: 10;
+    font-size: 2em;
+    color: black;
+}
+
+.span-box-menu {    
     width: 50px;
     height: 50px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 1);
+    left: 0;
     transform-origin: 100px;
-    transition: transform 0.4s ease;
     transform: rotate(0deg) translateX(80px);
 }
 
-#menu-container.active .span-box {
-    transform: rotate(calc(360deg / 4 * var(--i)));
-    transition: transform 0.4s ease 0.2s;
-}
-
-.menu .span-box svg {
+.svg-menu {
     transform: rotate(calc(360deg / -4 * var(--i)));
-    width: 30px;
-    height: 30px;
     color: black;
 }
 
-.menu .plus {
-    width: 40px !important;
-    height: 40px !important;
+#menu-container.active .span-box-menu {
+    transform: rotate(calc(360deg / 4 * var(--i)));
+}
+
+#menu-container.active .menu-option {
+    transition: transform 0.4s ease 0.2s, background-color 0.15s ease-in 0.07s;
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+#menu-container.active .menu-option:hover {
+    background-color: rgba(255, 255, 255, 1);
 }
 
 // Main Container
-
 .main-container {
     height: calc(100vh - 116px);
     padding-right: 0;
@@ -504,23 +506,9 @@ main {
     left: 50%;
     width: 75%;
     transform: translate(-50%, -50%);
-    border: groove 2px #d3d3d3;
     border-radius: $border-radius;
     text-align: center;
     background-color: $secondary;
-}
-
-#reevalInfo::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: -1;
-    margin: -$borderWidth;
-    border-radius: inherit;
-    background: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
 }
 
 #reevalInfoText {
@@ -528,6 +516,8 @@ main {
     text-align: center;
     margin: 0;
     background-color: $secondary;
+    border-radius: inherit;
+    
 }
 
 .reeval-col {
@@ -548,10 +538,12 @@ main {
 
 .transaction-body {
     min-height: 35px;
-    background-color: $secondary;
-    display: flex;
-    align-items: center;
     padding: 5px;
+    background-color: $secondary;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    align-items: center;
+    text-align: center;
 }
 
 .reevalIcon {
@@ -701,7 +693,7 @@ main {
     display: grid;
     grid-template-columns: 1fr;
     gap: 25px;
-    margin: 0 auto;
+    margin: 20px auto 0 auto;
     max-width: 800px;
 }
 
@@ -710,6 +702,7 @@ main {
     padding: 25px;
     border-radius: $border-radius;
     cursor: pointer;
+    transition: ease-in-out 0.2s;
 }
 
 .progress-container {
@@ -725,6 +718,26 @@ main {
     height: 200px;
     border-radius: $border-radius;
     border: 4px solid $secondary;
+    cursor: pointer;
+    transition: ease-in-out 0.2s;
+}
+
+.fiscalPlan-icon {
+    opacity: 0;
+    transition: 0.3s ease;
+}
+
+.fiscalPlan-icon:hover {
+    fill: url(#icon_gradient);
+    scale: 1.2;
+}
+
+.fiscalPlan-card:hover, .add-fiscalPlan-card:hover {
+    scale: 1.015;
+}
+
+.fiscalPlan-card:hover .fiscalPlan-icon {
+    opacity: 1;
     cursor: pointer;
 }
 
@@ -742,19 +755,14 @@ main {
 }
 
 .modalIcon {
-    width: 50px;
-    height: 50px;
-}
-
-.modalIconNecessity {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
 }
 
 .modalIconLabel {
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
 }
 
 .modalIconContainer {
@@ -803,10 +811,11 @@ main {
 
 
 @media (min-width: $small-screen-query) {
-    #action-sidebar {
+    #action-sidebar {        
         width: $sidebar-padding * 2 + $sidebar-icon-size;
         left: 0px;
-        top: calc(50% - calc(($sidebar-icon-size * 4 + $sidebar-gap * 3 + $sidebar-padding * 2) / 2));
+        top: 50%;
+        transform: translateY(-50%);
         flex-direction: column;
         justify-content: unset;
         border-radius: 0 $border-radius $border-radius 0;

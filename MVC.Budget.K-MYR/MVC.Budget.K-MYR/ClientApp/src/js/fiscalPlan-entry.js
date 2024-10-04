@@ -8,5 +8,5 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css';
 import '../scss/site.scss';
 
-import './site';
-import './fiscalPlan';
+import './site.js';
+import './fiscalPlan.js';

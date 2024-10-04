@@ -1,119 +1,132 @@
 ﻿@using System.Globalization
-@model MVC.Budget.K_MYR.Models.ViewModels.LayoutModel<Category>
+@model MVC.Budget.K_MYR.Models.ViewModels.LayoutModel<CategoryViewModel>
 
-
-@{
-    ViewData["Title"] = "Category";    
-    var monthlyTransactions = Model.PageModel.Transactions.Where(t => t.DateTime.Year == DateTime.UtcNow.Year && t.DateTime.Month == DateTime.UtcNow.Month);
-    var happyExpenses = monthlyTransactions.Where(t => t.IsHappy).Sum(t => t.Amount);
-    var necessaryExpenses = monthlyTransactions.Where(t => t.IsNecessary).Sum(t => t.Amount);
-    var expensesTotal = monthlyTransactions.Sum(t => t.Amount);
+@section Stylesheets {
+    @{
+        <link rel="stylesheet" href="~/dist/styles-index~fiscalPlan~category.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/dist/styles-fiscalPlan~category.css" asp-append-version="true" />
+    }
 }
 
-<section>
-    <div id="menu-container" data-transaction="0">
-        <div id="menu" class="menu">
-            @Html.AntiForgeryToken()
-            <span class="toggle" id="close-menu">
-                <svg class="close" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368" /></svg>
-            </span>
-            <span id="details-menu" class="span-box" style="--i:0">
-                <svg class="details" viewBox="0 0 512 512"><path d="M32 32v432a16 16 0 0016 16h432" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="96" y="224" width="80" height="192" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="240" y="176" width="80" height="240" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><rect x="383.64" y="112" width="80" height="304" rx="20" ry="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
-            </span>
-            <span id="add-menu" class="span-box" style="--i:1">
-                <svg class="plus" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112" /></svg>
-            </span>
-            <span id="edit-menu" class="span-box" style="--i:2">
-                <svg class="pen" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M364.13 125.25L87 403l-23 45 44.99-23 277.76-277.13-22.62-22.62zM420.69 68.69l-22.62 22.62 22.62 22.63 22.62-22.63a16 16 0 000-22.62h0a16 16 0 00-22.62 0z" /></svg>
-            </span>
-            <span id="delete-menu" class="span-box" style="--i:3">
-                <svg class="trash" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" /><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" /></svg>
-            </span>
-        </div>
-    </div>
-</section>
+@{
+    ViewData["Title"] = "Category";
+    var category = Model.PageModel.Category;
+    var isIncomeCategory = category.CategoryType == 1;
+}
 
-<section>
-    <div class="flip-container">
-        <div id="flip-container-inner" class="flip-container-inner">
-            <div class="flip-content" style="--s:0">
-                <div id="home">
-                    <div id="home-scrollcontainer">
-                        <div id="home-container">
-                            <div class="dashboard">
-                                <div class="dashboard-container">
-                                    <div class="chart-container">
-                                        <canvas id="chart" data-happy="@(happyExpenses.ToString("F2", CultureInfo.InvariantCulture))"
-                                                data-unhappy="@((expensesTotal - happyExpenses).ToString("F2", CultureInfo.InvariantCulture))">
-                                        </canvas>
-                                    </div>
-                                    <div class="chart-container">
-                                        <h1 class="text-center text-truncate">@Html.Encode(Model.PageModel.Name)</h1>
-                                        <h4 class="text-center">February 2024</h4>
-                                        <div class="dashboardStatistics mt-4">
-                                            <h5 class="text-center">Budget: @Model.PageModel.Budget.ToString("C2", Model.Culture) </h5>
-                                            <h5 class="text-center">Spent: @expensesTotal.ToString("C2", Model.Culture) </h5>
-                                            @{
-                                                var difference = Model.PageModel.Budget - expensesTotal;
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="visibility:hidden; position: absolute;">
+    <defs>
+        <linearGradient id="icon_gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#CCFBE5;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#A2D6CB;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#7EB1B1;stop-opacity:1" />
+        </linearGradient>
+        <radialGradient id="icon_gradient_radial" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="#CCFBE5" />
+            <stop offset="50%" stop-color="#A2D6CB" />
+            <stop offset="100%" stop-color="#7EB1B1" />
+        </radialGradient>
+    </defs>    
+    <symbol id="add-category-icon" viewBox="0 0 14 14">
+        <path fill="url(#icon_gradient_radial)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
+    </symbol>    
+</svg>
 
-                                                if (difference < 0)
-                                                {
-                                                    <h5 class="text-center">Overspending: @((-difference).ToString("C2", Model.Culture)) </h5>
-                                                }
-                                                else
-                                                {
-                                                    <h5 class="text-center">Available: @(difference.ToString("C2", Model.Culture)) </h5>
-                                                }
-                                            }
-                                        </div>
+<div id="action-sidebar">
+    <a asp-controller="Home" asp-action="FiscalPlan" asp-route-id="@category.FiscalPlanId" >
+        <div class="sidebar-button-container">
+            <svg class="sidebar-button" id="back-button" fill="#ffffff" xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 299.021 299.021">
+                <path d="M292.866,254.432c-2.288,0-4.443-1.285-5.5-3.399c-0.354-0.684-28.541-52.949-146.169-54.727v51.977 c0,2.342-1.333,4.48-3.432,5.513c-2.096,1.033-4.594,0.793-6.461-0.63L2.417,154.392C0.898,153.227,0,151.425,0,149.516 c0-1.919,0.898-3.72,2.417-4.888l128.893-98.77c1.87-1.426,4.365-1.667,6.461-0.639c2.099,1.026,3.432,3.173,3.432,5.509v54.776 c3.111-0.198,7.164-0.37,11.947-0.37c43.861,0,145.871,13.952,145.871,143.136c0,2.858-1.964,5.344-4.75,5.993 C293.802,254.384,293.34,254.432,292.866,254.432z" />
+            </svg>
+        </div>   
+    </a>
+</div>
+
+<div class="flip-container">
+    <div id="flip-container-inner" class="flip-container-inner">
+        <div class="flip-content" style="--s:0">
+            <div id="home" class="content-outer-container">
+                <div class="content-scrollcontainer">
+                    <div class="content-container">
+                        <div class="dashboard">
+                            <div class="dashboard-container">
+                                <div class="chart-container">
+                                    <canvas id="sentimentChart" data-happy="@(category.HappyTotal.ToString("F2", CultureInfo.InvariantCulture))"
+                                            data-unhappy="@((category.Total - category.HappyTotal).ToString("F2", CultureInfo.InvariantCulture))">
+                                    </canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h1 class="text-center text-truncate">@Html.Encode(category.Name)</h1>
+                                    <div class="input-group monthPicker mt-3">
+                                        <input id="monthSelector" type="text" class="monthSelector form-control" value="" aria-label="Month Selection" readonly>
+                                        <span class="input-group-text calendar-button"><i class="bi bi-calendar"></i></span>
                                     </div>
-                                    <div class="chart-container">
-                                        <canvas id="chart2" data-necessary="@(necessaryExpenses.ToString("F2", CultureInfo.InvariantCulture))"
-                                                data-unnecessary="@((expensesTotal - necessaryExpenses).ToString("F2", CultureInfo.InvariantCulture))">
-                                        </canvas>
+                                    <div class="dashboardStatistics mt-4">
+                                        @{
+                                            var budget = category.BudgetLimit?.Budget ?? category.Budget;
+                                            var difference = budget - category.Total;
+                                            var totalHeader = isIncomeCategory ? "Income" : "Expenses";
+                                            var budgetHeader = isIncomeCategory ? "Goal" : "Budget";
+                                        }
+                                        <h5 class="text-center" id="budget-header">@budgetHeader: @budget.ToString("C2", Model.Culture) </h5>
+                                        <h5 class="text-center" id="total-header">@totalHeader: @category.Total.ToString("C2", Model.Culture) </h5>                                        
+                                        @if (difference < 0)
+                                        {
+                                            var differenceHeader = isIncomeCategory ? "Surplus" : "Overspending";
+                                            <h5 class="text-center" id="difference-header">@differenceHeader: @((-difference).ToString("C2", Model.Culture)) </h5>
+                                        }
+                                        else
+                                        {
+                                            var differenceHeader = isIncomeCategory ? "Missing" : "Available";
+                                            <h5 class="text-center" id="difference-header">@differenceHeader: @(difference.ToString("C2", Model.Culture)) </h5>
+                                        }
+                                        
                                     </div>
                                 </div>
+                                <div class="chart-container">
+                                    <canvas id="necessityChart" data-necessary="@(category.NecessaryTotal.ToString("F2", CultureInfo.InvariantCulture))"
+                                            data-unnecessary="@((category.Total - category.NecessaryTotal).ToString("F2", CultureInfo.InvariantCulture))">
+                                    </canvas>
+                                </div>
                             </div>
+                        </div>
 
-
-
-                            <div class="accordion my-2" id="transactions" data-id="@Model.PageModel.Id">
-                                <div class="accordion-item">
-                                    <div id="accordion-head-transaction" class="accordion-head d-flex">
-                                        <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
-                                            Transactions
-                                        </h5>
-                                        <img class="add-icon ms-auto" src="~/img/svg/plus.svg" alt="" width="20px;" />
-                                        <div class="accordion-caret rotate"></div>
-                                    </div>
-                                    <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
-                                        <div class="accordion-body">
-                                            @foreach (var transaction in monthlyTransactions)
-                                            {
-                                                <div id="transaction_@transaction.Id" class="transaction"
-                                                     data-id="@transaction.Id"
-                                                     data-amount="@transaction.Amount.ToString("F2", CultureInfo.InvariantCulture)"
-                                                     data-date="@transaction.DateTime.ToString("yyyy-MM-ddTHH:mm")"
-                                                     data-title="@Html.Encode(transaction.Title)"
-                                                     data-categoryId="@transaction.CategoryId"
-                                                     data-isHappy="@transaction.IsHappy"
-                                                     data-isNecessary="@transaction.IsNecessary"
-                                                     data-evaluated="@transaction.Evaluated"
-                                                     data-evaluatedIsHappy="@transaction.PreviousIsHappy"
-                                                     data-evaluatedIsNecessary="@transaction.PreviousIsNecessary">
-
-                                                    <div class="border-container">
-                                                        <div class="content">
-                                                            <div class="category-body">
-                                                                <div>@Html.Encode(transaction.Title)</div>
-                                                                <div class="transaction-date">@transaction.DateTime.ToShortDateString()</div>
-                                                                <div class="transaction-value">@transaction.Amount.ToString("C2", Model.Culture)</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="border-animation"></div>
-                                                    </div>
-                                                </div>
-                                            }
+                        <div class="accordion my-2" id="transactions">
+                            <div class="accordion-item">
+                                <div id="accordion-head-transaction" class="accordion-head d-flex">
+                                    <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
+                                        Transactions
+                                    </h5>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="add-category-icon" viewBox="0 0 14 14" height="23" width="23">
+                                        <use href="#add-category-icon" xlink:href="#add-category-icon" />
+                                    </svg>
+                                    <div class="accordion-caret rotate"></div>
+                                </div>
+                                <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
+                                    <div class="accordion-body">
+                                        <div id="table-container" style="display: none">
+                                            <table class="table table-hover table-borderless w-100 px-2" id="transactions-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            Title
+                                                        </th>
+                                                        <th>
+                                                            Date
+                                                        </th>
+                                                        <th>
+                                                            Amount
+                                                        </th>
+                                                        <th>
+                                                            Category
+                                                        </th>
+                                                        <th>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -124,6 +137,16 @@
             </div>
         </div>
     </div>
-</section>
+</div>
 
 @await Html.PartialAsync("_TransactionModals", new Transaction())
+<input id="category_Id" type="hidden" value="@category.Id" data-object='@Json.Serialize(Model.PageModel.Category)'>
+
+@section Scripts {
+    @{
+        <script src="~/dist/runtime.js" asp-append-version="true"></script>
+        <script src="~/dist/vendors-index~fiscalPlan~category.js" asp-append-version="true"></script>
+        <script src="~/dist/vendors-category.js" asp-append-version="true"></script>
+        <script src="~/dist/category.js" asp-append-version="true"></script>
+    }
+}

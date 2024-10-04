@@ -1,9 +1,9 @@
 ﻿@using System.Globalization
-@model MVC.Budget.K_MYR.Models.ViewModels.LayoutModel<MVC.Budget.K_MYR.Models.ViewModels.HomeModel>
+@model MVC.Budget.K_MYR.Models.ViewModels.LayoutModel<MVC.Budget.K_MYR.Models.ViewModels.IndexViewModel>
 
 @section Stylesheets {
     @{
-        <link rel="stylesheet" href="~/dist/styles-index~fiscalPlan.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/dist/styles-index~fiscalPlan~category.css" asp-append-version="true" />
     }
 }
 
@@ -11,18 +11,44 @@
     ViewData["Title"] = "Budgets";
 }
 
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="visibility:hidden; position: absolute;">
+    <defs>
+        <linearGradient id="icon_gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#CCFBE5;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#A2D6CB;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#7EB1B1;stop-opacity:1" />
+        </linearGradient>        
+    </defs>    
+    <symbol xmlns="http://www.w3.org/2000/svg" id="edit-icon" viewBox='0 0 16 16'>
+        <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z' />
+        <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z' />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="trash-icon" viewBox="0 0 16 16">
+        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+    </symbol>
+</svg>
+
 <div class="content-outer-container" id="fiscalPlans-container">
     <div class="content-scrollcontainer">
         <div class="content-container">
             <div class="cards-container">                        
                 @foreach(var fiscalPlan in Model.PageModel.FiscalPlans)
-                {
-                    var progressbarWidthIncome = (int)Math.Min(100, fiscalPlan.TotalIncome / fiscalPlan.BudgetIncome * 100); ;
-                    var progressbarWidthExpenses = (int)Math.Min(100, fiscalPlan.TotalExpenses / fiscalPlan.BudgetExpenses * 100);
+                {                    
+                    int progressbarWidthIncome = fiscalPlan.BudgetIncome > 0 ? (int)Math.Min(100, fiscalPlan.TotalIncome / fiscalPlan.BudgetIncome * 100) : 100;
+                    int progressbarWidthExpenses = fiscalPlan.BudgetExpenses > 0 ? (int)Math.Min(100, fiscalPlan.TotalExpenses / fiscalPlan.BudgetExpenses * 100) : 100;
                     var color = progressbarWidthExpenses < 50 ? "bg-success" : progressbarWidthExpenses < 85 ? "bg-warning" : "bg-danger";
 
-                    <div class="fiscalPlan-card" data-id="@fiscalPlan.Id">
-                        <h1 class="text-center">@fiscalPlan.Name</h1>
+                    <div class="fiscalPlan-card" id="fiscalPlan-card_@fiscalPlan.Id" data-id="@fiscalPlan.Id" data-name="@fiscalPlan.Name">
+                        <div class="d-flex justify-content-between">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon" fill="#ffffff" data-action="edit">
+                                <use href="#edit-icon" xlink:href="#edit-icon"/>
+                            </svg>
+                            <h1 id="fiscalPlan-header_@fiscalPlan.Id" class="text-center">@fiscalPlan.Name</h1>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon" fill="#ffffff" data-action="delete">
+                                <use href="#trash-icon" xlink:href="#trash-icon"/>
+                            </svg>
+                        </div>
                         <div class="progress-container">
                             <div>
                                 <div class="d-flex justify-content-between">
@@ -72,7 +98,7 @@
 @section Scripts {
     @{
         <script src="~/dist/runtime.js" asp-append-version="true"></script>
-        <script src="~/dist/vendors-index~fiscalPlan.js" asp-append-version="true"></script>
+        <script src="~/dist/vendors-index~fiscalPlan~category.js" asp-append-version="true"></script>
         <script src="~/dist/index.js" asp-append-version="true"></script>
     }
 }

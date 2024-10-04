@@ -46,6 +46,11 @@ public sealed class TransactionsRepository : GenericRepository<Transaction>, ITr
         {
             Id = t.Id,
             Title = t.Title,
+            IsEvaluated = t.IsEvaluated,
+            IsHappy = t.IsHappy,
+            IsNecessary = t.IsNecessary,
+            PreviousIsHappy = t.PreviousIsHappy,
+            PreviouseIsNecessary = t.PreviousIsNecessary,
             Amount = t.Amount,
             Description = t.Description,
             DateTime = t.DateTime,

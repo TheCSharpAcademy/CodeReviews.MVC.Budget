@@ -35,9 +35,9 @@ public class FiscalPlansService : IFiscalPlansService
         return _unitOfWork.FiscalPlansRepository.GetByID(id);
     }
 
-    public async Task<FiscalPlanMonthDTO> GetDataByMonth(FiscalPlan fiscalPlan, DateTime Month)
+    public async Task<FiscalPlanMonthDTO> GetDataByMonth(FiscalPlan fiscalPlan, DateTime month)
     {
-        var categorieData = await _unitOfWork.CategoriesRepository.GetDataByMonth(fiscalPlan.Id, Month);
+        var categorieData = await _unitOfWork.CategoriesRepository.GetCategoriesDataByMonth(fiscalPlan.Id, month);
         var incomeCategories = new List<CategoryDTO>();
         var expenseCategories = new List<CategoryDTO>();
 
@@ -65,7 +65,7 @@ public class FiscalPlansService : IFiscalPlansService
 
         return new FiscalPlanMonthDTO
         {
-            Month = Month,
+            Month = month,
             Name = fiscalPlan.Name,
             Id = fiscalPlan.Id,
             IncomeCategories = [.. incomeCategories.OrderBy(c => c.Name)],
@@ -82,7 +82,7 @@ public class FiscalPlansService : IFiscalPlansService
 
     public async Task<FiscalPlanYearDTO> GetDataByYear(int fiscalPlanId, int year)
     {
-        var categoryStatistics = await _unitOfWork.CategoriesRepository.GetDataByYear(fiscalPlanId, year);
+        var categoryStatistics = await _unitOfWork.CategoriesRepository.GetCategoriesDataByYear(fiscalPlanId, year);
 
         if(categoryStatistics.Count == 0)
         {

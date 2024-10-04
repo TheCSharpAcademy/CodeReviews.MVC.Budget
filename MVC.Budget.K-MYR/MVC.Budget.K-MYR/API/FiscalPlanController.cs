@@ -50,8 +50,8 @@ public class FiscalPlanController : ControllerBase
         return Ok(fiscalPlanDTO);
     }
 
-    [HttpGet("{id:int}/{year:int}")]
-    public async Task<ActionResult<FiscalPlanYearDTO>> GetDataByYear([FromRoute] int id, [FromRoute] int year)
+    [HttpGet("{id:int}/YearlyData")]
+    public async Task<ActionResult<FiscalPlanYearDTO>> GetDataByYear([FromRoute] int id, [FromQuery] int year)
     {
         var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
@@ -80,7 +80,7 @@ public class FiscalPlanController : ControllerBase
         return CreatedAtAction(nameof(Category), new { id = fiscalPlan.Id }, fiscalPlan);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     [ValidateAntiForgeryToken]
     public async Task<ActionResult> PutFiscalPlan([FromRoute] int id, [Bind("Name,Id")] FiscalPlanPut fiscalPlanPut)
     {
@@ -89,7 +89,6 @@ public class FiscalPlanController : ControllerBase
 
         if (!ModelState.IsValid)
             return BadRequest();
-
 
         var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 

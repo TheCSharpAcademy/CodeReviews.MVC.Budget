@@ -1,5 +1,4 @@
-﻿import 'jquery-validation';
-import { getUnevaluatedTransactions, getCategoriesWithUnevaluatedTransactions, patchTransactionEvaluation } from './api';
+﻿import { getUnevaluatedTransactions, patchTransactionEvaluation } from './api';
 export default class ReevaluationDashboard {
     #data;
     #isLoading;
@@ -7,12 +6,12 @@ export default class ReevaluationDashboard {
     #container;
     #infoDiv;
 
-    constructor(id) {
+    constructor() {
         this.#data = null;   
-        this.#initPromise = this.#init(id);
+        this.#initPromise = this.#init();
     }
 
-    async #init(id) {
+    async #init() {
         try {
             this.#isLoading = true;
             this.#container = document.getElementById("reevalCategories-container");
@@ -26,18 +25,13 @@ export default class ReevaluationDashboard {
         }
     }
 
-    async #getData(id) {
-        var categories = await getCategoriesWithUnevaluatedTransactions(id);
-        return categories;
-    }
-
     async #reevaluateTransaction(form) {
-        var formData = new FormData(form);
+        var formData = new FormData(form);        
         var id = formData.get('Id');
         var element = document.getElementById(`reeval_transaction_${id}`);
         var previousIsHappy = element.dataset.ishappy === 'true';
         var previousIsNecessary = element.dataset.isnecessary === 'true';
-        var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary);
+        var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary);        
 
         if (IsPatched) {
             let accordionBody = form.closest(".accordion-body");
@@ -135,18 +129,15 @@ export default class ReevaluationDashboard {
         titleDiv.textContent = decodeURIComponent(transaction.title);
 
         var dateDiv = document.createElement('div');
-        dateDiv.className = 'ms-2 ';
         dateDiv.id = `transaction_date_${transaction.id}`;
         dateDiv.textContent = new Date(transaction.dateTime).toLocaleDateString(window.userLocale);
 
         var amountDiv = document.createElement('div');
         amountDiv.id = `transaction_amount_${transaction.id}`;
-        amountDiv.className = 'transaction-amount ms-2 me-auto';
         amountDiv.textContent = window.userNumberFormat.format(transaction.amount);
 
         var transactionForm = document.createElement('form');
         transactionForm.id = `reevaluate-transaction-form_${transaction.id}`;
-        transactionForm.className = 'reevaluate-transaction-form';
         transactionForm.setAttribute('novalidate', 'novalidate');
         transactionForm.addEventListener("submit", this.#onReevaluate.bind(this));
 
@@ -160,7 +151,7 @@ export default class ReevaluationDashboard {
         wrapperDiv.className = 'd-flex justify-content-around';
 
         var innerWrapper1 = document.createElement('div');
-        innerWrapper1.className = 'me-3 d-flex align-items-center';
+        innerWrapper1.className = 'd-flex align-items-center';
 
         var isHappyTrueInput = document.createElement('input');
         isHappyTrueInput.type = 'radio';
@@ -204,7 +195,7 @@ export default class ReevaluationDashboard {
         isUnhappyImg.className = "reevalIcon";
 
         var innerWrapper2 = document.createElement('div');
-        innerWrapper2.className = 'me-3 d-flex align-items-center';
+        innerWrapper2.className = 'd-flex align-items-center';
 
         var isNecessaryTrueInput = document.createElement('input');
         isNecessaryTrueInput.type = 'radio';
@@ -299,56 +290,7 @@ export default class ReevaluationDashboard {
         transactionBody.appendChild(transactionForm);
 
         return transactionBody;
-    }
-    
-    #createReevaluationElement(category) {
-        let self = this;
-        var accordion = document.createElement("div");
-        accordion.classList.add("accordion");
-
-        var accordionItem = document.createElement("div");
-        accordionItem.classList.add("accordion-item");
-
-        var accordionHeader = document.createElement("h5");
-        accordionHeader.id = `accordionHeader_${category.id}`;
-        accordionHeader.textContent = `${decodeURIComponent(category.name)}`;
-        accordionHeader.classList.add("accordion-header", "me-auto")
-        var accordionCaret = document.createElement("div");
-        accordionCaret.classList.add("accordion-caret", "rotate");
-
-        var accordionHead = document.createElement("div");
-        accordionHead.id = `accordion-head_${category.id}`;
-        accordionHead.classList.add("accordion-head", "d-flex");       
-
-        var accordionCollapse = document.createElement("div");
-        accordionCollapse.classList.add("accordion-collapse", "collapse", "show");
-        accordionCollapse.setAttribute("aria-labelledby", `accordionHeader_${category.id}`)
- 
-        var accordionBody = document.createElement("div");
-        accordionBody.classList.add("accordion-body");     
-
-        var submitButtonSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        submitButtonSvg.setAttribute('class', 'reeval-submit-svg');
-        submitButtonSvg.setAttribute('viewBox', '0 0 24 24');
-        submitButtonSvg.setAttribute('height', '40');
-        submitButtonSvg.setAttribute('width', '40');
-        submitButtonSvg.innerHTML = `<circle cx="12" cy="12" r="11.5" stroke-width="1"></circle>
-                            <path d="M8.5 12.5L10.5 14.5L15.5 9.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;
-
-        for (var i = 0; i < category.transactions.length; i++) {
-            let transactionElement = this.#createTransactionElement(category.transactions[i]);
-            accordionBody.appendChild(transactionElement);
-        }
-
-        accordionHead.appendChild(accordionHeader);
-        accordionHead.appendChild(accordionCaret);
-        accordionCollapse.appendChild(accordionBody);
-        accordionItem.appendChild(accordionHead);
-        accordionItem.appendChild(accordionCollapse);
-        accordion.appendChild(accordionItem);
-
-        return accordion;
-    }
+    }   
 
     #createTransactionElements(data, accordion, beforeElement) { 
         if (data && accordion) {

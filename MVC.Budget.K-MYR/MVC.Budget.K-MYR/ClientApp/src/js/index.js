@@ -1,29 +1,15 @@
-﻿import { importBootstrapModals } from './asyncComponents';
-import { addFiscalPlan } from './api'
+﻿import { PAGE_ROUTES } from './config';
+import { importBootstrapModals } from './asyncComponents';
+import { putFiscalPlan, deleteFiscalPlan, postFiscalPlan } from './api'
 
 formatDashboard();
-const fiscalPlanApi = "https://localhost:7246/api/FiscalPlan";
-const modals = importBootstrapModals().then((modalsArray) => {
-    let modal = modalsArray.find(m => m._element.id == "addFiscalPlan-modal");
-    document.getElementById("addFiscalPlan-card").addEventListener('click', function () {
-        modal.show();
-    });
-    document.getElementById("addFiscalPlan-form").addEventListener('submit', async function (event) {
-        event.preventDefault();
-        if ($(this).valid()) {
-            modal.hide();
-            await addFiscalPlan(new FormData(this));
-        }
-    })
- });
 
-$('.fiscalPlan-card').on('click', function (event) {
-    window.location.href = `https://localhost:7246/FiscalPlan/${this.dataset.id}`;
-});
+const modals = importBootstrapModals();
+setupModalHandlers();
 
 window.addEventListener('countryChanged', () => {
     formatDashboard();
-})
+});
 
 function formatDashboard() {
     var cards = $('.fiscalPlan-card');
@@ -34,4 +20,87 @@ function formatDashboard() {
         let expensesText = document.getElementById(`fiscalPlan_${id}_expenses`);
         expensesText.textContent = `${window.userNumberFormat.format(expensesText.dataset.total)} / ${window.userNumberFormat.format(expensesText.dataset.budget)}`;
     }
+}
+
+function updateFiscalPlan(formData) {
+    var id = formData.get('Id');
+    var name = formData.get('Name');
+    var header = document.getElementById(`fiscalPlan-header_${id}`);
+    header.textContent = name;
+}
+
+function removeFiscalPlan(id) {
+    var element = document.getElementById(`fiscalPlan-card_${id}`);
+    if (element) {
+        $(element).off();
+        element.remove();
+    }
+}
+
+async function setupModalHandlers() {
+    var modalsArray = await modals;
+    var addModal = modalsArray.find(m => m._element.id == 'addFiscalPlan-modal');
+    var updateModal = modalsArray.find(m => m._element.id == 'updateFiscalPlan-modal');
+    var updateModalLabel = document.getElementById('updateFiscalPlan-label');
+    var updateModalId = document.getElementById('updateFiscalPlan_id');
+    var updateModalName = document.getElementById('updateFiscalPlan_name');
+    var deleteModal = modalsArray.find(m => m._element.id == 'deleteFiscalPlan-modal');
+    var deleteModalLabel = document.getElementById('deleteFiscalPlan-label');
+    var deleteModalId = document.getElementById('deleteFiscalPlan_id');
+
+    document.getElementById('addFiscalPlan-card').addEventListener('click', function () {
+        addModal.show();
+    });
+    document.getElementById('addFiscalPlan-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            addModal.hide();
+            await postFiscalPlan(new FormData(this));
+        }
+    });
+
+    document.getElementById('updateFiscalPlan-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        if ($(this).valid()) {
+            updateModal.hide();
+            let formData = new FormData(this);
+            let isUpdated = await putFiscalPlan(formData);
+            if (isUpdated) {
+                updateFiscalPlan(formData);
+            }
+        }
+    });
+
+    document.getElementById('deleteFiscalPlan-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        deleteModal.hide();
+        var formData = new FormData(this);
+        var id = formData.get('Id');
+        var token = formData.get('__RequestVerificationToken');
+        var isDeleted = await deleteFiscalPlan(id, token);
+        if (isDeleted) {
+            removeFiscalPlan(id);
+        }
+    });
+
+    $('.fiscalPlan-card').on('click', function (event) {
+        if (event.target.matches('.fiscalPlan-icon')) {
+            switch (event.target.dataset.action) {
+                case 'delete':
+                    deleteModalLabel.textContent = `Delete '${this.dataset.name}'?`;
+                    deleteModalId.value = this.dataset.id;
+                    deleteModal.show();
+                    break;
+                case 'edit':
+                    updateModalLabel.textContent = `Edit '${this.dataset.name}'`;
+                    updateModalId.value = this.dataset.id;
+                    updateModalName.value = this.dataset.name;
+                    updateModal.show();
+                    break;
+            }
+        }
+        else {
+            window.location.href = PAGE_ROUTES.FISCAL_PLAN(this.dataset.id);
+        }
+    });
 }

@@ -8,7 +8,6 @@ document.getElementById("country-form").onsubmit = (event) => {
     event.stopPropagation();
 } 
 
-
 async function initializeCountrySelect() {
     var countrySelect = await getCountrySelect("#country");  
     countrySelect.countrySelect("selectCountry", window.userLocale.region.toLowerCase());

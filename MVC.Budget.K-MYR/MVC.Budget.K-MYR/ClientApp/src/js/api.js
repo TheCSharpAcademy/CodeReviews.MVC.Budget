@@ -1,16 +1,11 @@
-﻿const incomeCategoriesAPI = "https://localhost:7246/api/IncomeCategories";
-const expenseCategoriesAPI = "https://localhost:7246/api/ExpenseCategories";
-const transactionsAPI = "https://localhost:7246/api/Transactions";
-const fiscalPlanAPI = "https://localhost:7246/api/FiscalPlan";
-const homeController = "https://localhost:7246/Country";
-
+﻿import { API_ROUTES } from './config';
 export async function getCountryCookie(countryISOCode, token) {
     try {
-        var response = await fetch(homeController, {
-            method: "POST",
+        var response = await fetch(API_ROUTES.COUNTRY, {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": token
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
             },
             body: JSON.stringify(countryISOCode)
         });
@@ -27,16 +22,16 @@ export async function getCountryCookie(countryISOCode, token) {
     }    
 }
 
-export async function addFiscalPlan(formData) {
+export async function postFiscalPlan(formData) {
     try {
-        var response = await fetch(`${fiscalPlanApi}`, {
-            method: "POST",
+        var response = await fetch(API_ROUTES.fiscalPlans.BASE, {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": formData.get('__RequestVerificationToken')
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': formData.get('__RequestVerificationToken')
             },
             body: JSON.stringify({
-                Name: formData.get("Name"),
+                Name: formData.get('Name'),
             })
         });
 
@@ -53,10 +48,63 @@ export async function addFiscalPlan(formData) {
     }
 }
 
-export async function getFiscalPlanDataByMonth(id, date) {
+export async function putFiscalPlan(formData) {
     try {
-        var response = await fetch(`${fiscalPlanAPI}/${id}/MonthlyData?Month=${date.toISOString() ?? new Date().toISOString()}`, {
-            method: "GET",
+        var id = formData.get('Id');
+        var response = await fetch(API_ROUTES.fiscalPlans.BY_ID(id), {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': formData.get('__RequestVerificationToken'),
+            },
+            body: JSON.stringify({
+                Id: id,
+                Name: formData.get('Name'),
+            }),
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            console.error(`HTTP PUT Error: ${response.status}`);
+            return false;
+        }
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+}
+
+export async function deleteFiscalPlan(id, token) {
+    try {
+        var response = await fetch(API_ROUTES.fiscalPlans.BY_ID(id), {
+            method: 'DELETE',
+            headers: {
+                'RequestVerificationToken': token
+            }
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            console.error(`HTTP Delete Error: ${response.status}`);
+            return false;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+}
+
+export async function getFiscalPlanDataByMonth(id, date = new Date()) {
+    try {
+        var formattedDate = date instanceof Date ? date.toISOString() : new Date().toISOString();
+        var queryParams = new URLSearchParams({
+            Month: formattedDate
+        });   
+        var response = await fetch(API_ROUTES.fiscalPlans.GET_MONTHLY_DATA(id, queryParams), {
+            method: 'GET',
         });
 
         if (response.ok) {
@@ -71,10 +119,14 @@ export async function getFiscalPlanDataByMonth(id, date) {
     }
 }
 
-export async function getFiscalPlanDataByYear(id, year) {
+export async function getFiscalPlanDataByYear(id, date = new Date()) {
     try {
-        var response = await fetch(`${fiscalPlanAPI}/${id}/${year.getFullYear()}`, {
-            method: "GET"
+        var year = date instanceof Date ? date.getFullYear() : new Date().getFullYear();
+        var queryParams = new URLSearchParams({
+            Year: year
+        });
+        var response = await fetch(API_ROUTES.fiscalPlans.GET_YEARLY_DATA(id, queryParams), {
+            method: 'GET'
         });
 
         if (response.ok) {
@@ -91,19 +143,19 @@ export async function getFiscalPlanDataByYear(id, year) {
 
 export async function postTransaction(formData) {
     try {
-        var response = await fetch(`${transactionsAPI}`, {
-           method: "POST",
+        var response = await fetch(API_ROUTES.transactions.BASE, {
+           method: 'POST',
            headers: {
-               "Content-Type": "application/json",
-               "RequestVerificationToken": formData.get('__RequestVerificationToken')
+               'Content-Type': 'application/json',
+               'RequestVerificationToken': formData.get('__RequestVerificationToken')
            },
            body: JSON.stringify({
-               Title: formData.get("Title"),
-               Amount: parseFloat(formData.get("Amount")),
-               DateTime: formData.get("DateTime"),
-               IsHappy: formData.get("IsHappy") === "true" ? true : false,
-               IsNecessary: formData.get("IsNecessary") === "true" ? true : false,
-               CategoryId: parseInt(formData.get("CategoryId"))
+               Title: formData.get('Title'),
+               Amount: parseFloat(formData.get('Amount')),
+               DateTime: formData.get('DateTime'),
+               IsHappy: formData.get('IsHappy') === 'true',
+               IsNecessary: formData.get('IsNecessary') === 'true',
+               CategoryId: parseInt(formData.get('CategoryId'))
            })
         });
 
@@ -120,72 +172,98 @@ export async function postTransaction(formData) {
     }
 }
 
-export async function getTransactions(formData) {
+export async function putTransaction(formData) {
     try {
-        var response = await fetch(`${transactionsAPI}/search`, {
-            method: "POST",
+        var id = parseInt(formData.get('Id'));
+        var response = await fetch(API_ROUTES.transactions.BY_ID(id), {
+            method: 'PUT',
             headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": formData.get('__RequestVerificationToken')
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': formData.get('__RequestVerificationToken')
             },
             body: JSON.stringify({
-                FiscalPlanId: parseInt(formData.get("FiscalPlanId")),
-                SearchString: formData.get("SearchString"),
-                CategoryId: parseInt(formData.get("CategoryId")),
-                MinDate: formData.get("MinDate"),
-                MaxDate: formData.get("MaxDate"),
-                MinAmount: parseFloat(formData.get("MinAmount")),
-                MaxAmount: parseFloat(formData.get("MaxAmount"))
+                Id: id,
+                Title: formData.get('Title'),
+                Amount: parseFloat(formData.get('Amount')),
+                DateTime: formData.get('DateTime'),
+                IsHappy: formData.get('IsHappy') === 'true',
+                IsNecessary: formData.get('IsNecessary') === 'true',
+                IsEvaluated: formData.get('IsEvaluated') === 'true',
+                PreviousIsHappy: formData.get('PreviousIsHappy') === 'true',
+                PreviousIsNecessary: formData.get('PreviousIsNecessary') === 'true',
+                CategoryId: parseInt(formData.get('CategoryId'))
             })
         });
 
         if (response.ok) {
-            return await response.json();
+            return true;
         } else {
-            console.error(`HTTP POST Error: ${response.status}`);
-            return null;
+            console.error(`HTTP PUT Error: ${response.status}`);
+            return false;
         }
 
     } catch (error) {
         console.error(error);
-        return null;
+        return false;
+    }
+}
+
+export async function deleteTransaction(id, token) {
+    try {        
+        var response = await fetch(API_ROUTES.transactions.BY_ID(id), {
+            method: 'DELETE',
+            headers: {
+                'RequestVerificationToken': token
+            }
+        });
+
+        if (response.ok) {
+            return true;
+        } else {
+            console.error(`HTTP Delete Error: ${response.status}`);
+            return false;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return false;
     }
 }
 
 export async function patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary) {
     try {
-        var id = parseInt(formData.get("Id"));
+        var id = formData.get('Id');
 
         var patchDoc =
             [{
-                op: "replace",
-                path: "/IsHappy",
-                value: formData.get("IsHappy") === "true"
+                op: 'replace',
+                path: '/IsHappy',
+                value: formData.get('IsHappy') === 'true'
             },
             {
-                op: "replace",
-                path: "/IsNecessary",
-                value: formData.get("IsNecessary") === "true"
+                op: 'replace',
+                path: '/IsNecessary',
+                value: formData.get('IsNecessary') === 'true'
             }, {
-                op: "replace",
-                path: "/PreviousIsHappy",
+                op: 'replace',
+                path: '/PreviousIsHappy',
                 value: previousIsHappy
             },
             {
-                op: "replace",
-                path: "/PreviousIsNecessary",
+                op: 'replace',
+                path: '/PreviousIsNecessary',
                 value: previousIsNecessary
             },
             {
-                op: "replace",
-                path: "/Evaluated",
+                op: 'replace',
+                path: '/IsEvaluated',
                 value: true
             }];
 
-        var response = await fetch(`${transactionsAPI}/${id}`, {
-            method: "PATCH",
+        var response = await fetch(API_ROUTES.transactions.BY_ID(id), {
+            method: 'PATCH',
             headers: {
-                "Content-Type": "application/json-patch+json"
+                'Content-Type': 'application/json-patch+json'
             },
             body: JSON.stringify(patchDoc)
         });
@@ -203,18 +281,97 @@ export async function patchTransactionEvaluation(formData, previousIsHappy, prev
     };
 }
 
+export async function getUnevaluatedTransactions(categoryId, lastDate, lastId, pageSize) {
+    try {
+        var queryParams = new URLSearchParams({
+            categoryId: categoryId,
+            pageSize: pageSize
+        });
+
+        if (lastDate) {
+            queryParams.append('lastDate', lastDate)
+        }
+
+        if (lastId) {
+            queryParams.append('lastId', lastId)
+        }
+
+        var response = await fetch(API_ROUTES.transactions.GET_UNEVALUATED(queryParams), {
+            method: 'GET'
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error(`HTTP GET Error: ${response.status}`);
+            return null;
+        }
+
+    } catch (error) {
+        console.error(error);
+        return null;
+    };
+}
+
+export async function getCategoryDataByMonth(id, date = new Date(), type) {
+    try {
+        var formattedDate = date instanceof Date ? date.toISOString() : new Date().toISOString();
+        var queryParams = new URLSearchParams({
+            Month: formattedDate
+        });
+        var url;
+        switch (type) {
+            case 1:           
+                url = API_ROUTES.incomeCategories.GET_MONTHLY_DATA(id, queryParams);
+                break;
+            case 2:
+                url = API_ROUTES.expenseCategories.GET_MONTHLY_DATA(id, queryParams);
+                break;
+            default:
+                console.error(`Invalid value '${type}' for 'type' field`);
+                return null;
+        }
+        var response = await fetch(url, {
+            method: 'GET',
+        });
+
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error(`HTTP GET Error: ${response.status}`);
+            return null;
+        }
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
 export async function postCategory(formData) {
     try {
-        var response = await fetch(`${formData.get("type") == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}`, {
-            method: "POST",
+        var type = parseInt(formData.get('type'));
+        var url;
+        switch (type) {
+            case 1:
+                url = API_ROUTES.incomeCategories.BY_ID(id);
+                break;
+            case 2:
+                url = API_ROUTES.expenseCategories.BY_ID(id);
+                break;
+            default:
+                console.error(`Invalid value '${type}' for 'type' field`);
+                return false;
+        }        
+        var response = await fetch(url, {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": formData.get('__RequestVerificationToken')
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': formData.get('__RequestVerificationToken')
             },
             body: JSON.stringify({
-                Name: formData.get("Name"),
-                Budget: parseFloat(formData.get("Budget")),
-                FiscalPlanId: parseInt(formData.get("FiscalPlanId"))
+                Name: formData.get('Name'),
+                Budget: parseFloat(formData.get('Budget')),
+                FiscalPlanId: parseInt(formData.get('FiscalPlanId'))
             })
         });
 
@@ -231,25 +388,39 @@ export async function postCategory(formData) {
     }
 }
 
-export async function putCategory(formData, month) {
+export async function putCategory(formData, date = new Date()) {
     try {
-        var id = parseInt(formData.get("Id"));
-        let queryParams = new URLSearchParams({
-            Month: month
-        });        
+        var id = parseInt(formData.get('Id'));
+        var formattedDate = date instanceof Date ? date.toISOString() : new Date().toISOString();
+        var queryParams = new URLSearchParams({
+            Month: formattedDate
+        });      
+        var type = parseInt(formData.get('Type'));
+        var url;
+        switch (type) {
+            case 1:
+                url = API_ROUTES.incomeCategories.BY_ID&PARAMS(id, queryParams);
+                break;
+            case 2:
+                url = API_ROUTES.expenseCategories.BY_ID_PARAMS(id, queryParams);
+                break;
+            default:
+                console.error(`Invalid value '${type}' for 'type' field`);
+                return false;
+        }
 
-        var response = await fetch(`${formData.get("type") == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}/${id}?${queryParams}`, {
-            method: "PUT",
+        var response = await fetch(url, {
+            method: 'PUT',
             headers: {
-                "Content-Type": "application/json",
-                "RequestVerificationToken": formData.get('__RequestVerificationToken')
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': formData.get('__RequestVerificationToken')
             },
             body: JSON.stringify({
-                Name: formData.get("Name"),
-                Budget: parseFloat(formData.get("Budget")),
-                GroupId: parseInt(formData.get("GroupId")),
+                Name: formData.get('Name'),
+                Budget: parseFloat(formData.get('Budget')),
+                GroupId: parseInt(formData.get('GroupId')),
                 Id: id,
-                FiscalPlanId: parseInt(formData.get("FiscalPlanId"))
+                FiscalPlanId: parseInt(formData.get('FiscalPlanId'))
             })
         });
 
@@ -268,10 +439,22 @@ export async function putCategory(formData, month) {
 
 export async function deleteCategory(id, type, token) {
     try {
-        var response = await fetch(`${type == 1 ? incomeCategoriesAPI : expenseCategoriesAPI}/${id}`, {
-            method: "DELETE",
+        var url;
+        switch (type) {
+            case 1:
+                url = API_ROUTES.incomeCategories.BY_ID(id);
+                break;
+            case 2:
+                url = API_ROUTES.expenseCategories.BY_ID(id);
+                break;
+            default:
+                console.error(`Invalid value '${type}' for 'type' field`);
+                return false;
+        }
+        var response = await fetch(url, {
+            method: 'DELETE',
             headers: {
-                "RequestVerificationToken": token
+                'RequestVerificationToken': token
             }
         });
 
@@ -286,58 +469,4 @@ export async function deleteCategory(id, type, token) {
         console.error(error);
         return false;
     }
-}
-
-export async function getUnevaluatedTransactions(categoryId, lastDate, lastId, pageSize) {
-    try {
-        var queryParams = new URLSearchParams({
-            categoryId: categoryId,
-            pageSize: pageSize
-        });
-
-        if (lastDate) {
-            queryParams.append("lastDate", lastDate)
-        }
-
-        if (lastId) {
-            queryParams.append("lastId", lastId)
-        }
-
-        var response = await fetch(`${transactionsAPI}/unevaluated?${queryParams}`, {
-            method: "GET"
-        });
-
-        if (response.ok) {
-            return await response.json();
-        } else {
-            console.error(`HTTP GET Error: ${response.status}`);
-            return null;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return null;
-    };
-}
-
-export async function getCategoriesWithUnevaluatedTransactions(id) {
-    try {
-        var queryParams = new URLSearchParams({
-            FiscalPlanId: id
-        });
-        var response = await fetch(`${expenseCategoriesAPI}/filteredByEvaluation?${queryParams}`, {
-            method: "GET"
-        });
-
-        if (response.ok) {
-            return await response.json();
-        } else {
-            console.error(`HTTP GET Error: ${response.status}`);
-            return null;
-        }
-
-    } catch (error) {
-        console.error(error);
-        return null;
-    };
 }

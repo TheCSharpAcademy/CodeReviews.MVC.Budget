@@ -26,7 +26,7 @@ public class HomeController(ILogger<HomeController> logger, IFiscalPlansService 
         }
         catch (ArgumentException)
         {
-            return BadRequest();
+            return BadRequest($"'{countryISOCode}' is not a valid country ISO Code.");
         }
 
         var options = new CookieOptions
@@ -56,19 +56,19 @@ public class HomeController(ILogger<HomeController> logger, IFiscalPlansService 
     {
         var (culture, currency) = GetUserPreferences();
 
-        var homeModel = new HomeModel
+        var homeModel = new IndexViewModel
         {
             FiscalPlans = await _fiscalPlanService.GetFiscalPlanDTOs(),
             FiscalPlan = new()
         };
 
-        LayoutModel<HomeModel> viewModel = new(homeModel, culture, currency);
+        LayoutModel<IndexViewModel> viewModel = new(homeModel, culture, currency);
 
         return View(viewModel);
     }
 
     [HttpGet("FiscalPlan/{id:int}")]
-    public async Task<IActionResult> FiscalPlan([FromRoute]int id, DateTime? Month)
+    public async Task<IActionResult> FiscalPlan([FromRoute]int id, [FromQuery] DateTime? Month)
     {
         var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
@@ -84,8 +84,7 @@ public class HomeController(ILogger<HomeController> logger, IFiscalPlansService 
                                                                        .OrderBy(c => c.Name)
                                                                        .ToList(), "Id", "Name");
 
-
-        FiscalPlanModel fiscalPlanModel = new()
+        FiscalPlanViewModel fiscalPlanModel = new()
         {
             FiscalPlan = fiscalPlanDTO,     
             Categories = categories,
@@ -93,26 +92,35 @@ public class HomeController(ILogger<HomeController> logger, IFiscalPlansService 
             Transaction = new(),
             Search = new()
             {
+                FiscalPlanId = id,
                 Categories = selectList
             },
         };
 
-        LayoutModel<FiscalPlanModel> viewModel = new(fiscalPlanModel, culture, currency);
+        LayoutModel<FiscalPlanViewModel> viewModel = new(fiscalPlanModel, culture, currency);
 
         return View(viewModel);
     }    
 
     [HttpGet("Category/{id}")]
-    public async Task<IActionResult> Category([FromRoute] int id)
+    public async Task<IActionResult> Category([FromRoute] int id, [FromQuery] DateTime? Month)
     {
-        var category = await _categorieService.GetByIDAsync(id);
+        var category = await _categorieService.GetCategoryDataByMonth(id, Month ?? DateTime.UtcNow);
 
         if (category is null)
             return NotFound();
 
         var (culture, currency) = GetUserPreferences();
 
-        return View(new LayoutModel<Category>(category, culture, currency));
+        CategoryViewModel categoryModel = new()
+        {
+            Category = category,
+            Transaction = new(),
+        };
+
+        LayoutModel <CategoryViewModel> viewModel = new(categoryModel, culture, currency);
+
+        return View(viewModel);
     }
    
 

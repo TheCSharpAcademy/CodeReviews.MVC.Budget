@@ -1,7 +1,7 @@
 ﻿@model SearchViewModel
 
 <form id="search-form" method="post">
-    <input type="hidden" value="" id="search_fiscalPlanId" name="FiscalPlanId"/>
+    <input asp-for="FiscalPlanId" type="hidden" value="@Model.FiscalPlanId" id="search_fiscalPlanId" name="FiscalPlanId"/>
     <div class="d-flex mb-3">
         <svg class="my-2 me-2" id="search-button" fill="transparent" version="1.1"
              width="45px" height="45px" viewBox="0 0 24 24">

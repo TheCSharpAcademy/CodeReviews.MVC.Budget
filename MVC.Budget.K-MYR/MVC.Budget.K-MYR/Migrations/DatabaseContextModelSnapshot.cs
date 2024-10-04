@@ -117,7 +117,7 @@ namespace MVC.Budget.K_MYR.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Evaluated")
+                    b.Property<bool>("IsEvaluated")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsHappy")

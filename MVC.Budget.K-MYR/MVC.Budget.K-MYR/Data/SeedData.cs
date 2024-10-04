@@ -238,7 +238,7 @@ public static class SeedData
                     DateTime = Now.AddMonths(-i).AddDays(-j),
                     IsHappy = Random.Next(0, 2) == 1,
                     IsNecessary = Random.Next(0, 2) == 1,
-                    Evaluated = isEvaluated,
+                    IsEvaluated = isEvaluated,
                     PreviousIsHappy = isEvaluated && Random.Next(0, 2) == 1,
                     PreviousIsNecessary = isEvaluated && Random.Next(0, 2) == 1
                 });

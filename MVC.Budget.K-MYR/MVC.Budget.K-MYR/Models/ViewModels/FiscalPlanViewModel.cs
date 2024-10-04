@@ -1,7 +1,6 @@
-﻿
-namespace MVC.Budget.K_MYR.Models.ViewModels;
+﻿namespace MVC.Budget.K_MYR.Models.ViewModels;
 
-public class FiscalPlanModel
+public class FiscalPlanViewModel
 {
     public FiscalPlanMonthDTO FiscalPlan{ get; set; }
     public IncomeCategory Category { get; set; }

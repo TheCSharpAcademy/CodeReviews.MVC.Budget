@@ -11,4 +11,5 @@ public class SearchViewModel
     public decimal? MaxAmount { get; set; }
     public DateTime? MinDate { get; set; }
     public DateTime? MaxDate { get; set; }
+    public int FiscalPlanId { get; set; }
 }

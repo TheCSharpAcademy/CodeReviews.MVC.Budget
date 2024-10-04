@@ -1,15 +1,23 @@
 {
   "index": [
     "runtime.js",
-    "styles-index~fiscalPlan.css",
-    "vendors-index~fiscalPlan.js",
+    "styles-index~fiscalPlan~category.css",
+    "vendors-index~fiscalPlan~category.js",
     "index.js"
   ],
   "fiscalPlan": [
     "runtime.js",
-    "styles-index~fiscalPlan.css",
-    "styles-fiscalPlan.css",
-    "vendors-index~fiscalPlan.js",
+    "styles-index~fiscalPlan~category.css",
+    "styles-fiscalPlan~category.css",
+    "vendors-index~fiscalPlan~category.js",
     "fiscalPlan.js"
+  ],
+  "category": [
+    "runtime.js",
+    "styles-index~fiscalPlan~category.css",
+    "styles-fiscalPlan~category.css",
+    "vendors-index~fiscalPlan~category.js",
+    "vendors-category.js",
+    "category.js"
   ]
 }
