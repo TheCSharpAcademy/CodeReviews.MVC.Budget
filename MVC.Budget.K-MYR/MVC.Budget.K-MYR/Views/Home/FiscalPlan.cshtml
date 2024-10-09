@@ -291,7 +291,8 @@
                                                         <div id="transaction_date_@transaction.Id">@transaction.DateTime.ToString(CultureInfo.InvariantCulture)</div>
                                                         <div id="transaction_amount_@transaction.Id">@transaction.Amount.ToString("C2", Model.Culture)</div>
                                                         <form id="reevaluate-transaction-form_@transaction.Id" class="reevaluate-transaction-form" novalidate="novalidate">                                                            
-                                                            <input type="hidden" value="@transaction.Id" id="reeval_transaction_@transaction.Id" name="Id"><div class="d-flex justify-content-around">
+                                                            <input type="hidden" value="@transaction.Id" id="reeval_transaction_@transaction.Id" name="Id">
+                                                            <div class="reevalIconsContainer">
                                                                 <div class="d-flex align-items-center">
                                                                     <input type="radio" value="true" id="isHappyTrue_@transaction.Id" class="iconRadioButton" name="IsHappy">
                                                                     <label class="reevalIconLabel" for="isHappyTrue_@transaction.Id">
@@ -449,7 +450,7 @@
 
 @await Html.PartialAsync("_CategoryModals", Model.PageModel.Category)
 @await Html.PartialAsync("_TransactionModals", Model.PageModel.Transaction)
-<input id="fiscalPlan_Id" type="hidden" value="@fiscalPlanDTO.Id" data-object='@Json.Serialize(Model.PageModel.FiscalPlan)'>
+<input id="fiscalPlan_Id" type="hidden" value="@fiscalPlanDTO.Id" data-object='@Json.Serialize(Model.PageModel.FiscalPlan)' readonly>
 
 @section Scripts {
     @{

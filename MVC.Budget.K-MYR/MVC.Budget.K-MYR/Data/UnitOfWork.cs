@@ -10,11 +10,11 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     public ICategoryBudgetsRepository CategoryBudgetsRepository { get; }
     public IFiscalPlansRepository FiscalPlansRepository { get; }
 
-    public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepo, ITransactionsRepository transactionsRepo, ICategoryBudgetsRepository categoryBudgetsRepository, IFiscalPlansRepository fiscalPlansRepository)
+    public UnitOfWork(DatabaseContext context, ICategoriesRepository categoriesRepository, ITransactionsRepository transactionsRepository, ICategoryBudgetsRepository categoryBudgetsRepository, IFiscalPlansRepository fiscalPlansRepository)
     {
         _context = context;
-        CategoriesRepository = categoriesRepo;
-        TransactionsRepository = transactionsRepo;
+        CategoriesRepository = categoriesRepository;
+        TransactionsRepository = transactionsRepository;
         CategoryBudgetsRepository = categoryBudgetsRepository;
         FiscalPlansRepository = fiscalPlansRepository;
     }

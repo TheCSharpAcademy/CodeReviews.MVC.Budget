@@ -1,12 +1,13 @@
 ﻿import { ArcElement, Chart, DoughnutController } from 'chart.js';
 Chart.register(DoughnutController, ArcElement);
 import { getDatePicker } from './asyncComponents'
-import {  getCategoryDataByMonth } from './api';
+import { getCategoryDataByMonth } from './api';
+import { API_ROUTES } from './config'
 
 export default class CategoryDashboard {
     #data;
     #isLoading;
-    #initPromise;
+    initPromise;
     #monthPicker;
     #sentimentChart;
     #necessityChart;    
@@ -17,21 +18,23 @@ export default class CategoryDashboard {
 
     constructor(id, date, data) {
         this.#data = data;
-        this.#initPromise = this.#init(id, date);
+        this.initPromise = this.#init(id, date);
     }
 
     async #init(id, date) {
         try {
             this.#isLoading = true;
+            var token = document.getElementById('antiforgeryToken').value;
             var datepickerPromise = this.#initializeDatePicker(id, date);
-            var tablePromise = this.#initializeTable(datepickerPromise);
+            var tablePromise = this.#initializeTable(token);
             this.#initializeCharts();
-
             this.#budgetHeader = document.getElementById('budget-header');
             this.#totalHeader = document.getElementById('total-header');
             this.#differenceHeader = document.getElementById('difference-header');
 
-            this.#table = await tablePromise;
+            await tablePromise;
+            await datepickerPromise;
+            this.table.ajax.reload(null, false);
         } finally {
             this.#isLoading = false;
         }
@@ -109,7 +112,7 @@ export default class CategoryDashboard {
         this.#monthPicker = await getDatePicker("#monthSelector", "month")
         this.#monthPicker.datepicker('setDate', date.toISOString());
         this.#monthPicker.on('changeDate', async () => {
-            this.#refresh(id, this.#monthPicker.datepicker('getUTCDate'));
+            this.#refresh(id, this.#monthPicker.datepicker('getUTCDate'));            
         });
 
         $('.monthPicker .calendar-button').on('click', function () {
@@ -122,8 +125,7 @@ export default class CategoryDashboard {
         });
     }
 
-    async #initializeTable(promise) {
-        await promise;
+    async #initializeTable(token) {
         try {
             const { default: DataTable } = await import(/* webpackChunkName: "datatables" */'datatables.net-bs5');
             var lastAjaxData = {
@@ -131,27 +133,20 @@ export default class CategoryDashboard {
                 lastId: null,
                 lastValue: null
             };
+            var self = this;
             var table = new DataTable('#transactions-table', {
                 processing: true,
                 serverSide: true,
                 deferLoading: 0,
+                order: [[1, 'desc']],
                 ajax: function (data, callback, settings) {
-                    var formData = new FormData(document.getElementById('search-form'));
                     var table = new $.fn.dataTable.Api(settings);
-
-                    var searchString = formData.get('SearchString');
-                    var minDate = formData.get('MinDate');
-                    var maxDate = formData.get('MaxDate');
-                    var fiscalPlanId = formData.get('FiscalPlanId');
-                    var categoryId = formData.get('CategoryId');
-                    var minAmount = formData.get('MinAmount');
-                    var maxAmount = formData.get('MaxAmount');
 
                     var isPrevious = false;
                     var lastId = null;
                     var lastValue = null;
                     var orderBy = null;
-                    var orderDirection = null;
+                    var orderDirection = null;                    
 
                     if (data.order?.[0]) {
                         orderBy = data.order[0].name;
@@ -177,6 +172,10 @@ export default class CategoryDashboard {
                         }
                     }
 
+                    var date = self.#monthPicker.datepicker('getUTCDate');
+                    var start = new Date(Date.UTC(date.getFullYear(), date.getMonth()));
+                    var end = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 1));                  
+                    end.setMilliseconds(-1);
                     var requestData = {
                         draw: data.draw,
                         start: data.start,
@@ -186,20 +185,16 @@ export default class CategoryDashboard {
                         lastId: lastId,
                         lastValue: lastValue,
                         isPrevious: isPrevious,
-                        FiscalPlanId: fiscalPlanId.length > 0 ? parseInt(fiscalPlanId) : null,
-                        SearchString: searchString.length > 0 ? searchString : null,
-                        CategoryId: categoryId.length > 0 ? parseInt(categoryId) : null,
-                        MinDate: minDate.length > 0 ? minDate : null,
-                        MaxDate: maxDate.length > 0 ? maxDate : null,
-                        MinAmount: minAmount.length > 0 ? parseFloat(minAmount) : null,
-                        MaxAmount: maxAmount.length > 0 ? parseFloat(maxAmount) : null
+                        categoryId: self.#data.id,
+                        MinDate: start.toISOString(),
+                        MaxDate: end.toISOString(),
                     };
                     $.ajax({
                         url: API_ROUTES.transactions.GET_SEARCH,
                         type: 'POST',
                         contentType: 'application/json',
                         headers: {
-                            'RequestVerificationToken': formData.get('__RequestVerificationToken')
+                            'RequestVerificationToken': token
                         },
                         data: JSON.stringify(requestData),
                         success: function (response) {
@@ -232,12 +227,11 @@ export default class CategoryDashboard {
                         }
                     }
                 },
-                lengthMenu: [10, 25, 50, 100],
+                lengthMenu: [10, 25, 50],
                 columns: [
                     { data: 'title', render: DataTable.render.text(), name: 'title' },
                     { data: 'dateTime', name: 'dateTime' },
                     { data: 'amount', name: 'amount' },
-                    { data: 'category', render: DataTable.render.text(), name: 'category.name' },
                     {
                         data: null,
                         defaultContent:
@@ -275,11 +269,10 @@ export default class CategoryDashboard {
                 scrollX: true,
                 scrollCollapse: true
             });
+            this.table = table;
             var tableContainer = document.getElementById('table-container');
             tableContainer.style = '';
             table.columns.adjust();
-
-            return table;
         } catch (error) {
             console.error('Error loading Datatable:', error);
             throw error;
@@ -292,10 +285,12 @@ export default class CategoryDashboard {
                 console.log("Dashboard is loading...")
             }
             this.#isLoading = true;
+            this.table.ajax.reload(null, true)
             var data = await this.#getData(id, date, this.#data.categoryType);
 
             if (data) {
-                this.#renderData(data);
+                this.#formatCharts(data);
+                this.#formatHeaders(data);
                 this.#data = data;
             }
             
@@ -332,14 +327,13 @@ export default class CategoryDashboard {
         var isIncomeCategory = dataObj.categoryType === 1;
         var budgetHeading = isIncomeCategory ? 'Goal' : 'Budget';
         var totalHeading = isIncomeCategory ? 'Income' : 'Expenses';
-        var differenceHeading = isIncomeCategory ? 'Missing' : 'Overspending';
         var budget = dataObj.budgetLimit?.budget ?? dataObj.budget;
         var difference = budget - dataObj.total;
         var differenceHeading;
         if (difference < 0) {
             differenceHeading = isIncomeCategory ? "Surplus" : "Overspending";
         } else {
-            differenceHeading = isIncomeCategory ? "Missing" : "Available";
+            differenceHeading = isIncomeCategory ? "Pending" : "Available";
         }       
 
         this.#budgetHeader.textContent = `${budgetHeading}: ${window.userNumberFormat.format(budget)}`;
@@ -349,7 +343,7 @@ export default class CategoryDashboard {
         return true;
     }
 
-    #renderData(data) {
+    formatDashboard(data) {
         var dataObj = data ?? this.#data;
 
         if (dataObj == null) {
@@ -357,9 +351,33 @@ export default class CategoryDashboard {
         }
         this.#formatCharts(dataObj);
         this.#formatHeaders(dataObj);
-        //setTimeout(() => this.#table.rows().invalidate().draw(), 0);
+        this.table.rows().invalidate().draw();
 
         return true;
+    }
+
+    addTransaction(transaction) {
+        var transactionDate = new Date(transaction.dateTime)
+        var transactionYear = transactionDate.getYear();
+        var transactionMonth = transactionDate.getMonth();
+        var currentDate = this.getCurrentMonthUTC();
+        var currentYear = currentDate.getYear();
+        var currentMonth = currentDate.getMonth();
+
+        if (transactionYear === currentYear && transactionMonth == currentMonth) {
+            this.#data.total += transaction.amount;
+
+            if (transaction.isHappy) {
+                this.#data.happyTotal += transaction.amount;
+            }
+            if (transaction.isNecessary) {
+                this.#data.necessaryTotal += transaction.amount;
+            }     
+
+            this.#formatHeaders();
+            this.#formatCharts();
+            this.table.ajax.reload(null, false);
+        }
     }
 
     getCurrentMonthUTC = () => this.#monthPicker.datepicker('getUTCDate');

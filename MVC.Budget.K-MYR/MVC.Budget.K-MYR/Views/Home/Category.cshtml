@@ -1,5 +1,7 @@
 ﻿@using System.Globalization
+@using Microsoft.AspNetCore.Antiforgery
 @model MVC.Budget.K_MYR.Models.ViewModels.LayoutModel<CategoryViewModel>
+@inject IAntiforgery Antiforgery
 
 @section Stylesheets {
     @{
@@ -10,6 +12,7 @@
 
 @{
     ViewData["Title"] = "Category";
+    var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
     var category = Model.PageModel.Category;
     var isIncomeCategory = category.CategoryType == 1;
 }
@@ -27,9 +30,17 @@
             <stop offset="100%" stop-color="#7EB1B1" />
         </radialGradient>
     </defs>    
-    <symbol id="add-category-icon" viewBox="0 0 14 14">
+    <symbol id="add-transaction-icon" viewBox="0 0 14 14">
         <path fill="url(#icon_gradient_radial)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
-    </symbol>    
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="edit-icon" viewBox='0 0 16 16'>
+        <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z' />
+        <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z' />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="trash-icon" viewBox="0 0 16 16">
+        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+    </symbol>
 </svg>
 
 <div id="action-sidebar">
@@ -57,7 +68,7 @@
                                 </div>
                                 <div class="chart-container">
                                     <h1 class="text-center text-truncate">@Html.Encode(category.Name)</h1>
-                                    <div class="input-group monthPicker mt-3">
+                                    <div class="input-group monthPicker mt-3">                                        
                                         <input id="monthSelector" type="text" class="monthSelector form-control" value="" aria-label="Month Selection" readonly>
                                         <span class="input-group-text calendar-button"><i class="bi bi-calendar"></i></span>
                                     </div>
@@ -77,7 +88,7 @@
                                         }
                                         else
                                         {
-                                            var differenceHeader = isIncomeCategory ? "Missing" : "Available";
+                                            var differenceHeader = isIncomeCategory ? "Pending" : "Available";
                                             <h5 class="text-center" id="difference-header">@differenceHeader: @(difference.ToString("C2", Model.Culture)) </h5>
                                         }
                                         
@@ -97,13 +108,13 @@
                                     <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
                                         Transactions
                                     </h5>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="add-category-icon" viewBox="0 0 14 14" height="23" width="23">
-                                        <use href="#add-category-icon" xlink:href="#add-category-icon" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="add-category-icon" id="addTransaction-button" viewBox="0 0 14 14" height="23" width="23">
+                                        <use href="#add-transaction-icon" xlink:href="#add-transaction-icon" />
                                     </svg>
                                     <div class="accordion-caret rotate"></div>
                                 </div>
                                 <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
-                                    <div class="accordion-body">
+                                    <div class="accordion-body pt-0">
                                         <div id="table-container" style="display: none">
                                             <table class="table table-hover table-borderless w-100 px-2" id="transactions-table">
                                                 <thead>
@@ -116,10 +127,7 @@
                                                         </th>
                                                         <th>
                                                             Amount
-                                                        </th>
-                                                        <th>
-                                                            Category
-                                                        </th>
+                                                        </th>                                                        
                                                         <th>
                                                         </th>
                                                     </tr>
@@ -140,8 +148,8 @@
 </div>
 
 @await Html.PartialAsync("_TransactionModals", new Transaction())
-<input id="category_Id" type="hidden" value="@category.Id" data-object='@Json.Serialize(Model.PageModel.Category)'>
-
+<input id="category_Id" type="hidden" value="@category.Id" data-object='@Json.Serialize(Model.PageModel.Category)' readonly>
+<input type="hidden" value="@token" id="antiforgeryToken" />
 @section Scripts {
     @{
         <script src="~/dist/runtime.js" asp-append-version="true"></script>

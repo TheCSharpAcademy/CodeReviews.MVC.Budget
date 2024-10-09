@@ -36,24 +36,21 @@ export default class ReevaluationDashboard {
         if (IsPatched) {
             let accordionBody = form.closest(".accordion-body");
             let accordion = accordionBody.closest(".accordion");
+            let categoryId = parseInt(accordion.dataset.categoryid);
+            let spinner = document.getElementById(`spinner_${categoryId}`);
 
             element.removeEventListener("submit", this.#onReevaluate);
             element.remove();
 
-            if (accordionBody.childElementCount === 5) {
-                let categoryId = parseInt(accordion.dataset.categoryid)
+            if (accordionBody.childElementCount < 5 && spinner) {
                 let lastTransaction = accordionBody.children[accordionBody.childElementCount - 2];
                 let lastDate = lastTransaction.dataset.date;
                 let transactions = await getUnevaluatedTransactions(categoryId, lastDate, parseInt(lastTransaction.dataset.id), 6);
 
-                let spinner = document.getElementById(`spinner_${categoryId}`);
-
                 if (transactions && transactions.length > 0) {
                     this.#createTransactionElements(transactions, accordionBody, spinner);
                 } else {
-                    if (spinner) {
-                        spinner.remove();
-                    }
+                    spinner.remove();
                 }
             }
 
@@ -148,7 +145,7 @@ export default class ReevaluationDashboard {
         hiddenInput.name = 'Id';
 
         var wrapperDiv = document.createElement('div');
-        wrapperDiv.className = 'd-flex justify-content-around';
+        wrapperDiv.className = 'reevalIconsContainer';
 
         var innerWrapper1 = document.createElement('div');
         innerWrapper1.className = 'd-flex align-items-center';
@@ -189,7 +186,7 @@ export default class ReevaluationDashboard {
         isUnhappySvgContainer.className = 'reevalIconContainer';
 
         var isUnhappyImg = document.createElement('img');
-        isUnhappyImg.src = "/dist/img/happy-emote.svg";
+        isUnhappyImg.src = "/dist/img/sad-emote.svg";
         isUnhappyImg.height = 30;
         isUnhappyImg.width = 30;
         isUnhappyImg.className = "reevalIcon";

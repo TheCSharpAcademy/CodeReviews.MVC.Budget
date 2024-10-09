@@ -30,7 +30,7 @@ const transactionsTablePromise = getTransactionsTable();
 
 setupFlipContainer();
 setupMenuHandlers(modalsPromise, homeDashboardPromise);
-setupDataTableHandlers(transactionsTablePromise);
+setupDataTableHandlers(transactionsTablePromise, modalsPromise);
 setupRerenderHandlers(homeDashboardPromise, statisticsDashboardPromise, reevaluationDashboardPromise, transactionsTablePromise);
 
 async function setupRerenderHandlers(homeDBPromise, statisticsDBPromise, reevaluationDBPromise, tablePromise) {
@@ -45,14 +45,13 @@ async function setupRerenderHandlers(homeDBPromise, statisticsDBPromise, reevalu
     })
 }
 
-async function setupDataTableHandlers(tablePromise) {
+async function setupDataTableHandlers(tablePromise, modalsPromise) {
     var table = await tablePromise;
 
     $('#search-form').on('submit', async function (event) {
         event.preventDefault();
         if ($(this).valid()) {
-            table.page(0);
-            table.ajax.reload(null, false);
+            table.ajax.reload(null, true);
         }
     });
 
@@ -422,7 +421,7 @@ async function getTransactionsTable() {
                     }
                 }
             },
-            lengthMenu: [10, 25, 50, 100],
+            lengthMenu: [10, 25, 50],
             columns: [
                 { data: 'title', render: DataTable.render.text(), name: 'title' },
                 { data: 'dateTime', name: 'dateTime' },

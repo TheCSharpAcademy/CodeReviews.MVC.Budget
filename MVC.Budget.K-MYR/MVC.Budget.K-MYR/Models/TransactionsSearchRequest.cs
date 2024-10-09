@@ -12,7 +12,7 @@ public class TransactionsSearchRequest
     public string? OrderBy { get; set; }
     public OrderDirection OrderDirection { get; set; } = OrderDirection.Ascending;
     public string? SearchString { get; set; }
-    public int FiscalPlanId { get; set; }
+    public int? FiscalPlanId { get; set; }
     public int? CategoryId { get; set; }
     public decimal? MinAmount { get; set; }
     public decimal? MaxAmount { get; set; }

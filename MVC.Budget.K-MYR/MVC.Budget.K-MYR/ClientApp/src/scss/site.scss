@@ -574,11 +574,18 @@ main {
 .reeval-submit-button {
     background-color: transparent;
     border: none;
+    padding: 0;
 }
 
 .reeval-submit-svg {
     stroke: white;
     fill: transparent;
+}
+
+.reevalIconsContainer {
+    display: flex;
+    justify-content: space-around;
+    gap: 2px;
 }
 // Statistics
 
@@ -685,6 +692,14 @@ main {
     color: transparent;
     background-clip: text;
     -webkit-background-clip: text;
+}
+
+.dt-layout-table {
+    margin-top: 0 !important;
+}
+
+div.dt-processing > div:last-child > div {
+    background: linear-gradient(45deg, #7EB1B1, #608C94, #456977) !important;
 }
 
 // Budget Selection

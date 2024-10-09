@@ -579,7 +579,6 @@ export default class HomeDashboard {
 
                 if (transaction.isHappy) {
                     this.#data.expensesHappyTotal += transaction.amount;
-
                 }
                 if (transaction.isNecessary) {
                     this.#data.expensesNecessaryTotal += transaction.amount;
