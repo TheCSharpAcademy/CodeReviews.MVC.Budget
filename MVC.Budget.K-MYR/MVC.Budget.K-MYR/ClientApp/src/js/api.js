@@ -349,14 +349,14 @@ export async function getCategoryDataByMonth(id, date = new Date(), type) {
 
 export async function postCategory(formData) {
     try {
-        var type = parseInt(formData.get('type'));
+        var type = parseInt(formData.get('Type'));
         var url;
         switch (type) {
             case 1:
-                url = API_ROUTES.incomeCategories.BY_ID(id);
+                url = API_ROUTES.incomeCategories.BASE;
                 break;
             case 2:
-                url = API_ROUTES.expenseCategories.BY_ID(id);
+                url = API_ROUTES.expenseCategories.BASE;
                 break;
             default:
                 console.error(`Invalid value '${type}' for 'type' field`);
@@ -399,7 +399,7 @@ export async function putCategory(formData, date = new Date()) {
         var url;
         switch (type) {
             case 1:
-                url = API_ROUTES.incomeCategories.BY_ID&PARAMS(id, queryParams);
+                url = API_ROUTES.incomeCategories.BY_ID_PARAMS(id, queryParams);
                 break;
             case 2:
                 url = API_ROUTES.expenseCategories.BY_ID_PARAMS(id, queryParams);

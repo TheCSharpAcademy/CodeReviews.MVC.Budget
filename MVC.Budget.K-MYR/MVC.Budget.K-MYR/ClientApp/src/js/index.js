@@ -48,20 +48,23 @@ async function setupModalHandlers() {
     var deleteModalLabel = document.getElementById('deleteFiscalPlan-label');
     var deleteModalId = document.getElementById('deleteFiscalPlan_id');
 
-    document.getElementById('addFiscalPlan-card').addEventListener('click', function () {
+    var addfiscalPlanCard = document.getElementById('addFiscalPlan-card');
+    addfiscalPlanCard.addEventListener('click', function () {
         addModal.show();
     });
-    document.getElementById('addFiscalPlan-form').addEventListener('submit', async function (event) {
+    var addFiscalPlanForm = document.getElementById('addFiscalPlan-form');
+    addFiscalPlanForm.addEventListener('submit', async function (event) {
         event.preventDefault();
-        if ($(this).valid()) {
+        if (addModal._isShown && $(this).valid()) {
             addModal.hide();
             await postFiscalPlan(new FormData(this));
         }
     });
 
-    document.getElementById('updateFiscalPlan-form').addEventListener('submit', async function (event) {
+    var updateFiscalPlanForm = document.getElementById('updateFiscalPlan-form');
+    updateFiscalPlanForm.addEventListener('submit', async function (event) {
         event.preventDefault();
-        if ($(this).valid()) {
+        if (updateModal._isShown && $(this).valid()) {
             updateModal.hide();
             let formData = new FormData(this);
             let isUpdated = await putFiscalPlan(formData);
@@ -71,16 +74,20 @@ async function setupModalHandlers() {
         }
     });
 
-    document.getElementById('deleteFiscalPlan-form').addEventListener('submit', async function (event) {
+    var deleteFiscalPlanForm = document.getElementById('deleteFiscalPlan-form');
+    deleteFiscalPlanForm.addEventListener('submit', async function (event) {
         event.preventDefault();
-        deleteModal.hide();
-        var formData = new FormData(this);
-        var id = formData.get('Id');
-        var token = formData.get('__RequestVerificationToken');
-        var isDeleted = await deleteFiscalPlan(id, token);
-        if (isDeleted) {
-            removeFiscalPlan(id);
+        if (deleteModal._isShown) {
+            deleteModal.hide();
+            var formData = new FormData(this);
+            var id = formData.get('Id');
+            var token = formData.get('__RequestVerificationToken');
+            var isDeleted = await deleteFiscalPlan(id, token);
+            if (isDeleted) {
+                removeFiscalPlan(id);
+                }
         }
+
     });
 
     $('.fiscalPlan-card').on('click', function (event) {

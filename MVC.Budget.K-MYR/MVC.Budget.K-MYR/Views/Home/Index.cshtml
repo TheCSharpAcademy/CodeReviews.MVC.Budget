@@ -40,11 +40,11 @@
                     var color = progressbarWidthExpenses < 50 ? "bg-success" : progressbarWidthExpenses < 85 ? "bg-warning" : "bg-danger";
 
                     <div class="fiscalPlan-card" id="fiscalPlan-card_@fiscalPlan.Id" data-id="@fiscalPlan.Id" data-name="@fiscalPlan.Name">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between gap-1">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon" fill="#ffffff" data-action="edit">
                                 <use href="#edit-icon" xlink:href="#edit-icon"/>
                             </svg>
-                            <h1 id="fiscalPlan-header_@fiscalPlan.Id" class="text-center">@fiscalPlan.Name</h1>
+                            <h1 id="fiscalPlan-header_@fiscalPlan.Id" class="fiscalPlan-heading">@fiscalPlan.Name</h1>
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon" fill="#ffffff" data-action="delete">
                                 <use href="#trash-icon" xlink:href="#trash-icon"/>
                             </svg>

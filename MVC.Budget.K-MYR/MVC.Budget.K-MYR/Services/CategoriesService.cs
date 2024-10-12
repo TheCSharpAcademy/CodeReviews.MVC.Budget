@@ -57,7 +57,7 @@ public class CategoriesService : ICategoriesService
                                    .Take(pageSize));
     }
 
-    public async Task<T> AddCategory<T>(T categoryPost) where T : Category, new()
+    public async Task<T> AddCategory<T>(CategoryPost categoryPost) where T : Category, new()
     {
         var category = new T()
         {
@@ -82,7 +82,7 @@ public class CategoriesService : ICategoriesService
         return category;
     }
 
-    public async Task UpdateCategory<T>(T category, T categoryPut, DateTime month) where T : Category
+    public async Task UpdateCategory(Category category, CategoryPut categoryPut, DateTime month)
     {
         if (categoryPut.Budget != category.Budget) 
         {
@@ -114,7 +114,7 @@ public class CategoriesService : ICategoriesService
         await _unitOfWork.Save();
     }
 
-    public async Task DeleteCategory<T>(T category) where T : Category
+    public async Task DeleteCategory(Category category)
     {
         _unitOfWork.CategoriesRepository.Delete(category);
         await _unitOfWork.Save();

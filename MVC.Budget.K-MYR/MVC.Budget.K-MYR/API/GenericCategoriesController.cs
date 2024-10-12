@@ -47,24 +47,19 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostCategory([FromBody][Bind("Name, Budget, FiscalPlanId")] T categoryPost)
+    public async Task<ActionResult> PostCategory([FromBody] CategoryPost categoryPost)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
-
-        var category = await _categoriesService.AddCategory(categoryPost);
+        var category = await _categoriesService.AddCategory<T>(categoryPost);
+        _logger.LogCritical("Category Id {id} Type {type}", category.Id, category.CategoryType);
 
         return CreatedAtAction(nameof(Category), new { id = category.Id }, category);
     }
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutCategory([FromRoute] int id, [Bind("Name,Budget,Id")] T categoryPut, [FromQuery] DateTime? month)
+    public async Task<ActionResult> PutCategory([FromRoute] int id, CategoryPut categoryPut, [FromQuery] DateTime? month)
     {
         if (id != categoryPut.Id)
-            return BadRequest();
-
-        if (!ModelState.IsValid)
             return BadRequest();
 
         var date = month ?? DateTime.UtcNow;
@@ -73,7 +68,9 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
         var category = await _categoriesService.GetCategoryWithBudgetLimit(categoryPut.Id, cutOffDate);
 
         if (category is null)
+        {
             return NotFound();
+        }
 
         try
         {
@@ -93,7 +90,9 @@ public abstract class GenericCategoriesController<T> : ControllerBase where T : 
         var category = await _categoriesService.GetByIDAsync(id);
 
         if (category is null)
+        {
             return NotFound();
+        }
 
         try
         {

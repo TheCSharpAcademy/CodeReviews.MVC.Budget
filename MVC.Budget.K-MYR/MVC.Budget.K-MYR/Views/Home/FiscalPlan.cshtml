@@ -132,12 +132,12 @@
                                     <canvas id="sentimentChart"></canvas>
                                 </div>
                                 <div class="chart-container">
-                                    <h1 class="text-center mt-1">@fiscalPlanDTO.Name</h1>
+                                    <h1 class="text-center text-truncate mt-1">@fiscalPlanDTO.Name</h1>
                                     <div class="input-group monthPicker mt-3">
                                         <input id="home-monthSelector" type="text" class="monthSelector form-control" value="" aria-label="Month Selection" readonly>
                                         <span class="input-group-text calendar-button"><i class="bi bi-calendar"></i></span>
                                     </div>                                    
-                                    <h5 id="home-overspending" class="text-center mt-5">
+                                    <h5 id="home-overspending" class="text-center mt-5 mb-0">
                                         Overspending: @fiscalPlanDTO.Overspending.ToString("C2", Model.Culture)
                                     </h5>                                    
                                 </div>

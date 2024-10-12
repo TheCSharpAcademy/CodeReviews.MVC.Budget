@@ -336,7 +336,7 @@ export default class HomeDashboard {
             deviationDiv.remove();
         }
 
-        var progressBarPercentage = Math.min(100, Math.floor(category.total * 100 / category.budget));
+        var progressBarPercentage = budget > 0 ? Math.min(100, Math.floor(category.total * 100 / budget)) : 100;
         var color = "bg-success";
         if (category.categoryType == 2) {
             color = progressBarPercentage < 50 ? "bg-success" : progressBarPercentage < 85 ? "bg-warning" : "bg-danger";
@@ -406,18 +406,19 @@ export default class HomeDashboard {
         var progressDiv = document.createElement('div');
         progressDiv.className = 'progress';
 
-        var progressBarDivPercentage = Math.floor(category.total * 100 / budget);
+        var progressBarPercentage = budget > 0 ? Math.min(100, Math.floor(category.total * 100 / budget)) : 100;
+
         var color = "bg-success";
         if (category.categoryType == 2) {
-            color = progressBarDivPercentage < 50 ? "bg-success" : progressBarDivPercentage < 85 ? "bg-warning" : "bg-danger";
+            color = progressBarPercentage < 50 ? "bg-success" : progressBarPercentage < 85 ? "bg-warning" : "bg-danger";
         }
 
         var progressBarDiv = document.createElement('div');
         progressBarDiv.id = `category_${category.id}_progressbar`;
         progressBarDiv.className = `progress-bar ${color}`;
         progressBarDiv.role = 'progressbar';
-        progressBarDiv.style.width = `${progressBarDivPercentage}%`;
-        progressBarDiv.ariaValuenow = `${progressBarDivPercentage}`;
+        progressBarDiv.style.width = `${progressBarPercentage}%`;
+        progressBarDiv.ariaValuenow = `${progressBarPercentage}`;
         progressBarDiv.ariaValuemin = '0';
         progressBarDiv.ariaValuemax = '100';
         progressBarDiv.setAttribute('aria-labelledby', `category_${category.id}_balance`); 

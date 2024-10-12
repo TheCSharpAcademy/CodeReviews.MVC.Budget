@@ -117,11 +117,13 @@ async function setupMenuHandlers(modalsPromise, homeDBPromise) {
     initAddTransactionModal(addTransactionModal, homeDashboard); 
 
     document.getElementById('close-menu').onclick = function () {
-        menu.classList.remove('active');
-        var id = menu.dataset.categoryid;
-        var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
-        borderBox.classList.remove('border-rotate');
-        menu.dataset.categoryid = 0;
+        if (menu.classList.contains('active')) {
+            var id = menu.dataset.categoryid;
+            var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
+            borderBox.classList.remove('border-rotate');
+            menu.dataset.categoryid = 0;
+            menu.classList.remove('active');
+        }        
     }    
     document.getElementById('details-menu').onclick = function () {
         var id = menu.dataset.categoryid;
@@ -135,8 +137,8 @@ function initAddCategoryModal(modal, homeDashboard) {
     var addCategoryModalFiscalPlanId = document.getElementById('addCategory_fiscalPlanId');
     var form = document.getElementById('addCategory-form');
     form.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        if ($(this).valid()) {
+        event.preventDefault();            
+        if (modal._isShown && $(this).valid()) {
             modal.hide();
             let category = await postCategory(new FormData(this));
             if (category) {
@@ -163,7 +165,7 @@ function initUpdateCategoryModal(modal, homeDashboard) {
     var form = document.getElementById('updateCategory-form');
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        if ($(this).valid()) {
+        if (modal._isShown && $(this).valid()) {
             modal.hide();
             let month = homeDashboard.getCurrentMonth();
             let formData = new FormData(this);
@@ -194,16 +196,18 @@ function initDeleteCategoryModal(modal, homeDashboard) {
     var form = document.getElementById('deleteCategory-form');
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        modal.hide();
-        var formData = new FormData(this);
-        var id = parseInt(formData.get('Id'));
-        var type = parseInt(formData.get('Type'));
-        var token = formData.get('__RequestVerificationToken');
-        var isDeleted = await deleteCategory(id, type, token);
-        if (isDeleted) {
-            homeDashboard.removeCategory(id, type);
-            menu.classList.remove('active');
-            menu.dataset.categoryid = 0;
+        if (modal._isShown) {
+            modal.hide();
+            var formData = new FormData(this);
+            var id = parseInt(formData.get('Id'));
+            var type = parseInt(formData.get('Type'));
+            var token = formData.get('__RequestVerificationToken');
+            var isDeleted = await deleteCategory(id, type, token);
+            if (isDeleted) {
+                homeDashboard.removeCategory(id, type);
+                menu.classList.remove('active');
+                menu.dataset.categoryid = 0;
+            }
         }
     });
     var deleteIcon = document.getElementById('delete-menu');
@@ -221,7 +225,7 @@ function initAddTransactionModal(modal, homeDashboard) {
     var form = document.getElementById('addTransaction-form');
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        if ($(this).valid()) {
+        if (modal._isShown && $(this).valid()) {
             modal.hide();
             let transaction = await postTransaction(new FormData(this));
 
@@ -239,9 +243,10 @@ function initAddTransactionModal(modal, homeDashboard) {
 }
 
 function initUpdateTransactionModal(modal, table) {
-    document.getElementById('updateTransaction-form').addEventListener('submit', async function (event) {
+    var form = document.getElementById('updateTransaction-form');
+    form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        if ($(this).valid()) {
+        if (modal._isShown && $(this).valid()) {
             modal.hide();
             let formData = new FormData(this);
             let isUpdated = await putTransaction(formData);
@@ -258,7 +263,7 @@ function initUpdateTransactionModal(modal, table) {
                     data.previousIsHappy = formData.get('PreviousIsHappy') === 'true';
                     data.PreviousIsNecessary = formData.get('PreviousIsNecessary') === 'true';
                     row.invalidate();
-                }              
+                }            
             }
         }
     });
@@ -268,16 +273,18 @@ function initDeleteTransactionModal(modal, table) {
     var form = document.getElementById('deleteTransaction-form');
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        modal.hide();
-        var formData = new FormData(this);
-        var id = parseInt(formData.get('Id'));
-        var token = formData.get('__RequestVerificationToken');
-        var isDeleted = await deleteTransaction(id, token);
-        if (isDeleted) {
-            let row = table.row((_, data) => data.id === parseInt(formData.get('Id')));
-            if (row) {
-                row.remove().draw();
-            }    
+        if (modal._isShown) {
+            modal.hide();
+            var formData = new FormData(this);
+            var id = parseInt(formData.get('Id'));
+            var token = formData.get('__RequestVerificationToken');
+            var isDeleted = await deleteTransaction(id, token);
+            if (isDeleted) {
+                let row = table.row((_, data) => data.id === parseInt(formData.get('Id')));
+                if (row) {
+                    row.remove().draw();
+                }
+            }
         }
     });  
 }

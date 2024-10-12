@@ -109,7 +109,7 @@ async function initAddTransactionModal(dashboardPromise, modalsPromise) {
     var form = document.getElementById('addTransaction-form');
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        if ($(this).valid()) {
+        if (modal._isShown && $(this).valid()) {
             modal.hide();
             let transaction = await postTransaction(new FormData(this));
             if (transaction) {
@@ -126,9 +126,10 @@ async function initAddTransactionModal(dashboardPromise, modalsPromise) {
 }
 
 function initUpdateTransactionModal(modal, table) {
-    document.getElementById('updateTransaction-form').addEventListener('submit', async function (event) {
+    var form = document.getElementById('updateTransaction-form');
+    form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        if ($(this).valid()) {
+        if (modal._isShown && $(this).valid()) {
             modal.hide();
             let formData = new FormData(this);
             let isUpdated = await putTransaction(formData);
@@ -155,15 +156,17 @@ function initDeleteTransactionModal(modal, table) {
     var form = document.getElementById('deleteTransaction-form');
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        modal.hide();
-        var formData = new FormData(this);
-        var id = parseInt(formData.get('Id'));
-        var token = formData.get('__RequestVerificationToken');
-        var isDeleted = await deleteTransaction(id, token);
-        if (isDeleted) {
-            let row = table.row((_, data) => data.id === parseInt(formData.get('Id')));
-            if (row) {
-                row.remove().draw();
+        if (modal._isShown) {
+            modal.hide();
+            var formData = new FormData(this);
+            var id = parseInt(formData.get('Id'));
+            var token = formData.get('__RequestVerificationToken');
+            var isDeleted = await deleteTransaction(id, token);
+            if (isDeleted) {
+                let row = table.row((_, data) => data.id === parseInt(formData.get('Id')));
+                if (row) {
+                    row.remove().draw();
+                }
             }
         }
     });

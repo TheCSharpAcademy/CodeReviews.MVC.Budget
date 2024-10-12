@@ -59,7 +59,7 @@ public class HomeController(ILogger<HomeController> logger, IFiscalPlansService 
         var homeModel = new IndexViewModel
         {
             FiscalPlans = await _fiscalPlanService.GetFiscalPlanDTOs(),
-            FiscalPlan = new()
+            FiscalPlan = new(),
         };
 
         LayoutModel<IndexViewModel> viewModel = new(homeModel, culture, currency);

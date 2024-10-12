@@ -11,6 +11,10 @@ body {
     overflow: hidden;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    padding-bottom: 5px;
+}
+
 svg * {
     pointer-events: none;
 }
@@ -367,7 +371,7 @@ main {
 
 .dashboard-container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1.5fr 1fr;
     border-radius: inherit;
 }
 
@@ -718,6 +722,7 @@ div.dt-processing > div:last-child > div {
     border-radius: $border-radius;
     cursor: pointer;
     transition: ease-in-out 0.2s;
+    overflow: hidden;
 }
 
 .progress-container {
@@ -740,6 +745,16 @@ div.dt-processing > div:last-child > div {
 .fiscalPlan-icon {
     opacity: 0;
     transition: 0.3s ease;
+    flex-shrink: 0;
+}
+
+.fiscalPlan-heading {
+    text-align: center;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 0;
 }
 
 .fiscalPlan-icon:hover {

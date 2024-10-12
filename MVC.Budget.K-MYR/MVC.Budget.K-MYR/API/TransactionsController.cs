@@ -23,9 +23,9 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
     }
 
     [HttpGet("Unevaluated")]
-    public async Task<ActionResult<Transaction>> GetUnevaluatedTransactions([FromQuery][Required] int categoryid, [FromQuery] int? lastId = null, [FromQuery] DateTime? lastDate = null,[FromQuery] int pageSize = 10)
+    public async Task<ActionResult<Transaction>> GetUnevaluatedTransactions([FromQuery][Required] int categoryId, [FromQuery] int? lastId = null, [FromQuery] DateTime? lastDate = null,[FromQuery] int pageSize = 10)
     {
-        var transactions = await _transactionsService.GetUnevaluatedTransactions(categoryid, lastId, lastDate, pageSize);
+        var transactions = await _transactionsService.GetUnevaluatedTransactions(categoryId, lastId, lastDate, pageSize);
 
         return Ok(transactions);
     }
@@ -43,11 +43,8 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostTransaction([FromBody][Bind("Title, DateTime, Amount, IsHappy, IsNecessary, CategoryId")] TransactionPost transactionPost)
+    public async Task<ActionResult> PostTransaction([FromBody] TransactionPost transactionPost)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
-
         var transaction = await _transactionsService.AddTransaction(transactionPost);
 
         return CreatedAtAction(nameof(GetTransaction), new { id = transaction.Id }, transaction);
@@ -55,15 +52,19 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
 
     [HttpPut("{id}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutTransaction([FromRoute] int id, [FromBody][Bind("Id, Title, DateTime, Amount, IsHappy, IsNecessary, Evaluated, EvaluatedIsHappy, EvaluatedIsNecessary, Id")] TransactionPut transactionPut)
+    public async Task<ActionResult> PutTransaction([FromRoute] int id, [FromBody] TransactionPut transactionPut)
     {
-        if (id != transactionPut.Id || !ModelState.IsValid)
+        if (id != transactionPut.Id)
+        {
             return BadRequest();
+        }
 
         var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
+        {
             return NotFound();
+        }
 
         try
         {
@@ -78,15 +79,20 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
     }
 
     [HttpPatch("{id}")]
+    [ValidateAntiForgeryToken]
     public async Task<ActionResult> PatchTransaction([FromRoute] int id, [FromBody] JsonPatchDocument<TransactionPut> patchDoc)
     {
         if (patchDoc is null)
+        {
             return BadRequest();
+        }
 
         var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
+        {
             return NotFound();
+        }
 
         TransactionPut transactionToPatch = new()
         {
@@ -105,7 +111,9 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
         patchDoc.ApplyTo(transactionToPatch, ModelState);
 
         if (transactionToPatch.Id != transaction.Id || !ModelState.IsValid)
+        {
             return BadRequest();
+        }
 
         try
         {
@@ -125,7 +133,9 @@ public class TransactionsController(ILogger<TransactionsController> logger, ITra
         var transaction = await _transactionsService.GetByIDAsync(id);
 
         if (transaction is null)
+        {
             return NotFound();
+        }
 
         try
         {

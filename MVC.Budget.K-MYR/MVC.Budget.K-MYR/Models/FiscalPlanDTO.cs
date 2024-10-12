@@ -3,7 +3,7 @@
 public class FiscalPlanDTO
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public decimal TotalIncome { get; set; }
     public decimal BudgetIncome { get; set; }
     public decimal TotalExpenses { get; set; }

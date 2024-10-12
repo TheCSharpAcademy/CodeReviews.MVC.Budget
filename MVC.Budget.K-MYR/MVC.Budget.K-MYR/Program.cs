@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using MVC.Budget.K_MYR.Data;
+using MVC.Budget.K_MYR.Extensions;
 using MVC.Budget.K_MYR.Repositories;
 using MVC.Budget.K_MYR.Services;
-using Newtonsoft.Json;
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
@@ -22,12 +23,16 @@ builder.Services.AddTransient<IFiscalPlansService, FiscalPlansService>();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MSQL")));
-builder.Services
-    .AddControllersWithViews()
-    .AddNewtonsoftJson(options =>
-    {
-        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-    });
+builder.Services.AddControllersWithViews(options =>
+                {
+                    options.InputFormatters.Insert(0, JsonPatchInputFormatter.GetJsonPatchInputFormatter());
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                    options.AllowInputFormatterExceptionMessages = false;
+                });
+
 
 var app = builder.Build();
 

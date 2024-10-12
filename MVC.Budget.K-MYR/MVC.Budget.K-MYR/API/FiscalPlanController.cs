@@ -70,11 +70,8 @@ public class FiscalPlanController : ControllerBase
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PostFiscalPlan([FromBody][Bind("Name")] FiscalPlanPost fiscalPlanPost)
+    public async Task<ActionResult> PostFiscalPlan([FromBody] FiscalPlanPost fiscalPlanPost)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
-
         var fiscalPlan = await _fiscalPlanService.AddFiscalPlan(fiscalPlanPost);
 
         return CreatedAtAction(nameof(Category), new { id = fiscalPlan.Id }, fiscalPlan);
@@ -82,18 +79,19 @@ public class FiscalPlanController : ControllerBase
 
     [HttpPut("{id:int}")]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> PutFiscalPlan([FromRoute] int id, [Bind("Name,Id")] FiscalPlanPut fiscalPlanPut)
+    public async Task<ActionResult> PutFiscalPlan([FromRoute] int id, FiscalPlanPut fiscalPlanPut)
     {
         if (id != fiscalPlanPut.Id)
+        {
             return BadRequest();
-
-        if (!ModelState.IsValid)
-            return BadRequest();
+        }
 
         var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
         if (fiscalPlan is null)
+        {
             return NotFound();
+        }
 
         try
         {
@@ -113,7 +111,9 @@ public class FiscalPlanController : ControllerBase
         var fiscalPlan = await _fiscalPlanService.GetByIDAsync(id);
 
         if (fiscalPlan is null)
+        {
             return NotFound();
+        }
 
         try
         {
