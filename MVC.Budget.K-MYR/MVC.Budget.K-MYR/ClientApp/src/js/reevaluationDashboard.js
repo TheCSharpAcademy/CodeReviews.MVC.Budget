@@ -5,8 +5,10 @@ export default class ReevaluationDashboard {
     #initPromise;
     #container;
     #infoDiv;
+    #antiforgeryToken
 
-    constructor() {
+    constructor(token) {
+        this.#antiforgeryToken = token;
         this.#data = null;   
         this.#initPromise = this.#init();
     }
@@ -14,8 +16,8 @@ export default class ReevaluationDashboard {
     async #init() {
         try {
             this.#isLoading = true;
-            this.#container = document.getElementById("reevalCategories-container");
-            this.#infoDiv = document.getElementById("reevalInfo");
+            this.#container = document.getElementById('reevalCategories-container');
+            this.#infoDiv = document.getElementById('reevalInfo');
             this.#attachEventHandlers();  
             this.#toggleReevaluationInfo();
            
@@ -31,38 +33,41 @@ export default class ReevaluationDashboard {
         var element = document.getElementById(`reeval_transaction_${id}`);
         var previousIsHappy = element.dataset.ishappy === 'true';
         var previousIsNecessary = element.dataset.isnecessary === 'true';
-        var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary);        
+        var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary, this.#antiforgeryToken);        
 
-        if (IsPatched) {
-            let accordionBody = form.closest(".accordion-body");
-            let accordion = accordionBody.closest(".accordion");
-            let categoryId = parseInt(accordion.dataset.categoryid);
-            let spinner = document.getElementById(`spinner_${categoryId}`);
+        if (IsPatched) {            
+            let accordion = $(form).closest('.accordion');
 
-            element.removeEventListener("submit", this.#onReevaluate);
+            element.removeEventListener('submit', this.#onReevaluate);
             element.remove();
-
-            if (accordionBody.childElementCount < 5 && spinner) {
+            debugger;
+            let accordionBody = accordion.find('.accordion-body')[0];
+            let categoryId = parseInt(accordion[0].dataset.categoryid);
+            let spinner = document.getElementById(`spinner_${categoryId}`);    
+            
+            if (accordionBody.childElementCount < 6 && spinner) {
+                spinner.classList.remove('invisible');
                 let lastTransaction = accordionBody.children[accordionBody.childElementCount - 2];
                 let lastDate = lastTransaction.dataset.date;
                 let transactions = await getUnevaluatedTransactions(categoryId, lastDate, parseInt(lastTransaction.dataset.id), 6);
 
                 if (transactions && transactions.length > 0) {
                     this.#createTransactionElements(transactions, accordionBody, spinner);
+                    spinner.classList.add('invisible');
                 } else {
                     spinner.remove();
                 }
             }
 
             if (accordionBody.childElementCount === 0) {
-                accordionBody.closest(".accordion").remove();
+                accordion.remove();
             }
             this.#toggleReevaluationInfo();
         }
     }
 
     #attachEventHandlers() {
-        $(".reevaluate-transaction-form").on("submit", this.#onReevaluate.bind(this));
+        $('.reevaluate-transaction-form').on('submit', this.#onReevaluate.bind(this));
     }
 
     #onReevaluate(event) {
@@ -73,7 +78,7 @@ export default class ReevaluationDashboard {
     formatDashboard() {
         try {
             if (this.#isLoading) {
-                console.log("Dashboard is loading...")
+                console.log('Dashboard is loading...')
                 return false;
             }
             this.#isLoading = true;
@@ -91,7 +96,7 @@ export default class ReevaluationDashboard {
                 }
             }
             else {
-                let transactions = $(".transaction-body", this.#container);
+                let transactions = $('.transaction-body', this.#container);
 
                 for (let i = 0; i < transactions.length; i++) {
                     let transaction = transactions[i];
@@ -136,7 +141,7 @@ export default class ReevaluationDashboard {
         var transactionForm = document.createElement('form');
         transactionForm.id = `reevaluate-transaction-form_${transaction.id}`;
         transactionForm.setAttribute('novalidate', 'novalidate');
-        transactionForm.addEventListener("submit", this.#onReevaluate.bind(this));
+        transactionForm.addEventListener('submit', this.#onReevaluate.bind(this));
 
         var hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
@@ -165,10 +170,10 @@ export default class ReevaluationDashboard {
         isHappySvgContainer.className = 'reevalIconContainer';
 
         var isHappyImg = document.createElement('img');
-        isHappyImg.src = "/dist/img/happy-emote.svg";
-        isHappyImg.height = 30;
-        isHappyImg.width = 30;
-        isHappyImg.className = "reevalIcon";
+        isHappyImg.src = '/dist/img/happy-emote.svg';
+        isHappyImg.height = 25;
+        isHappyImg.width = 25;
+        isHappyImg.className = 'reevalIcon';
 
         var isHappyFalseInput = document.createElement('input');
         isHappyFalseInput.type = 'radio';
@@ -186,10 +191,10 @@ export default class ReevaluationDashboard {
         isUnhappySvgContainer.className = 'reevalIconContainer';
 
         var isUnhappyImg = document.createElement('img');
-        isUnhappyImg.src = "/dist/img/sad-emote.svg";
-        isUnhappyImg.height = 30;
-        isUnhappyImg.width = 30;
-        isUnhappyImg.className = "reevalIcon";
+        isUnhappyImg.src = '/dist/img/sad-emote.svg';
+        isUnhappyImg.height = 25;
+        isUnhappyImg.width = 25;
+        isUnhappyImg.className = 'reevalIcon';
 
         var innerWrapper2 = document.createElement('div');
         innerWrapper2.className = 'd-flex align-items-center';
@@ -209,10 +214,10 @@ export default class ReevaluationDashboard {
         isNecessarySvgContainer.className = 'reevalIconContainer';
 
         var isNecessaryImg = document.createElement('img');
-        isNecessaryImg.src = "/dist/img/chart-growth.svg";
-        isNecessaryImg.height = 30;
-        isNecessaryImg.width = 30;
-        isNecessaryImg.className = "reevalIconNecessity";
+        isNecessaryImg.src = '/dist/img/chart-growth.svg';
+        isNecessaryImg.height = 25;
+        isNecessaryImg.width = 25;
+        isNecessaryImg.className = 'reevalIcon';
 
         var isNecessaryFalseInput = document.createElement('input');
         isNecessaryFalseInput.type = 'radio';
@@ -230,10 +235,10 @@ export default class ReevaluationDashboard {
         isUnnecessarySvgContainer.className = 'reevalIconContainer';
 
         var isUnnecessaryImg = document.createElement('img');
-        isUnnecessaryImg.src = "/dist/img/chart-decrease.svg";
-        isUnnecessaryImg.height = 30;
-        isUnnecessaryImg.width = 30;
-        isUnnecessaryImg.className = "reevalIconNecessity";
+        isUnnecessaryImg.src = '/dist/img/chart-decrease.svg';
+        isUnnecessaryImg.height = 25;
+        isUnnecessaryImg.width = 25;
+        isUnnecessaryImg.className = 'reevalIcon';
 
         var buttonDiv = document.createElement('div');
 

@@ -1,8 +1,18 @@
 ﻿import { importChartDefaults, importBootstrapCollapses, importBootstrapModals } from './asyncComponents';
 import { ArcElement, Chart, DoughnutController } from 'chart.js';
 import { postTransaction, putTransaction, deleteTransaction } from './api'
+import MessageBox from "./messageBox";
 Chart.register(DoughnutController, ArcElement);
 
+const messageBox = new MessageBox();
+messageBox.addMessage({
+    iconId: "#check-icon",
+    text: "Loading Dashboard..."
+});
+messageBox.addMessage({
+    iconId: "#cross-icon",
+    text: "Failed Task"
+});
 const chartDefaultsTask = importChartDefaults();
 
 const currentDate = new Date();
@@ -13,7 +23,7 @@ const modalsPromise = importBootstrapModals();
 const collapsesPromise = importBootstrapCollapses()
     .then(() => {
         $('.accordion-head').on('click', function (event) {
-            if (!event.target.classList.contains('add-category-icon')) {
+            if (event.target.id !== 'addTransaction-button') {
                 let collapse = $(this).next();
                 if (!collapse[0].classList.contains('collapsing')) {
                     collapse.collapse('toggle');

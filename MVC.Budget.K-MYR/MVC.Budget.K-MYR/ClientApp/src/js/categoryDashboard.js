@@ -11,7 +11,7 @@ export default class CategoryDashboard {
     #monthPicker;
     #sentimentChart;
     #necessityChart;    
-    #table;
+    table;
     #budgetHeader;
     #differenceHeader;
     #totalHeader;
@@ -237,10 +237,10 @@ export default class CategoryDashboard {
                         defaultContent:
                             `<div class="d-flex justify-content-center align-items-center flex-wrap gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="table-icon" fill="rgba(255, 255, 255, 1)" data-icon="edit">
-                            <use href="#edit-icon" xlink:href="#edit-icon"/>
+                            <use href="#edit-icon"/>
                         </svg >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="table-icon" viewBox="0 0 16 16" fill="rgba(255, 255, 255, 1)" data-icon="delete">
-                            <use href="#trash-icon" xlink:href="#trash-icon"/>
+                            <use href="#trash-icon"/>
                         </svg>
                     </div>`,
                         targets: -1,

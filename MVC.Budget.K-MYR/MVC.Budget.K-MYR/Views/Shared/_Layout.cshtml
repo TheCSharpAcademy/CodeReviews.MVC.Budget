@@ -36,6 +36,21 @@
         </nav>
     </header>
 
+    <div class="messageBox" id="messageBox">
+        <div class="messageBoxIcon-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="70" width="70">
+                <use href="" id="messageBoxIcon"/>
+            </svg>
+        </div>
+        <div class="messageBox-collapse">
+            <div class="messageBox-body">
+                <div class="messageBox-scrollcontainer" id="messageBox-scrollcontainer">
+                </div>                
+            <button id="messageBoxClose-button" type="button" class="btn-close flex-shrink-0" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <div class="container main-container">
         <main role="main">
             @RenderBody()

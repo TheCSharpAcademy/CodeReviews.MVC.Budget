@@ -7,16 +7,16 @@ const currentDate = new Date();
 
 const fiscalPlanId = document.getElementById('fiscalPlan_Id');
 const menu = document.getElementById('menu-container');
-
+const antiforgeryToken = document.getElementById('antiforgeryToken');
 const chartDefaultsTask = importChartDefaults();
 const homeDashboardPromise = getHomeDashboard(menu, fiscalPlanId.value, currentDate, JSON.parse(fiscalPlanId.dataset.object));
 const statisticsDashboardPromise = getStatisticsDashboard(fiscalPlanId.value, currentDate);
-const reevaluationDashboardPromise = getReevaluationDashboard();
+const reevaluationDashboardPromise = getReevaluationDashboard(antiforgeryToken.value);
 const modalsPromise = importBootstrapModals();
 const collapsesPromise = importBootstrapCollapses()
     .then(() => {
         $('.accordion-head').on('click', function (event) {
-            if (!event.target.classList.contains('add-category-icon')) {
+            if (!event.target.classList.contains('addCategory-icon')) {
                 let collapse = $(this).next();                
                 if (!collapse[0].classList.contains('collapsing')) {
                     collapse.collapse('toggle');
@@ -147,7 +147,7 @@ function initAddCategoryModal(modal, homeDashboard) {
         }
     });
 
-    $('.add-category-icon').on('click', function () {
+    $('.addCategory-icon').on('click', function () {
         var type = $(this).closest('.accordion')[0].dataset.type;
         addCategoryModalType.value = type;
         addCategoryModalFiscalPlanId.value = fiscalPlanId.value;
@@ -304,19 +304,35 @@ function setupFlipContainer() {
         var currentFace = document.getElementById(faces[currentSideIndex]);
         var nextFace = document.getElementById(faces[index]);
 
+        if (currentSideIndex == 0) {
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            }
+        }
+
         var degreeDiff = shortestAngle(currentSideIndex, index);
-        currentDeg += degreeDiff;
+        currentDeg += degreeDiff;       
 
         flipContainer.style = `transform: rotateY(${currentDeg}deg)`;
         currentFace.classList.remove('visible-face');
         nextFace.classList.add('visible-face');
+        nextFace.removeAttribute('inert');
+        currentFace.setAttribute('inert', '');
+        nextFace.setAttribute('aria-hidden', 'false');
+        currentFace.setAttribute('aria-hidden', 'true');
         currentSideIndex = index;
     });
 
-    flipContainer.addEventListener('transitionend', () => {
-        currentDeg = currentDeg % 360;
-        flipContainer.style = `transform: rotateY(${currentDeg}deg); transition: transform 0s`;
+    flipContainer.addEventListener('transitionend', (event) => {
+        if (event.propertyName == 'transform') {
+            currentDeg = currentDeg % 360;
+            flipContainer.style = `transform: rotateY(${currentDeg}deg); transition: transform 0s`;
+        }
     });
+}
+
+function setupMessageBox() {
+
 }
 
 async function getTransactionsTable() {
@@ -439,10 +455,10 @@ async function getTransactionsTable() {
                     defaultContent:
                     `<div class="d-flex justify-content-center align-items-center flex-wrap gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="table-icon" fill="rgba(255, 255, 255, 1)" data-icon="edit">
-                            <use href="#edit-icon" xlink:href="#edit-icon"/>
+                            <use href="#edit-icon"/>
                         </svg >
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="table-icon" viewBox="0 0 16 16" fill="rgba(255, 255, 255, 1)" data-icon="delete">
-                            <use href="#trash-icon" xlink:href="#trash-icon"/>
+                            <use href="#trash-icon"/>
                         </svg>
                     </div>`,
                     targets: -1,
@@ -503,11 +519,11 @@ async function getHomeDashboard(menu, id, date, data) {
     }
 } 
 
-async function getReevaluationDashboard() {
+async function getReevaluationDashboard(token) {
     try {
         const { default: ReevaluationDashboard } = await import(/* webpackChunkName: "reevaluationDashboard" */'./reevaluationDashboard');
 
-        return new ReevaluationDashboard();
+        return new ReevaluationDashboard(token);
     } catch (error) {
         console.error('Error loading reevaluation dashboard:', error);
         throw error;

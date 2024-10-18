@@ -230,7 +230,7 @@ export async function deleteTransaction(id, token) {
     }
 }
 
-export async function patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary) {
+export async function patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary, token) {
     try {
         var id = formData.get('Id');
 
@@ -263,7 +263,8 @@ export async function patchTransactionEvaluation(formData, previousIsHappy, prev
         var response = await fetch(API_ROUTES.transactions.BY_ID(id), {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json-patch+json'
+                'Content-Type': 'application/json-patch+json',
+                'RequestVerificationToken': token
             },
             body: JSON.stringify(patchDoc)
         });
