@@ -5,21 +5,20 @@ import MessageBox from "./messageBox";
 Chart.register(DoughnutController, ArcElement);
 
 const messageBox = new MessageBox();
-messageBox.addMessage({
-    iconId: "#check-icon",
-    text: "Loading Dashboard..."
-});
-messageBox.addMessage({
-    iconId: "#cross-icon",
-    text: "Failed Task"
-});
 const chartDefaultsTask = importChartDefaults();
 
 const currentDate = new Date();
 const categoryId = document.getElementById('category_Id');
 
-const categoryDashboardPromise = getCategoryDashboard(categoryId.value, currentDate, JSON.parse(categoryId.dataset.object));
-const modalsPromise = importBootstrapModals();
+const categoryDashboardPromise = getCategoryDashboard(currentDate, JSON.parse(categoryId.dataset.object));
+const modalsPromise = importBootstrapModals()
+    .catch(() => {
+    messageBox.addMessage({
+        text: 'An Critical Error Occured. Please reload the page!',
+        iconId: '#cross-icon'
+    });
+    messageBox.show(false);
+    });
 const collapsesPromise = importBootstrapCollapses()
     .then(() => {
         $('.accordion-head').on('click', function (event) {
@@ -32,6 +31,13 @@ const collapsesPromise = importBootstrapCollapses()
                 }               
             }
         });
+    })
+    .catch((error) => {
+        messageBox.addMessage({
+            text: 'An Critical Error Occured. Please reload the page!',
+            iconId: '#cross-icon'
+        });
+        messageBox.show(false);
     });
 
 setupDataTableHandlers(categoryDashboardPromise, modalsPromise)
@@ -46,13 +52,17 @@ async function getCategoryDashboard(id, date, data) {
         return new CategoryDashboard(id, date, data);
 
     } catch (error) {
-        console.error('Error loading category dashboard:', error);
-        throw error;
+        messageBox.addMessage({
+            text: 'Dashboard Couldn\'t Be Loaded. Please reload the page! ',
+            iconId: '#cross-icon'
+        });
+        messageBox.show(false);
+        console.error(error);
     }
 } 
 
 async function setupRerenderHandlers(dashboardPromise) {
-    var dashBoard = await dashboardPromise;
+    var dashBoard = await dashboardPromise;   
     await dashBoard.initPromise;
     window.addEventListener('countryChanged', () => {
         setTimeout(() => dashBoard.formatDashboard(), 0);
@@ -60,7 +70,7 @@ async function setupRerenderHandlers(dashboardPromise) {
 }
 
 async function setupDataTableHandlers(dashboardPromise, modalsPromise) {
-    var dashBoard = await dashboardPromise;
+    var dashBoard = await dashboardPromise;   
     await dashBoard.initPromise;
     var table = dashBoard.table;
     var modals = await modalsPromise;
@@ -68,8 +78,8 @@ async function setupDataTableHandlers(dashboardPromise, modalsPromise) {
     var updateTransactionModal = modals.find(m => m._element.id == 'updateTransaction-modal');
     var deleteTransactionModal = modals.find(m => m._element.id == 'deleteTransaction-modal');
 
-    initUpdateTransactionModal(updateTransactionModal, table);
-    initDeleteTransactionModal(deleteTransactionModal, table);
+    initUpdateTransactionModal(dashBoard, updateTransactionModal, table);
+    initDeleteTransactionModal(dashBoard, deleteTransactionModal, table);
 
     var idUpdate = document.getElementById('updateTransaction_id');
     var labelUpdate = document.getElementById('updateTransaction-label');
@@ -124,6 +134,11 @@ async function initAddTransactionModal(dashboardPromise, modalsPromise) {
             let transaction = await postTransaction(new FormData(this));
             if (transaction) {
                 dB.addTransaction(transaction);
+                messageBox.addMessage({
+                    text: 'Transaction added successfully.',
+                    iconId: '#check-icon'
+                });
+                messageBox.show();
             }
         }
     });
@@ -135,7 +150,7 @@ async function initAddTransactionModal(dashboardPromise, modalsPromise) {
     });
 }
 
-function initUpdateTransactionModal(modal, table) {
+function initUpdateTransactionModal(dashboard, modal, table) {
     var form = document.getElementById('updateTransaction-form');
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -144,14 +159,23 @@ function initUpdateTransactionModal(modal, table) {
             let formData = new FormData(this);
             let isUpdated = await putTransaction(formData);
             if (isUpdated) {
+                messageBox.addMessage({
+                    text: 'Transaction edited successfully.',
+                    iconId: '#check-icon'
+                });
+                messageBox.show();
                 let row = table.row((_, data) => data.id === parseInt(formData.get('Id')));
                 if (row) {
                     let data = row.data();
-                    data.amount = parseFloat(formData.get('Amount'));
+                    let newAmount = parseFloat(formData.get('Amount'));
+                    let newIsHappy = formData.get('IsHappy') === 'true';
+                    let newIsNecessary = formData.get('IsNecessary') === 'true'; 
+                    dashboard.editTransaction(data, newAmount, newIsHappy, newIsNecessary);
+                    data.amount = newAmount;
                     data.title = formData.get('Title');
                     data.dateTime = formData.get('DateTime');
-                    data.isHappy = formData.get('IsHappy') === 'true';
-                    data.isNecessary = formData.get('IsNecessary') === 'true';
+                    data.isHappy = newIsHappy;
+                    data.isNecessary = newIsNecessary;
                     data.isEvaluated = formData.get('IsEvaluated') === 'true';
                     data.previousIsHappy = formData.get('PreviousIsHappy') === 'true';
                     data.PreviousIsNecessary = formData.get('PreviousIsNecessary') === 'true';
@@ -162,7 +186,7 @@ function initUpdateTransactionModal(modal, table) {
     });
 }
 
-function initDeleteTransactionModal(modal, table) {
+function initDeleteTransactionModal(dashboard, modal, table) {
     var form = document.getElementById('deleteTransaction-form');
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
@@ -173,8 +197,14 @@ function initDeleteTransactionModal(modal, table) {
             var token = formData.get('__RequestVerificationToken');
             var isDeleted = await deleteTransaction(id, token);
             if (isDeleted) {
+                messageBox.addMessage({
+                    text: 'Transaction deleted successfully.',
+                    iconId: '#check-icon'
+                });
+                messageBox.show();
                 let row = table.row((_, data) => data.id === parseInt(formData.get('Id')));
                 if (row) {
+                    dashboard.removeTransaction(row.data());
                     row.remove().draw();
                 }
             }

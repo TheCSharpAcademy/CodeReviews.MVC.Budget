@@ -16,16 +16,16 @@ export default class CategoryDashboard {
     #differenceHeader;
     #totalHeader;
 
-    constructor(id, date, data) {
+    constructor(date, data) {
         this.#data = data;
-        this.initPromise = this.#init(id, date);
+        this.initPromise = this.#init(date);
     }
 
-    async #init(id, date) {
+    async #init(date) {
         try {
             this.#isLoading = true;
             var token = document.getElementById('antiforgeryToken').value;
-            var datepickerPromise = this.#initializeDatePicker(id, date);
+            var datepickerPromise = this.#initializeDatePicker(date);
             var tablePromise = this.#initializeTable(token);
             this.#initializeCharts();
             this.#budgetHeader = document.getElementById('budget-header');
@@ -108,11 +108,11 @@ export default class CategoryDashboard {
         });
     }
 
-    async #initializeDatePicker(id, date) {
+    async #initializeDatePicker(date) {
         this.#monthPicker = await getDatePicker("#monthSelector", "month")
         this.#monthPicker.datepicker('setDate', date.toISOString());
         this.#monthPicker.on('changeDate', async () => {
-            this.#refresh(id, this.#monthPicker.datepicker('getUTCDate'));            
+            this.#refresh(this.#monthPicker.datepicker('getUTCDate'));            
         });
 
         $('.monthPicker .calendar-button').on('click', function () {
@@ -279,14 +279,14 @@ export default class CategoryDashboard {
         }
     }
 
-    async #refresh(id, date) {
+    async #refresh(date) {
         try {
             if (this.#isLoading) {
                 console.log("Dashboard is loading...")
             }
             this.#isLoading = true;
             this.table.ajax.reload(null, true)
-            var data = await this.#getData(id, date, this.#data.categoryType);
+            var data = await this.#getData(this.#data.id, date, this.#data.categoryType);
 
             if (data) {
                 this.#formatCharts(data);
@@ -378,6 +378,24 @@ export default class CategoryDashboard {
             this.#formatCharts();
             this.table.ajax.reload(null, false);
         }
+    }
+
+    editTransaction(oldTransaction, newAmount, newIsHappy, newIsNecessary) {
+        this.#data.total += newAmount - oldTransaction.amount;
+        this.#data.happyTotal += (newIsHappy - oldTransaction.isHappy) * oldTransaction.amount;
+        this.#data.necessaryTotal += (newIsNecessary - oldTransaction.isNecessary) * oldTransaction.amount;
+
+        this.#formatHeaders();
+        this.#formatCharts();
+    }
+
+    removeTransaction(transaction) {
+        this.#data.total -= transaction.amount;
+        this.#data.happyTotal -= transaction.isHappy * transaction.amount;
+        this.#data.necessaryTotal -= transaction.isNecessary * transaction.amount;
+
+        this.#formatHeaders();
+        this.#formatCharts();
     }
 
     getCurrentMonthUTC = () => this.#monthPicker.datepicker('getUTCDate');

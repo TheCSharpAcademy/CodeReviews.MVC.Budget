@@ -249,8 +249,9 @@ svg * {
 .messageBox {
     visibility: hidden;
     display: flex;
-    background-color: rgba(255,200,200, 0.2);
-    backdrop-filter: blur(15px);
+    background-color: rgba(255,255,255, 0.4);
+    backdrop-filter: blur(8px);
+    color: $secondary;
     height: 80px;    
     position: absolute;
     top: 10px;
@@ -259,14 +260,14 @@ svg * {
     border-radius: 40px;
     max-width: 80px;
     transform: translateX(-100%);
-    transition: transform 0.2s ease-out 0.8s, max-width 0.8s ease-out, visibility 1s;
+    transition: transform 0.2s ease-out 0.7s, max-width 0.6s ease-out, visibility 0.9s;
 }
 
 .messageBox.show {
     visibility: visible;
     transform: none;
-    max-width: calc(100% - 20px);
-    transition: transform 0.2s ease-out, max-width 0.8s 0.2s ease-out;
+    max-width: calc(100vw - 20px);
+    transition: transform 0.2s ease-out, max-width 0.6s 0.3s ease-out;
 }
 
 .messageBoxIcon-container{
@@ -286,23 +287,42 @@ svg * {
     overflow: hidden;
     transition: max-width ease-out 5s 0.5s;
 }
+
+.messageBox-button {
+    display: block;
+    margin-left: calc(50% - 32px);
+    height: 16px;
+    opacity: 0.7;
+}
+
+.messageBox-button[disabled]:hover, .messageBox-button[disabled] {
+    opacity: 0.45;
+}
+
+.messageBox-button:hover {
+    opacity: 0.8;
+}
+
+.messageBox-caret {
+    display: inline-block;
+    vertical-align: top;
+    color: #000;
+    opacity: inherit;
+}
+
 .messageBox-body {
-    height: 100%;
+    height: calc(100% - 32px);
     width: 100%;
     display: flex;
     gap: 5px;
     align-items: center;
-    padding: 5px 10px;
-}
-
-.messageBox-scrollcontainer::-webkit-scrollbar {
-    display: none;
+    padding: 0 10px;
 }
 
 .messageBox-scrollcontainer {
     height: 100%;
     max-width: calc(100% - 24px);
-    overflow-y: scroll;
+    overflow: hidden;
     scroll-snap-type: y mandatory;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -311,18 +331,25 @@ svg * {
 .messageBoxMessage {
     scroll-snap-align: center;
     scroll-snap-stop: always;
-    height: 70px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 200px;
+    min-width: 190px;
+    overflow-y: scroll;
 }
 
 .messageBox-text {
     white-space: nowrap;
-    overflow: hidden;
+    max-height: 100%;
+    overflow: scroll hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
+.messageBox-text::-webkit-scrollbar {
+    display: none;
+}
 
 // Action sidebar
 

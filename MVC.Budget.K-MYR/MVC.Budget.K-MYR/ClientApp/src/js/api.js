@@ -136,7 +136,7 @@ export async function getFiscalPlanDataByYear(id, date = new Date()) {
             return null;
         }
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
         return null;
     }
 }
@@ -163,6 +163,7 @@ export async function postTransaction(formData) {
             return await response.json();
         } else {
             console.error(`HTTP Post Error: ${response.status}`);
+            var response = await response.json();
             return null;
         }
 
