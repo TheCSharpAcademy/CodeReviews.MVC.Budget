@@ -1,8 +1,9 @@
 ﻿import { getUnevaluatedTransactions, patchTransactionEvaluation } from './api';
+import messageBox from './messageBox';
+
 export default class ReevaluationDashboard {
     #data;
     #isLoading;
-    #initPromise;
     #container;
     #infoDiv;
     #antiforgeryToken
@@ -10,7 +11,7 @@ export default class ReevaluationDashboard {
     constructor(token) {
         this.#antiforgeryToken = token;
         this.#data = null;   
-        this.#initPromise = this.#init();
+        this.#init();
     }
 
     async #init() {
@@ -33,30 +34,29 @@ export default class ReevaluationDashboard {
         var element = document.getElementById(`reeval_transaction_${id}`);
         var previousIsHappy = element.dataset.ishappy === 'true';
         var previousIsNecessary = element.dataset.isnecessary === 'true';
-        var IsPatched = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary, this.#antiforgeryToken);        
-
-        if (IsPatched) {            
+        var responsePatch = await patchTransactionEvaluation(formData, previousIsHappy, previousIsNecessary, this.#antiforgeryToken);
+        messageBox.addAndShow(responsePatch.message, responsePatch.isSuccess ? '#check-icon' : '#cross-icon');
+        
+        if (responsePatch.isSuccess) {
             let accordion = $(form).closest('.accordion');
-
             element.removeEventListener('submit', this.#onReevaluate);
             element.remove();
-            debugger;
             let accordionBody = accordion.find('.accordion-body')[0];
             let categoryId = parseInt(accordion[0].dataset.categoryid);
-            let spinner = document.getElementById(`spinner_${categoryId}`);    
-            
+            let spinner = document.getElementById(`spinner_${categoryId}`);
+
             if (accordionBody.childElementCount < 6 && spinner) {
                 spinner.classList.remove('invisible');
                 let lastTransaction = accordionBody.children[accordionBody.childElementCount - 2];
                 let lastDate = lastTransaction.dataset.date;
-                let transactions = await getUnevaluatedTransactions(categoryId, lastDate, parseInt(lastTransaction.dataset.id), 6);
-
-                if (transactions && transactions.length > 0) {
-                    this.#createTransactionElements(transactions, accordionBody, spinner);
+                let responseGet = await getUnevaluatedTransactions(categoryId, lastDate, parseInt(lastTransaction.dataset.id), 6);
+                if (responseGet.isSuccess && responseGet.data.length > 0) {
+                    this.#createTransactionElements(responseGet.data, accordionBody, spinner);
                     spinner.classList.add('invisible');
                 } else {
                     spinner.remove();
-                }
+                    messageBox.addAndShow(responseGet.message, responseGet.isSuccess ? '#check-icon' : '#cross-icon');                  
+                }                 
             }
 
             if (accordionBody.childElementCount === 0) {
@@ -64,6 +64,7 @@ export default class ReevaluationDashboard {
             }
             this.#toggleReevaluationInfo();
         }
+              
     }
 
     #attachEventHandlers() {
@@ -78,7 +79,7 @@ export default class ReevaluationDashboard {
     formatDashboard() {
         try {
             if (this.#isLoading) {
-                console.log('Dashboard is loading...')
+                messageBox.addAndShow('The dashboard is loading...', '#info-icon');
                 return false;
             }
             this.#isLoading = true;

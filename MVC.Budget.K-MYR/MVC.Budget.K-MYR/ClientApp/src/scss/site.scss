@@ -836,7 +836,7 @@ div.dt-processing > div:last-child > div {
     display: grid;
     grid-template-columns: 1fr;
     gap: 25px;
-    margin: 20px auto 0 auto;
+    margin: 0 auto;
     max-width: 800px;
 }
 
@@ -867,9 +867,9 @@ div.dt-processing > div:last-child > div {
 }
 
 .fiscalPlan-icon {
-    opacity: 0;
     transition: 0.3s ease;
     flex-shrink: 0;
+    cursor: pointer;
 }
 
 .fiscalPlan-heading {
@@ -888,11 +888,6 @@ div.dt-processing > div:last-child > div {
 
 .fiscalPlan-card:hover, .add-fiscalPlan-card:hover {
     scale: 1.015;
-}
-
-.fiscalPlan-card:hover .fiscalPlan-icon {
-    opacity: 1;
-    cursor: pointer;
 }
 
 .add-fiscalPlan-card svg {

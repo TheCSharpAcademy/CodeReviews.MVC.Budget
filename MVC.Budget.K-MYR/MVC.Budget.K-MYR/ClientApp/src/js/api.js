@@ -1,4 +1,23 @@
 ﻿import { API_ROUTES } from './config';
+
+class ApiResponse {
+    constructor(isSuccess, status, message, errors = [], data = null) {
+        this.isSuccess = isSuccess;
+        this.status = status;
+        this.errors = errors;
+        this.message = message;
+        this.data = data;
+    }
+
+    static success(status, message, data) {
+        return new ApiResponse(true, status, message, undefined, data);
+    }
+
+    static failure(status, message, errors) {
+        return new ApiResponse(false, status, message, errors, undefined);
+    }
+}  
+
 export async function getCountryCookie(countryISOCode, token) {
     try {
         var response = await fetch(API_ROUTES.COUNTRY, {
@@ -8,17 +27,16 @@ export async function getCountryCookie(countryISOCode, token) {
                 'RequestVerificationToken': token
             },
             body: JSON.stringify(countryISOCode)
-        });
+        });        
 
         if (response.ok) {
-            return await response.json();
-        } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-            return null;
+            let json = await response.json()
+            return ApiResponse.success(response.status, 'Country changed successfully.', json);
+        } else {      
+            return ApiResponse.failure(response.status, 'Failed to change country. Please try again.', []);
         }
-    } catch (error) {
-        console.error(error);
-        return null;
+    } catch (error) {        
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }    
 }
 
@@ -36,15 +54,13 @@ export async function postFiscalPlan(formData) {
         });
 
         if (response.ok) {
-            return true;
+            let json = await response.json()
+            return ApiResponse.success(response.status, 'Fiscal plan added successfully.', json);
         } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-            return false;
+            return ApiResponse.failure(response.status, 'Failed to add fiscal plan. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return false;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -64,14 +80,12 @@ export async function putFiscalPlan(formData) {
         });
 
         if (response.ok) {
-            return true;
+            return ApiResponse.success(response.status, 'Fiscal plan edited successfully.');
         } else {
-            console.error(`HTTP PUT Error: ${response.status}`);
-            return false;
+            return ApiResponse.failure(response.status, 'Failed to edit fiscal plan. Please try again.', []);
         }
     } catch (error) {
-        console.error(error);
-        return false;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -85,15 +99,12 @@ export async function deleteFiscalPlan(id, token) {
         });
 
         if (response.ok) {
-            return true;
+            return ApiResponse.success(response.status, 'Fiscal plan deleted successfully.');
         } else {
-            console.error(`HTTP Delete Error: ${response.status}`);
-            return false;
+            return ApiResponse.failure(response.status, 'Failed to delete fiscal plan. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return false;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -108,14 +119,13 @@ export async function getFiscalPlanDataByMonth(id, date = new Date()) {
         });
 
         if (response.ok) {
-            return await response.json();
+            let data = await response.json();
+            return ApiResponse.success(response.status, 'Fetched data successfully.', data);
         } else {
-            console.error(`HTTP GET Error: ${response.status}`);
-            return null;
+            return ApiResponse.failure(response.status, 'Failed to fetch data. Please try again.', []);
         }
     } catch (error) {
-        console.error(error);
-        return null;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -130,14 +140,13 @@ export async function getFiscalPlanDataByYear(id, date = new Date()) {
         });
 
         if (response.ok) {
-            return await response.json();
+            let data = await response.json();
+            return ApiResponse.success(response.status, 'Fetched data successfully.', data);
         } else {
-            console.error(`HTTP GET Error: ${response.status}`);
-            return null;
+            return ApiResponse.failure(response.status, 'Failed to fetch data. Please try again.', []);
         }
     } catch (error) {
-        console.error(error.message);
-        return null;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -160,16 +169,13 @@ export async function postTransaction(formData) {
         });
 
         if (response.ok) {
-            return await response.json();
+            let json = await response.json()
+            return ApiResponse.success(response.status, 'Transaction added successfully.', json);
         } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-            var response = await response.json();
-            return null;
+            return ApiResponse.failure(response.status, 'Failed to add transaction. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return null;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -197,15 +203,12 @@ export async function putTransaction(formData) {
         });
 
         if (response.ok) {
-            return true;
+            return ApiResponse.success(response.status, 'Transaciton edited successfully.');
         } else {
-            console.error(`HTTP PUT Error: ${response.status}`);
-            return false;
+            return ApiResponse.failure(response.status, 'Failed to edit transaction. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return false;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -219,15 +222,12 @@ export async function deleteTransaction(id, token) {
         });
 
         if (response.ok) {
-            return true;
+            return ApiResponse.success(response.status, 'Transaction deleted successfully.');
         } else {
-            console.error(`HTTP Delete Error: ${response.status}`);
-            return false;
+            return ApiResponse.failure(response.status, 'Failed to delete transaction. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return false;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -271,16 +271,13 @@ export async function patchTransactionEvaluation(formData, previousIsHappy, prev
         });
 
         if (response.ok) {
-            return true;
+            return ApiResponse.success(response.status, 'Transaction evaluated successfully.');
         } else {
-            console.error(`HTTP Patch Error: ${response.status}`);
-            return false;
+            return ApiResponse.failure(response.status, 'Failed to evaluated transaction. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return false;
-    };
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
+    }
 }
 
 export async function getUnevaluatedTransactions(categoryId, lastDate, lastId, pageSize) {
@@ -303,16 +300,14 @@ export async function getUnevaluatedTransactions(categoryId, lastDate, lastId, p
         });
 
         if (response.ok) {
-            return await response.json();
+            var data = await response.json();
+            return ApiResponse.success(response.status, 'Fetched data successfully.', data);
         } else {
-            console.error(`HTTP GET Error: ${response.status}`);
-            return null;
+            return ApiResponse.failure(response.status, 'Failed to fetch data. Please reload the page.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return null;
-    };
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
+    }
 }
 
 export async function getCategoryDataByMonth(id, date = new Date(), type) {
@@ -338,14 +333,13 @@ export async function getCategoryDataByMonth(id, date = new Date(), type) {
         });
 
         if (response.ok) {
-            return await response.json();
+            var data = await response.json();
+            return ApiResponse.success(response.status, 'Fetched data successfully.', data);
         } else {
-            console.error(`HTTP GET Error: ${response.status}`);
-            return null;
+            return ApiResponse.failure(response.status, 'Failed to fetch data. Please reload the page.', []);
         }
     } catch (error) {
-        console.error(error);
-        return null;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -378,15 +372,13 @@ export async function postCategory(formData) {
         });
 
         if (response.ok) {
-            return await response.json();
+            let json = await response.json()
+            return ApiResponse.success(response.status, 'Category added successfully.', json);
         } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-            return null;
+            return ApiResponse.failure(response.status, 'Failed to add category. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return null;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -427,15 +419,12 @@ export async function putCategory(formData, date = new Date()) {
         });
 
         if (response.ok) {
-            return true;
+            return ApiResponse.success(response.status, 'Category edited successfully.');
         } else {
-            console.error(`HTTP Post Error: ${response.status}`);
-            return false;
+            return ApiResponse.failure(response.status, 'Failed to edit category. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return false;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }
 
@@ -461,14 +450,11 @@ export async function deleteCategory(id, type, token) {
         });
 
         if (response.ok) {
-            return true;
+            return ApiResponse.success(response.status, 'Category deleted successfully.');
         } else {
-            console.error(`HTTP Delete Error: ${response.status}`);
-            return false;
+            return ApiResponse.failure(response.status, 'Failed to delete category. Please try again.', []);
         }
-
     } catch (error) {
-        console.error(error);
-        return false;
+        return ApiResponse.failure(null, 'A network error occured. Please try again.', [error]);
     }
 }

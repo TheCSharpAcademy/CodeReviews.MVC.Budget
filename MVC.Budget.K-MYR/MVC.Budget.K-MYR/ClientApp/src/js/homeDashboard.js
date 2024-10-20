@@ -2,11 +2,11 @@
 Chart.register(DoughnutController, ArcElement);
 import { getDatePicker } from './asyncComponents'
 import { getFiscalPlanDataByMonth } from './api';
+import messageBox from './messageBox';
 
 export default class HomeDashboard {
     #data;
     #isLoading;
-    #initPromise;
     #monthPicker;
     #sentimentChartMonthly;
     #necessityChartMonthly;
@@ -26,8 +26,8 @@ export default class HomeDashboard {
     async #init(id, date) {
         try {
             this.#isLoading = true;
-            var promise = this.#initializeDatePicker(id, date);
-            this.#initializeCharts();            
+            var datepickerPromise = this.#initializeDatePicker(id, date);
+            var chartPromise = this.#initializeCharts();            
 
             this.#overspendingHeading = document.getElementById('home-overspending');
 
@@ -39,7 +39,8 @@ export default class HomeDashboard {
             
             this.#formatHeaders();   
             this.#formatCategories();
-            await promise;
+            await datepickerPromise;
+            await chartPromise;
         } finally {
             this.#isLoading = false;
         }        
@@ -163,16 +164,18 @@ export default class HomeDashboard {
     async #refresh(id, date) {        
         try {
             if (this.#isLoading) {
-                console.log("Dashboard is loading...")
+                messageBox.addAndShow('The dashboard is loading...', '#info-icon');
             }
 
             this.#isLoading = true;
-            var data = await this.#getData(id, date);
-
-            if (data) {
-                this.#renderData(data);
-                this.#data = data;
-            }            
+            let response = await this.#getData(id, date);
+            if (response.isSuccess) {
+                this.#renderData(response.data);
+            } else {
+                messageBox.addMessage({ text: response.message, iconId: '#cross-icon' });
+                messageBox.show();
+            }
+            
         } finally {
             this.#isLoading = false;
         }
@@ -186,7 +189,7 @@ export default class HomeDashboard {
     formatDashboard(data) {
         try {
             if (this.#isLoading) {
-                console.log("Dashboard is loading...")
+                messageBox.addAndShow('The dashboard is loading...', '#info-icon');
                 return false;
             }
             this.#isLoading = true;
@@ -445,7 +448,7 @@ export default class HomeDashboard {
         return category;
     }
 
-    addCategory(category) {        
+    addCategory(category) { 
         var categoryDTO =
         {
             id: category.id,
@@ -456,6 +459,12 @@ export default class HomeDashboard {
             necessaryTotal: 0,           
             total: 0
         }
+
+        if (category.categoryType === 1) {
+            this.#data.incomeBudget += category.budget;
+        } else if (category.categoryType === 2) {
+            this.#data.expensesBudget += category.budget;
+        }  
 
         var categoryElement = this.#createCategoryElement(categoryDTO);
 
@@ -470,6 +479,9 @@ export default class HomeDashboard {
             array.splice(insertIndex, 0, categoryDTO);      
             accordion.insertBefore(categoryElement, accordion.children[insertIndex]);
         }
+
+        this.#formatCharts();
+        this.#formatHeaders();
     }
 
     editCategory(formData, month) {        
@@ -507,7 +519,6 @@ export default class HomeDashboard {
             let newOverspending = Math.max(0, category.total - budget);
             let diff = newOverspending - overspending;
             this.#data.overspending += diff;
-            debugger;
             switch (type) {
                 case 1:
                     this.#data.incomeBudget += budget - oldBudget;
@@ -550,13 +561,24 @@ export default class HomeDashboard {
             default:
                 return false;
         }
-
-        var index = array.findIndex(item => item.id === id);
-
+        debugger;
+        var index = array.findIndex(item => item.id === id);    
         if (index !== -1) {
-            array.splice(index, 1)
+            let category = array[index];
+            if (type === 1) {
+                this.#data.incomeTotal -= category.total;
+                this.#data.incomeBudget -= category.budget;
+            } else if (type === 2) {
+                this.#data.overspending -= Math.max(0, category.total - category.budget)
+                this.#data.expensesTotal -= category.total;
+                this.#data.expensesBudget -= category.budget;
+                this.#data.expensesHappyTotal -= category.happyTotal;
+                this.#data.expensesNecessaryTotal -= category.necessaryTotal;
+            }            
+            array.splice(index, 1);
+            this.#formatCharts();
+            this.#formatHeaders();
         }
-
         return true;
     }
 
@@ -575,20 +597,26 @@ export default class HomeDashboard {
             
             category.total += transaction.amount;
             this.#data.overspending += Math.max(0, category.total - category.budget - overspending);
-            if (category.categoryType == 2) {
-                this.#data.expensesTotal += transaction.amount;
 
+            if (category.categoryType === 2) {
+                this.#data.expensesTotal += transaction.amount;
                 if (transaction.isHappy) {
                     this.#data.expensesHappyTotal += transaction.amount;
                 }
                 if (transaction.isNecessary) {
                     this.#data.expensesNecessaryTotal += transaction.amount;
                 }
-            }
-            else if (category.categoryType == 1) {
+            } else if (category.categoryType === 1) {
                 this.#data.incomeTotal += transaction.amount;
             }
-            
+
+            if (transaction.isHappy) {
+                category.happyTotal += transaction.amount;
+            }
+            if (transaction.isNecessary) {
+                category.necessaryTotal += transaction.amount;
+            }
+
             this.#formatHeaders();
             this.#formatCharts();
             this.#updateCategory(category);

@@ -1,10 +1,9 @@
 ﻿import { importChartDefaults, importBootstrapCollapses, importBootstrapModals } from './asyncComponents';
 import { ArcElement, Chart, DoughnutController } from 'chart.js';
 import { postTransaction, putTransaction, deleteTransaction } from './api'
-import MessageBox from "./messageBox";
+import messageBox from "./messageBox";
 Chart.register(DoughnutController, ArcElement);
 
-const messageBox = new MessageBox();
 const chartDefaultsTask = importChartDefaults();
 
 const currentDate = new Date();
@@ -13,11 +12,7 @@ const categoryId = document.getElementById('category_Id');
 const categoryDashboardPromise = getCategoryDashboard(currentDate, JSON.parse(categoryId.dataset.object));
 const modalsPromise = importBootstrapModals()
     .catch(() => {
-    messageBox.addMessage({
-        text: 'An Critical Error Occured. Please reload the page!',
-        iconId: '#cross-icon'
-    });
-    messageBox.show(false);
+        messageBox.addAndShow('A critical error occurred. Please reload the page', '#cross-icon', false);
     });
 const collapsesPromise = importBootstrapCollapses()
     .then(() => {
@@ -32,12 +27,8 @@ const collapsesPromise = importBootstrapCollapses()
             }
         });
     })
-    .catch((error) => {
-        messageBox.addMessage({
-            text: 'An Critical Error Occured. Please reload the page!',
-            iconId: '#cross-icon'
-        });
-        messageBox.show(false);
+    .catch(() => {
+        messageBox.addAndShow('A critical error occurred. Please reload the page.', '#cross-icon', false);
     });
 
 setupDataTableHandlers(categoryDashboardPromise, modalsPromise)
@@ -51,13 +42,8 @@ async function getCategoryDashboard(id, date, data) {
 
         return new CategoryDashboard(id, date, data);
 
-    } catch (error) {
-        messageBox.addMessage({
-            text: 'Dashboard Couldn\'t Be Loaded. Please reload the page! ',
-            iconId: '#cross-icon'
-        });
-        messageBox.show(false);
-        console.error(error);
+    } catch(error) {
+        messageBox.addAndShow('A critical error occurred. Please reload the page', '#cross-icon', false);
     }
 } 
 
@@ -131,15 +117,11 @@ async function initAddTransactionModal(dashboardPromise, modalsPromise) {
         event.preventDefault();
         if (modal._isShown && $(this).valid()) {
             modal.hide();
-            let transaction = await postTransaction(new FormData(this));
-            if (transaction) {
-                dB.addTransaction(transaction);
-                messageBox.addMessage({
-                    text: 'Transaction added successfully.',
-                    iconId: '#check-icon'
-                });
-                messageBox.show();
+            let response = await postTransaction(new FormData(this));
+            if (response.isSuccess) {
+                dB.addTransaction(response.data);
             }
+            messageBox.addAndShow(response.message, response.isSuccess ? '#check-icon' : '#cross-icon'); 
         }
     });
 
@@ -157,13 +139,8 @@ function initUpdateTransactionModal(dashboard, modal, table) {
         if (modal._isShown && $(this).valid()) {
             modal.hide();
             let formData = new FormData(this);
-            let isUpdated = await putTransaction(formData);
-            if (isUpdated) {
-                messageBox.addMessage({
-                    text: 'Transaction edited successfully.',
-                    iconId: '#check-icon'
-                });
-                messageBox.show();
+            let response = await putTransaction(formData);
+            if (response.isSuccess) {
                 let row = table.row((_, data) => data.id === parseInt(formData.get('Id')));
                 if (row) {
                     let data = row.data();
@@ -181,6 +158,7 @@ function initUpdateTransactionModal(dashboard, modal, table) {
                     data.PreviousIsNecessary = formData.get('PreviousIsNecessary') === 'true';
                     row.invalidate();
                 }
+                messageBox.addAndShow(response.message, response.isSuccess ? '#check-icon' : '#cross-icon'); 
             }
         }
     });
@@ -195,19 +173,15 @@ function initDeleteTransactionModal(dashboard, modal, table) {
             var formData = new FormData(this);
             var id = parseInt(formData.get('Id'));
             var token = formData.get('__RequestVerificationToken');
-            var isDeleted = await deleteTransaction(id, token);
-            if (isDeleted) {
-                messageBox.addMessage({
-                    text: 'Transaction deleted successfully.',
-                    iconId: '#check-icon'
-                });
-                messageBox.show();
+            var response = await deleteTransaction(id, token);
+            if (response.isSuccess) {              
                 let row = table.row((_, data) => data.id === parseInt(formData.get('Id')));
                 if (row) {
                     dashboard.removeTransaction(row.data());
                     row.remove().draw();
                 }
             }
+            messageBox.addAndShow(response.message, response.isSuccess ? '#check-icon' : '#cross-icon'); 
         }
     });
 }

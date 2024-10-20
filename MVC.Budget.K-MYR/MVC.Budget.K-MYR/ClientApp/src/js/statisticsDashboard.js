@@ -3,10 +3,10 @@ Chart.register(BarController, BarElement, CategoryScale, LinearScale, LineContro
 import { getColor } from './utilities';
 import { getDatePicker } from './asyncComponents';
 import { getFiscalPlanDataByYear } from './api';
+import messageBox from './messageBox';
 
 export default class StatisticsDashboard {
     #data;
-    #initPromise;
     #isLoading;
     #yearPicker
     #sentimentChartYearly;
@@ -20,7 +20,7 @@ export default class StatisticsDashboard {
 
     constructor(id, year) {
         this.#data = null;
-        this.#initPromise = this.#init(id, year);
+        this.#init(id, year);
     }
 
     async #init(id, year) {
@@ -32,10 +32,13 @@ export default class StatisticsDashboard {
             this.#totalSpentHeading = document.getElementById('statistics-totalSpent');
             this.#totalSpentHeading.textContent = `Total Spent: ${window.userNumberFormat.format(0)}`;
 
-            var data = await this.#getData(id, year);
-            await chartsPromise;           
-
-            this.#renderData(data);
+            var response = await this.#getData(id, year);
+            if (response.isSuccess) {
+                await chartsPromise;
+                this.#renderData(response.data);
+                this.#data = response.data;
+            }
+            
             this.#initializeDatePicker(id, year)
 
             $('.yearPicker .calendar-button').on('click', function () {
@@ -47,7 +50,6 @@ export default class StatisticsDashboard {
                 }
             });
 
-            this.#data = data;
 
         } finally {
             this.#isLoading = false;
@@ -57,13 +59,18 @@ export default class StatisticsDashboard {
     async refresh(id, year) {
         try {
             if (this.#isLoading) {
-                console.log("Dashboard is loading...")
+                messageBox.addAndShow('The dashboard is loading...', '#info-icon');
                 return false;
             }
 
             this.#isLoading = true;
-            let data = await this.#getData(id, year);
-            this.#renderData(data);
+            let response = await this.#getData(id, year);
+            if (response.isSuccess) {
+                this.#renderData(response.data);
+            } else {
+                messageBox.addAndShow(response.message, '#cross-icon');
+            }
+            
         } finally {
             this.#isLoading = false;
         }
@@ -77,7 +84,7 @@ export default class StatisticsDashboard {
     formatDashboard() {
         try {
             if (this.#isLoading) {
-                console.log("Dashboard is loading...")
+                messageBox.addAndShow('The dashboard is loading...', '#info-icon');
                 return false;
             }
             this.#isLoading = true;

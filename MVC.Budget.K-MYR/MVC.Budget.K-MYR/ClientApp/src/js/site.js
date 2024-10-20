@@ -1,5 +1,6 @@
 ﻿import { getCountrySelect } from "./asyncComponents";
 import { getCountryCookie } from "./api";
+import messageBox from "./messageBox";
 
 const countryChangedEvent = new CustomEvent('countryChanged');
 const countrySelectPromise = initializeCountrySelect();
@@ -17,12 +18,15 @@ async function initializeCountrySelect() {
         let iso2Code = countrySelect.countrySelect("getSelectedCountryData").iso2;
         let token = form.querySelector('input[name="__RequestVerificationToken"]').value
 
-        let preferences = await getCountryCookie(iso2Code, token);
+        let response = await getCountryCookie(iso2Code, token);
 
-        if (preferences) {
-            window.userLocale = new Intl.Locale(preferences.locale);
-            window.userNumberFormat = new Intl.NumberFormat(preferences.locale, { style: 'currency', currency: preferences.currency });
+        if (response.isSuccess) {
+            console.log(response);
+            window.userLocale = new Intl.Locale(response.data.locale);
+            window.userNumberFormat = new Intl.NumberFormat(response.data.locale, { style: 'currency', currency: response.data.currency });
             window.dispatchEvent(countryChangedEvent);
         }        
+        messageBox.addMessage({ text: response.message, iconId: response.isSuccess ? '#check-icon' : '#cross-icon' });
+        messageBox.show();
     });
 }

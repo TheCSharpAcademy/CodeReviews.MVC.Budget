@@ -1,4 +1,4 @@
-﻿export default class MessageBox {
+﻿class MessageBox {
     #messageBox;
     #messages;
     #index;
@@ -11,6 +11,10 @@
     #removeInterval;
 
     constructor() {
+        if (MessageBox.instance) {
+            return MessageBox.instance;
+        }
+
         this.#messageBox = document.getElementById('messageBox');
         this.#messagesContainer = document.getElementById('messageBox-scrollcontainer');
         this.#icon = document.getElementById('messageBoxIcon');
@@ -22,6 +26,7 @@
         this.#newMessagesQueue = [];
 
         this.#setupEventHandler();
+        MessageBox.instance = this;
     }
 
     #setupEventHandler() {
@@ -39,14 +44,15 @@
             }
         });
 
-        this.#messageBox.addEventListener('transitionend', () => {
-            if (this.#isClosing) {
+        this.#messageBox.addEventListener('transitionend', (event) => {           
+            if (this.#isClosing && event.propertyName === 'visibility') {
                 this.#clearMessages();
                 this.#isClosing = false;
 
                 if (this.#newMessagesQueue.length > 0) {
                     this.#newMessagesQueue.forEach(message => this.addMessage(message));
                     this.#newMessagesQueue = [];
+                    this.show();
                 }
             }
         });
@@ -83,6 +89,11 @@
         }
     }
 
+    addAndShow(text, iconId, fade = true) {
+        this.addMessage({ text: text, iconId: iconId });
+        this.show(fade);
+    }
+
     addMessage(messageObject) {
         if (this.#isClosing) {
             this.#newMessagesQueue.push(messageObject);
@@ -109,14 +120,13 @@
             this.#messagesContainer.removeChild(childToRemove);            
         }
         this.#messages.splice(index, 1);
-        this.#index = Math.min(this.#index, this.#messagesContainer.childElementCount);
+        this.#index = Math.min(this.#index, this.#messagesContainer.childElementCount - 1);
         this.#setIcon();
         this.#setButtons();
-        
     }
 
     show(fade = true) {
-        if (!this.#messageBox.classList.contains('show')) {
+        if (!this.#messageBox.classList.contains('show') && !this.#isClosing) {
             if (fade && !this.#removeInterval) {
                 this.#removeInterval = setInterval(() => {
                     if (this.#messagesContainer.childElementCount > 1) {
@@ -160,3 +170,5 @@
         this.#index < this.#messages.length - 1 ? this.#downButton.disabled = false : this.#downButton.disabled = true;
     }
 }
+
+export default new MessageBox();

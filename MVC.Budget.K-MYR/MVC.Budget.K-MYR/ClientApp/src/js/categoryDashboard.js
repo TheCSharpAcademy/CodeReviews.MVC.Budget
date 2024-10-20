@@ -3,6 +3,7 @@ Chart.register(DoughnutController, ArcElement);
 import { getDatePicker } from './asyncComponents'
 import { getCategoryDataByMonth } from './api';
 import { API_ROUTES } from './config'
+import messageBox from './messageBox';
 
 export default class CategoryDashboard {
     #data;
@@ -210,7 +211,7 @@ export default class CategoryDashboard {
                             };
                         },
                         error: function (xhr, status, error) {
-                            console.error(`Couldn't fetch transactions'`, error);
+                            messageBox.addAndShow('Failed to fetch data.Please try again.', '#cross-icon');
                         }
                     });
 
@@ -274,24 +275,26 @@ export default class CategoryDashboard {
             tableContainer.style = '';
             table.columns.adjust();
         } catch (error) {
-            console.error('Error loading Datatable:', error);
-            throw error;
+            messageBox.addAndShow('A critical error occurred. Please reload the page', '#cross-icon', false);
         }
     }
 
     async #refresh(date) {
         try {
             if (this.#isLoading) {
-                console.log("Dashboard is loading...")
+                messageBox.addAndShow('The dashboard is loading...', '#info-icon');
+                return false;
             }
             this.#isLoading = true;
             this.table.ajax.reload(null, true)
-            var data = await this.#getData(this.#data.id, date, this.#data.categoryType);
+            var response = await this.#getData(this.#data.id, date, this.#data.categoryType);
 
-            if (data) {
-                this.#formatCharts(data);
-                this.#formatHeaders(data);
-                this.#data = data;
+            if (response.isSuccess) {
+                this.#formatCharts(response.data);
+                this.#formatHeaders(response.data);
+                this.#data = response.data;
+            } else {
+                messageBox.addAndShow(response.message, '#cross-icon');
             }
             
         } finally {
@@ -381,9 +384,10 @@ export default class CategoryDashboard {
     }
 
     editTransaction(oldTransaction, newAmount, newIsHappy, newIsNecessary) {
-        this.#data.total += newAmount - oldTransaction.amount;
-        this.#data.happyTotal += (newIsHappy - oldTransaction.isHappy) * oldTransaction.amount;
-        this.#data.necessaryTotal += (newIsNecessary - oldTransaction.isNecessary) * oldTransaction.amount;
+        var difference = newAmount - oldTransaction.amount
+        this.#data.total += difference;
+        this.#data.happyTotal += (newIsHappy * newAmount) - (oldTransaction.isHappy * oldTransaction.amount);
+        this.#data.necessaryTotal += (newIsNecessary * newAmount) - (oldTransaction.isNecessary * oldTransaction.amount);
 
         this.#formatHeaders();
         this.#formatCharts();
