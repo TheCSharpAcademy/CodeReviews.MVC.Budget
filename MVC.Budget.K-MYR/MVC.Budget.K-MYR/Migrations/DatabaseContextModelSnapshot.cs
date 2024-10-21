@@ -47,7 +47,7 @@ namespace MVC.Budget.K_MYR.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
 
                     b.HasDiscriminator<int>("CategoryType");
 
@@ -76,7 +76,7 @@ namespace MVC.Budget.K_MYR.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("CategoryBudgets");
+                    b.ToTable("CategoryBudgets", (string)null);
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.FiscalPlan", b =>
@@ -94,7 +94,7 @@ namespace MVC.Budget.K_MYR.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FiscalPlans");
+                    b.ToTable("FiscalPlans", (string)null);
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.Transaction", b =>
@@ -145,7 +145,7 @@ namespace MVC.Budget.K_MYR.Migrations
 
                     b.HasIndex("DateTime");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("MVC.Budget.K_MYR.Models.ExpenseCategory", b =>

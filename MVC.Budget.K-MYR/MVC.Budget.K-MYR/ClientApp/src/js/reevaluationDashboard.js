@@ -41,27 +41,30 @@ export default class ReevaluationDashboard {
             let accordion = $(form).closest('.accordion');
             element.removeEventListener('submit', this.#onReevaluate);
             element.remove();
-            let accordionBody = accordion.find('.accordion-body')[0];
-            let categoryId = parseInt(accordion[0].dataset.categoryid);
-            let spinner = document.getElementById(`spinner_${categoryId}`);
+            if (accordion) {
+                let accordionBody = accordion.find('.accordion-body')[0];
+                let categoryId = parseInt(accordion[0].dataset.categoryid);
+                let spinner = document.getElementById(`spinner_${categoryId}`);
 
-            if (accordionBody.childElementCount < 6 && spinner) {
-                spinner.classList.remove('invisible');
-                let lastTransaction = accordionBody.children[accordionBody.childElementCount - 2];
-                let lastDate = lastTransaction.dataset.date;
-                let responseGet = await getUnevaluatedTransactions(categoryId, lastDate, parseInt(lastTransaction.dataset.id), 6);
-                if (responseGet.isSuccess && responseGet.data.length > 0) {
-                    this.#createTransactionElements(responseGet.data, accordionBody, spinner);
-                    spinner.classList.add('invisible');
-                } else {
-                    spinner.remove();
-                    messageBox.addAndShow(responseGet.message, responseGet.isSuccess ? '#check-icon' : '#cross-icon');                  
-                }                 
-            }
+                if (accordionBody.childElementCount < 6 && spinner) {
+                    spinner.classList.remove('invisible');
+                    let lastTransaction = accordionBody.children[accordionBody.childElementCount - 2];
+                    let lastDate = lastTransaction.dataset.date;
+                    let responseGet = await getUnevaluatedTransactions(categoryId, lastDate, parseInt(lastTransaction.dataset.id), 6);
+                    if (responseGet.isSuccess && responseGet.data.length > 0) {
+                        this.#createTransactionElements(responseGet.data, accordionBody, spinner);
+                        spinner.classList.add('invisible');
+                    } else {
+                        spinner.remove();
+                        messageBox.addAndShow(responseGet.message, responseGet.isSuccess ? '#check-icon' : '#cross-icon');
+                    }
+                }
 
-            if (accordionBody.childElementCount === 0) {
-                accordion.remove();
+                if (accordionBody.childElementCount === 0) {
+                    accordion.remove();
+                }
             }
+            
             this.#toggleReevaluationInfo();
         }
               
@@ -115,6 +118,14 @@ export default class ReevaluationDashboard {
         } finally {
             this.#isLoading = false;
         }
+    }
+
+    removeCategory(id) {
+        let reevalAccordion = document.getElementById(`accordion_${id}`);
+        if (reevalAccordion) {
+            reevalAccordion.remove();
+        }
+        this.#toggleReevaluationInfo();
     }
 
     #createTransactionElement(transaction) {

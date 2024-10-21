@@ -20,7 +20,7 @@ public class TransactionPut
     [JsonRequired]
     public DateTime DateTime { get; set; }
     [DataType(DataType.Currency)]
-    [Range(0.0, 79_228_162_514_264_337_593_543_950_335.0, ErrorMessage = $"'Amount' must be between 0 and 79,228,162,514,264,337,593,543,950,335.")]
+    [Range(0.0, 100000000000000, ErrorMessage = $"'Amount' must be between 0 and 100000000000000.")] 
     [JsonRequired]
     public decimal Amount { get; set; }
     [JsonRequired]

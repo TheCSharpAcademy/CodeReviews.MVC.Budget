@@ -110,7 +110,7 @@ async function setupDataTableHandlers(tablePromise, modalsPromise) {
     table.columns.adjust();
 }
 
-async function setupMenuHandlers(modalsPromise, homeDBPromise, reevaluationDBPromise) {
+async function setupMenuHandlers(modalsPromise, homeDBPromise, reevalDBPromise) {
     var modals = await modalsPromise;
     var homeDashboard = await homeDBPromise;    
     var addCategoryModal = modals.find(m => m._element.id == 'addCategory-modal');
@@ -120,8 +120,9 @@ async function setupMenuHandlers(modalsPromise, homeDBPromise, reevaluationDBPro
 
     initAddCategoryModal(addCategoryModal, homeDashboard);
     initUpdateCategoryModal(updateCategoryModal, homeDashboard);
-    initDeleteCategoryModal(deleteCategoryModal, homeDashboard);  
     initAddTransactionModal(addTransactionModal, homeDashboard); 
+    var reevalDashboard = await reevalDBPromise;
+    initDeleteCategoryModal(deleteCategoryModal, homeDashboard, reevalDashboard);  
 
     document.getElementById('close-menu').onclick = function () {
         if (menu.classList.contains('active')) {
@@ -198,7 +199,7 @@ function initUpdateCategoryModal(modal, homeDashboard) {
     });
 }
 
-function initDeleteCategoryModal(modal, homeDashboard) {
+function initDeleteCategoryModal(modal, homeDashboard, reevalDashboard) {    
     var deleteCategoryModalLabel = document.getElementById('deleteCategory-label');
     var deleteCategoryModalId = document.getElementById('deleteCategory_id');
     var deleteCategoryModalType = document.getElementById('deleteCategory_type');
@@ -214,12 +215,9 @@ function initDeleteCategoryModal(modal, homeDashboard) {
             let response = await deleteCategory(id, type, token);
             if (response.isSuccess) {
                 homeDashboard.removeCategory(id, type);
+                reevalDashboard.removeCategory(id);
                 menu.classList.remove('active');
-                menu.dataset.categoryid = 0;
-                let reevalAccordion = document.getElementById(`accordion_${id}`);
-                if (reevalAccordion) {
-                    reevalAccordion.remove();
-                }
+                menu.dataset.categoryid = 0;                
             }
             messageBox.addAndShow(response.message, response.isSuccess ? '#check-icon' : '#cross-icon'); 
         }

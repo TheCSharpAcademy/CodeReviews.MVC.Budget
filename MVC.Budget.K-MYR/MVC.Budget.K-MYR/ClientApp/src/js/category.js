@@ -1,8 +1,6 @@
 ﻿import { importChartDefaults, importBootstrapCollapses, importBootstrapModals } from './asyncComponents';
-import { ArcElement, Chart, DoughnutController } from 'chart.js';
 import { postTransaction, putTransaction, deleteTransaction } from './api'
 import messageBox from "./messageBox";
-Chart.register(DoughnutController, ArcElement);
 
 const chartDefaultsTask = importChartDefaults();
 

@@ -203,7 +203,7 @@
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if ({"async-countrySelect":1,"async-chartJS~statisticsDashboard~homeDashboard":1,"async-bootstrap-modals":1,"async-datepicker":1,"async-datatables":1,"async-statisticsDashboard":1,"async-homeDashboard":1,"async-reevaluationDashboard":1,"async-categoryDashboard":1}[chunkId]) return "" + chunkId + ".js";
+/******/ 			if ({"async-countrySelect":1,"async-chartJS~statisticsDashboard~homeDashboard~categoryDashboard":1,"async-bootstrap-modals":1,"async-datepicker":1,"async-datatables":1,"async-statisticsDashboard":1,"async-homeDashboard":1,"async-reevaluationDashboard":1,"async-categoryDashboard":1}[chunkId]) return "" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};

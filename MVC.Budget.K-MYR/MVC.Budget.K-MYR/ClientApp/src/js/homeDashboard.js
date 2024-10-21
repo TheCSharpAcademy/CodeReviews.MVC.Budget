@@ -561,7 +561,6 @@ export default class HomeDashboard {
             default:
                 return false;
         }
-        debugger;
         var index = array.findIndex(item => item.id === id);    
         if (index !== -1) {
             let category = array[index];
