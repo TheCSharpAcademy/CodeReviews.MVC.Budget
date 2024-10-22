@@ -41,20 +41,20 @@ export async function importChartDefaults() {
 
 export async function importBootstrapCollapses() {
     try {
-        const { Collapse } = await import(/* webpackChunkName: "bootstrap-collapses" */'bootstrap');
+        const Collapse = (await import(/* webpackChunkName: "bootstrap-collapses" */'bootstrap/js/dist/collapse.js')).default;
         let collapseElements = document.querySelectorAll('.collapse')
         let collapses = [...collapseElements].map(collapseElement => new Collapse(collapseElement, { toggle: false }))
 
         return collapses;
     } catch (error) {
-        console.error('Error loading Bootstrap modals:', error);
+        console.error('Error loading Bootstrap collapses:', error);
         throw error;
     }
 }
 
 export async function importBootstrapModals() {
     try {
-        const { Modal } = await import(/* webpackChunkName: "bootstrap-modals" */'bootstrap');
+        const Modal = (await import(/* webpackChunkName: "bootstrap-modals" */'bootstrap/js/dist/modal')).default;
         let modalElements = document.querySelectorAll('.modal')
         let modals = [...modalElements].map(modalElement => new Modal(modalElement, { toggle: false }))
 

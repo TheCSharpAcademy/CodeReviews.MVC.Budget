@@ -29,6 +29,7 @@ const collapsesPromise = importBootstrapCollapses()
         messageBox.addAndShow('A critical error occurred. Please reload the page.', '#cross-icon', false);
     });
 
+const tooltipsPromise = getTooltips();
 setupDataTableHandlers(categoryDashboardPromise, modalsPromise)
 initAddTransactionModal(categoryDashboardPromise, modalsPromise)
 setupRerenderHandlers(categoryDashboardPromise);
@@ -182,4 +183,15 @@ function initDeleteTransactionModal(dashboard, modal, table) {
             messageBox.addAndShow(response.message, response.isSuccess ? '#check-icon' : '#cross-icon'); 
         }
     });
+}
+
+async function getTooltips() {
+    const Tooltip = (await import(/* webpackChunkName: "bootstrap-tooltips" */'bootstrap/js/dist/tooltip')).default;
+    var tooltipElements = document.querySelectorAll('.sidebar-button-container');
+    var tooltips = [...tooltipElements].map(element => new Tooltip(element, {
+        container: 'body',
+        delay: { show: 500, hide: 0 },
+        placement: 'right',
+    }));
+    return tooltips;
 }

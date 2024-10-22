@@ -36,7 +36,7 @@
 </svg>
 
 <div class="content-outer-container" id="fiscalPlans-container">
-    <div class="content-scrollcontainer">
+    <div class="content-scrollcontainer" tabindex="0">
         <div class="content-container">
             <div class="cards-container" id="cards-container">                        
                 @foreach(var fiscalPlan in Model.PageModel.FiscalPlans)
@@ -45,13 +45,13 @@
                     int progressbarWidthExpenses = fiscalPlan.BudgetExpenses > 0 ? (int)Math.Min(100, fiscalPlan.TotalExpenses / fiscalPlan.BudgetExpenses * 100) : 100;
                     var color = progressbarWidthExpenses < 50 ? "bg-success" : progressbarWidthExpenses < 85 ? "bg-warning" : "bg-danger";
 
-                    <div class="fiscalPlan-card" id="fiscalPlan-card_@fiscalPlan.Id" data-id="@fiscalPlan.Id" data-name="@fiscalPlan.Name">
+                    <div class="fiscalPlan-card" id="fiscalPlan-card_@fiscalPlan.Id" data-id="@fiscalPlan.Id" data-name="@fiscalPlan.Name" tabindex="0">
                         <div class="d-flex justify-content-between gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon" fill="#ffffff" data-action="edit">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon" fill="#ffffff" data-action="edit" tabindex="0">
                                 <use href="#edit-icon"/>
                             </svg>
                             <h1 id="fiscalPlan-header_@fiscalPlan.Id" class="fiscalPlan-heading">@fiscalPlan.Name</h1>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon" fill="#ffffff" data-action="delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon" fill="#ffffff" data-action="delete" tabindex="0">
                                 <use href="#trash-icon" />
                             </svg>
                         </div>
@@ -87,7 +87,7 @@
                         </div>                        
                     </div>
                 }
-                <div id="addFiscalPlan-card" class="add-fiscalPlan-card">
+                <div id="addFiscalPlan-card" class="add-fiscalPlan-card" tabindex="0">
                     <svg viewBox="0 0 14 14" height="23" width="23">
                         <g id="plus">                            
                             <path  fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>

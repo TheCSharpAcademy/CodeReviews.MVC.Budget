@@ -5,7 +5,7 @@ body {
     color: $text-color;
     margin: 0;
     padding: 0;
-    background-image: linear-gradient(45deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
+    background-image: linear-gradient(160deg, #CCFBE5, #A2D6CB, #7EB1B1, #608C94, #456977);
     background-size: cover;
     background-position: center;
     overflow: hidden;
@@ -442,6 +442,12 @@ $sidebar-gap: 8px;
     transform: rotate(0deg) translateX(80px);
 }
 
+.button-menu {
+    border-radius: 50%;
+    height: 100%;
+    width: 100%;
+}
+
 .svg-menu {
     transform: rotate(calc(360deg / -4 * var(--i)));
     color: black;
@@ -683,11 +689,6 @@ main {
     border-radius: 50%;
     width: 40px;
     height: 40px;
-}
-
-.reevalIconContainer {
-    width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -728,18 +729,11 @@ main {
 .barChart-container {
     width: 100%;
     padding: 2px;
-    min-height: 250px;
-    background-color: $secondary;
-    border-radius: $border-radius;
-}
-
-.overspendingChart-container {
-    width: 100%;
-    padding: 2px;
     min-height: 320px;
     background-color: $secondary;
     border-radius: $border-radius;
 }
+
 
 // Search Transactions
 
@@ -796,23 +790,29 @@ main {
     text-align: center;
 }
 
-#transactions-table .table-icon {
+.table-icon {
     fill: white;
     opacity: 0.6;
     cursor: pointer;
     scale: 1.1;
+    transition: transform 0.3s cubic-bezier(0.64, 0.57, 0.67, 1.3), opacity 0.3s ease-out;
 }
 
-#transactions-table .table-icon:hover {
+.table-icon:hover, .table-icon:focus-visible {
     scale: 1.3;
     transition: scale 0.1s cubic-bezier(0.64, 0.57, 0.67, 1.3);
+}
+
+.table-icon:focus-visible {
+    fill: url(#icon_gradient);
+    opacity: 1;
+    transform: scale(1.12);
 }
 
 #transactions-table tr:hover .table-icon {
     fill: url(#icon_gradient);
     opacity: 1;
     transform: scale(1.12);
-    transition: transform 0.3s cubic-bezier(0.64, 0.57, 0.67, 1.3), opacity 0.3s ease-out;
 }
 
 .dt-scroll:hover .dt-column-title {
@@ -881,12 +881,16 @@ div.dt-processing > div:last-child > div {
     margin-bottom: 0;
 }
 
-.fiscalPlan-icon:hover {
+.fiscalPlan-icon:focus {
+    outline: none;
+}
+.fiscalPlan-icon:focus-visible, .fiscalPlan-icon:hover {
     fill: url(#icon_gradient);
     scale: 1.2;
 }
 
-.fiscalPlan-card:hover, .add-fiscalPlan-card:hover {
+.fiscalPlan-card:hover, .add-fiscalPlan-card:hover,
+.fiscalPlan-card:focus-within, .add-fiscalPlan-card:focus-within {      
     scale: 1.015;
 }
 
@@ -971,12 +975,12 @@ div.dt-processing > div:last-child > div {
     }
 
     .main-container {
-        height: calc(100vh - 116px);
-        max-width: calc(100% - 80px);
+        height: calc(100vh - 56px);
+        max-width: calc(100% - 90px);
     }
 
     .navbar-container {
-        max-width: calc(100% - 120px);
+        max-width: calc(100% - 130px);
     }
 }
 

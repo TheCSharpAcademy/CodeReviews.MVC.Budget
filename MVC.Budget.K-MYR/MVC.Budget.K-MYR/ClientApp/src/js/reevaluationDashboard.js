@@ -176,10 +176,7 @@ export default class ReevaluationDashboard {
 
         var isHappyTrueLabel = document.createElement('label');
         isHappyTrueLabel.className = 'reevalIconLabel';
-        isHappyTrueLabel.htmlFor = `isHappyTrue_${transaction.id}`;
-
-        var isHappySvgContainer = document.createElement('div');
-        isHappySvgContainer.className = 'reevalIconContainer';
+        isHappyTrueLabel.htmlFor = `isHappyTrue_${transaction.id}`;       
 
         var isHappyImg = document.createElement('img');
         isHappyImg.src = '/dist/img/happy-emote.svg';
@@ -199,9 +196,6 @@ export default class ReevaluationDashboard {
         isHappyFalseLabel.className = 'reevalIconLabel';
         isHappyFalseLabel.htmlFor = `isHappyFalse_${transaction.id}`;
 
-        var isUnhappySvgContainer = document.createElement('div');
-        isUnhappySvgContainer.className = 'reevalIconContainer';
-
         var isUnhappyImg = document.createElement('img');
         isUnhappyImg.src = '/dist/img/sad-emote.svg';
         isUnhappyImg.height = 25;
@@ -220,10 +214,7 @@ export default class ReevaluationDashboard {
 
         var isNecessaryTrueLabel = document.createElement('label');
         isNecessaryTrueLabel.className = 'reevalIconLabel';
-        isNecessaryTrueLabel.htmlFor = `isNecessaryTrue_${transaction.id}`;
-
-        var isNecessarySvgContainer = document.createElement('div');
-        isNecessarySvgContainer.className = 'reevalIconContainer';
+        isNecessaryTrueLabel.htmlFor = `isNecessaryTrue_${transaction.id}`;       
 
         var isNecessaryImg = document.createElement('img');
         isNecessaryImg.src = '/dist/img/chart-growth.svg';
@@ -242,9 +233,6 @@ export default class ReevaluationDashboard {
         var isNecessaryFalseLabel = document.createElement('label');
         isNecessaryFalseLabel.className = 'reevalIconLabel';
         isNecessaryFalseLabel.htmlFor = `isNecessaryFalse_${transaction.id}`;
-
-        var isUnnecessarySvgContainer = document.createElement('div');
-        isUnnecessarySvgContainer.className = 'reevalIconContainer';
 
         var isUnnecessaryImg = document.createElement('img');
         isUnnecessaryImg.src = '/dist/img/chart-decrease.svg';
@@ -266,22 +254,16 @@ export default class ReevaluationDashboard {
         submitButtonSvg.innerHTML = `<circle cx="12" cy="12" r="11.5" stroke-width="1"></circle>
                             <path d="M8.5 12.5L10.5 14.5L15.5 9.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>`;
 
-        isHappySvgContainer.appendChild(isHappyImg);
-        isHappyTrueLabel.appendChild(isHappySvgContainer);
-
-        isUnhappySvgContainer.appendChild(isUnhappyImg);
-        isHappyFalseLabel.appendChild(isUnhappySvgContainer);
+        isHappyTrueLabel.appendChild(isHappyImg);
+        isHappyFalseLabel.appendChild(isUnhappyImg);
 
         innerWrapper1.appendChild(isHappyTrueInput);
         innerWrapper1.appendChild(isHappyTrueLabel);
         innerWrapper1.appendChild(isHappyFalseInput);
         innerWrapper1.appendChild(isHappyFalseLabel);
 
-        isNecessarySvgContainer.appendChild(isNecessaryImg);
-        isNecessaryTrueLabel.appendChild(isNecessarySvgContainer);
-
-        isUnnecessarySvgContainer.appendChild(isUnnecessaryImg);
-        isNecessaryFalseLabel.appendChild(isUnnecessarySvgContainer);
+        isNecessaryTrueLabel.appendChild(isNecessaryImg);
+        isNecessaryFalseLabel.appendChild(isUnnecessaryImg);
 
         innerWrapper2.appendChild(isNecessaryTrueInput);
         innerWrapper2.appendChild(isNecessaryTrueLabel);

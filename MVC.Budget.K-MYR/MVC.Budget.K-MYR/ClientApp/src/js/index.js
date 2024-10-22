@@ -20,6 +20,7 @@ var deleteModal = modalsArray.find(m => m._element.id == 'deleteFiscalPlan-modal
 var deleteModalLabel = document.getElementById('deleteFiscalPlan-label');
 var deleteModalId = document.getElementById('deleteFiscalPlan_id');
 setupModalHandlers(modals);
+setupRefocusHandlers();
 
 function formatDashboard() {
     var cards = $('.fiscalPlan-card');
@@ -38,6 +39,7 @@ function addFiscalPlan(fiscalPlan, beforeElement) {
     card.id = `fiscalPlan-card_${fiscalPlan.id}`;
     card.setAttribute('data-id', fiscalPlan.id);
     card.setAttribute('data-name', fiscalPlan.name);
+    card.tabIndex = 0;
 
     var headerContainer = document.createElement('div');
     headerContainer.className = 'd-flex justify-content-between gap-1';
@@ -49,6 +51,7 @@ function addFiscalPlan(fiscalPlan, beforeElement) {
     editIcon.setAttribute('class', 'fiscalPlan-icon');
     editIcon.setAttribute('fill', '#ffffff');
     editIcon.setAttribute('data-action', 'edit');
+    editIcon.tabIndex = 0;
     var editUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
     editUse.setAttribute('href', '#edit-icon');
     editIcon.appendChild(editUse);
@@ -65,6 +68,7 @@ function addFiscalPlan(fiscalPlan, beforeElement) {
     deleteIcon.setAttribute('class', 'fiscalPlan-icon');
     deleteIcon.setAttribute('fill', '#ffffff');
     deleteIcon.setAttribute('data-action', 'delete');
+    deleteIcon.tabIndex = 0;
     var deleteUse = document.createElementNS("http://www.w3.org/2000/svg", "use");
     deleteUse.setAttribute('href', '#trash-icon');
     deleteIcon.appendChild(deleteUse);
@@ -134,6 +138,7 @@ function addFiscalPlan(fiscalPlan, beforeElement) {
     card.appendChild(headerContainer);
     card.appendChild(progressContainer);
     card.addEventListener('click', onFiscalPlanClick);
+    card.addEventListener('keydown', onFiscalPlanClick);
 
     cardsContainer.insertBefore(card, beforeElement);
 }
@@ -150,7 +155,7 @@ function updateFiscalPlan(formData) {
 function removeFiscalPlan(id) {
     var element = document.getElementById(`fiscalPlan-card_${id}`);
     if (element) {
-        element.removeEventListener('click', onFiscalPlanClick);
+        element.removeEventListener('click', handleFiscalPlanInteraction);
         element.remove();
     }
 }
@@ -211,6 +216,12 @@ async function setupModalHandlers() {
                   .forEach(element => element.addEventListener("click", onFiscalPlanClick))   
 }
 
+function handleFiscalPlanInteraction(event) {
+    if (event.type === 'click' || (event.type === 'keydown' && event.key === 'Enter')) {
+        this.onFiscalPlanClick(event);
+    }
+}
+
 function onFiscalPlanClick(event) {
     var fiscalPlanCard = event.currentTarget;
     var id = parseInt(fiscalPlanCard.dataset.id);
@@ -233,4 +244,16 @@ function onFiscalPlanClick(event) {
     else {        
         window.location.href = PAGE_ROUTES.FISCAL_PLAN(id);
     }
+}
+
+function setupRefocusHandlers() {
+    var lastFocus;
+    $('.modal').on('show.bs.modal', function () {
+        lastFocus = document.activeElement;
+    });
+    $('.modal').on('hidden.bs.modal', function () {
+        if (lastFocus) {
+            lastFocus.focus();
+        }
+    });
 }

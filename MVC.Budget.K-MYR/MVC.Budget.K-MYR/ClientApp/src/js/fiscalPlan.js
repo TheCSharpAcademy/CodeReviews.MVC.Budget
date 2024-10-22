@@ -3,7 +3,7 @@ import { shortestAngle } from './utilities';
 import { importChartDefaults, importBootstrapModals, importBootstrapCollapses } from './asyncComponents';
 import { postTransaction, putTransaction, deleteTransaction, postCategory, putCategory, deleteCategory } from './api';
 import messageBox from "./messageBox";
-
+const smallScreenSize = 576;
 const currentDate = new Date();
 
 const fiscalPlanId = document.getElementById('fiscalPlan_Id');
@@ -19,26 +19,30 @@ const modalsPromise = importBootstrapModals()
     });
 const collapsesPromise = importBootstrapCollapses()
     .then(() => {
-        $('.accordion-head').on('click', function (event) {
-            if (!event.target.classList.contains('addCategory-icon')) {
-                let collapse = $(this).next();                
-                if (!collapse[0].classList.contains('collapsing')) {
-                    collapse.collapse('toggle');
-                    let caret = $('.accordion-caret', this)[0];
-                    caret.classList.toggle('rotate');
+        $('.accordion-head').on('click keydown', function (event) {
+            if (event.type === 'click' || event.type === 'keydown' && event.key === 'Enter') {
+                if (!event.target.classList.contains('addCategory-icon')) {
+                    let collapse = $(this).next();
+                    if (!collapse[0].classList.contains('collapsing')) {
+                        collapse.collapse('toggle');
+                        let caret = $('.accordion-caret', this)[0];
+                        caret.classList.toggle('rotate');
+                    }
                 }
-            }
+            }            
         });
     })
     .catch(() => {
         messageBox.addAndShow('A critical error occurred. Please reload the page', '#cross-icon', false);
     });
 const transactionsTablePromise = getTransactionsTable();    
+const tooltipsPromise = getTooltips();
 
 setupFlipContainer();
-setupMenuHandlers(modalsPromise, homeDashboardPromise, reevaluationDashboardPromise);
-setupDataTableHandlers(transactionsTablePromise, modalsPromise);
+setupModalHandlers(modalsPromise, homeDashboardPromise, reevaluationDashboardPromise);
+setupDataTableModalHandlers(transactionsTablePromise, modalsPromise);
 setupRerenderHandlers(homeDashboardPromise, statisticsDashboardPromise, reevaluationDashboardPromise, transactionsTablePromise);
+setupRefocusHandlers();
 
 async function setupRerenderHandlers(homeDBPromise, statisticsDBPromise, reevaluationDBPromise, tablePromise) {
     var [homeDB, statisticsDB, reevaluationDB, transactionsTable] = await Promise.all(
@@ -52,7 +56,7 @@ async function setupRerenderHandlers(homeDBPromise, statisticsDBPromise, reevalu
     })
 }
 
-async function setupDataTableHandlers(tablePromise, modalsPromise) {
+async function setupDataTableModalHandlers(tablePromise, modalsPromise) {
     var table = await tablePromise;
 
     $('#search-form').on('submit', async function (event) {
@@ -110,7 +114,7 @@ async function setupDataTableHandlers(tablePromise, modalsPromise) {
     table.columns.adjust();
 }
 
-async function setupMenuHandlers(modalsPromise, homeDBPromise, reevalDBPromise) {
+async function setupModalHandlers(modalsPromise, homeDBPromise, reevalDBPromise) {
     var modals = await modalsPromise;
     var homeDashboard = await homeDBPromise;    
     var addCategoryModal = modals.find(m => m._element.id == 'addCategory-modal');
@@ -156,11 +160,13 @@ function initAddCategoryModal(modal, homeDashboard) {
         }
     });
 
-    $('.addCategory-icon').on('click', function () {
-        var type = $(this).closest('.accordion')[0].dataset.type;
-        addCategoryModalType.value = type;
-        addCategoryModalFiscalPlanId.value = fiscalPlanId.value;
-        modal.show();
+    $('.addCategory-icon').on('click keydown', function (event) {
+        if (event.type === 'click' || event.type === 'keydown' && event.key === 'Enter') {
+            var type = $(this).closest('.accordion')[0].dataset.type;
+            addCategoryModalType.value = type;
+            addCategoryModalFiscalPlanId.value = fiscalPlanId.value;
+            modal.show();
+        }
     });
 }
 
@@ -310,6 +316,7 @@ function setupFlipContainer() {
     var currentDeg = 0;
 
     $('#action-sidebar').on('click', '.sidebar-button-container', function () {
+        this.blur();
         var index = parseInt(this.dataset.index);
         if (currentSideIndex === index) {
             return;
@@ -341,6 +348,37 @@ function setupFlipContainer() {
         if (event.propertyName == 'transform') {
             currentDeg = currentDeg % 360;
             flipContainer.style = `transform: rotateY(${currentDeg}deg); transition: transform 0s`;
+        }
+    });
+}
+
+function setupRefocusHandlers() {
+    var lastFocus;
+    $('.modal').on('show.bs.modal', function () {
+        lastFocus = document.activeElement;
+    });
+    $('.modal').on('hidden.bs.modal', function () {
+        if (lastFocus) {
+            lastFocus.focus();
+        }
+    });
+
+    var closeButton = menu.querySelector('#close-button-menu');
+
+    menu.addEventListener('transitionend', function (event) {
+        if (event.propertyName === 'visibility') {
+            if (menu.classList.contains('active')) {
+                lastFocus = document.activeElement;
+                closeButton.focus();
+            } 
+        }
+    });
+
+    menu.addEventListener('transitionstart', function (event) {
+        if (event.propertyName === 'visibility') {
+            if (!menu.classList.contains('active')) {
+                lastFocus.focus();
+            }
         }
     });
 }
@@ -464,10 +502,10 @@ async function getTransactionsTable() {
                     data: null,
                     defaultContent:
                     `<div class="d-flex justify-content-center align-items-center flex-wrap gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="table-icon" fill="rgba(255, 255, 255, 1)" data-icon="edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="table-icon" data-icon="edit" tabindex="0">
                             <use href="#edit-icon"/>
                         </svg >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="table-icon" viewBox="0 0 16 16" fill="rgba(255, 255, 255, 1)" data-icon="delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="table-icon" viewBox="0 0 16 16" data-icon="delete" tabindex="0">
                             <use href="#trash-icon"/>
                         </svg>
                     </div>`,
@@ -533,6 +571,21 @@ async function getReevaluationDashboard(token) {
 
         return new ReevaluationDashboard(token);
     } catch (error) {
-        messageBox.addAndShow('A critical error occurred. Please reload the page', '#cross-icon', false);
+        messageBox.addAndShow('A critical error occurred. Please reload the page', '#cross-icon', false);        
     }    
 } 
+
+async function getTooltips() {
+    const Tooltip = (await import(/* webpackChunkName: "bootstrap-tooltips" */'bootstrap/js/dist/tooltip')).default;
+    var tooltipElements = document.querySelectorAll('.tooltipped');
+    var tooltips = [...tooltipElements].map(element => new Tooltip(element, {
+        container: 'body',
+        delay: { show: 500, hide: 0 },
+        placement: (instance, _) => {
+            var query = window.matchMedia(`(min-width: ${smallScreenSize}px)`);
+            return instance._element.classList.contains('sidebar-button-container')
+                && query.matches ? 'right' : 'top';
+        },
+    }));
+    return tooltips;
+}
