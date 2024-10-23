@@ -2,6 +2,7 @@
 import { importBootstrapModals } from './asyncComponents';
 import { putFiscalPlan, deleteFiscalPlan, postFiscalPlan } from './api'
 import messageBox from "./messageBox";
+import { setupRefocusHandlers } from './utilities'
 
 const cardsContainer = document.getElementById('cards-container');
 formatDashboard();
@@ -10,6 +11,7 @@ window.addEventListener('countryChanged', () => {
 });
 
 const modals = importBootstrapModals();
+const tooltips = getTooltips();
 var modalsArray = await modals;
 var addModal = modalsArray.find(m => m._element.id == 'addFiscalPlan-modal');
 var updateModal = modalsArray.find(m => m._element.id == 'updateFiscalPlan-modal');
@@ -179,6 +181,11 @@ async function setupModalHandlers() {
     addfiscalPlanCard.addEventListener('click', function () {
         addModal.show();
     });
+    addfiscalPlanCard.addEventListener('keydown', function (event) {
+        if (event.key == 'Enter') {
+            addModal.show();
+        }
+    });
 
     var updateFiscalPlanForm = document.getElementById('updateFiscalPlan-form');
     updateFiscalPlanForm.addEventListener('submit', async function (event) {
@@ -213,12 +220,15 @@ async function setupModalHandlers() {
     });
 
     cardsContainer.querySelectorAll('.fiscalPlan-card')
-                  .forEach(element => element.addEventListener("click", onFiscalPlanClick))   
+        .forEach(element => {
+            element.addEventListener("click", handleFiscalPlanInteraction)
+            element.addEventListener("keydown", handleFiscalPlanInteraction)
+        });
 }
 
 function handleFiscalPlanInteraction(event) {
     if (event.type === 'click' || (event.type === 'keydown' && event.key === 'Enter')) {
-        this.onFiscalPlanClick(event);
+        onFiscalPlanClick(event);
     }
 }
 
@@ -246,14 +256,14 @@ function onFiscalPlanClick(event) {
     }
 }
 
-function setupRefocusHandlers() {
-    var lastFocus;
-    $('.modal').on('show.bs.modal', function () {
-        lastFocus = document.activeElement;
-    });
-    $('.modal').on('hidden.bs.modal', function () {
-        if (lastFocus) {
-            lastFocus.focus();
-        }
-    });
+async function getTooltips() {
+    const Tooltip = (await import(/* webpackChunkName: "bootstrap-tooltips" */'bootstrap/js/dist/tooltip')).default;
+    var tooltipElements = document.querySelectorAll('.tooltipped');
+    var tooltips = [...tooltipElements].map(element => new Tooltip(element, {
+        container: 'body',
+        delay: { show: 500, hide: 0 },
+        placement: 'top',
+        offset: [0, 10]       
+    }));
+    return tooltips;
 }

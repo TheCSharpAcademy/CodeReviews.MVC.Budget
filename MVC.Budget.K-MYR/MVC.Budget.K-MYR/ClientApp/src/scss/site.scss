@@ -31,6 +31,14 @@ svg * {
     pointer-events: none;
 }
 
+.no-focus:focus {
+    outline: none;
+}
+
+.no-focus:focus-visible {
+    outline: revert;
+}
+
 .form-control {
     background-color: white !important;
     color: black !important;
@@ -798,6 +806,10 @@ main {
     transition: transform 0.3s cubic-bezier(0.64, 0.57, 0.67, 1.3), opacity 0.3s ease-out;
 }
 
+.table-icon:focus {
+    outline: none;
+}
+
 .table-icon:hover, .table-icon:focus-visible {
     scale: 1.3;
     transition: scale 0.1s cubic-bezier(0.64, 0.57, 0.67, 1.3);
@@ -884,6 +896,7 @@ div.dt-processing > div:last-child > div {
 .fiscalPlan-icon:focus {
     outline: none;
 }
+
 .fiscalPlan-icon:focus-visible, .fiscalPlan-icon:hover {
     fill: url(#icon_gradient);
     scale: 1.2;

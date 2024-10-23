@@ -3,9 +3,9 @@ import { shortestAngle } from './utilities';
 import { importChartDefaults, importBootstrapModals, importBootstrapCollapses } from './asyncComponents';
 import { postTransaction, putTransaction, deleteTransaction, postCategory, putCategory, deleteCategory } from './api';
 import messageBox from "./messageBox";
+
 const smallScreenSize = 576;
 const currentDate = new Date();
-
 const fiscalPlanId = document.getElementById('fiscalPlan_Id');
 const menu = document.getElementById('menu-container');
 const antiforgeryToken = document.getElementById('antiforgeryToken');
@@ -86,27 +86,31 @@ async function setupDataTableModalHandlers(tablePromise, modalsPromise) {
     var labelDelete = document.getElementById('deleteTransaction-label');
     var idDelete = document.getElementById('deleteTransaction_id');     
 
-    table.on('click', 'svg', function (event) {
-        var row = table.row(event.target.closest('tr'));
-        var data = row.data();
-        switch (this.dataset.icon) {
-            case 'edit':                
-                idUpdate.value = data.id;
-                labelUpdate.textContent = `Edit '${data.title}'`;
-                title.value = data.title;
-                dateTime.value = data.dateTime.slice(0, 19);
-                amount.value = data.amount;
-                let element = data.isHappy ? isHappy : isUnhappy;
-                element.checked = true;
-                element = data.isNecessary ? isNecessary : isUnnecessary;
-                element.checked = true;
-                updateTransactionModal.show();
-                break;
-            case 'delete':
-                idDelete.value = data.id;
-                labelDelete.textContent = `Delete '${data.title}'`;
-                deleteTransactionModal.show();
+    table.on('click keydown', 'svg', function (event) {
+        if (event.type === 'click' || event.type === 'keydown' && event.key === 'Enter') {
+            var row = table.row(event.target.closest('tr'));
+            var data = row.data();
+            switch (this.dataset.icon) {
+                case 'edit':                
+                    idUpdate.value = data.id;
+                    labelUpdate.textContent = `Edit '${data.title}'`;
+                    title.value = data.title;
+                    dateTime.value = data.dateTime.slice(0, 19);
+                    amount.value = data.amount;
+                    let element = data.isHappy ? isHappy : isUnhappy;
+                    element.checked = true;
+                    element = data.isNecessary ? isNecessary : isUnnecessary;
+                    element.checked = true;
+                    updateTransactionModal.show();
+                    break;
+                case 'delete':
+                    idDelete.value = data.id;
+                    labelDelete.textContent = `Delete '${data.title}'`;
+                    deleteTransactionModal.show();
+                    break;
+            }
         }
+
     });
 
     var tableContainer = document.getElementById('table-container');
@@ -581,6 +585,7 @@ async function getTooltips() {
     var tooltips = [...tooltipElements].map(element => new Tooltip(element, {
         container: 'body',
         delay: { show: 500, hide: 0 },
+        offset: [0, 10],
         placement: (instance, _) => {
             var query = window.matchMedia(`(min-width: ${smallScreenSize}px)`);
             return instance._element.classList.contains('sidebar-button-container')

@@ -1,9 +1,10 @@
 ﻿import { importChartDefaults, importBootstrapCollapses, importBootstrapModals } from './asyncComponents';
 import { postTransaction, putTransaction, deleteTransaction } from './api'
-import messageBox from "./messageBox";
+import messageBox from './messageBox';
+import { setupRefocusHandlers } from './utilities'
 
 const chartDefaultsTask = importChartDefaults();
-
+const smallScreenSize = 576;
 const currentDate = new Date();
 const categoryId = document.getElementById('category_Id');
 
@@ -14,14 +15,16 @@ const modalsPromise = importBootstrapModals()
     });
 const collapsesPromise = importBootstrapCollapses()
     .then(() => {
-        $('.accordion-head').on('click', function (event) {
-            if (event.target.id !== 'addTransaction-button') {
-                let collapse = $(this).next();
-                if (!collapse[0].classList.contains('collapsing')) {
-                    collapse.collapse('toggle');
-                    let caret = $('.accordion-caret', this)[0];
-                    caret.classList.toggle('rotate');
-                }               
+        $('.accordion-head').on('click keydown', function (event) {
+            if (event.type === 'click' || event.type === 'keydown' && event.key === 'Enter') {
+                if (event.target.id !== 'addTransaction-button') {
+                    let collapse = $(this).next();
+                    if (!collapse[0].classList.contains('collapsing')) {
+                        collapse.collapse('toggle');
+                        let caret = $('.accordion-caret', this)[0];
+                        caret.classList.toggle('rotate');
+                    }
+                }
             }
         });
     })
@@ -33,6 +36,7 @@ const tooltipsPromise = getTooltips();
 setupDataTableHandlers(categoryDashboardPromise, modalsPromise)
 initAddTransactionModal(categoryDashboardPromise, modalsPromise)
 setupRerenderHandlers(categoryDashboardPromise);
+setupRefocusHandlers();
 
 async function getCategoryDashboard(id, date, data) {
     try {
@@ -78,26 +82,30 @@ async function setupDataTableHandlers(dashboardPromise, modalsPromise) {
 
     var labelDelete = document.getElementById('deleteTransaction-label');
     var idDelete = document.getElementById('deleteTransaction_id');
-    table.on('click', 'svg', function (event) {
-        var row = table.row(event.target.closest('tr'));
-        var data = row.data();
-        switch (this.dataset.icon) {
-            case 'edit':
-                idUpdate.value = data.id;
-                labelUpdate.textContent = `Edit '${data.title}'`;
-                title.value = data.title;
-                dateTime.value = data.dateTime.slice(0, 19);
-                amount.value = data.amount;
-                let element = data.isHappy ? isHappy : isUnhappy;
-                element.checked = true;
-                element = data.isNecessary ? isNecessary : isUnnecessary;
-                element.checked = true;
-                updateTransactionModal.show();
-                break;
-            case 'delete':
-                idDelete.value = data.id;
-                labelDelete.textContent = `Delete '${data.title}'`;
-                deleteTransactionModal.show();
+    table.on('click keydown', 'svg', function (event) {
+        if (event.type === 'click' || event.type === 'keydown' && event.key === 'Enter') {
+
+            var row = table.row(event.target.closest('tr'));
+            var data = row.data();
+            switch (this.dataset.icon) {
+                case 'edit':
+                    idUpdate.value = data.id;
+                    labelUpdate.textContent = `Edit '${data.title}'`;
+                    title.value = data.title;
+                    dateTime.value = data.dateTime.slice(0, 19);
+                    amount.value = data.amount;
+                    let element = data.isHappy ? isHappy : isUnhappy;
+                    element.checked = true;
+                    element = data.isNecessary ? isNecessary : isUnnecessary;
+                    element.checked = true;
+                    updateTransactionModal.show();
+                    break;
+                case 'delete':
+                    idDelete.value = data.id;
+                    labelDelete.textContent = `Delete '${data.title}'`;
+                    deleteTransactionModal.show();
+                    break;
+            }
         }
     });
 
@@ -125,9 +133,11 @@ async function initAddTransactionModal(dashboardPromise, modalsPromise) {
     });
 
     var addIcon = document.getElementById('addTransaction-button');
-    addIcon.addEventListener('click', function () {
-        addTransactionModalCategoryId.value = categoryId.value;
-        modal.show();
+    $(addIcon).on('click keydown', function (event) {
+        if (event.type === 'click' || event.type === 'keydown' && event.key === 'Enter') {
+            addTransactionModalCategoryId.value = categoryId.value;
+            modal.show();
+        }
     });
 }
 
@@ -187,11 +197,16 @@ function initDeleteTransactionModal(dashboard, modal, table) {
 
 async function getTooltips() {
     const Tooltip = (await import(/* webpackChunkName: "bootstrap-tooltips" */'bootstrap/js/dist/tooltip')).default;
-    var tooltipElements = document.querySelectorAll('.sidebar-button-container');
+    var tooltipElements = document.querySelectorAll('.tooltipped');
     var tooltips = [...tooltipElements].map(element => new Tooltip(element, {
         container: 'body',
         delay: { show: 500, hide: 0 },
-        placement: 'right',
+        offset: [0, 10],
+        placement: (instance, _) => {
+            var query = window.matchMedia(`(min-width: ${smallScreenSize}px)`);
+            return instance._element.classList.contains('sidebar-button-container')
+                && query.matches ? 'right' : 'top';
+        },
     }));
     return tooltips;
 }
