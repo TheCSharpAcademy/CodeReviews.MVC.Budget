@@ -50,6 +50,8 @@ The sidebar contains five buttons: four navigate to different sections of the ap
 3. Yearly statistics (monthly overspending, total spending, etc.).  
 4. Search for transactions.
 
+Attention: Currently, users can also evaluate transactions from income categories, but these evaluations will not be included in the chart data.
+
 ## Disclaimer
 
 This is a learning project as part of my journey to mastering C# and beyond.
