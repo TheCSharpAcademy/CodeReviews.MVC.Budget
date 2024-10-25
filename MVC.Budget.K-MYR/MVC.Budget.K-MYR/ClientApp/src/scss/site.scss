@@ -858,7 +858,7 @@ div.dt-processing > div:last-child > div {
     border-radius: $border-radius;
     cursor: pointer;
     transition: ease-in-out 0.2s;
-    overflow: hidden;
+    overflow: hidden;    
 }
 
 .progress-container {
@@ -960,6 +960,50 @@ div.dt-processing > div:last-child > div {
     50% {
         opacity: 1;
         transform: none;
+    }
+}
+
+.fading-in {
+    animation: fading-in forwards 1s ease-out;
+}
+
+@keyframes fading-in {
+    0% {
+        max-height: 0;
+        opacity: 0;
+        transform: translateX(100vw);
+    }
+    50% {
+        max-height: 350px;
+        transform: translateX(100vw);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.fading-out {
+    animation: fading-out forwards 1s ease-out;
+}
+
+@keyframes fading-out {
+    100% {
+        max-height: 0;
+        transform: translateX(-100vw);
+        opacity: 0;
+    }
+
+    50% {
+        max-height: 350px;
+        transform: translateX(-100vw);
+        opacity: 0;
+    }
+
+    0% {
+        transform: translateX(0);
+        opacity: 1;
     }
 }
 

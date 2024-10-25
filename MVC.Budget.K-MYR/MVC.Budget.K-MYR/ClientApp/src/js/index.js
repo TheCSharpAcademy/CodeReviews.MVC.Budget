@@ -37,7 +37,7 @@ function formatDashboard() {
 
 function addFiscalPlan(fiscalPlan, beforeElement) {   
     var card = document.createElement('div');
-    card.className = 'fiscalPlan-card';
+    card.className = 'fiscalPlan-card fading-in';
     card.id = `fiscalPlan-card_${fiscalPlan.id}`;
     card.setAttribute('data-id', fiscalPlan.id);
     card.setAttribute('data-name', fiscalPlan.name);
@@ -88,6 +88,7 @@ function addFiscalPlan(fiscalPlan, beforeElement) {
     var incomeTitle = document.createElement('div');
     incomeTitle.textContent = 'Income';
     var incomeTotal = document.createElement('div');
+    incomeTotal.className = 'text-end';
     incomeTotal.id = `fiscalPlan_income_${fiscalPlan.id}`;
     incomeTotal.textContent = `${window.userNumberFormat.format(0)} /  ${window.userNumberFormat.format(0)}`;
 
@@ -116,6 +117,7 @@ function addFiscalPlan(fiscalPlan, beforeElement) {
     expensesTitle.textContent = 'Expenses';
     var expensesTotal = document.createElement('div');
     expensesTotal.id = `fiscalPlan_expenses_${fiscalPlan.id}`;
+    expensesTotal.className = 'text-end';
     expensesTotal.textContent = `${window.userNumberFormat.format(0)} /  ${window.userNumberFormat.format(0)}`;
             
     expensesTitleContainer.appendChild(expensesTitle);
@@ -141,6 +143,7 @@ function addFiscalPlan(fiscalPlan, beforeElement) {
     card.appendChild(progressContainer);
     card.addEventListener('click', onFiscalPlanClick);
     card.addEventListener('keydown', onFiscalPlanClick);
+    card.addEventListener('animationend', onFiscalPlanFadeOut);
 
     cardsContainer.insertBefore(card, beforeElement);
 }
@@ -157,8 +160,7 @@ function updateFiscalPlan(formData) {
 function removeFiscalPlan(id) {
     var element = document.getElementById(`fiscalPlan-card_${id}`);
     if (element) {
-        element.removeEventListener('click', handleFiscalPlanInteraction);
-        element.remove();
+        element.classList.add('fading-out');
     }
 }
 
@@ -253,6 +255,16 @@ function onFiscalPlanClick(event) {
     }
     else {        
         window.location.href = PAGE_ROUTES.FISCAL_PLAN(id);
+    }
+}
+
+function onFiscalPlanFadeOut(event) {
+    if (event.animationName === 'fading-out') {
+        var card = event.currentTarget;
+        card.removeEventListener('animationend', onFiscalPlanFadeOut);
+        card.removeEventListener('click', onFiscalPlanClick);
+        card.removeEventListener('keydown', onFiscalPlanClick);
+        card.remove();
     }
 }
 

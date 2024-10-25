@@ -156,7 +156,8 @@ function initUpdateTransactionModal(dashboard, modal, table) {
                     let newAmount = parseFloat(formData.get('Amount'));
                     let newIsHappy = formData.get('IsHappy') === 'true';
                     let newIsNecessary = formData.get('IsNecessary') === 'true'; 
-                    dashboard.editTransaction(data, newAmount, newIsHappy, newIsNecessary);
+                    let newDateTime = new Date(formData.get('DateTime')); 
+                    dashboard.editTransaction(data, newAmount, newIsHappy, newIsNecessary, newDateTime);
                     data.amount = newAmount;
                     data.title = formData.get('Title');
                     data.dateTime = formData.get('DateTime');

@@ -383,11 +383,16 @@ export default class CategoryDashboard {
         }
     }
 
-    editTransaction(oldTransaction, newAmount, newIsHappy, newIsNecessary) {
-        var difference = newAmount - oldTransaction.amount
-        this.#data.total += difference;
-        this.#data.happyTotal += (newIsHappy * newAmount) - (oldTransaction.isHappy * oldTransaction.amount);
-        this.#data.necessaryTotal += (newIsNecessary * newAmount) - (oldTransaction.isNecessary * oldTransaction.amount);
+    editTransaction(oldTransaction, newAmount, newIsHappy, newIsNecessary, newDate) {
+        var oldDate = new Date(oldTransaction.dateTime);
+        if (oldDate.getYear() === newDate.getYear() && oldDate.getMonth() === newDate.getMonth()) {
+            this.#data.total += newAmount;
+            this.#data.happyTotal += newIsHappy * newAmount     
+            this.#data.necessaryTotal += newIsNecessary * newAmount;
+        }
+        this.#data.total -= oldTransaction.amount;
+        this.#data.happyTotal -= oldTransaction.isHappy * oldTransaction.amount
+        this.#data.necessaryTotal -= oldTransaction.isNecessary * oldTransaction.amount
 
         this.#formatHeaders();
         this.#formatCharts();

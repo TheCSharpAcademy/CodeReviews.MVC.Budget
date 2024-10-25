@@ -132,15 +132,7 @@ async function setupModalHandlers(modalsPromise, homeDBPromise, reevalDBPromise)
     var reevalDashboard = await reevalDBPromise;
     initDeleteCategoryModal(deleteCategoryModal, homeDashboard, reevalDashboard);  
 
-    document.getElementById('close-menu').onclick = function () {
-        if (menu.classList.contains('active')) {
-            var id = menu.dataset.categoryid;
-            var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
-            borderBox.classList.remove('border-rotate');
-            menu.dataset.categoryid = 0;
-            menu.classList.remove('active');
-        }        
-    }    
+    document.getElementById('close-menu').onclick = closeMenu;  
     document.getElementById('details-menu').onclick = function () {
         var id = menu.dataset.categoryid;
         window.location.href = PAGE_ROUTES.CATEGORY(id);
@@ -313,6 +305,16 @@ function initDeleteTransactionModal(modal, table) {
     });  
 }
 
+function closeMenu() {
+    if (menu.classList.contains('active')) {
+        var id = menu.dataset.categoryid;
+        var borderBox = document.getElementById(`category_${id}`).querySelector('.border-animation');
+        borderBox.classList.remove('border-rotate');
+        menu.dataset.categoryid = 0;
+        menu.classList.remove('active');
+    }
+}
+
 function setupFlipContainer() {
     var faces = ['face_0', 'face_1', 'face_2', 'face_3'];
     var flipContainer = document.getElementById('flip-container-inner');
@@ -330,9 +332,7 @@ function setupFlipContainer() {
         var nextFace = document.getElementById(faces[index]);
 
         if (currentSideIndex == 0) {
-            if (menu.classList.contains('active')) {
-                menu.classList.remove('active');
-            }
+            closeMenu();
         }
 
         var degreeDiff = shortestAngle(currentSideIndex, index);

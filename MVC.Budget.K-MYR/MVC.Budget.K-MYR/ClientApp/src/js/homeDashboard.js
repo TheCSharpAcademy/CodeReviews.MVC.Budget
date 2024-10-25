@@ -54,42 +54,56 @@ export default class HomeDashboard {
             let element = document.getElementById(`category_${category.id}`);
 
             if (element) {
-                element.addEventListener("click", this.#handleCategoryInteraction.bind(this));
-                element.addEventListener("keydown", this.#handleCategoryInteraction.bind(this));
+                element.addEventListener("click", this.#handleCategoryClick);
+                element.addEventListener("keydown", this.#handleCategoryClick);
+                element.addEventListener("animationend", this.#handleCategoryAnimationEvents);
+                element.addEventListener("animationcancel", this.#handleCategoryAnimationEvents);
             }     
         }
     }
 
-    #handleCategoryInteraction(event) {
+    #handleCategoryClick = (event) => {
         if (event.type === 'click' || (event.type === 'keydown' && event.key === 'Enter')) {
-            this.#onCategoryClick(event);
-        }
-    }
+            var categoryElement = event.currentTarget;
+            var id = categoryElement.dataset.id;
+            if (this.#menu.dataset.categoryid != 0) {
+                let borderBox = document.getElementById(`category_${this.#menu.dataset.categoryid}`).querySelector('.border-animation');
+                borderBox.classList.remove('border-rotate');
+            }
+            var x = event.pageX;
+            var y = event.pageY;
+            if (x === undefined || y === undefined) {
+                let rect = categoryElement.getBoundingClientRect();
+                x = rect.left + (rect.width / 2);
+                y = rect.top + (rect.height / 2);
+            }
+            y = Math.max(Math.min(y - 100, window.innerHeight - 200), 66);
+            x = Math.max(Math.min(x - 100, window.innerWidth - 220), 20);
 
-    #onCategoryClick(event) {
-        var categoryElement = event.target.closest('.category');
-        var id = categoryElement.dataset.id;
-        if (this.#menu.dataset.categoryid != 0) {
-            let borderBox = document.getElementById(`category_${this.#menu.dataset.categoryid}`).querySelector('.border-animation');
-            borderBox.classList.remove('border-rotate');
-        }
-        var x = event.pageX;
-        var y = event.pageY;
-        if (x === undefined || y === undefined) {
-            let rect = categoryElement.getBoundingClientRect();
-            x = rect.left + (rect.width / 2);
-            y = rect.top + (rect.height / 2);
-        }
-        y = Math.max(Math.min(y - 100, window.innerHeight - 200), 66);
-        x = Math.max(Math.min(x - 100, window.innerWidth - 220), 20);
-        
-        
-        this.#menu.dataset.categoryid = id;
-        this.#menu.style.left = `${x}px`;
-        this.#menu.style.top = `${y}px`;
-        this.#menu.classList.add('active');
 
-        categoryElement.querySelector('.border-animation').classList.add('border-rotate');
+            this.#menu.dataset.categoryid = id;
+            this.#menu.style.left = `${x}px`;
+            this.#menu.style.top = `${y}px`;
+            this.#menu.classList.add('active');
+
+            categoryElement.querySelector('.border-animation').classList.add('border-rotate');
+        }
+    }  
+
+    #handleCategoryAnimationEvents = (event) => {
+        console.log(event)
+        if (event.animationName === 'fading-out') {
+            var category = event.currentTarget;
+            category.removeEventListener('animationend', this.#handleCategoryAnimationEvents);
+            category.removeEventListener('animationcancel', this.#handleCategoryAnimationEvents);
+            category.removeEventListener('click', this.#handleCategoryClick);
+            category.removeEventListener('keydown', this.#handleCategoryClick);
+            category.remove();
+        }
+        if (event.animationName === 'fading-in') {
+            var category = event.currentTarget;
+            category.classList.remove('fading-in');
+        }
     }
 
     async #initializeDatePicker(id, date) {
@@ -371,10 +385,13 @@ export default class HomeDashboard {
     #createCategoryElement(category) {
         var mainDiv = document.createElement('div');
         mainDiv.id = `category_${category.id}`;
-        mainDiv.className = 'category';
+        mainDiv.className = 'category fading-in';
         mainDiv.dataset.id = `${category.id}`;
         mainDiv.tabIndex = 0;
-        mainDiv.addEventListener("click", this.#onCategoryClick.bind(this));
+        mainDiv.addEventListener("click", this.#handleCategoryClick);
+        mainDiv.addEventListener("keydown", this.#handleCategoryClick);
+        mainDiv.addEventListener("animationend", this.#handleCategoryAnimationEvents);
+        mainDiv.addEventListener("animationcancel", this.#handleCategoryAnimationEvents);
 
         var borderContainerDiv = document.createElement('div');
         borderContainerDiv.className = 'border-container';
@@ -556,17 +573,12 @@ export default class HomeDashboard {
         this.#updateCategory(category);
     }
 
-    removeCategory(id, type) {        
+    removeCategory(id, type) {       
         var categoryElement = document.getElementById(`category_${id}`);
-
-        if (!categoryElement) {
-            return false;
+        if (categoryElement) {
+            categoryElement.classList.add('fading-out');
         }
-
-        categoryElement.removeEventListener("click", this.#onCategoryClick)
-        categoryElement.remove();
-
-        var array;
+        var array;    
 
         switch (type) {
             case 1:
