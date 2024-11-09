@@ -1,0 +1,64 @@
+﻿@model SearchViewModel
+
+<form id="search-form" method="post">
+    <input asp-for="FiscalPlanId" type="hidden" value="@Model.FiscalPlanId" id="search_fiscalPlanId" name="FiscalPlanId"/>
+    <div class="d-flex mb-3">
+        <svg class="my-2 me-2" id="search-button" fill="transparent" version="1.1"
+             width="45px" height="45px" viewBox="0 0 24 24">
+            <path d="M11 6C13.7614 6 16 8.23858 16 11M16.6588 16.6549L21 21M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <input asp-for="SearchString" class="form-control w-100 my-2" id="transaction-search" type="text" aria-label="Search Key" />
+    </div>
+    <div id="filter-accordion" class="accordion mb-1">
+        <div class="accordion-item">
+            <div class="accordion-head">
+                <h2 class="accordion-header me-auto">Filters</h2>
+                <div class="accordion-caret rotate" tabindex="0"></div>
+            </div>
+            <div id="collapseFilters" class="accordion-collapse collapse show" aria-labelledby="filterHeader">
+                <div class="accordion-body">
+                    <div class="filter-content-container">
+                        <div>
+                            <label id="category_search-label" for="CategoryId">Category</label>
+                            <select class="category-select form-select" asp-for="CategoryId" asp-items="Model.Categories" aria-labelledby="category_search-label">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                        <div class="inputs-container">
+                            <div class="input-group-container">
+                                <div class="input-container">
+                                    <span>From </span>
+                                    <input asp-for="MinDate" class="form-control mt-1" value="" aria-label="Transaction date range start" />
+                                </div>
+                                <div class="input-container">
+                                    <span>To </span>
+                                    <input asp-for="MaxDate" class="form-control mt-1" value="" aria-label="Transaction date range end" />
+                                </div>
+                            </div>
+                            <div class="input-group-container">
+                                <div class="input-container">
+                                    <span>Amount From </span>
+                                    <input asp-for="MinAmount" class="form-control mt-1" value="" aria-label="Transaction date range start" />
+                                </div>
+                                <div class="input-container">
+                                    <span>Amount To </span>
+                                    <input asp-for="MaxAmount" class="form-control mt-1" value="" aria-label="Transaction date range end" />
+                                </div>
+                            </div>
+                            <div>
+                                <span asp-validation-for="MinDate" class="text-danger"></span>
+                                <span asp-validation-for="MaxDate" class="text-danger"></span>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                <span asp-validation-for="MinAmount" class="text-danger"></span>
+                                <span asp-validation-for="MaxAmount" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+                <div class="text-center mt-3 mb-1">
+                    <input class="submit-btn" type="submit" value="Filter" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

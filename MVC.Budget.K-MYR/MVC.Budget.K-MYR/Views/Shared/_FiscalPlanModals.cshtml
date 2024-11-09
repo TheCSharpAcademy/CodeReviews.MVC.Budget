@@ -1,0 +1,73 @@
+﻿@model MVC.Budget.K_MYR.Models.FiscalPlan;
+
+<section id="fiscalPlan-modals">
+    <div class="modal fade" id="addFiscalPlan-modal" tabindex="-1" aria-labelledby="add-fiscalPlan-label" aria-hidden="true" aria-modal="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-truncate text-center flex-grow-1" id="add-fiscalPlan-label">Add Fiscal Plan</h4>
+                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addFiscalPlan-form" method="post">
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>                        
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Add" class="px-4 submit-btn" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="updateFiscalPlan-modal" tabindex="-1" aria-labelledby="updateFiscalPlan-label" aria-hidden="true" aria-modal="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-truncate text-center flex-grow-1" id="updateFiscalPlan-label"></h4>
+                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateFiscalPlan-form" method="post">
+                        <input type="hidden" asp-for="Id" value="" id="updateFiscalPlan_id" />
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" id="updateFiscalPlan_name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>                       
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Edit" class="px-4 submit-btn" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteFiscalPlan-modal" tabindex="-1" aria-labelledby="deleteFiscalPlan-label" aria-hidden="true" aria-modal="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-truncate text-center flex-grow-1" id="deleteFiscalPlan-label"></h4>                   
+                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>                        
+                        Deleting this budget will permanently remove all its categories and their associated transactions. This action cannot be undone.
+                        Are you sure you want to delete it?
+                    </p>
+                    <form id="deleteFiscalPlan-form" method="post">
+                        <input type="hidden" asp-for="Id" value="" id="deleteFiscalPlan_id"/>                        
+                        <div class="form-group mt-3 d-flex align-items-center justify-content-center">
+                            <input type="submit" value="Delete" class="px-4 submit-btn" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,110 @@
+﻿@using System.Globalization
+@model MVC.Budget.K_MYR.Models.ViewModels.LayoutModel<MVC.Budget.K_MYR.Models.ViewModels.IndexViewModel>
+
+@section Stylesheets {
+    @{
+        <link rel="stylesheet" href="~/dist/styles-index~fiscalPlan~category.css" asp-append-version="true" />
+    }
+}
+
+@{
+    ViewData["Title"] = "Budgets";
+}
+
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="visibility:hidden; position: absolute;">
+    <defs>
+        <linearGradient id="icon_gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#CCFBE5;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#A2D6CB;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#7EB1B1;stop-opacity:1" />
+        </linearGradient>        
+    </defs>    
+    <symbol xmlns="http://www.w3.org/2000/svg" id="edit-icon" viewBox='0 0 16 16'>
+        <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z' />
+        <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z' />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="trash-icon" viewBox="0 0 16 16">
+        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="check-icon" viewBox="0 0 1024 1024">
+        <path d="M866.133333 258.133333L362.666667 761.6l-204.8-204.8L98.133333 618.666667 362.666667 881.066667l563.2-563.2z" fill="#3cb44b" stroke-width="60" stroke="#3cb44b" stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="cross-icon" viewBox="0 0 512 512">
+        <path fill="none" stroke="#e6194B" stroke-linecap="round" stroke-linejoin="round" stroke-width="65" d="M368 368L144 144M368 144L144 368" />
+    </symbol>
+</svg>
+
+<div class="content-outer-container" id="fiscalPlans-container">
+    <div class="content-scrollcontainer" tabindex="0">
+        <div class="content-container">
+            <div class="cards-container" id="cards-container">                        
+                @foreach(var fiscalPlan in Model.PageModel.FiscalPlans)
+                {                    
+                    int progressbarWidthIncome = fiscalPlan.BudgetIncome > 0 ? (int)Math.Min(100, fiscalPlan.TotalIncome / fiscalPlan.BudgetIncome * 100) : 100;
+                    int progressbarWidthExpenses = fiscalPlan.BudgetExpenses > 0 ? (int)Math.Min(100, fiscalPlan.TotalExpenses / fiscalPlan.BudgetExpenses * 100) : 100;
+                    var color = progressbarWidthExpenses < 50 ? "bg-success" : progressbarWidthExpenses < 85 ? "bg-warning" : "bg-danger";
+
+                    <div class="fiscalPlan-card" id="fiscalPlan-card_@fiscalPlan.Id" data-id="@fiscalPlan.Id" data-name="@fiscalPlan.Name" tabindex="0">
+                        <div class="d-flex justify-content-between gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="fiscalPlan-icon no-focus tooltipped" title="Edit Fiscal Plan" viewBox="0 0 14 14" height="30" width="30" fill="#ffffff" data-action="edit" tabindex="0">
+                                <use href="#edit-icon"/>
+                            </svg>
+                            <h1 id="fiscalPlan-header_@fiscalPlan.Id" class="fiscalPlan-heading">@fiscalPlan.Name</h1>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" height="30" width="30" class="fiscalPlan-icon no-focus tooltipped" title="Delete Fiscal Plan" fill="#ffffff" data-action="delete" tabindex="0">
+                                <use href="#trash-icon" />
+                            </svg>
+                        </div>
+                        <div class="progress-container">
+                            <div>
+                                <div class="d-flex justify-content-between">
+                                    <div>Income</div>
+                                    <div class="text-end" id="fiscalPlan_income_@(fiscalPlan.Id)" data-total="@fiscalPlan.TotalIncome" data-budget="@fiscalPlan.BudgetIncome">
+                                        @fiscalPlan.TotalIncome.ToString("C2", Model.Culture) / @fiscalPlan.BudgetIncome.ToString("C2", Model.Culture)
+                                    </div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success"
+                                         role="progressbar" style="width: @(progressbarWidthIncome)%"
+                                         aria-valuenow="@(progressbarWidthIncome)" aria-valuemin="0" aria-valuemax="100" aria-labelledby="fiscalPlan_balance_@(fiscalPlan.Id)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between">
+                                    <div>Expenses</div>
+                                    <div class="text-end" id="fiscalPlan_expenses_@(fiscalPlan.Id)" data-total="@fiscalPlan.TotalExpenses" data-budget="@fiscalPlan.BudgetExpenses">
+                                        @fiscalPlan.TotalExpenses.ToString("C2", Model.Culture) / @fiscalPlan.BudgetExpenses.ToString("C2", Model.Culture)
+                                    </div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar @(color)"
+                                         role="progressbar" style="width: @(progressbarWidthExpenses)%"
+                                         aria-valuenow="@(progressbarWidthExpenses)" aria-valuemin="0" aria-valuemax="100" aria-labelledby="fiscalPlan_balance_@(fiscalPlan.Id)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>
+                }
+                <div id="addFiscalPlan-card" class="add-fiscalPlan-card" tabindex="0">
+                    <svg viewBox="0 0 14 14" height="23" width="23">
+                        <g id="plus">                            
+                            <path  fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
+                        </g>
+                    </svg>
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_FiscalPlanModals", Model.PageModel.FiscalPlan)
+
+@section Scripts {
+    @{
+        <script src="~/dist/runtime.js" asp-append-version="true"></script>
+        <script src="~/dist/vendors-index~fiscalPlan~category.js" asp-append-version="true"></script>
+        <script src="~/dist/index.js" asp-append-version="true"></script>
+    }
+}

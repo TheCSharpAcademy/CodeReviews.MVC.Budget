@@ -1,0 +1,165 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Antiforgery
+@model MVC.Budget.K_MYR.Models.ViewModels.LayoutModel<CategoryViewModel>
+@inject IAntiforgery Antiforgery
+
+@section Stylesheets {
+    @{
+        <link rel="stylesheet" href="~/dist/styles-index~fiscalPlan~category.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/dist/styles-fiscalPlan~category.css" asp-append-version="true" />
+    }
+}
+
+@{
+    ViewData["Title"] = "Category";
+    var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+    var category = Model.PageModel.Category;
+    var isIncomeCategory = category.CategoryType == 1;
+}
+
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="visibility:hidden; position: absolute;">
+    <defs>
+        <linearGradient id="icon_gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#CCFBE5;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#A2D6CB;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#7EB1B1;stop-opacity:1" />
+        </linearGradient>
+        <radialGradient id="icon_gradient_radial" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="#CCFBE5" />
+            <stop offset="50%" stop-color="#A2D6CB" />
+            <stop offset="100%" stop-color="#7EB1B1" />
+        </radialGradient>
+    </defs>    
+    <symbol id="addTransaction-icon" viewBox="0 0 14 14">
+        <path fill="url(#icon_gradient_radial)" fill-rule="evenodd" d="M8 1a1 1 0 0 0 -2 0v5H1a1 1 0 0 0 0 2h5v5a1 1 0 1 0 2 0V8h5a1 1 0 1 0 0 -2H8V1Z" clip-rule="evenodd" stroke-width="1"></path>
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="edit-icon" viewBox='0 0 16 16'>
+        <path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z' />
+        <path fill-rule="evenodd" d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z' />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="trash-icon" viewBox="0 0 16 16">
+        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="check-icon" viewBox="0 0 1024 1024">
+        <path d="M866.133333 258.133333L362.666667 761.6l-204.8-204.8L98.133333 618.666667 362.666667 881.066667l563.2-563.2z" fill="#3cb44b" stroke-width="60" stroke="#3cb44b" stroke-linecap="round" stroke-linejoin="round" />
+    </symbol>
+    <symbol xmlns="http://www.w3.org/2000/svg" id="cross-icon" viewBox="0 0 512 512">
+        <path fill="none" stroke="#e6194B" stroke-linecap="round" stroke-linejoin="round" stroke-width="65" d="M368 368L144 144M368 144L144 368" />
+    </symbol>
+</svg>
+
+<div id="action-sidebar">
+    <a asp-controller="Home" asp-action="FiscalPlan" asp-route-id="@category.FiscalPlanId" title="Back">
+        <div class="sidebar-button-container">
+            <svg class="sidebar-button" id="back-button" fill="#ffffff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 299.021 299.021">
+                <path d="M292.866,254.432c-2.288,0-4.443-1.285-5.5-3.399c-0.354-0.684-28.541-52.949-146.169-54.727v51.977 c0,2.342-1.333,4.48-3.432,5.513c-2.096,1.033-4.594,0.793-6.461-0.63L2.417,154.392C0.898,153.227,0,151.425,0,149.516 c0-1.919,0.898-3.72,2.417-4.888l128.893-98.77c1.87-1.426,4.365-1.667,6.461-0.639c2.099,1.026,3.432,3.173,3.432,5.509v54.776 c3.111-0.198,7.164-0.37,11.947-0.37c43.861,0,145.871,13.952,145.871,143.136c0,2.858-1.964,5.344-4.75,5.993 C293.802,254.384,293.34,254.432,292.866,254.432z" />
+            </svg>
+        </div>   
+    </a>
+</div>
+
+<div class="flip-container">
+    <div id="flip-container-inner" class="flip-container-inner">
+        <div class="flip-content" style="--s:0">
+            <div id="home" class="content-outer-container">
+                <div class="content-scrollcontainer" tabindex="0">
+                    <div class="content-container">
+                        <div class="dashboard">
+                            <div class="dashboard-container">
+                                <div class="chart-container">
+                                    <canvas id="sentimentChart" data-happy="@(category.HappyTotal.ToString("F2", CultureInfo.InvariantCulture))"
+                                            data-unhappy="@((category.Total - category.HappyTotal).ToString("F2", CultureInfo.InvariantCulture))">
+                                    </canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h1 class="text-center text-truncate">@Html.Encode(category.Name)</h1>
+                                    <div class="input-group monthPicker mt-3">                                        
+                                        <input id="monthSelector" type="text" class="monthSelector form-control" value="" aria-label="Month Selection" readonly>
+                                        <span class="input-group-text calendar-button"><i class="bi bi-calendar"></i></span>
+                                    </div>
+                                    <div class="dashboardStatistics mt-4">
+                                        @{
+                                            var budget = category.BudgetLimit?.Budget ?? category.Budget;
+                                            var difference = budget - category.Total;
+                                            var totalHeader = isIncomeCategory ? "Income" : "Expenses";
+                                            var budgetHeader = isIncomeCategory ? "Goal" : "Budget";
+                                        }
+                                        <h5 class="text-center" id="budget-header">@budgetHeader: @budget.ToString("C2", Model.Culture) </h5>
+                                        <h5 class="text-center" id="total-header">@totalHeader: @category.Total.ToString("C2", Model.Culture) </h5>                                        
+                                        @if (difference < 0)
+                                        {
+                                            var differenceHeader = isIncomeCategory ? "Surplus" : "Overspending";
+                                            <h5 class="text-center" id="difference-header">@differenceHeader: @((-difference).ToString("C2", Model.Culture)) </h5>
+                                        }
+                                        else
+                                        {
+                                            var differenceHeader = isIncomeCategory ? "Pending" : "Available";
+                                            <h5 class="text-center" id="difference-header">@differenceHeader: @(difference.ToString("C2", Model.Culture)) </h5>
+                                        }
+                                        
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="necessityChart" data-necessary="@(category.NecessaryTotal.ToString("F2", CultureInfo.InvariantCulture))"
+                                            data-unnecessary="@((category.Total - category.NecessaryTotal).ToString("F2", CultureInfo.InvariantCulture))">
+                                    </canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion my-2" id="table-container" style="display: none">
+                            <div class="accordion-item">
+                                <div id="accordion-head-transaction" class="accordion-head d-flex">
+                                    <h5 class="accordion-header me-auto" id="accordionTransactionHeader">
+                                        Transactions
+                                    </h5>
+                                    <svg xmlns="http://www.w3.org/2000/svg" tabindex="0" class="no-focus tooltipped" title="Add Transaction" id="addTransaction-button" height="23" width="23" class="no-focus">
+                                        <use href="#addTransaction-icon" />
+                                    </svg>
+                                    <div class="accordion-caret rotate" tabindex="0"></div>
+                                </div>
+                                <div id="collapseTransaction" class="accordion-collapse collapse show" aria-labelledby="accordionTransactionHeader">
+                                    <div class="accordion-body pt-0">
+                                        <div>
+                                            <table class="table table-hover table-borderless w-100 px-2" id="transactions-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            Title
+                                                        </th>
+                                                        <th>
+                                                            Date
+                                                        </th>
+                                                        <th>
+                                                            Amount
+                                                        </th>                                                        
+                                                        <th>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_TransactionModals", new Transaction())
+<input id="category_Id" type="hidden" value="@category.Id" data-object='@Json.Serialize(Model.PageModel.Category)' readonly>
+<input type="hidden" value="@token" id="antiforgeryToken" />
+@section Scripts {
+    @{
+        <script src="~/dist/runtime.js" asp-append-version="true"></script>
+        <script src="~/dist/vendors-index~fiscalPlan~category.js" asp-append-version="true"></script>
+        <script src="~/dist/category.js" asp-append-version="true"></script>
+    }
+}
