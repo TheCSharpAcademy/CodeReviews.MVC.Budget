@@ -1,0 +1,395 @@
+﻿@model Budget.Doc415.Models.IndexViewModel;
+@{
+    ViewData["Title"] = "Transactions";
+    int deleteId=-1;
+    
+}
+
+<div class="container">
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active me-2">
+                @*ADD CATEGORY MODAL TOGGLE BUTTON*@
+                <button type="button" class="btn btn-info categorybutton" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add New Category</button>
+
+            </li>
+            <li class="nav-item me-2">
+                @*EDIT CATEGORY MODAL TOGGLE BUTTON*@
+                <button type="button" class="btn btn-info categorybutton" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit Categories</button>
+
+            </li>
+
+            <li class="nav-item me-2">
+                <form asp-action="Index" asp-controller="Transaction" method="Get" class="form-inline my-2 my-lg-0 mr-2">
+                    <div class="d-flex justify-content-around">
+                        <div class="form-group me-2">
+                            <input asp-for="SearchName" class="form-control mr-sm-2 transanctionfilter" placeholder="Transaction name" type="search" id="searchbox" aria-label="Search">
+                        </div>
+                        <div class="form-group me-2 categorypulldown">
+                            Category: <select class="categorypulldown me-2" asp-for="FilterCategory" asp-items="Model.CategoriesSelect">
+                                <option value="">All</option>
+                            </select>
+
+                        </div>
+                        <div class="form-group me-2">
+                            <input asp-for="StartDate" class="form-control transactionfilter" type="date" placeholder="Start" aria-label="Start date" />
+                        </div>
+                        <div class="form-group me-2">
+                            <input asp-for="EndDate" class="form-control transactionfilter" type="date" placeholder="End" aria-label="End date" />
+                        </div>
+                        <div class="form-group me-2">
+                            <button class="btn btn-outline-dark transactionfilter my-2 my-sm-0" type="submit">Filter transactions</button>
+                        </div>
+                    </div>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+</div>
+
+
+
+@*EDIT CATEGORY MODAL*@
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel">Edit categories</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @foreach (var category in Model.Categories)
+                {
+                    <form asp-action="Edit" asp-controller="Category" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="@category.Id" value="@category.Id" />
+                        <div class="form-group">
+                            <label asp-for="@category.Name" class="control-label"></label>
+                            <input asp-for="@category.Name" class="form-control" />
+                            <span asp-validation-for="@category.Name" class="text-danger"></span>
+                            <p></p>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Save changes" data-bs-dismiss="modal" class="btn btn-primary" />
+                            <button type="button" class="btn btn-secondary" onclick=deleteCategory(@category.Id) data-dismiss="modal">Delete</button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@*ADD CATEGORY MODAL*@
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Add new category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Create" asp-controller="Category" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="NewCategory.Id" />
+                    <div class="form-group">
+                        <label asp-for="NewCategory.Name" class="control-label"></label>
+                        <input asp-for="NewCategory.Name" class="form-control" />
+                        <span asp-validation-for="NewCategory.Name" class="text-danger"></span>
+                        <p></p>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Add" data-bs-dismiss="modal" class="btn btn-primary" />
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Delete transaction modal*@
+
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this transaction?
+                <input type="hidden" id="itemIdToDelete" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn btn-danger">Confirm Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Add transaction*@
+
+<div class="container" id="newtransactionform">
+    <form asp-action="Add" asp-controller="Transaction"  class="row p-4 row-cols-sm-auto g-2 border bg-light mt-4 align-items-center"> 
+        <input asp-for="NewTransaction.Id" hidden />
+        <div class="col-1">
+            <label class="visually-hidden" asp-for="NewTransaction.Date">
+                Date
+            </label>
+            <div class="input-group">
+                <input asp-for="NewTransaction.Date" type="date" class="form-control">
+            </div>
+        </div>
+        <div class="col-2"> 
+            <label class="visually-hidden" asp-for="NewTransaction.Name"> 
+                Name</label> 
+             <div class="input-group"> 
+                <input asp-for="NewTransaction.Name" type="text" class="form-control" 
+                    placeholder="Name"> 
+            </div> 
+        </div> 
+        
+        <div class="col-3"> 
+            <label class="visually-hidden" asp-for="NewTransaction.Category"> </label>
+            <select class="form-select" asp-for="NewTransaction.Category" asp-items="Model.CategoriesSelect">
+                
+            </select>
+        </div> 
+  
+        <div class="col-4"> 
+            <div class="input-group"> 
+                <label class="visually-hidden" asp-for="NewTransaction.Amount"> 
+                    Amount</label> 
+                <input asp-for="NewTransaction.Amount" type="number" class="form-control" 
+                    placeholder="Amount"> 
+            </div> 
+        </div> 
+
+        <div class="col-5">
+            <div class="input-group">
+                <label class="visually-hidden" asp-for="NewTransaction.Description">
+                    Description
+                </label>
+                <input asp-for="NewTransaction.Description" type="text" class="form-control"
+                       placeholder="Description">
+            </div>
+        </div>
+
+        <div class="col-5"> 
+            <button type="submit" class="btn btn-success"> 
+                Add transaction</button> 
+        </div> 
+    </form> 
+</div>
+
+@*Show transactions*@
+
+@if (Model.Transactions!=null && Model.Transactions.Count() >0)
+{
+
+    foreach (var transaction in Model.Transactions)
+    {
+
+        <div class="container editformcontainer" style="display:none !important" id="@transaction.Id">
+            <form asp-action="Put" asp-route-id="@transaction.Id" asp-controller="Transaction" class="row p-4 row-cols-sm-auto g-2 border bg-light mt-4 align-items-center">
+                <input asp-for="@transaction.Id" hidden />
+                <div class="col-1">
+                    <label class="visually-hidden" asp-for="@transaction.Date">
+                        Date
+                    </label>
+                    <div class="input-group">
+                        <input asp-for="@transaction.Date" type="date" class="form-control">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <label class="visually-hidden" asp-for="@transaction.Name">
+                        Name
+                    </label>
+                    <div class="input-group">
+                        <input asp-for="@transaction.Name" type="text" class="form-control"
+                        placeholder="Name">
+                    </div>
+                </div>
+
+                <div class="col-3">
+                    <label class="visually-hidden" asp-for="@transaction.Category"> </label>
+                    <select class="form-select" asp-for="@transaction.Category" asp-items="Model.CategoriesSelect">
+                    </select>
+                </div>
+
+                <div class="col-4">
+                    <div class="input-group">
+                        <label class="visually-hidden" asp-for="@transaction.Amount">
+                            Amount
+                        </label>
+                        <input asp-for="@transaction.Amount" type="number" class="form-control"
+                        placeholder="Amount">
+                    </div>
+                </div>
+
+                <div class="col-5">
+                    <div class="input-group">
+                        <label class="visually-hidden" asp-for="@transaction.Description">
+                            Description
+                        </label>
+                        <input asp-for="@transaction.Description" type="text" class="form-control"
+                        placeholder="Description">
+                    </div>
+                </div>
+
+                <div class="col-5">
+                    <button type="submit" class="btn btn-warning">
+                        Save transaction
+                    </button>
+                </div>
+                 <div class="col-5">
+                    <button type="button" class="btn btn-success" onclick="closeEditForm(@transaction.Id)">
+                        Close
+                    </button>
+                </div>
+            </form>
+        </div>
+    }
+
+
+
+
+<div class="container">
+        <table class="table table-dark table-striped table-hover">
+        <thead id="tableheads">
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in Model.Transactions)
+            {
+                <tr class="@(transaction.Amount > 1000 ? "Red" : "Green")">
+                    <td>@transaction.Date.ToShortDateString()</td>
+                    <td>@transaction.Name</td>
+                    <td>@transaction.Category</td>
+                    <td class="@(transaction.Amount > 1000 ? "Red" : "Green")">@transaction.Amount</td>
+                  
+
+                    <td>@transaction.Description</td>
+                    <td>
+                        <button class="viewButton btn btn-outline-warning btn-block" onclick="openEditForm(@transaction.Id)">Edit</button>
+                    </td>
+                    <td>
+                            <button class="viewButton btn btn-outline-danger btn-block" onclick="openDeleteModal(@transaction.Id)" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
+                    </td>
+                </tr>
+                     
+            }
+        </tbody>
+    </table>
+    </div>
+  
+  
+} else
+{
+    <p style="color:white">No transactions</p>
+}
+
+<style>
+    .Red{
+        color:red !important;
+    }
+
+    .Green {
+        color: forestgreen !important;
+    }
+
+    th{
+        color:darkmagenta !important;
+    }
+
+    #newtransactionform >*{
+        background-color: #040037 !important;
+        color : ivory;
+    }
+
+
+    #newtransactionform input{
+        background-color: #5A5C45 !important;
+        color:ivory !important;
+    }
+
+    #newtransactionform input:hover{
+        background-color: #6E6E59 !important;
+        color: ivory !important;
+    }
+
+    #newtransactionform select{
+        background-color: #5A5C45 !important;
+        color: ivory;
+    }
+
+    #newtransactionform select:hover {
+        background-color: #6E6E59 !important;
+        color: ivory !important;
+    }
+
+    #newtransactionform ::placeholder{
+        color:ivory;
+    }
+
+    @*  *@
+
+
+    .editformcontainer >*{
+        background-color: #BE8141 !important;
+        color : ivory;
+    }
+
+
+    .editformcontainer input{
+        background-color: #5A5C45 !important;
+        color:ivory !important;
+    }
+
+    .editformcontainer input:hover{
+        background-color: #6E6E59 !important;
+        color: ivory !important;
+    }
+
+    .editformcontainer select{
+        background-color: #5A5C45 !important;
+        color: ivory;
+    }
+
+    .editformcontainerselect:hover {
+        background-color: #6E6E59 !important;
+        color: ivory !important;
+    }
+
+    .editformcontainer::placeholder{
+        color:ivory;
+    }
+
+    
+</style>
+
+
+
+
+

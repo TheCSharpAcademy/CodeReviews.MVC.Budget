@@ -1,0 +1,5 @@
+﻿@Budget.Doc415_HostAddress = https://localhost:7272
+
+GET {{Budget.Doc415_HostAddress}}/transaction/get/{id}?name=string&transactionDate=string&categoryId=0
+
+###
