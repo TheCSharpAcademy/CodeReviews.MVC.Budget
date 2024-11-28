@@ -21,8 +21,8 @@
         <div class="row">
             <div class="col-3 p-2 d-flex justify-content-center">
                 <div class="row">
-                    <input type="text" class="col-9" id="searchTransactionName" placeholder="Search name" />
-                    <button class="btn btn-success btn-sm col-3" onclick="searchOnTransactionName()">Search</button>
+                    <input type="text" class="col-8" id="searchTransactionName" placeholder="Search name" />
+                    <button class="btn btn-success btn-sm col-3 ms-1" onclick="searchOnTransactionName()">Search</button>
                 </div>
             </div>
             <div class="col-3 p-2 d-flex justify-content-center">
@@ -78,10 +78,14 @@
         <div class="modal-content">
             <form action="javascript:void(0);" method="post" onsubmit="editTransaction()">
                 Edit Transaction:<br>
-                Date: <input type="date" id="edit-date"><br />
-                Name: <input type="text" id="edit-source"><br />
-                Amount: <input type="text" id="edit-amount"><br />
-                Category: <select id="edit-selectedcategory" required> </select>
+                <label for="edit-date">Date:</label>
+                <input type="date" id="edit-date"><br />
+                <label for="edit-source">Name:</label>
+                <input type="text" id="edit-source"><br />
+                <label for="edit-amount">Amount:</label>
+                <input for="text" id="edit-amount"><br />
+                <label for="edit-selectedcategory">Category:</label>
+                <select id="edit-selectedcategory" required> </select><br />
                 <input type="submit" value="Save Changes">
                 <div id="error-message-edit" style="color:red; display: none;"></div>
             </form>
