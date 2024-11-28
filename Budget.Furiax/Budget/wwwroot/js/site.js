@@ -54,7 +54,7 @@ function displayTransactions(data) {
     const tBody = tList.querySelector('tBody');
     tBody.innerHTML = '';
     balance = 0;
-    data.forEach(item => { 
+    data.forEach(item => {
         let tr = tBody.insertRow();
 
         let td1 = tr.insertCell(0);
@@ -73,7 +73,7 @@ function displayTransactions(data) {
 
         let td4 = tr.insertCell(3);
         let decimalAmount = item.transactionAmount;
-        let formattedAmount = formatAmount(decimalAmount);
+        let formattedAmount = `${formatAmount(decimalAmount)} €`;
         let textNodeAmount = document.createTextNode(formattedAmount);
         td4.appendChild(textNodeAmount);
 
@@ -120,7 +120,7 @@ function displayTransactions(data) {
 function searchOnTransactionName() {
     const searchString = document.getElementById('searchTransactionName').value.toLowerCase();
     const searchTransactionResult = transactions.filter(transaction =>
-       transaction.transactionSource.toLowerCase().includes(searchString)
+        transaction.transactionSource.toLowerCase().includes(searchString)
     );
     displayTransactions(searchTransactionResult);
 }
@@ -148,6 +148,18 @@ function sortOnDate() {
                 var dateA = new Date(a.transactionDate);
                 var dateB = new Date(b.transactionDate);
                 return dateA - dateB;
+            });
+            displayTransactions(sortedOnDate);
+        });
+}
+function sortOnDateDesc() {
+    fetch(uriTransaction)
+        .then(response => response.json())
+        .then(data => {
+            const sortedOnDate = data.sort(function (a, b) {
+                var dateA = new Date(a.transactionDate);
+                var dateB = new Date(b.transactionDate);
+                return dateB - dateA;
             });
             displayTransactions(sortedOnDate);
         });
@@ -508,7 +520,7 @@ function renderDeleteCategoryForm() {
     });
 
     const deleteCategorySelect = document.getElementById('delete-selectedcategory');
-    
+
     populateCategoriesDropMenu(deleteCategorySelect, uriCategory);
     listOfCategoriesSelect = deleteCategorySelect;
     listOfCategoriesSelect.addEventListener('change', function () {
