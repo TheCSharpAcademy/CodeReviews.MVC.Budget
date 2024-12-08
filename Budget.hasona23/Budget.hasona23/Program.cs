@@ -1,21 +1,32 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Budget.hasona23.Data;
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<BudgetDB>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BudgetDB") ?? throw new InvalidOperationException("Connection string 'BudgetDB' not found.")));
+using Budget.hasona23.Services;
 
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<BudgetContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BudgetDB") ?? throw new InvalidOperationException("Connection string 'BudgetDB' not found.")));
+builder.Services.AddScoped<ITransactionService,TransactionService>();
+builder.Services.AddScoped<ICategoryService,CategoryService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+// Configure the HTTP request pipeline.
 using (var scope = app.Services.CreateScope())
 {
-    scope.ServiceProvider.GetRequiredService<BudgetDB>().Database.Migrate();
-    var seed = new DataSeeder(scope.ServiceProvider);
-    seed.SeedData();
+    scope.ServiceProvider.GetRequiredService<BudgetContext>().Database.Migrate();
+    try
+    {
+        DataSeed.Seed(scope.ServiceProvider);
+    }
+    catch (Exception e)
+    {
+        scope.ServiceProvider.GetRequiredService<ILogger>().LogError(e.Message);
+        throw;
+    }
 }
-// Configure the HTTP request pipeline.
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -32,8 +43,9 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
+        pattern: "{controller=Category}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 
 app.Run();
+Console.ReadLine();

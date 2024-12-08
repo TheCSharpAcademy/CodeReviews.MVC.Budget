@@ -16,4 +16,42 @@
       <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Categories\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Categories\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Categories\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Categories\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Categories\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Home\Privacy.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Transactions\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Transactions\_Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Transactions\_Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Transactions\_Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Transactions\_Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Category\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Category\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Category\_CreatePartial.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Category\_DeletePartial.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Category\_EditPartial.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Views\Categories\Create.cshtml" />
+      <UpToDateCheckInput Remove="Views\Categories\Delete.cshtml" />
+      <UpToDateCheckInput Remove="Views\Categories\Details.cshtml" />
+      <UpToDateCheckInput Remove="Views\Categories\Edit.cshtml" />
+      <UpToDateCheckInput Remove="Views\Categories\Index.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\" />
+      <Folder Include="Views\Category\" />
+      <Folder Include="Views\Transaction\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Todo.txt" />
+    </ItemGroup>
+
 </Project>
