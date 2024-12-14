@@ -4,11 +4,11 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>{Categories}</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<button type="button" class="btn btn-primary btn-create">
+    Create New
+</button>
 <table class="table">
     <thead>
         <tr>
@@ -25,11 +25,61 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <button class="btn btn-warning edit-btn" data-id="@item.Id">Edit</button>
+                <button class="btn btn-danger delete-btn" data-id="@item.Id">Delete</button>
+
             </td>
         </tr>
 }
     </tbody>
 </table>
+<!-- Create Modal -->
+<div class="modal fade" id="createModal">
+    <div class="modal-dialog">
+        <div class="modal-content" id="createModalContent">
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal">
+    <div class="modal-dialog">
+        <div class="modal-content" id="editModalContent">
+            <!-- Modal content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal">
+    <div class="modal-dialog">
+        <div class="modal-content" id="deleteModalContent">
+            <!-- Modal content will be loaded here -->
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(function() {
+            // Create Modal
+            $(document).on('click', '.btn-create', function() {
+                $('#createModal').modal('show');
+                $('#createModalContent').load('@Url.Action("Create", "Category")');
+            });
+
+            // Edit Modal
+            $(document).on('click', '.edit-btn', function() {
+                var id = $(this).data('id');
+                $('#editModal').modal('show');
+                $('#editModalContent').load('@Url.Action("Edit", "Category")/' + id);
+            });
+
+            // Delete Modal
+            $(document).on('click', '.delete-btn', function() {
+                var id = $(this).data('id');
+                $('#deleteModal').modal('show');
+                $('#deleteModalContent').load('@Url.Action("Delete", "Category")/' + id);
+            });
+        });
+    </script>
+}

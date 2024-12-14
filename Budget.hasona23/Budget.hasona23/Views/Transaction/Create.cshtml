@@ -1,0 +1,55 @@
+@model Budget.hasona23.Models.TransactionDto
+
+<div class="modal-header">
+    <h5 class="modal-title">Create Transaction</h5>
+</div>
+<form id="createForm">
+    <p hidden="hidden">@Html.AntiForgeryToken();</p>
+    <div class="modal-body">
+        <div class="form-group">
+            <label>Details</label>
+            <input type="text" name="Details" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <input type="number"  name="Price" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Date</label>
+            <input type="date" name="Date" class="form-control" required />
+        </div> 
+        <div class="form-group">
+            <select required="required" name="CategoryId">
+                @foreach (var category in (List<CategoryModel>)ViewData["Categories"]!)
+                {
+                    <option value="@category.Id" >@category.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#createModal').modal('hide');">Close</button>
+    </div>
+</form>
+
+<script>
+    $('#createForm').on('submit', function (e) {
+        e.preventDefault();
+        var form = $(this);
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            url: '@Url.Action("Create", "Transaction")',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (result) {
+                if (result.success) {
+                    $('#createModal').modal('hide');
+                    location.reload();
+                }else {
+                    alert("Can't Create")
+                }
+            }
+        });
+    });
+</script>

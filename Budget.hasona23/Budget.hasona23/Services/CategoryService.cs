@@ -31,8 +31,11 @@ public class CategoryService : ICategoryService
     {
         try
         {
-            _context.Categories.Add(new CategoryModel{Name = category.Name});
-            _context.SaveChanges();
+            if (!_context.Categories.Any(x => x.Name == category.Name))
+            {
+                _context.Categories.Add(new CategoryModel { Name = category.Name });
+                _context.SaveChanges();
+            }
         }
         catch (Exception ex)
         {
@@ -88,8 +91,11 @@ public class CategoryService : ICategoryService
     {
         try
         {
-            await _context.Categories.AddAsync(new CategoryModel{Name = category.Name});
-            await _context.SaveChangesAsync();
+            if (!await _context.Categories.AnyAsync(x => x.Name == category.Name))
+            {
+                await _context.Categories.AddAsync(new CategoryModel { Name = category.Name });
+                await _context.SaveChangesAsync();
+            }
         }
         catch (Exception ex)
         {
@@ -102,8 +108,13 @@ public class CategoryService : ICategoryService
     {
         try
         {
-            _context.Update(new CategoryModel{Id = id,Name = category.Name});
-            await _context.SaveChangesAsync();
+            var result = _context.Categories.SingleOrDefault(c => c.Id == id);
+            if (result != null)
+            {
+                result.Name = category.Name;
+                await _context.SaveChangesAsync();
+            }
+            
         }
         catch (Exception ex)
         {

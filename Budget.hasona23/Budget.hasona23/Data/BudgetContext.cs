@@ -10,6 +10,6 @@ public class BudgetContext : DbContext
     public DbSet<CategoryModel> Categories { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<CategoryModel>().HasMany<TransactionModel>().WithOne(x => x.Category);
+        modelBuilder.Entity<CategoryModel>().HasMany<TransactionModel>().WithOne(x => x.Category).IsRequired().OnDelete(DeleteBehavior.Cascade);
     }
 }

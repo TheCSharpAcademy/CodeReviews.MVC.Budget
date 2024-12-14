@@ -1,0 +1,57 @@
+@model Budget.hasona23.Models.TransactionDto
+
+
+<div class="modal-header">
+    <h5 class="modal-title">Edit Transaction</h5>
+
+</div>
+<form id="editForm">
+    <p hidden="hidden">@Html.AntiForgeryToken();</p>
+    <div class="modal-body">
+        <div class="form-group">
+            <label>Details</label>
+            <input type="text" name="Details" class="form-control" value="@Model.Details" required/>
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <input type="number" name="Price" class="form-control" value="@Model.Price" required/>
+        </div>
+        <div class="form-group">
+            <label>Date</label>
+            <input type="date" name="Date" class="form-control" value="@Model.Date" required/>
+        </div>
+        <div class="form-group">
+            <select required="required" name="CategoryId">
+                @foreach (var category in (List<CategoryModel>)ViewData["Categories"]!)
+                {
+                    <option value="@category.Id" >@category.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#editModal').modal('hide');">Close</button>
+    </div>
+</form>
+
+<script>
+    $('#editForm').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            url: '@Url.Action("Edit", "Transaction")',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(result) {
+                if (result.success) {
+                    $('#editModal').modal('hide');
+                    location.reload();
+                }else{
+                    alert("Cant edit")
+                }
+            }
+        });
+    });
+</script>

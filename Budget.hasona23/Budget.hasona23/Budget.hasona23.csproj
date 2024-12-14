@@ -45,13 +45,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\" />
-      <Folder Include="Views\Category\" />
-      <Folder Include="Views\Transaction\" />
+      <None Remove="Todo.txt" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Todo.txt" />
+      <Folder Include="Controllers\" />
     </ItemGroup>
 
 </Project>
