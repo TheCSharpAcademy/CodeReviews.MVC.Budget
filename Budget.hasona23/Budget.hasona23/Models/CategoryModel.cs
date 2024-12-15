@@ -6,6 +6,7 @@ public class CategoryModel
 {
     public int Id { get; set; }
     [StringLength(32,MinimumLength = 1)]
+    [Required]
     public string Name { get; set; } = string.Empty;
     //Navigation
     public ICollection<TransactionModel> Transactions { get; set; }

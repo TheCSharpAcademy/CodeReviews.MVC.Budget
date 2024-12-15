@@ -15,10 +15,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 using (var scope = app.Services.CreateScope())
 {
-    scope.ServiceProvider.GetRequiredService<BudgetContext>().Database.EnsureCreated();
-    scope.ServiceProvider.GetRequiredService<BudgetContext>().Database.Migrate();
+   
     try
     {
+        scope.ServiceProvider.GetRequiredService<BudgetContext>().Database.EnsureCreated();
+        scope.ServiceProvider.GetRequiredService<BudgetContext>().Database.Migrate();
         DataSeed.Seed(scope.ServiceProvider);
     }
     catch (Exception e)

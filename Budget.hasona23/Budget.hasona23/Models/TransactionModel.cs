@@ -7,12 +7,15 @@ namespace Budget.hasona23.Models;
 public class TransactionModel
 {
     public int Id { get; set; }
+    [Required]
     public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     [DataType(DataType.Currency)]
     [Range(0, double.MaxValue)]    
     [Column(TypeName = "decimal(18, 2)")]
+    [Required]
     public decimal Price { get; set; }    
     [StringLength(128,MinimumLength = 4)]
+    [Required]
     public string Details { get; set; }=string.Empty;
     //Navigation
     public CategoryModel Category { get; set; }
