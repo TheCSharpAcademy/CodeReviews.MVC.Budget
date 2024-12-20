@@ -1,0 +1,123 @@
+﻿﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Budget App</title>
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="row"><h1 class="display-4 text-center">Budget App</h1></div>
+        <div class="row">
+            <div class="col-6 p-2 d-flex justify-content-center">
+                <button id="openTransactionModal" class="btn-outline-success">Add Transaction</button>
+            </div>
+            <div class="col-6 p-2 d-flex justify-content-center">
+                <button id="openCategoryModal" class="btn-outline-success">Manage Categories</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3 p-2 d-flex justify-content-center">
+                <div class="row">
+                    <input type="text" class="col-8" id="searchTransactionName" placeholder="Search name" />
+                    <button class="btn btn-success btn-sm col-3 ms-1" onclick="searchOnTransactionName()">Search</button>
+                </div>
+            </div>
+            <div class="col-3 p-2 d-flex justify-content-center">
+                <button class="btn btn-success btn-sm" onclick="sortOnCategory()">Sort on Category</button>
+            </div>
+            <div class="col-3 p-2 d-flex justify-content-center">
+                <button class="btn btn-success btn-sm" onclick="sortOnDate()">Sort on Date <i class="bi bi-arrow-down"></i></button>
+            </div>
+            <div class="col-3 p-2 d-flex justify-content-center">
+                <button class="btn btn-success btn-sm" onclick="sortOnDateDesc()">Sort on Date <i class="bi bi-arrow-up"></i></button>
+            </div>
+        </div>
+        <div class="row" id="balance"><div>Account balance: <div id="balanceTotal"></div></div></div>
+
+        <table id="transactionList" class="table-striped mt-2 table">
+            <thead class="table-light table">
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+
+
+    <div id="transactionModal" class="modal">
+            <div class="modal-content" id="modalTransaction">
+                <form action="javascript:void(0);" method="POST" onsubmit="addTransaction()">
+                <h4>Add Transaction: <span><button id="closeModalTransaction">X</button></span></h4>
+                    <label for="add-date">Date:</label>
+                    <input type="date" id="add-date"><br />
+                    <label for="add-source">Name:</label>
+                    <input type="text" id="add-source" placeholder="To/From"><br />
+                    <label for="add-amount">Amount:</label>
+                    <input type="text" id="add-amount" placeholder="amount"><br />
+                    <label for="add-selectedcategory">Category:</label>
+                    <select id="add-selectedcategory" required> </select>
+                    <input type="submit" value="Add">
+                    <div id="error-message" style="color:red; display: none;"></div>
+                </form>
+            </div>
+    </div>
+
+    <div id="editTransactionModal" class="modal">
+        <div class="modal-content">
+            <form action="javascript:void(0);" method="post" onsubmit="editTransaction()">
+                Edit Transaction:<br>
+                <label for="edit-date">Date:</label>
+                <input type="date" id="edit-date"><br />
+                <label for="edit-source">Name:</label>
+                <input type="text" id="edit-source"><br />
+                <label for="edit-amount">Amount:</label>
+                <input for="text" id="edit-amount"><br />
+                <label for="edit-selectedcategory">Category:</label>
+                <select id="edit-selectedcategory" required> </select><br />
+                <input type="submit" value="Save Changes">
+                <div id="error-message-edit" style="color:red; display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <div>
+                What action would you like to do: <select id="categoryAction">
+                    <option value="add-category">ADD</option>
+                    <option value="edit-category">EDIT</option>
+                    <option value="delete-category">DELETE</option>
+                </select>
+                <hr>
+            </div>
+
+            <div id="categoryModal-display">
+                <form action="javascript:void(0);" method="POST" onsubmit="addCategory()">
+                    <label for="add-categoryname">Add Category:</label><br>
+                    <input type="text" id="add-categoryname" placeholder="Name"><span class="btn-close" id="closeModalCategory"></span>
+                    <input type="submit" value="Add Category">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        getTransactions();
+        const addCategorySelect = document.getElementById('add-selectedcategory');
+        populateCategoriesDropMenu(addCategorySelect, uriCategory);
+    </script>
+</body>
+</html>
