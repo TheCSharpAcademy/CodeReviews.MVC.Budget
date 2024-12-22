@@ -1,0 +1,58 @@
+﻿@model Budget.jollejonas.Models.Transaction
+@{
+    Layout = null; // Sørg for, at layoutet ikke inkluderes i modalens Partial View
+}
+<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form" asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">@Model.Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Date" class="form-label">@Model.Date</label>
+                        <input asp-for="Date" class="form-control" />
+                        <span asp-validation-for="Date" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Amount" class="form-label">@Model.Amount</label>
+                        <input asp-for="Amount" class="form-control" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="CategoryId" class="form-label">Category</label>
+                        <select asp-for="CategoryId" class="form-control">
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                var isSelected = category.Id == Model.CategoryId ? "selected" : "";
+                                if (isSelected == "selected")
+                                {
+                                    <option value="@category.Id" selected>@category.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="edit-form" id="confirm-edit" class="btn btn-primary">Confirm Changes</button>
+            </div>
+        </div>
+    </div>
+</div>

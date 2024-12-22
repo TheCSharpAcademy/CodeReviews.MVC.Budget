@@ -1,0 +1,94 @@
+﻿@model Budget.jollejonas.Models.TransactionCategoryViewModel
+
+<h1>Transactions</h1>
+
+<button class="btn btn-primary" onclick="openCreateModal()">Add Transaction</button>
+
+<form asp-controller="Transactions" asp-action="Index" method="get">
+    <p>
+        <label>Category: </label>
+        <select asp-for="CategoryId" asp-items="Model.CategoriesList">
+            <option value="">All</option>
+        </select>
+        <label>Month: </label>
+        <select asp-for="Month" asp-items="Model.MonthList">
+            <option value="">All</option>
+        </select>
+
+        <label>Year: </label>
+        <select asp-for="Year" asp-items="Model.YearList">
+            <option value="">All</option>
+        </select>
+
+        <label>Transaction: <input type="text" asp-for="SearchString" /></label>
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in Model.Transaction)
+        {
+            <tr>
+                <td id="transaction-name-@transaction.Id">@transaction.Name</td>
+                <td id="transaction-name-@transaction.Id">@transaction.Date</td>
+                <td id="transaction-name-@transaction.Id">@transaction.Amount</td>
+                <td id="transaction-name-@transaction.Id">
+                    @(transaction.Category != null ? transaction.Category.Name : "No Category")
+                </td>
+                <td>
+                    <button class="btn btn-warning" onclick="openEditModal(@transaction.Id)">Edit</button>
+
+                    <form asp-action="Delete" method="post" style="display:inline;" data-id="@transaction.Id">
+                        <input type="hidden" name="id" value="@transaction.Id" />
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete(@transaction.Id, '@transaction.Name')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        function openCreateModal() {
+            $.get('/Transactions/Create', function (response) {
+                $('#modal-container').html(response);
+                $('#create-modal').modal('show');
+                $.validator.unobtrusive.parse($('#create-form'));
+            });
+        }
+
+        function openEditModal(id) {
+            $.get(`/Transactions/Details/${id}`, function (response) {
+                $('#modal-container').html(response);
+                $('#edit-modal').modal('show');
+                $.validator.unobtrusive.parse($('#edit-form'));
+            });
+        }
+
+        function loadEditModal(id) {
+            $.get(`/Transactions/Details/${id}`, function (response) {
+                $('#modal-container').html(response); 
+                $('#edit-modal').modal('show');
+            });
+        }
+
+        function confirmDelete(id, name) {
+            $('#confirmationMessage').text(`Are you sure you want to delete the category: ${name}?`);
+            $('#confirmActionButton').off('click').on('click', function () {
+                $(`form[action="/Categories/Delete"][data-id="${id}"]`).submit();
+                $('#confirmationModal').modal('hide');
+            });
+            $('#confirmationModal').modal('show');
+        }
+    </script>
+}
