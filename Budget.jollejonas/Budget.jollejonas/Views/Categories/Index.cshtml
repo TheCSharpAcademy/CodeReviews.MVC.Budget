@@ -1,0 +1,64 @@
+﻿@model IEnumerable<Budget.jollejonas.Models.Category>
+
+<h1>Categories</h1>
+
+<button class="btn btn-primary" onclick="openCreateModal()">Add Category</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td id="category-name-@category.Id">@category.Name</td>
+                <td>
+                    <button class="btn btn-warning" onclick="openEditModal(@category.Id)">Edit</button>
+
+                    <form asp-action="Delete" method="post" style="display:inline;" data-id="@category.Id">
+                        <input type="hidden" name="id" value="@category.Id" />
+                        <button type="button" class="btn btn-danger" onclick="confirmDelete(@category.Id, '@category.Name')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        function openCreateModal() {
+            $.get('/Categories/Create', function (response) {
+                $('#modal-container').html(response);
+                $('#create-modal').modal('show');
+            });
+        }
+
+        function openEditModal(id) {
+            $.get(`/Categories/Details/${id}`, function (response) {
+                $('#modal-container').html(response); 
+                $('#edit-modal').modal('show');
+            });
+        }
+
+        function loadEditModal(id) {
+            $.get(`/Categories/Details/${id}`, function (response) {
+                $('#modal-container').html(response);
+                $('#edit-modal').modal('show');
+            });
+        }
+
+        function confirmDelete(id, name) {
+            $('#confirmationMessage').text(`Are you sure you want to delete the category: ${name}?`);
+            $('#confirmActionButton').off('click').on('click', function () {
+                $(`form[action="/Categories/Delete"][data-id="${id}"]`).submit();
+                $('#confirmationModal').modal('hide');
+            });
+            $('#confirmationModal').modal('show');
+        }
+    </script>
+}
